@@ -1,23 +1,29 @@
 Package: diseasystore
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: feature store handler for the diseasy framework
+Version: 0.0.0.9001
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Rasmus Skytte", "Randløv", , "rske@ssi.dk", c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5860-3838"))
+Description: This package handles the feature store data model for the diseasy framework.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
+Language: en-GB
+Imports:
+    checkmate,
+    DBI,
+    dplyr,
+    glue,
+    lubridate,
+    purrr,
+    rlang,
+    stringr,
+    tidyr,
+    tidyselect,
+    zoo
 Suggests: 
     knitr,
     rmarkdown,
     spelling
 VignetteBuilder: knitr
-URL: https://github.com/RasmusSkytte/diseasystore,
-    https://rasmusskytte.github.io/diseasystore/
-BugReports: https://github.com/RasmusSkytte/diseasystore/issues
-Imports: 
-    lifecycle
-Language: en-GB
