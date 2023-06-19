@@ -65,7 +65,9 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(
       # features are requested.
 
       # Manually perform filtering
-      if (is.null(aggregation_features) || (!is.null(aggregation_features) && aggregation_features %in% c("country_id", "country", "region_id", "region", "subregion_id", "subregion"))) {
+      if (is.null(aggregation_features) ||
+         (!is.null(aggregation_features) &&
+          aggregation_features %in% c("country_id", "country", "region_id", "region", "subregion_id", "subregion"))) {
 
         # If no spatial aggregation is requested, use the largest available per country
         filter_level <- fs$get_feature("country_id") |>
