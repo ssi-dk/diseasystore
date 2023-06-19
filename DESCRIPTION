@@ -1,6 +1,6 @@
 Package: diseasystore
 Title: feature store handler for the diseasy framework
-Version: 0.0.0.9001
+Version: 0.0.0.9002
 Authors@R:
     c(person("Rasmus Skytte", "Randløv", , "rske@ssi.dk", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-5860-3838")),
@@ -19,6 +19,7 @@ Language: en-GB
 Imports:
     checkmate,
     DBI,
+    dbplyr,
     dplyr,
     glue,
     lubridate,

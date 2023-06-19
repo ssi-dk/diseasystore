@@ -8,3 +8,9 @@ tbl
 dbi
 conn
 cloneable
+COVID
+DBIConnection
+DBIDriver
+POSIXct
+PascalCase
+colname
