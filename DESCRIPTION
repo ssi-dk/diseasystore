@@ -24,8 +24,10 @@ Imports:
     glue,
     lubridate,
     purrr,
+    readr,
     rlang,
     stringr,
+    testthat,
     tidyr,
     tidyselect,
     zoo
@@ -34,3 +36,4 @@ Suggests:
     rmarkdown,
     spelling
 VignetteBuilder: knitr
+Config/testthat/edition: 3

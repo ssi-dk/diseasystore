@@ -86,9 +86,9 @@ Computes, stores, and returns the requested feature for the study period.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$get_feature(
   feature,
-  start_date = purrr::pluck(private, "start_date"),
-  end_date = purrr::pluck(private, "end_date"),
-  slice_ts = purrr::pluck(private, "slice_ts")
+  start_date = private \%.\% start_date,
+  end_date = private \%.\% end_date,
+  slice_ts = private \%.\% slice_ts
 )}\if{html}{\out{</div>}}
 }
 
