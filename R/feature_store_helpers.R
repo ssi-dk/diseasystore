@@ -94,9 +94,11 @@ interlace <- function(primary, secondary = NULL) {
 
 # Existence operator
 `%.%` <- function(env, field) {
-  field <- as.character(substitute(field))
-  if (!(field %in% ls(env))) {
-    stop(field, " not found in ", as.character(substitute(env)))
+  field_name <- as.character(substitute(field))
+  env_name <- as.character(substitute(env))
+  if (is.environment(env)) env <- as.list(env)
+  if (!(field_name %in% names(env))) {
+    stop(field_name, " not found in ", env_name)
   }
-  return(purrr::pluck(env, field))
+  return(purrr::pluck(env, field_name))
 }
