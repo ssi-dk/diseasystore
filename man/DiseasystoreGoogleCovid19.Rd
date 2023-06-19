@@ -7,7 +7,7 @@
 TODO
 }
 \section{Super class}{
-\code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
+\code{diseasystore::DiseasystoreBase} -> \code{DiseasystoreGoogleCovid19}
 }
 \section{Methods}{
 \subsection{Public methods}{

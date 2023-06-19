@@ -2,7 +2,7 @@
 title: "Disesystore: Google COVID-19 data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Disesystore: Google COVID-19 data}
+  %\VignetteIndexEntry{diseasystore: Google COVID-19 data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

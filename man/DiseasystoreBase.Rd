@@ -35,8 +35,8 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
   start_date = NULL,
   end_date = NULL,
   slice_ts = NULL,
-  source_conn = private$source_conn,
-  target_conn = private$target_conn,
+  source_conn = NULL,
+  target_conn = NULL,
   verbose = TRUE
 )}\if{html}{\out{</div>}}
 }
