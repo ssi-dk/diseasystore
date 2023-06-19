@@ -45,6 +45,9 @@ get_diseasystore <- function(case_definition) {
   return(get(diseasystore_case_definition(case_definition)))
 }
 
+# #' @importFrom rlang .data
+# #' @export
+# drop_feature_store <- function(conn, pattern = NULL) {
 
 interlace <- function(primary, secondary = NULL) {
 
