@@ -4,7 +4,9 @@ test_that("DiseasystoreGoogleCovid19 works", {
   remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
   tmp_dir <- tempdir()
   options(diseasystore.DiseasystoreGoogleCovid19.source_conn = tmp_dir)
-  options(diseasystore.DiseasystoreGoogleCovid19.target_conn = \() dbConnect(RSQLite::SQLite(), file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")))
+
+  target_conn <- \() dbConnect(RSQLite::SQLite(), file.path(tmp_dir, "diseasystore_google_covid_19.sqlite"))
+  options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 
 
   # Then we download the first n rows of each data set of interest

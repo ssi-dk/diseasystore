@@ -1679,4 +1679,3 @@ auto_comment <- function(conn, db_table, timestamp = glue::glue("{today()} 09:00
   purrr::pwalk(dplyr::collect(auto_comments),
        ~ mg_db_comment(conn, ..4, column = ..1, comment = ..3, auto_generated = TRUE, timestamp = timestamp))
 }
-

@@ -6,7 +6,7 @@ diseasystore_case_definition <- function(case_definition) {
     stringr::str_to_title() |>
     stringr::str_replace_all(" ", "") |>
     stringr::str_replace_all("-", "") |>
-    (\(.)paste0("Diseasystore", .))()
+    (\(.) paste0("Diseasystore", .))()
 
 }
 

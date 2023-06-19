@@ -26,7 +26,7 @@ First, it is a good idea to copy the relevant Google COVID-19 data files locally
 options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "/local/file/path") # Should not end with "/"
 
 # Define the Google files to download
-google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv") 
+google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 
 # Download each file and compress them to reduce storage
 #' \dontrun{
@@ -46,7 +46,8 @@ NOTE: a global DB can also be configured using `options(diseasystore.target_conn
 ```{r init_diseasystore, eval=FALSE}
 
 # We will store the target_conn as a function that opens a DBIconnection to the DB
-options(diseasystore.DiseasystoreGoogleCovid19.target_conn = \() dbConnect(RSQLite::SQLite(), "/local/file/path/diseasystore_google_covid_19.sqlite")) 
+target_conn <- \() dbConnect(RSQLite::SQLite(), "/local/file/path/diseasystore_google_covid_19.sqlite")
+options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 ```
 
 

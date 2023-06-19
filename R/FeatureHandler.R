@@ -2,7 +2,7 @@
 #'
 #' @description TODO
 #' @export
-FeatureHandler <- R6::R6Class(
+FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
   classname = "FeatureHandler",
 
   public = list(
@@ -31,10 +31,10 @@ FeatureHandler <- R6::R6Class(
         }))
       }
       if (is.null(compute)) {
-        args <- append(args, c("compute" = \(...) {stop("compute not configured!")}))
+        args <- append(args, c("compute" = \(...) stop("compute not configured!")))
       }
       if (is.null(key_join)) {
-        args  <- append(args, c("key_join" = \(...) {stop("key_join not configured!")}))
+        args  <- append(args, c("key_join" = \(...) stop("key_join not configured!")))
       }
 
       # Set the functions of the FeatureHandler
