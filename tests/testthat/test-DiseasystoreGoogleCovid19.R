@@ -1,7 +1,7 @@
-test_that("multiplication works", {
+test_that("DiseasystoreGoogleCovid19 works", {
 
   # First we create a temporary directory for the Google COVID-19 data
-  remote_conn <- getOption("diseasystore.DiseasystoreGoogleCovid19.remote_conn", default = stop("Option not set"))
+  remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
   tmp_dir <- tempdir()
   options(diseasystore.DiseasystoreGoogleCovid19.source_conn = tmp_dir)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = \() dbConnect(RSQLite::SQLite(), file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")))
@@ -16,4 +16,16 @@ test_that("multiplication works", {
 
   fs <- DiseasystoreGoogleCovid19$new()
 
+  # Check feature store has been created
+  expect_class(fs, "DiseasystoreGoogleCovid19")
+
+  # Check all FeatureHandlers have been initialized
+  private <- fs$.__enclos_env__$private
+  feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
+    purrr::map(~ purrr::pluck(private, .)) |>
+    purrr::walk(~ \(fh) {
+      checkmate::expect_function(fh %.% compute)
+      checkmate::expect_function(fh %.% get)
+      checkmate::expect_function(fh %.% key_join)
+    })
 })
