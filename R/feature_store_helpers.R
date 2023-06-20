@@ -13,7 +13,7 @@ diseasystore_case_definition <- function(case_definition) {
 
 #' Detect available diseasystores
 #' @export
-available_diseasy_stores <- function() {
+available_diseasystores <- function() {
   ls("package:diseasystore") |>
     purrr::keep(~ startsWith(., "Diseasystore")) |>
     purrr::discard(~ . %in% c("DiseasystoreBase", "DiseasystoreGeneric"))
@@ -22,21 +22,21 @@ available_diseasy_stores <- function() {
 #' Check for the existence of a `diseasystore` for the case definition
 #' @template case_definition
 #' @export
-feature_store_exists <- function(case_definition) {
+diseasystore_exists <- function(case_definition) {
 
   checkmate::assert_character(case_definition)
 
   # Convert case_definition to DiseasystorePascalCase and check existence
-  return(diseasystore_case_definition(case_definition) %in% available_diseasy_stores())
+  return(diseasystore_case_definition(case_definition) %in% available_diseasystores())
 
 }
 
 #' Get the `diseasystore` for the case definition
 #' @template case_definition
 #' @export
-get_feature_store <- function(case_definition) {
+get_diseasystore <- function(case_definition) {
 
-  checkmate::assert_true(feature_store_exists(case_definition))
+  checkmate::assert_true(diseasystore_exists(case_definition))
 
   return(get(diseasystore_case_definition(case_definition)))
 }

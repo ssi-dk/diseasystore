@@ -29,8 +29,8 @@ TODO
 \if{html}{\out{<a id="method-DiseasystoreGoogleCovid19-key_join_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreGoogleCovid19-key_join_filter}{}}}
 \subsection{Method \code{key_join_filter()}}{
-This function implements an intermediate filtering in the aggreagtion pipeline.
-For semi-aggreagted data like Googles COVID-19 data, some people are counted more than once.
+This function implements an intermediate filtering in the aggregation pipeline.
+For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
 The \code{key_join_filter} is inserted into the aggregation pipeline to remove this double counting.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(.data, aggregation_features)}\if{html}{\out{</div>}}

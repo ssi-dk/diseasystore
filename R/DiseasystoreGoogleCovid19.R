@@ -48,8 +48,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(
   public = list(
 
     #' @description
-    #'   This function implements an intermediate filtering in the aggreagtion pipeline.
-    #'   For semi-aggreagted data like Googles COVID-19 data, some people are counted more than once.
+    #'   This function implements an intermediate filtering in the aggregation pipeline.
+    #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
     #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
     #' @template .data
     #' @param aggregation_features (`character`)\cr
@@ -273,6 +273,6 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(
 )
 
 # Set default options for the package related to the Google COVID-19 store
-options(diseasystore.DiseasystoreGoogleCovid19.remote_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
-options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
-options(diseasystore.DiseasystoreGoogleCovid19.target_conn = NULL)
+  options(diseasystore.DiseasystoreGoogleCovid19.remote_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
+  options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
+  options(diseasystore.DiseasystoreGoogleCovid19.target_conn = NULL)

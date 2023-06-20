@@ -1,9 +1,3 @@
-Rasmus
-Skytte
-Lasse
-Engbo
-ORCID
-
 cloneable
 conn
 COVID
@@ -15,11 +9,20 @@ DBIDriver
 diseasy
 diseasystores
 
+Engbo
+
 FeatureHandler
 
+Lasse
+
 tbl
+
+ORCID
 
 PascalCase
 POSIXct
 
+Rasmus
+
+Skytte
 
