@@ -244,14 +244,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Add the new valid counts
       t_add <- out |>
-        dplyr::group_by(date = valid_from, .add = T) |>
+        dplyr::group_by(date = valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename(n_add = n) |>
         dplyr::compute()
 
       # Add the new invalid counts
       t_remove <- out |>
-        dplyr::group_by(date = valid_until, .add = T) |>
+        dplyr::group_by(date = valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename(n_remove = n) |>
         dplyr::compute()
@@ -262,7 +262,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       if (!is.null(aggregation)) {
         all_combi <- out |>
           dplyr::distinct(!!!aggregation) |>
-          dplyr::full_join(all_dates, by = character(), copy = T) |>
+          dplyr::full_join(all_dates, by = character(), copy = TRUE) |>
           dplyr::compute()
       } else {
         all_combi <- all_dates
