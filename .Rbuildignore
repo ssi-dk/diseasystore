@@ -4,3 +4,6 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+.lintr
+man-roxygen
+^LICENSE\.md$
