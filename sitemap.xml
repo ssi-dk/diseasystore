@@ -4,6 +4,9 @@
     <loc>https://rasmusskytte.github.io/diseasystore/404.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/LICENSE.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasystore/articles/index.html</loc>
   </url>
   <url>
@@ -17,6 +20,12 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/DiseasystoreBase.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore-package.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/index.html</loc>
