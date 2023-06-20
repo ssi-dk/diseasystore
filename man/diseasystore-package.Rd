@@ -13,5 +13,12 @@ This package handles the feature store data model for the diseasy framework.
 \author{
 \strong{Maintainer}: Rasmus Skytte Randløv \email{rske@ssi.dk} (\href{https://orcid.org/0000-0002-5860-3838}{ORCID})
 
+Authors:
+\itemize{
+  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID})
+  \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID})
+  \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
+}
+
 }
 \keyword{internal}
