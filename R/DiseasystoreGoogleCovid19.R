@@ -138,7 +138,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
                             values_to = out_name) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate(valid_from = as.Date("2020-01-01"), valid_until = as.Date(NA))
+        dplyr::mutate(valid_from = date, valid_until = as.Date(date + lubridate::days(1)))
 
       return(data)
     },
