@@ -46,7 +46,6 @@ test_that("DiseasystoreGoogleCovid19 works", {
     ~ {
         feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
           dplyr::collect() |>
-          #filter(valid_from > 18321) |>
           mg_digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -65,6 +64,34 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
         expect_identical(feature, reference)
     })
+
+
+  # Attempt to get features from the feature store (using different dates)
+  # then check that they match the expected value from the generators
+  start_date <- as.Date("2020-04-01")
+  end_date   <- as.Date("2020-11-30")
+  purrr::walk2(fs$available_features, names(fs$fs_map),
+   ~ {
+       feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
+         dplyr::collect() |>
+         mg_digest_to_checksum() |>
+         dplyr::pull("checksum") |>
+         sort()
+
+       reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+
+       reference <- reference_generator(start_date  = start_date,
+                                        end_date    = end_date,
+                                        slice_ts    = fs$.__enclos_env__$private$slice_ts,
+                                        source_conn = fs$.__enclos_env__$private$source_conn) %>%
+         dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
+         dplyr::collect() |>
+         mg_digest_to_checksum() |>
+         dplyr::pull("checksum") |>
+         sort()
+
+       expect_identical(feature, reference)
+     })
 
   # Cleanup
   rm(fs)
