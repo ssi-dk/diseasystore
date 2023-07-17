@@ -5,7 +5,9 @@ test_that("DiseasystoreGoogleCovid19 works", {
   tmp_dir <- tempdir()
   options(diseasystore.DiseasystoreGoogleCovid19.source_conn = tmp_dir)
 
-  target_conn <- \() dbConnect(RSQLite::SQLite(), file.path(tmp_dir, "diseasystore_google_covid_19.sqlite"))
+  sqlite_path <- file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")
+  if (file.exists(sqlite_path)) unlink(sqlite_path)
+  target_conn <- \() dbConnect(RSQLite::SQLite(), sqlite_path)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 
 
@@ -16,7 +18,11 @@ test_that("DiseasystoreGoogleCovid19 works", {
     readr::write_csv(file.path(tmp_dir, .))
   })
 
-  fs <- DiseasystoreGoogleCovid19$new()
+  start_date <- as.Date("2020-03-01")
+  end_date   <- as.Date("2020-12-31")
+  fs <- DiseasystoreGoogleCovid19$new(start_date = start_date,
+                                      end_date   = end_date,
+                                      verbose = FALSE)
 
   # Check feature store has been created
   expect_class(fs, "DiseasystoreGoogleCovid19")
@@ -24,10 +30,42 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Check all FeatureHandlers have been initialized
   private <- fs$.__enclos_env__$private
   feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
-    purrr::map(~ purrr::pluck(private, .)) |>
-    purrr::walk(~ \(fh) {
-      checkmate::expect_function(fh %.% compute)
-      checkmate::expect_function(fh %.% get)
-      checkmate::expect_function(fh %.% key_join)
+    purrr::map(~ purrr::pluck(private, .))
+
+  purrr::walk(feature_handlers,
+    ~ {
+        expect_class(.x, "FeatureHandler")
+        checkmate::expect_function(.x %.% compute)
+        checkmate::expect_function(.x %.% get)
+        checkmate::expect_function(.x %.% key_join)
     })
+
+  # Attempt to get features from the feature store
+  # then check that they match the expected value from the generators
+  purrr::walk2(fs$available_features, names(fs$fs_map),
+    ~ {
+        feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
+          dplyr::collect() |>
+          #filter(valid_from > 18321) |>
+          mg_digest_to_checksum() |>
+          dplyr::pull("checksum") |>
+          sort()
+
+        reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+
+        reference <- reference_generator(start_date  = start_date,
+                                         end_date    = end_date,
+                                         slice_ts    = fs$.__enclos_env__$private$slice_ts,
+                                         source_conn = fs$.__enclos_env__$private$source_conn) %>%
+          dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
+          dplyr::collect() |>
+          mg_digest_to_checksum() |>
+          dplyr::pull("checksum") |>
+          sort()
+
+        expect_identical(feature, reference)
+    })
+
+  # Cleanup
+  rm(fs)
 })
