@@ -116,7 +116,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Inform that we are computing features
       tic <- Sys.time()
       if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
-          cat(glue::glue("feature: {feature} needs to be computed on the specified date interval.",
+          cat(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
                          "please wait..."))
       }
 
@@ -146,13 +146,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         # Commit to DB
         capture.output(
           mg_update_snapshot(.data = fs_updated_feature,
-                              conn = private %.% target_conn,
-                              db_table = target_table,
-                              timestamp = slice_ts,
-                              message = glue::glue("fs-range: {start_date} - {end_date}"),
+                             conn = private %.% target_conn,
+                             db_table = target_table,
+                             timestamp = slice_ts,
+                             message = glue::glue("fs-range: {start_date} - {end_date}"),
                              log_path = NULL, # no log file, but DB logging still enabled
                              log_db = paste0(private %.% target_schema, "logs", collapse = "."),
-                              enforce_chronological_order = FALSE))
+                             enforce_chronological_order = FALSE))
       })
 
       # Inform how long has elapsed for updating data
@@ -163,7 +163,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Finally, return the data to the user
       out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
-              args = list(target_table = target_table,
+                     args = list(target_table = target_table,
                                  slice_ts = slice_ts, target_conn = private %.% target_conn))
 
       # We need to slice to the period of interest.

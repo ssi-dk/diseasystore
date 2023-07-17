@@ -22,7 +22,7 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
     initialize = function(compute = NULL, get = NULL, key_join = NULL) {
 
       # Determine given args
-      args <- list()
+      args <- as.list(c(compute = compute, get = get, key_join = key_join))
 
       # Set defaults for missing functions
       if (is.null(get)) {
