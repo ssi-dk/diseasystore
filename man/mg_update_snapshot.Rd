@@ -12,8 +12,8 @@ mg_update_snapshot(
   filters = NULL,
   message = NULL,
   tic = Sys.time(),
-  log_file = TRUE,
-  log_db = "prod.logs",
+  log_path = getOption("mg.log_path"),
+  log_db = getOption("mg.log_db"),
   enforce_chronological_order = TRUE
 )
 
@@ -25,8 +25,8 @@ mg_update_snapshot(
   filters = NULL,
   message = NULL,
   tic = Sys.time(),
-  log_file = TRUE,
-  log_db = "prod.logs",
+  log_path = getOption("mg.log_path"),
+  log_db = getOption("mg.log_db"),
   enforce_chronological_order = TRUE
 )
 }
@@ -43,11 +43,14 @@ mg_update_snapshot(
 
 \item{message}{A message to add to the log-file (useful for supplying metadata to the log)}
 
-\item{tic}{A timestamp when computation began. If not supplied, it will be created at call-time. (Used to more accurately convey how long runtime of the update process has been)}
+\item{tic}{A timestamp when computation began. If not supplied, it will be created at call-time.
+(Used to more accurately convey how long runtime of the update process has been)}
 
-\item{log_file}{A logical that controls whether or not to produce a log file (useful for debugging). TRUE: log file is produced and copied to DB. FALSE: no log file and no updates to DB. NULL: no logfile but DB is updated}
+\item{log_path}{The path where logs are stored.
+If NULL, no file logs are created.}
 
-\item{log_db}{The log table in the DB where logging information should be stored (default prod.logs)}
+\item{log_db}{The specification to where db logs are stored ("schema.table").
+If NULL, no db logs are created.}
 
 \item{enforce_chronological_order}{A logical that controls whether or not to check if timestamp of update is prior to timstamps in the DB}
 }

@@ -4,12 +4,15 @@
 \alias{mg_digest_to_checksum}
 \title{Computes an MD5 checksum from columns}
 \usage{
-mg_digest_to_checksum(.data, col = "checksum", warn = TRUE)
+mg_digest_to_checksum(.data, col = "checksum", exclude = NULL, warn = TRUE)
 }
 \arguments{
-\item{.data}{A tbl object. Typically a lazy query to the DB (from mg::get_table())}
+\item{.data}{\cr
+The data object to perform the operation on}
 
 \item{col}{Name of the column to put the checksums in}
+
+\item{exclude}{Columns to exclude from the checksum generation}
 
 \item{warn}{Flag to warn if target column already exists in data}
 }

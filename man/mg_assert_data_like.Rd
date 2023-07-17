@@ -4,12 +4,14 @@
 \alias{mg_assert_data_like}
 \title{checkmate helper: Check for "generic" data.table/data.frame/tbl/tibble type}
 \usage{
-mg_assert_data_like(.data, ...)
+mg_assert_data_like(.data, ..., add = NULL)
 }
 \arguments{
 \item{.data}{Object to test if is data.table, data.frame, tbl or tibble}
 
 \item{...}{parameters passed to checkmate::check_*}
+
+\item{add}{\code{AssertCollection} to add asertions to}
 }
 \description{
 checkmate helper: Check for "generic" data.table/data.frame/tbl/tibble type

@@ -13,6 +13,9 @@ It defines the primary methods of each feature stores as well as all of the publ
 \item{\code{fs_map}}{(\verb{named list}(\code{character}))\cr
 A list that maps features known by the feature store to the corresponding feature handlers
 that compute the features.}
+
+\item{\code{available_features}}{(\code{character})\cr
+A list of available features in the feature store}
 }
 \if{html}{\out{</div>}}
 }
