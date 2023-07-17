@@ -162,10 +162,19 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Finally, return the data to the user
-      do.call(what = purrr::pluck(private, feature_loader) %.% get,
+      out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
               args = list(target_table = target_table,
-                          slice_ts = slice_ts, target_conn = private %.% target_conn)) |>
-        dplyr::filter(valid_from <= !!end_date, !!start_date < valid_until | is.na(valid_until))
+                                 slice_ts = slice_ts, target_conn = private %.% target_conn))
+
+      # We need to slice to the period of interest.
+      # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
+      dplyr::inner_join(out,
+                        data.frame(valid_from = start_date, valid_until = end_date) %>%
+                          dplyr::copy_to(private %.% target_conn, ., "fs_tmp", overwrite = TRUE),
+                        sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
+                                  ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
+                        suffix = c("", ".p")) |>
+        dplyr::select(!c("valid_from.p", "valid_until.p"))
 
     },
 
