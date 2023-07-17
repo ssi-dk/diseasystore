@@ -340,6 +340,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       return(c(fs_generic, fs_specific))
+    },
+
+
+    #' @field available_features (`character`)\cr
+    #'   A list of available features in the feature store
+    available_features = function() {
+      return(unlist(self$fs_map, use.names = FALSE))
     }
   ),
 
