@@ -103,8 +103,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine which feature_loader should be called
       feature_loader <- names(fs_map[fs_map == feature])
 
+      # Create log table
+      mg_create_logs_if_missing(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)
+
       # Determine which dates need to be computed
-      target_table <- paste("fs", feature_loader, sep = ".")
+      target_table <- paste0(c(private %.% target_schema, feature_loader), collapse = ".")
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date = start_date,
                                                         end_date   = end_date,
@@ -147,8 +150,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                               db_table = target_table,
                               timestamp = slice_ts,
                               message = glue::glue("fs-range: {start_date} - {end_date}"),
-                              log_file = NULL, # no log file, but DB logging still enabled
-                              log_db = "fs.logs",
+                             log_path = NULL, # no log file, but DB logging still enabled
+                             log_db = paste0(private %.% target_schema, "logs", collapse = "."),
                               enforce_chronological_order = FALSE))
       })
 
@@ -349,34 +352,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
     verbose = TRUE,
 
-    craete_logs_if_missing = function() {
-      if (!mg_table_exists(private %.% target_conn, "fs.logs")) {
-        log_signature <- tibble::tibble(date = as.POSIXct(NA),
-                                        schema = NA_character_,
-                                        table = NA_character_,
-                                        n_insertions = NA_integer_,
-                                        n_deactivations = NA_integer_,
-                                        start_time = as.POSIXct(NA),
-                                        end_time = as.POSIXct(NA),
-                                        duration = NA_character_,
-                                        success = NA,
-                                        message = NA_character_,
-                                        log_file = NA_character_) |>
-          head(0)
-
-        DBI::dbWriteTable(conn, DBI::Id(schema = "fs", table = "logs"), log_signature)
-      }
-    },
-
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
-      private$craete_logs_if_missing()
-
       # Get a list of the logs for the target_table on the slice_ts
-      logs <- dplyr::tbl(private %.% target_conn, mg_in_schema("fs.logs")) |>
-        tidyr::unite("target_table", "schema", "table", sep = ".") |>
-        dplyr::filter(target_table == !!target_table, date == !!slice_ts) |>
-        dplyr::collect()
+      logs <- dplyr::tbl(private %.% target_conn,
+                         mg_id(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)) |>
+        dplyr::collect() |>
+        tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
+        dplyr::filter(target_table == !!target_table, date == !!slice_ts)
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
