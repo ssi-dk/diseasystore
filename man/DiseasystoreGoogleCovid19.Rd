@@ -9,7 +9,7 @@ Health COVID 19 Open Data repository.
 See the vignette("google_covid_19_data") for details on how to configure the feature store
 }
 \section{Super class}{
-\code{diseasystore::DiseasystoreBase} -> \code{DiseasystoreGoogleCovid19}
+\code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
 }
 \section{Methods}{
 \subsection{Public methods}{

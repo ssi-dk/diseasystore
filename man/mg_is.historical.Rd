@@ -2,7 +2,7 @@
 % Please edit documentation in R/mg_reexports.R
 \name{mg_is.historical}
 \alias{mg_is.historical}
-\title{Checks if lazy_query query contains historical data}
+\title{Checks if table contains historical data}
 \usage{
 mg_is.historical(.data)
 }
@@ -14,5 +14,5 @@ The data object to perform the operation on}
 TRUE if .data contains the columns: "checksum", "from_ts", and "until_ts". FALSE otherwise
 }
 \description{
-Checks if lazy_query query contains historical data
+Checks if table contains historical data
 }

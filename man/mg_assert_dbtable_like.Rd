@@ -4,12 +4,14 @@
 \alias{mg_assert_dbtable_like}
 \title{checkmate helper: Check for "generic" db_table type}
 \usage{
-mg_assert_dbtable_like(db_table, ...)
+mg_assert_dbtable_like(db_table, ..., add = NULL)
 }
 \arguments{
 \item{db_table}{Object to test if is of class "tbl_dbi" or character on form "schema.table"}
 
 \item{...}{parameters passed to checkmate::check_*}
+
+\item{add}{\code{AssertCollection} to add asertions to}
 }
 \description{
 checkmate helper: Check for "generic" db_table type

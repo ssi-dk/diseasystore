@@ -4,12 +4,14 @@
 \alias{mg_assert_timestamp_like}
 \title{checkmate helper: Check for "generic" timestamp type}
 \usage{
-mg_assert_timestamp_like(timestamp, ...)
+mg_assert_timestamp_like(timestamp, ..., add = NULL)
 }
 \arguments{
 \item{timestamp}{Object to test if is POSIX or character}
 
 \item{...}{parameters passed to checkmate::check_*}
+
+\item{add}{\code{AssertCollection} to add asertions to}
 }
 \description{
 checkmate helper: Check for "generic" timestamp type

@@ -333,12 +333,38 @@ mg_join_warn_experimental <- function() {
 
 
 
-#' Combine any number of sql queries, where each has their own time axis of
-#' validity (valid_from and valid_until)
 #'
-#' @description
-#' The function "interlaces" the queries and combines their validity time axes
-#' onto a single time axis
+# It seems we need to do more hacking since
+# @importFrom openssl md5 does not work in the below usecase.
+# defining md5 here succesfully causes local objects to use the openssl md5 function
+# and remote objects to use their own md5 functions.
+md5 <- openssl::md5
+
+
+#' Some backends have native md5 support, these use this function
+#' @importFrom rlang `:=`
+mg_digest_to_checksum_native_md5 <- function(.data, col) {
+
+  .data <- .data |>
+    tidyr::unite(!!col, tidyselect::ends_with(".__chr"), remove = TRUE) |>
+    dplyr::mutate(dplyr::across(tidyselect::all_of(col), md5))
+
+  return(.data)
+}
+
+
+#' Some backends have native md5 support, these use this function
+#' @importFrom rlang `:=`
+mg_digest_to_checksum_native_md5 <- function(.data, col) {
+
+  .data <- .data |>
+    tidyr::unite(!!col, tidyselect::ends_with(".__chr"), remove = TRUE) |>
+    dplyr::mutate(dplyr::across(tidyselect::all_of(col), md5))
+
+  return(.data)
+}
+
+
 #'
 #' @param tables    A list(!) of tables you want to combine is supplied here as
 #'                  lazy_queries.
@@ -353,14 +379,17 @@ mg_join_warn_experimental <- function() {
 #'                  valid_from / valid_until time axis
 #' @rdname mg_reexports
 #' @export
-mg_interlace_sql <- function(tables, by = NULL, colnames = NULL) {
+mg_create_table <- function(.data, conn = NULL, db_table_id = NULL, temporary = TRUE, ...) {
 
-  # Check arguments
-  checkmate::assert_character(by)
-  # TODO: how to checkmate tables and colnames?
+  checkmate::assert_class(.data, "data.frame")
+  checkmate::assert_class(conn, "DBIConnection", null.ok = TRUE)
+  checkmate::assert(
+    checkmate::check_class(db_table_id, "Id", null.ok = TRUE),
+    checkmate::check_character(db_table_id, len = 1)
+  )
 
-  # Check edgecase
-  if (length(tables) == 1) return(purrr::pluck(tables, 1))
+  # Assert unique column names (may cause unexpected mg_getTableSignature results)
+  checkmate::assert_character(names(.data), unique = TRUE)
 
   # Parse inputs for colnames .from / .to columns
   from_cols <- seq_along(tables) |>
@@ -371,12 +400,25 @@ mg_interlace_sql <- function(tables, by = NULL, colnames = NULL) {
     purrr::map_chr(\(t) paste0("t", t, ".until")) |>
     purrr::map_chr(\(col) ifelse(col %in% names(colnames), colnames[col], "valid_until"))
 
+  # Add "metadata" columns to .data
+  .data <- .data |>
+    dplyr::mutate(checksum = NA_character_,
+                  from_ts  = as.POSIXct(NA_real_),
+                  until_ts = as.POSIXct(NA_real_),
+                  .after = tidyselect::everything())
 
   # Rename valid_from / valid_until columns
   tables <- tables |>
     purrr::map2(from_cols,  \(table, from_col)  table |> dplyr::rename(valid_from  = !!from_col)) |>
     purrr::map2(until_cols, \(table, until_col) table |> dplyr::rename(valid_until = !!until_col))
 
+  # Create the table on the remote and return the table
+  stopifnot("Table already exists!" = !mg_table_exists(conn, db_table_id))
+  DBI::dbCreateTable(conn = conn,
+                     name = db_table_id,
+                     fields = mg_getTableSignature(.data = .data, conn = conn),
+                     temporary = temporary,
+                     ...)
 
   # Get all changes to valid_from / valid_until
   q1 <- tables |> purrr::map(\(table) table |>
