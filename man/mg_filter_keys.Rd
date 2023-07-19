@@ -10,7 +10,7 @@ mg_filter_keys(.data, filters, by = NULL, na_by = NULL)
 \item{.data}{\cr
 The data object to perform the operation on}
 
-\item{filters}{A filter to subset data by.  if filters == NULL, no filtering occurs. Else, an inner_join is performed using all columns of the filter}
+\item{filters}{A filter to subset data by.  if filters == NULL, no filtering occurs. Else, an mg_inner_join is performed using all columns of the filter}
 
 \item{by}{passed to mg_inner_join if different from NULL}
 
