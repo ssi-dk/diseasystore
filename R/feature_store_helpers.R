@@ -41,29 +41,6 @@ get_diseasystore <- function(case_definition) {
   return(get(diseasystore_case_definition(case_definition)))
 }
 
-# #' @importFrom rlang .data
-# #' @export
-# drop_feature_store <- function(conn, pattern = NULL) {
-
-#   # Get tables to delete
-#   tables_to_delete <- mg_get_tables(conn, pattern) |>
-#     dplyr::filter(.data$schema == "fs")
-
-#   # Check if logs is in the table, if yes, all tables must be deleted
-#   if ("logs" %in% tables_to_delete$table &&
-#       !identical(tables_to_delete, dplyr::filter(mg_get_tables(conn), .data$schema == private %.% target_schema))) {
-#     stop("'fs.logs' set to delete. Can only delete if entire featurestore is dropped.")
-#   }
-
-#   tables_to_delete |>
-#     purrr::pwalk(~ DBI::dbExecute(conn, glue::glue('DROP TABLE "{..1}"."{..2}"')))
-
-#   # Delete from logs
-#   if (mg_table_exists(conn, "fs.logs")) {
-#     purrr::walk(tables_to_delete$table,
-#      ~ DBI::dbExecute(conn, glue::glue("DELETE FROM fs.logs WHERE logs.table = '{.x}'")))
-#   }
-# }
 
 interlace <- function(primary, secondary = NULL) {
 
@@ -91,6 +68,7 @@ interlace <- function(primary, secondary = NULL) {
 
   return(out)
 }
+
 
 # Existence operator
 `%.%` <- function(env, field) {
