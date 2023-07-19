@@ -45,7 +45,9 @@ test_that("DiseasystoreGoogleCovid19 works", {
   purrr::walk2(fs$available_features, names(fs$fs_map),
     ~ {
         feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect() |>
+          dplyr::collect()
+
+        feature_checksum <- feature |>
           mg_digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -57,12 +59,14 @@ test_that("DiseasystoreGoogleCovid19 works", {
                                          slice_ts    = fs$.__enclos_env__$private$slice_ts,
                                          source_conn = fs$.__enclos_env__$private$source_conn) %>%
           dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
-          dplyr::collect() |>
+          dplyr::collect()
+
+        reference_checksum <- reference |>
           mg_digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
-        expect_identical(feature, reference)
+        expect_identical(feature_checksum, reference_checksum)
     })
 
 

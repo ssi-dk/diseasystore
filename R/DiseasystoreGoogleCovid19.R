@@ -266,7 +266,7 @@ google_covid_19_index_      <- function() {
   )
 }
 
-google_covid_19_min_temperature_ <- function() {
+google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()
@@ -288,7 +288,7 @@ google_covid_19_min_temperature_ <- function() {
   )
 }
 
-google_covid_19_max_temperature_ <- function() {
+google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()
