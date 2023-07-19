@@ -51,7 +51,7 @@ mg_get_tables <- function(conn, pattern = NULL) {
 
   # Subset if pattern is given
   if (!is.null(pattern)) {
-    tables <- subset(tables, table %like% pattern)
+    tables <- subset(tables, grepl(pattern, table))
   }
 
   # Remove empty schemas
@@ -81,9 +81,7 @@ mg_get_table <- function(conn, db_table_id = NULL, slice_ts = NA, include_slice_
 
   # Check arguments
   checkmate::assert_class(conn, "DBIConnection")
-  checkmate::assert(
-    checkmate::check_character(db_table_id, null.ok = TRUE),
-    checkmate::check_class(db_table_id, "Id"), combine = "or")
+  mg_assert_id_like(db_table_id, null.ok = TRUE)
   mg_assert_timestamp_like(slice_ts, null.ok = TRUE)
   checkmate::assert_logical(include_slice_info)
 
@@ -130,25 +128,24 @@ mg_get_table <- function(conn, db_table_id = NULL, slice_ts = NA, include_slice_
 #' Check if table exists in db
 #'
 #' @template conn
-#' @param db_table_name Name of the table to return or a DBI::Id specification of the table to look for.
+#' @template db_table_id
 #' @export
-mg_table_exists <- function(conn, db_table_name) {
+mg_table_exists <- function(conn, db_table_id) {
 
   # Check arguments
-  checkmate::assert(checkmate::check_character(db_table_name),
-                    checkmate::check_class(db_table_name, "Id"), combine = "or")
+  mg_assert_id_like(db_table_id)
 
-  if (inherits(db_table_name, "Id")) {
-    db_name <- attr(db_table_name, "name")
+  if (inherits(db_table_id, "Id")) {
+    db_name <- attr(db_table_id, "name")
     db_schema <- purrr::pluck(db_name, "schema", .default = NA_character_)
     db_table  <- purrr::pluck(db_name, "table")
-    db_table_name <- paste0(purrr::discard(c(db_schema, db_table), is.na), collapse = ".")
+    db_table_id <- paste0(purrr::discard(c(db_schema, db_table), is.na), collapse = ".")
   }
 
   # Determine matches in the existing tables
   n_matches <- mg_get_tables(conn) |>
-    tidyr::unite("db_table_name", "schema", "table", sep = ".", na.rm = TRUE) |>
-    dplyr::filter(db_table_name == !!db_table_name) |>
+    tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE) |>
+    dplyr::filter(db_table_id == !!db_table_id) |>
     mg_nrow()
 
   if (n_matches >= 2) stop("Edge case detected. Cannot determine if table exists!")
@@ -157,426 +154,78 @@ mg_table_exists <- function(conn, db_table_name) {
 
 
 
-#' Gets a named table from a given schema
-#'
-#' @template conn
-#' @templateVar miss TRUE
-#' @template db_table_id
-#' @param slice_ts
-#'   If set different from NA (default), the returned data looks as on the given date.
-#'   If set as NULL, all data is returned
-#' @param include_slice_info
-#'   Default FALSE.
-#'   If set TRUE, the history columns "checksum", "from_ts", "until_ts" are returned also
-#' @return
-#'   A "lazy" dataframe (tbl_lazy) generated using dbplyr
-#' @export
-mg_get_table <- function(conn, db_table_id = NULL, slice_ts = NA, include_slice_info = FALSE) {
-
-  # Check arguments
-  checkmate::assert_class(conn, "DBIConnection")
-  checkmate::assert(
-    checkmate::check_character(db_table_id, null.ok = TRUE),
-    checkmate::check_class(db_table_id, "Id"), combine = "or")
-  mg_assert_timestamp_like(slice_ts, null.ok = TRUE)
-  checkmate::assert_logical(include_slice_info)
-
-  # Get tables in db schema
-  if (is.null(db_table_id)) {
-    print("Select one the following tables:")
-    return(mg_get_tables(conn))
-  }
-
-  if (is.character(db_table_id)) db_table_id <- mg_id(db_table_id, conn = conn)
-
-  # Ensure existence of table
-  if (!mg_table_exists(conn, db_table_id)) {
-    db_table_name_str <- paste(c(purrr::pluck(db_table_id, "name", "schema"),
-                                 purrr::pluck(db_table_id, "name", "table")),
-                               collapse = ".")
-    stop(glue::glue("Table {db_table_name_str} is not found!"))
-  }
-
-  # Look-up table in DB
-  q <- dplyr::tbl(conn, db_table_id)
-
-  # Check whether data mg_is.historical
-  if (mg_is.historical(q) && !is.null(slice_ts)) {
-
-    # Filter based on date
-    if (is.na(slice_ts)) {
-      q <- dplyr::filter(q, is.na(.data$until_ts)) # Newest data
-    } else {
-      q <- mg_slice_time(q, slice_ts)
-    }
-
-    # Remove history columns
-    if (!include_slice_info) {
-      q <- dplyr::select(q, !tidyselect::any_of(c("from_ts", "until_ts", "checksum")))
-    }
-  }
-
-  return(q)
-}
-
-
-
 #' Convenience function for DBI::Id
 #'
-#' @param db_table_name Name of the table to return. Can implicitly contain information about schema.
+#' @template db_table_id
 #' @template conn
 #' @seealso [DBI::Id] which this function wraps.
 #' @export
-mg_id <- function(db_table_name, conn = NULL) {
+mg_id <- function(db_table_id, conn = NULL) {
 
   # Check if already Id
-  if (inherits(db_table_name, "Id")) return(db_table_name)
+  if (inherits(db_table_id, "Id")) return(db_table_id)
 
   # Check arguments
-  checkmate::assert_character(db_table_name)
+  checkmate::assert_character(db_table_id)
 
   # SQLite does not have schemas
   if (inherits(conn, "SQLiteConnection")) {
-    return(DBI::Id(table = db_table_name))
+    return(DBI::Id(table = db_table_id))
   }
 
-  if (stringr::str_detect(db_table_name, "\\.")) {
-    db_name <- stringr::str_split_1(db_table_name, "\\.")
+  if (stringr::str_detect(db_table_id, "\\.")) {
+    db_name <- stringr::str_split_1(db_table_id, "\\.")
     db_schema <- db_name[1]
     db_table  <- db_name[2]
   } else {
     db_schema <- NULL
-    db_table <- db_table_name
+    db_table <- db_table_id
   }
 
   DBI::Id(schema = db_schema, table = db_table)
 }
 
 
-#' Create a historical table from input data
-#'
-#' @name mg_create_table
+#' Slices a data object based on time / date
 #'
 #' @template .data
-#' @template conn
-#' @template db_table_id
-#' @param temporary Should the table be created as a temporary table?
-#' @param ... Other arguments passed to [DBI::dbCreateTable()]
-#' @returns Invisibly returns the table as it looks on the destination (or locally if conn is NULL)
+#' @param slice_ts The time / date to slice by
+#' @param from_ts  The name of the column in .data specifying valid from time (note: must be unquoted)
+#' @param until_ts The name of the column in .data specifying valid until time (note: must be unquoted)
+#' @template .data_return
 #' @export
-mg_create_table <- function(.data, conn = NULL, db_table_id = NULL, temporary = TRUE, ...) {
-
-  checkmate::assert_class(.data, "data.frame")
-  checkmate::assert_class(conn, "DBIConnection", null.ok = TRUE)
-  checkmate::assert(
-    checkmate::check_class(db_table_id, "Id", null.ok = TRUE),
-    checkmate::check_character(db_table_id, len = 1)
-  )
-
-  # Assert unique column names (may cause unexpected mg_getTableSignature results)
-  checkmate::assert_character(names(.data), unique = TRUE)
-
-  # Convert db_table_id to mg_id (mg_id() returns early if this is the case)
-  if (!is.null(db_table_id)) { # TODO: db_table_name vs db_table_id
-    db_table_id <- mg_id(db_table_name = db_table_id, conn = conn)
-  } else {
-    db_table_id <- deparse(substitute(.data))
-  }
-
-  stopifnot("checksum/from_ts/until_ts column(s) already exist(s) in .data!" != any(
-    c("checksum", "from_ts", "in_ts") %in% colnames(.data)))
-
-  # Add "metadata" columns to .data
-  .data <- .data |>
-    dplyr::mutate(checksum = NA_character_,
-                  from_ts  = as.POSIXct(NA_real_),
-                  until_ts = as.POSIXct(NA_real_),
-                  .after = tidyselect::everything())
-
-  # Early return if there is no connection to push to
-  if (is.null(conn)) return(invisible(.data))
-
-  # Create the table on the remote and return the table
-  stopifnot("Table already exists!" = !mg_table_exists(conn, db_table_id))
-  DBI::dbCreateTable(conn = conn,
-                     name = db_table_id,
-                     fields = mg_getTableSignature(.data = .data, conn = conn),
-                     temporary = temporary,
-                     ...)
-
-  invisible(dplyr::tbl(conn, db_table_id))
-}
-
-
-
-# TODO: some development comments
-
-#' Update a historical table
-#' @template .data_dbi
-#' @template conn
-#' @template db_table
-#' @param timestamp
-#'   A timestamp (POSIXct) with which to update from_ts/until_ts columns
-#' @template filters
-#' @param message
-#'   A message to add to the log-file (useful for supplying metadata to the log)
-#' @param tic
-#'   A timestamp when computation began. If not supplied, it will be created at call-time.
-#'   (Used to more accurately convey how long runtime of the update process has been)
-#' @template log_path
-#' @template log_db
-#' @param enforce_chronological_order
-#'   A logical that controls whether or not to check if timestamp of update is prior to timstamps in the DB
-#' @return NULL
-#' @seealso mg_filter_keys
-#' @importFrom rlang .data
-#' @export
-mg_update_snapshot <- function(.data, conn, db_table, timestamp, filters = NULL, message = NULL, tic = Sys.time(),
-                            log_path = getOption("mg.log_path"), log_db = getOption("mg.log_db"),
-                            enforce_chronological_order = TRUE) {
+mg_slice_time <- function(.data, slice_ts, from_ts = from_ts, until_ts = until_ts) {
 
   # Check arguments
-  checkmate::assert_class(.data, "tbl_dbi")
-  checkmate::assert_class(conn, "DBIConnection")
-  mg_assert_dbtable_like(db_table)
-  mg_assert_timestamp_like(timestamp)
-  checkmate::assert_class(filters, "tbl_dbi", null.ok = TRUE)
-  checkmate::assert_character(message, null.ok = TRUE)
-  mg_assert_timestamp_like(tic)
-  checkmate::assert_logical(enforce_chronological_order)
+  mg_assert_data_like(.data)
+  mg_assert_timestamp_like(slice_ts)
+  # TODO: How to checkmate from_ts and until_ts?
 
-
-  # If db_table is given as str, fetch the actual table
-  # If the table does not exist, create an empty table using the signature of the incoming data
-  if (is.character(db_table)) {
-
-    db_table_name <- db_table
-    db_table_id <- mg_id(db_table, conn)
-
-    if (mg_table_exists(conn, db_table)) {
-      db_table <- dplyr::tbl(conn, db_table_id)
-    } else {
-      db_table <- mg_create_table(dplyr::collect(utils::head(.data, 0)), conn, db_table_id, temporary = FALSE)
-    }
-  } else {
-    db_table_id <- dbplyr::remote_name(db_table)
-    db_table_name <- db_table_id |> as.character() |> stringr::str_remove_all('\"')
-  }
-
-  # Initialize logger
-  logger <- mg_Logger$new(
-    db_tablestring = db_table_name,
-    log_db = log_db,
-    log_conn = conn,
-    log_path = log_path,
-    ts = timestamp,
-    tic = tic
-  )
-
-  logger$log_to_db(start_time = !!mg_db_timestamp(tic, conn))
-  logger$log_info("Started", tic = tic) # Use input time in log
-
-  # Add message to log (if given)
-  if (!is.null(message)) {
-    logger$log_to_db(message = message)
-    logger$log_info("Message:", message, tic = tic)
-  }
-
-
-  # Opening checks
-  if (!mg_is.historical(db_table)) {
-    logger$log_to_db(success = FALSE, end_time = !!mg_db_timestamp(tic, conn))
-    logger$log_error("Table does not seem like a historical table", tic = tic) # Use input time in log
-  }
-
-  if (!setequal(colnames(.data), colnames(
-    dplyr::select(db_table, !c("checksum", "from_ts", "until_ts")))
-  )) {
-    logger$log_to_db(success = FALSE, end_time = !!mg_db_timestamp(tic, conn))
-    logger$log_error("Columns do not match!\n",
-                     "Table columns:\n",
-                     paste(colnames(dplyr::select(db_table, !tidyselect::any_of(c("checksum", "from_ts", "until_ts")))),
-                           collapse = ", "),
-                      "\nInput columns:\n",
-                     paste(colnames(.data), collapse = ", "), tic = tic) # Use input time in log
-  }
-
-  logger$log_to_db(schema = purrr::pluck(db_table_id@name, "schema"), table = purrr::pluck(db_table_id@name, "table"))
-  logger$log_info("Parsing data for table", db_table_name, "started", tic = tic) # Use input time in log
-  logger$log_to_db(date = !!mg_db_timestamp(timestamp, conn))
-  logger$log_info("Given timestamp for table is", timestamp, tic = tic) # Use input time in log
-
-  # Check for current update status
-  db_latest <- db_table |>
-    dplyr::summarize(max(.data$from_ts, na.rm = TRUE)) |>
-    dplyr::pull() |>
-    as.character() |>
-    max("1900-01-01 00:00:00", na.rm = TRUE)
-
-    # Convert timestamp to character to prevent inconsistent R behavior with date/timestamps
-  timestamp <- strftime(timestamp)
-
-  if (enforce_chronological_order && timestamp < db_latest) {
-    logger$log_to_db(success = FALSE, end_time = !!mg_db_timestamp(tic, conn))
-    logger$log_error("Given timestamp", timestamp, "is earlier than latest",
-                     "timestamp in table:", db_latest, tic = tic) # Use input time in log
-  }
-
-  # Compute .data immediately to reduce runtime and compute checksum
+  from_ts  <- dplyr::enquo(from_ts)
+  until_ts <- dplyr::enquo(until_ts)
   .data <- .data |>
-    dplyr::ungroup() |>
-    dplyr::select(
-      colnames(dplyr::select(db_table, !tidyselect::any_of(c("checksum", "from_ts", "until_ts"))))
-    ) |>
-    mg_digest_to_checksum(col = "checksum", warn = TRUE) |>
-    mg_filter_keys(filters) |>
-    dplyr::compute()
-
-
-  # Apply filter to current records
-  db_table <- mg_filter_keys(db_table, filters)
-
-  # Determine the next timestamp in the data (can be NA if none is found)
-  next_timestamp <- min(
-    db_table |>
-      dplyr::filter(.data$from_ts  > timestamp) |>
-      dplyr::summarize(next_timestamp = min(.data$from_ts, na.rm = TRUE)) |>
-      dplyr::pull("next_timestamp"),
-    db_table |>
-      dplyr::filter(.data$until_ts > timestamp) |>
-      dplyr::summarize(next_timestamp = min(.data$until_ts, na.rm = TRUE)) |>
-      dplyr::pull("next_timestamp")) |>
-    strftime()
-
-  # Consider only records valid at timestamp (and apply the filter if present)
-  db_table <- mg_slice_time(db_table, timestamp)
-
-  # Count open rows at timestamp
-  nrow_open <- mg_nrow(db_table)
-
-
-  # Select only data with no until_ts and with different values in any fields
-  logger$log_info("Deactivating records")
-  if (nrow_open > 0) {
-    to_remove <- dplyr::setdiff(dplyr::select(db_table, "checksum"),
-                                dplyr::select(.data, "checksum")) |>
-      dplyr::compute() # Something has changed in dbplyr (2.2.1) that makes this compute needed.
-                       # Code that takes 20 secs with can be more than 30 minutes to compute without...
-
-    nrow_to_remove <- mg_nrow(to_remove)
-
-    # Determine from_ts and checksum for the records we need to deactivate
-    to_remove <- to_remove |>
-      dplyr::left_join(dplyr::select(db_table, "from_ts", "checksum"), by = "checksum") |>
-      dplyr::mutate(until_ts = !!mg_db_timestamp(timestamp, conn))
-
-  } else {
-    nrow_to_remove <- 0
-  }
-  logger$log_info("After to_remove")
-
-
-
-  to_add <- dplyr::setdiff(.data, dplyr::select(db_table, colnames(.data))) |>
-    dplyr::mutate(from_ts  = !!mg_db_timestamp(timestamp, conn),
-                  until_ts = !!mg_db_timestamp(next_timestamp, conn))
-
-  nrow_to_add <- mg_nrow(to_add)
-  logger$log_info("After to_add")
-
-
-
-  if (nrow_to_remove > 0) {
-    dplyr::rows_update(x = dplyr::tbl(conn, db_table_id),
-                       y = to_remove,
-                       by = c("checksum", "from_ts"),
-                       in_place = TRUE,
-                       unmatched = "ignore")
-  }
-
-  logger$log_to_db(n_deactivations = nrow_to_remove) # Logs contains the aggregate number of added records on the day
-  logger$log_info("Deactivate records count:", nrow_to_remove)
-  logger$log_info("Adding new records")
-
-  if (nrow_to_add > 0) {
-    dplyr::rows_append(x = dplyr::tbl(conn, db_table_id),
-                       y = to_add,
-                       in_place = TRUE)
-  }
-
-  logger$log_to_db(n_insertions = nrow_to_add)
-  logger$log_info("Insert records count:", nrow_to_add)
-
-
-  # If several updates come in a single day, some records may have from_ts = until_ts.
-  # We remove these records here
-  redundant_rows <- dplyr::tbl(conn, db_table_id) |>
-    dplyr::filter(.data$from_ts == .data$until_ts) |>
-    dplyr::select("checksum", "from_ts")
-  nrow_redundant <- mg_nrow(redundant_rows)
-
-  if (nrow_redundant > 0) {
-    dplyr::rows_delete(
-      dplyr::tbl(conn, db_table_id),
-      redundant_rows,
-      by = c("checksum", "from_ts"),
-      in_place = TRUE, unmatched = "ignore")
-    logger$log_info("Doubly updated records removed:", nrow_redundant)
-  }
-
-  # If chronological order is not enforced, some records may be split across several records
-  # checksum is the same, and from_ts / until_ts are continuous
-  # We collapse these records here
-  if (!enforce_chronological_order) {
-    redundant_rows <- dplyr::tbl(conn, db_table_id) |>
-      mg_filter_keys(filters)
-
-    redundant_rows <- dplyr::inner_join(
-        redundant_rows,
-        redundant_rows |> dplyr::select("checksum", "from_ts", "until_ts"),
-        suffix = c("", ".p"),
-        sql_on = '"RHS"."checksum" = "LHS"."checksum" AND "LHS"."until_ts" = "RHS"."from_ts"'
-      ) |>
-      dplyr::select(!"checksum.p")
-
-    redundant_rows_to_delete <- redundant_rows |>
-      dplyr::transmute(.data$checksum, from_ts = .data$from_ts.p) |>
-      dplyr::compute()
-
-    redundant_rows_to_update <- redundant_rows |>
-      dplyr::transmute(.data$checksum, from_ts = .data$from_ts, until_ts = .data$until_ts.p) |>
-      dplyr::compute()
-
-    if (mg_nrow(redundant_rows_to_delete) > 0) {
-      dplyr::rows_delete(x = dplyr::tbl(conn, db_table_id),
-                         y = redundant_rows_to_delete,
-                         by = c("checksum", "from_ts"),
-                         in_place = TRUE,
-                         unmatched = "ignore")
-    }
-
-    if (mg_nrow(redundant_rows_to_update) > 0) {
-      dplyr::rows_update(x = dplyr::tbl(conn, db_table_id),
-                         y = redundant_rows_to_update,
-                         by = c("checksum", "from_ts"),
-                         in_place = TRUE,
-                         unmatched = "ignore")
-      logger$log_info("Continous records collapsed:", mg_nrow(redundant_rows_to_update))
-    }
-
-  }
-
-  toc <- Sys.time()
-  logger$log_to_db(end_time = !!mg_db_timestamp(toc, conn),
-                   duration = !!format(round(difftime(toc, tic), digits = 2)), success = TRUE)
-  logger$log_info("Finished processing for table", db_table_name, tic = toc)
-
+    dplyr::filter(is.na({{until_ts}}) | slice_ts < {{until_ts}},
+                  {{from_ts}} <= slice_ts)
+  return(.data)
 }
 
 
 
+#' SQL Joins
+#'
+#' @name joins
+#'
+#' @description Overloads the dplyr *_join to accept an na_by argument.
+#' By default, joining using SQL does not match on NA / NULL.
+#' dbplyr has the option "na_matches = na" to match on NA / NULL but this is very inefficient
+#' This function does the matching more efficiently.
+#' If a column contains NA / NULL, give the argument to na_by to match during the join
+#' If no na_by is given, the function defaults to using dplyr::*_join
+#' @inheritParams dplyr::left_join
+#' @param na_by columns that should match on NA
+#' @seealso [dplyr::mutate-joins] which this function wraps.
+#' @seealso [dbplyr::join.tbl_sql] which this function wraps.
 #' @export
-#' @rdname joins
 mg_inner_join <- function(x, y, by = NULL, na_by = NULL, ...) {
 
   # Check arguments
@@ -597,6 +246,7 @@ mg_inner_join <- function(x, y, by = NULL, na_by = NULL, ...) {
              dplyr::select(tidyselect::all_of(names(renamer))))
   }
 }
+
 
 
 # This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
@@ -731,27 +381,91 @@ mg_join_warn_experimental <- function() {
 
 
 
-#' Slices a data object based on time / date
+#' Combine any number of sql queries, where each has their own time axis of
+#' validity (valid_from and valid_until)
 #'
-#' @template .data
-#' @param slice_ts The time / date to slice by
-#' @param from_ts  The name of the column in .data specifying valid from time (note: must be unquoted)
-#' @param until_ts The name of the column in .data specifying valid until time (note: must be unquoted)
-#' @template .data_return
+#' @description
+#' The function "interlaces" the queries and combines their validity time axes
+#' onto a single time axis
+#'
+#' @param tables    A list(!) of tables you want to combine is supplied here as
+#'                  lazy_queries.
+#' @param by        The (group) variable to merge by
+#' @param colnames  If the time axes of validity is not called "valid_to" and
+#'                  "valid_until" inside each lazy_query, you can specify their
+#'                  names by supplying the arguments as a list
+#'                  (e.g. c(t1.from = "\<colname\>", t2.until = "\<colname\>").
+#'                  colnames must be named in same order as as given in tables
+#'                  (i.e. t1, t2, t3, ...).
+#' @return          The combination of input queries with a single, interlaced
+#'                  valid_from / valid_until time axis
 #' @export
-mg_slice_time <- function(.data, slice_ts, from_ts = from_ts, until_ts = until_ts) {
+mg_interlace_sql <- function(tables, by = NULL, colnames = NULL) {
 
   # Check arguments
-  mg_assert_data_like(.data)
-  mg_assert_timestamp_like(slice_ts)
-  # TODO: How to checkmate from_ts and until_ts?
+  checkmate::assert_character(by)
+  # TODO: how to checkmate tables and colnames?
 
-  from_ts  <- dplyr::enquo(from_ts)
-  until_ts <- dplyr::enquo(until_ts)
-  .data <- .data |>
-    dplyr::filter(is.na({{until_ts}}) | slice_ts < {{until_ts}},
-                  {{from_ts}} <= slice_ts)
-  return(.data)
+  # Check edgecase
+  if (length(tables) == 1) return(purrr::pluck(tables, 1))
+
+  # Parse inputs for colnames .from / .to columns
+  from_cols <- seq_along(tables) |>
+    purrr::map_chr(\(t) paste0("t", t, ".from")) |>
+    purrr::map_chr(\(col) ifelse(col %in% names(colnames), colnames[col], "valid_from"))
+
+  until_cols <- seq_along(tables) |>
+    purrr::map_chr(\(t) paste0("t", t, ".until")) |>
+    purrr::map_chr(\(col) ifelse(col %in% names(colnames), colnames[col], "valid_until"))
+
+
+  # Rename valid_from / valid_until columns
+  tables <- tables |>
+    purrr::map2(from_cols,  \(table, from_col)  table |> dplyr::rename(valid_from  = !!from_col)) |>
+    purrr::map2(until_cols, \(table, until_col) table |> dplyr::rename(valid_until = !!until_col))
+
+
+  # Get all changes to valid_from / valid_until
+  q1 <- tables |> purrr::map(\(table) table |>
+                               dplyr::select(tidyselect::all_of(by), "valid_from"))
+  q2 <- tables |> purrr::map(\(table) table |>
+                               dplyr::select(tidyselect::all_of(by), "valid_until") |>
+                               dplyr::rename(valid_from = "valid_until"))
+  t <- union(q1, q2) |> purrr::reduce(union)
+
+  # Sort and find valid_until in the combined validities
+  t <- t |>
+    dplyr::group_by(dplyr::across(tidyselect::all_of(by))) |>
+    dbplyr::window_order(.data$valid_from) |>
+    dplyr::mutate(
+      .row_number_id = dplyr::if_else(is.na(.data$valid_from),  # Some DB backends considers NULL to be the
+                                      dplyr::n(),               # smallest, so we need to adjust for that
+                                      dplyr::row_number() - ifelse(is.na(dplyr::first(.data$valid_from)), 1, 0)))
+
+  t <- dplyr::left_join(t |>
+                          dplyr::filter(.data$.row_number_id < dplyr::n()),
+                        t |>
+                          dplyr::filter(.data$.row_number_id > 1) |>
+                          dplyr::mutate(.row_number_id = .data$.row_number_id - 1) |>
+                          dplyr::rename("valid_until" = "valid_from"),
+                        by = c(by, ".row_number_id")) |>
+    dplyr::select(!".row_number_id") |>
+    dplyr::ungroup() |>
+    dplyr::compute()
+
+
+  # Merge data onto the new validities using non-equi joins
+  joiner <- \(.data, table) .data |>
+    dplyr::left_join(table,
+                     suffix = c("", ".tmp"),
+                     sql_on = paste0(
+                       '"LHS"."', by, '" = "RHS"."', by, '" AND
+                        "LHS"."valid_from"  >= "RHS"."valid_from" AND
+                       ("LHS"."valid_until" <= "RHS"."valid_until" OR "RHS"."valid_until" IS NULL)')) |>
+    dplyr::select(!tidyselect::ends_with(".tmp")) |>
+    dplyr::relocate(tidyselect::starts_with("valid_"), .after = tidyselect::everything())
+
+  return(purrr::reduce(tables, joiner, .init = t))
 }
 
 
@@ -800,6 +514,7 @@ md5 <- openssl::md5
 
 
 #' Some backends have native md5 support, these use this function
+#' @rdname digest_internal
 #' @importFrom rlang `:=`
 mg_digest_to_checksum_native_md5 <- function(.data, col) {
 
@@ -811,24 +526,15 @@ mg_digest_to_checksum_native_md5 <- function(.data, col) {
 }
 
 
-#' Some backends have native md5 support, these use this function
-#' @importFrom rlang `:=`
-mg_digest_to_checksum_native_md5 <- function(.data, col) {
-
-  .data <- .data |>
-    tidyr::unite(!!col, tidyselect::ends_with(".__chr"), remove = TRUE) |>
-    dplyr::mutate(dplyr::across(tidyselect::all_of(col), md5))
-
-  return(.data)
-}
-
-
-#'
+#' @name digest_internal
+#' @template .data
+#' @param col The name of column the checksums will be placed in
 mg_digest_to_checksum_internal <- function(.data, col) {
   UseMethod("mg_digest_to_checksum_internal")
 }
 
 
+#' @rdname digest_internal
 #' @importFrom rlang `:=` .data
 mg_digest_to_checksum_internal.default <- function(.data, col) {
 
@@ -848,21 +554,23 @@ mg_digest_to_checksum_internal.default <- function(.data, col) {
 }
 
 
-#'
+#' @rdname digest_internal
 mg_digest_to_checksum_internal.tbl_PqConnection <- mg_digest_to_checksum_native_md5
 
 
-#'
+#' @rdname digest_internal
 mg_digest_to_checksum_internal.data.frame       <- mg_digest_to_checksum_native_md5
 
 
-#'
+#' @rdname digest_internal
 mg_digest_to_checksum_internal.tibble           <- mg_digest_to_checksum_native_md5
 
 
 
 
-#'
+#' @name digest_internal
+#' @template .data
+#' @param col The name of column the checksums will be placed in
 mg_digest_to_checksum_internal <- function(.data, col) {
   UseMethod("mg_digest_to_checksum_internal")
 }
@@ -883,17 +591,14 @@ mg_create_table <- function(.data, conn = NULL, db_table_id = NULL, temporary = 
 
   checkmate::assert_class(.data, "data.frame")
   checkmate::assert_class(conn, "DBIConnection", null.ok = TRUE)
-  checkmate::assert(
-    checkmate::check_class(db_table_id, "Id", null.ok = TRUE),
-    checkmate::check_character(db_table_id, len = 1)
-  )
+  mg_assert_id_like(db_table_id)
 
   # Assert unique column names (may cause unexpected mg_getTableSignature results)
   checkmate::assert_character(names(.data), unique = TRUE)
 
   # Convert db_table_id to mg_id (mg_id() returns early if this is the case)
   if (!is.null(db_table_id)) { # TODO: db_table_name vs db_table_id
-    db_table_id <- mg_id(db_table_name = db_table_id, conn = conn)
+    db_table_id <- mg_id(db_table_id, conn = conn)
   } else {
     db_table_id <- deparse(substitute(.data))
   }
@@ -926,14 +631,14 @@ mg_create_table <- function(.data, conn = NULL, db_table_id = NULL, temporary = 
 
 # TODO: some development comments
 
-#'
-setGeneric("mg_getTableSignature", # TODO: Why camelCase here?
+#' @importFrom methods setGeneric
+methods::setGeneric("mg_getTableSignature", # TODO: Why camelCase here?
            function(.data, conn = NULL) standardGeneric("mg_getTableSignature"),
            signature = "conn")
 
 
 #'
-setMethod("mg_getTableSignature", "DBIConnection", function(.data, conn) {
+methods::setMethod("mg_getTableSignature", "DBIConnection", function(.data, conn) {
   # Define the column types to be updated based on backend class
   col_types <- DBI::dbDataType(conn, .data)
 
@@ -959,11 +664,11 @@ setMethod("mg_getTableSignature", "DBIConnection", function(.data, conn) {
 
 
 #'
-setMethod("mg_getTableSignature", "NULL", function(.data, conn) {
+methods::setMethod("mg_getTableSignature", "NULL", function(.data, conn) {
   # Emulate product of DBI::dbDataType
   signature <- dplyr::summarise(.data, dplyr::across(tidyselect::everything(), ~ class(.)[1]))
 
-  setNames(as.character(signature), names(signature))
+  stats::setNames(as.character(signature), names(signature))
 
   return(signature)
 })
@@ -985,7 +690,7 @@ setMethod("mg_getTableSignature", "NULL", function(.data, conn) {
 #' @template log_path
 #' @template log_db
 #' @param enforce_chronological_order
-#'   A logical that controls whether or not to check if timestamp of update is prior to timstamps in the DB
+#'   A logical that controls whether or not to check if timestamp of update is prior to timestamps in the DB
 #' @return NULL
 #' @seealso mg_filter_keys
 #' @importFrom rlang .data
@@ -1280,18 +985,21 @@ mg_filter_keys <- function(.data, filters, by = NULL, na_by = NULL) {
 
 
 #' Determine the type of timestamps the DB supports
+#' @name mg_db_timestamp
+#' @param timestamp The timestamp to be transformed to the DB type. Can be character.
+#' @param conn A `DBIConnection` to the DB where the timestamp should be stored
 mg_db_timestamp <- function(timestamp, conn) {
   UseMethod("mg_db_timestamp", conn)
 }
 
 
-#'
+#' @rdname mg_db_timestamp
 mg_db_timestamp.default <- function(timestamp, conn) {
   return(dbplyr::translate_sql(as.POSIXct(!!timestamp), con = conn))
 }
 
 
-#'
+#' @rdname mg_db_timestamp
 mg_db_timestamp.SQLiteConnection <- function(timestamp, conn) {
   if (is.na(timestamp)) {
     dbplyr::translate_sql(NA_character_, con = conn)
@@ -1303,6 +1011,9 @@ mg_db_timestamp.SQLiteConnection <- function(timestamp, conn) {
 
 
 #' Determine the type of timestamps the DB supports
+#' @name mg_db_timestamp
+#' @param timestamp The timestamp to be transformed to the DB type. Can be character.
+#' @param conn A `DBIConnection` to the DB where the timestamp should be stored
 mg_db_timestamp <- function(timestamp, conn) {
   UseMethod("mg_db_timestamp", conn)
 }
@@ -1336,36 +1047,6 @@ mg_nrow <- function(.data) {
     return(base::nrow(.data))
   }
 }
-
-
-# Utility timing function
-timer <- function(expr) {
-  tic <- Sys.time()
-  expr
-  return(as.numeric(Sys.time() - tic))
-}
-
-
-## Utility functions to test for data type ##
-is.listlike <- function(obj) { # nolint: object_name_linter
-  if (length(obj) == 0) {
-    return(FALSE)
-  } else {
-    return(any(c(
-                  is.list(obj),
-                  is.vector(obj)
-    )))
-  }
-}
-
-
-is.datelike <- function(obj) { # nolint: object_name_linter
-  checkmate::assert(
-    checkmate::check_date(obj),
-    checkmate::check_posixct(obj)
-  )
-}
-
 
 
 
@@ -1640,18 +1321,18 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
 mg_create_logs_if_missing <- function(log_table, conn) {
 
   if (!mg_table_exists(conn, log_table)) {
-    log_signature <- tibble::tibble(date = as.POSIXct(NA),
-                                    schema = NA_character_,
-                                    table = NA_character_,
-                                    n_insertions = NA_integer_,
-                                    n_deactivations = NA_integer_,
-                                    start_time = as.POSIXct(NA),
-                                    end_time = as.POSIXct(NA),
-                                    duration = NA_character_,
-                                    success = NA,
-                                    message = NA_character_,
-                                    log_file = NA_character_) |>
-      head(0)
+    log_signature <- data.frame(date = as.POSIXct(NA),
+                                schema = NA_character_,
+                                table = NA_character_,
+                                n_insertions = NA_integer_,
+                                n_deactivations = NA_integer_,
+                                start_time = as.POSIXct(NA),
+                                end_time = as.POSIXct(NA),
+                                duration = NA_character_,
+                                success = NA,
+                                message = NA_character_,
+                                log_file = NA_character_) |>
+      utils::head(0)
 
     DBI::dbWriteTable(conn, mg_id(log_table, conn), log_signature)
   }
@@ -1659,11 +1340,11 @@ mg_create_logs_if_missing <- function(log_table, conn) {
   return(dplyr::tbl(conn, mg_id(log_table, conn)))
 }
 
-#' Provides age_labels that follows the mg standard
+#' Provides mg_age_labels that follows the mg standard
 #' @template age_cuts
 #' @return A vector of labels with zero-padded numerics so they can be sorted easily
 #' @export
-mg_mg_age_labels <- function(age_cuts) {
+mg_age_labels <- function(age_cuts) {
   checkmate::assert_numeric(age_cuts, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE)
 
   age_cuts <- age_cuts[age_cuts > 0 & is.finite(age_cuts)]
@@ -1676,10 +1357,10 @@ mg_mg_age_labels <- function(age_cuts) {
 
 
 
-#' checkmate helper: Check for "generic" db_table type
+#' checkmate helper: Assert for "generic" db_table type
 #' @param db_table Object to test if is of class "tbl_dbi" or character on form "schema.table"
-#' @param ...       parameters passed to checkmate::check_*
-#' @param add       `AssertCollection` to add asertions to
+#' @param ...      Parameters passed to checkmate::check_*
+#' @param add      `AssertCollection` to add assertions to
 #' @export
 mg_assert_dbtable_like <- function(db_table, ..., add = NULL) {
   checkmate::assert(
@@ -1689,10 +1370,12 @@ mg_assert_dbtable_like <- function(db_table, ..., add = NULL) {
     add = add)
 }
 
-#' checkmate helper: Check for "generic" timestamp type
+
+
+#' checkmate helper: Assert "generic" timestamp type
 #' @param timestamp Object to test if is POSIX or character
 #' @param ...       parameters passed to checkmate::check_*
-#' @param add       `AssertCollection` to add asertions to
+#' @param add       `AssertCollection` to add assertions to
 #' @export
 mg_assert_timestamp_like <- function(timestamp, ..., add = NULL) {
   checkmate::assert(
@@ -1704,10 +1387,10 @@ mg_assert_timestamp_like <- function(timestamp, ..., add = NULL) {
 
 
 
-#' checkmate helper: Check for "generic" data.table/data.frame/tbl/tibble type
+#' checkmate helper: Assert "generic" data.table/data.frame/tbl/tibble type
 #' @param .data Object to test if is data.table, data.frame, tbl or tibble
-#' @param ...   parameters passed to checkmate::check_*
-#' @param add   `AssertCollection` to add asertions to
+#' @param ...   Parameters passed to checkmate::check_*
+#' @param add   `AssertCollection` to add assertions to
 #' @export
 mg_assert_data_like <- function(.data, ..., add = NULL) {
   checkmate::assert(
@@ -1719,4 +1402,16 @@ mg_assert_data_like <- function(.data, ..., add = NULL) {
 }
 
 
+
+#' checkmate helper: Assert for "generic" mg_id structure
+#' @param mg_id   Object to test if is of class "Id" or character on form "schema.table"
+#' @param ...  Parameters passed to checkmate::check_*
+#' @param add `AssertCollection` to add assertions to
+#' @export
+mg_assert_id_like <- function(mg_id, ..., add = NULL) {
+  checkmate::assert(
+    checkmate::check_character(mg_id, ...),
+    checkmate::check_class(mg_id, "Id", ...),
+    add = add)
+}
 

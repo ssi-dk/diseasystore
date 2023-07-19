@@ -2,7 +2,7 @@
 % Please edit documentation in R/mg_reexports.R
 \name{mg_assert_timestamp_like}
 \alias{mg_assert_timestamp_like}
-\title{checkmate helper: Check for "generic" timestamp type}
+\title{checkmate helper: Assert "generic" timestamp type}
 \usage{
 mg_assert_timestamp_like(timestamp, ..., add = NULL)
 }
@@ -11,8 +11,8 @@ mg_assert_timestamp_like(timestamp, ..., add = NULL)
 
 \item{...}{parameters passed to checkmate::check_*}
 
-\item{add}{\code{AssertCollection} to add asertions to}
+\item{add}{\code{AssertCollection} to add assertions to}
 }
 \description{
-checkmate helper: Check for "generic" timestamp type
+checkmate helper: Assert "generic" timestamp type
 }

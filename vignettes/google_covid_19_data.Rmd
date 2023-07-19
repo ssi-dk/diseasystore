@@ -1,5 +1,5 @@
 ---
-title: "disesystore: Google COVID-19 data"
+title: "diseasystore: Google COVID-19 data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{diseasystore: Google COVID-19 data}

@@ -16,19 +16,6 @@ mg_update_snapshot(
   log_db = getOption("mg.log_db"),
   enforce_chronological_order = TRUE
 )
-
-mg_update_snapshot(
-  .data,
-  conn,
-  db_table,
-  timestamp,
-  filters = NULL,
-  message = NULL,
-  tic = Sys.time(),
-  log_path = getOption("mg.log_path"),
-  log_db = getOption("mg.log_db"),
-  enforce_chronological_order = TRUE
-)
 }
 \arguments{
 \item{.data}{A tbl object. Typically a lazy query to the DB (from mg::get_table())}
@@ -39,7 +26,7 @@ mg_update_snapshot(
 
 \item{timestamp}{A timestamp (POSIXct) with which to update from_ts/until_ts columns}
 
-\item{filters}{A filter to subset data by.  if filters == NULL, no filtering occurs. Else, an inner_join is performed using all columns of the filter}
+\item{filters}{A filter to subset data by.  if filters == NULL, no filtering occurs. Else, an mg_inner_join is performed using all columns of the filter}
 
 \item{message}{A message to add to the log-file (useful for supplying metadata to the log)}
 
@@ -52,15 +39,11 @@ If NULL, no file logs are created.}
 \item{log_db}{The specification to where db logs are stored ("schema.table").
 If NULL, no db logs are created.}
 
-\item{enforce_chronological_order}{A logical that controls whether or not to check if timestamp of update is prior to timstamps in the DB}
+\item{enforce_chronological_order}{A logical that controls whether or not to check if timestamp of update is prior to timestamps in the DB}
 }
 \description{
 Update a historical table
-
-Update a historical table
 }
 \seealso{
-mg_filter_keys
-
 mg_filter_keys
 }

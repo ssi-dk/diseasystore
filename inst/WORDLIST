@@ -1,13 +1,19 @@
+backends
+
 cloneable
 conn
 COVID
 colname
 
+db
 dbi
 DBIConnection
 DBIDriver
+dbplyr
 diseasy
 diseasystores
+dplyr
+dtplyr
 
 Engbo
 
@@ -16,6 +22,12 @@ FeatureHandler
 Lasse
 
 tbl
+tibble
+ts
+
+md
+
+nrow
 
 ORCID
 
@@ -23,6 +35,7 @@ PascalCase
 POSIXct
 
 Rasmus
+regex
 
 Skytte
-
+sql
