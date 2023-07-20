@@ -36,7 +36,6 @@ key_join_min <- function(.data, feature) {
                           .groups = "drop"))
 }
 
-
 #' @rdname aggregators
 #' @export
 key_join_count <- function(.data, feature) {
