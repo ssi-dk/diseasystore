@@ -138,7 +138,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
                             values_to = out_name) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date) + lubridate::days(1))
 
       return(data)
     },
@@ -280,7 +280,7 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::select("key_location" = "location_key",
                       "date",
                       "min_temp" = "minimum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date) + lubridate::days(1))
 
       return(out)
     },
@@ -302,7 +302,7 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::select("key_location" = "location_key",
                       "date",
                       "max_temp" = "maximum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date) + lubridate::days(1))
 
       return(out)
     },
