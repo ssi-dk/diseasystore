@@ -181,11 +181,11 @@ google_covid_19_population_ <- function() {
 # The functions below generate `FeatureHandler`s for the feature store.
 # by keeping them here as separate files, we can use them in our testing framework to check that everything
 # works as expected
-google_covid_19_hospital_   <- google_covid_19_population_ #function() google_covid_19_metric("hospitalized_patients", "n_hospital")
-google_covid_19_deaths_     <- google_covid_19_population_ #function() google_covid_19_metric("deceased", "n_deaths")
-google_covid_19_positive_   <- google_covid_19_population_ #function() google_covid_19_metric("confirmed", "n_positive")
-google_covid_19_icu_        <- google_covid_19_population_ #function() google_covid_19_metric("intensive_care_patients", "n_icu")
-google_covid_19_ventilator_ <- google_covid_19_population_ #function() google_covid_19_metric("ventilator_patients", "n_ventilator")
+google_covid_19_hospital_   <- function() google_covid_19_metric("hospitalized_patients", "n_hospital")
+google_covid_19_deaths_     <- function() google_covid_19_metric("deceased", "n_deaths")
+google_covid_19_positive_   <- function() google_covid_19_metric("confirmed", "n_positive")
+google_covid_19_icu_        <- function() google_covid_19_metric("intensive_care_patients", "n_icu")
+google_covid_19_ventilator_ <- function() google_covid_19_metric("ventilator_patients", "n_ventilator")
 
 
 google_covid_19_age_group_  <- function() {
