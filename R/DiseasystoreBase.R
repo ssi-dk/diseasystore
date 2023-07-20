@@ -253,7 +253,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Merge and prepare for counting
-      out <- interlace(observable_data, aggregation_data) |>
+      out <- truncate_interlace(observable_data, aggregation_data) |>
         private$key_join_filter(aggregation_features) |>
         dplyr::compute() |>
         dplyr::group_by(!!!aggregation)
