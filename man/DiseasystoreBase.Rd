@@ -13,6 +13,9 @@ It defines the primary methods of each feature stores as well as all of the publ
 \item{\code{fs_map}}{(\verb{named list}(\code{character}))\cr
 A list that maps features known by the feature store to the corresponding feature handlers
 that compute the features.}
+
+\item{\code{available_features}}{(\code{character})\cr
+A list of available features in the feature store}
 }
 \if{html}{\out{</div>}}
 }
@@ -35,8 +38,8 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
   start_date = NULL,
   end_date = NULL,
   slice_ts = NULL,
-  source_conn = private$source_conn,
-  target_conn = private$target_conn,
+  source_conn = NULL,
+  target_conn = NULL,
   verbose = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -86,9 +89,9 @@ Computes, stores, and returns the requested feature for the study period.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$get_feature(
   feature,
-  start_date = purrr::pluck(private, "start_date"),
-  end_date = purrr::pluck(private, "end_date"),
-  slice_ts = purrr::pluck(private, "slice_ts")
+  start_date = private \%.\% start_date,
+  end_date = private \%.\% end_date,
+  slice_ts = private \%.\% slice_ts
 )}\if{html}{\out{</div>}}
 }
 
