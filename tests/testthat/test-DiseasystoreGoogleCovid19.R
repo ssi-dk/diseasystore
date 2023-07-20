@@ -2,13 +2,14 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # First we create a temporary directory for the Google COVID-19 data
   remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
-  tmp_dir <- tempdir()
+
+  tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
   options(diseasystore.DiseasystoreGoogleCovid19.source_conn = tmp_dir)
 
   sqlite_path <- file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")
   if (file.exists(sqlite_path)) {
     closeAllConnections()
-    file.remove(sqlite_path)
+    stopifnot("Could not delete SQLite DB before tests" = file.remove(sqlite_path))
   }
   target_conn <- \() dbConnect(RSQLite::SQLite(), sqlite_path)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
@@ -17,7 +18,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Then we download the first n rows of each data set of interest
   google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
   purrr::walk(google_files, ~ {
-    readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+    readr::read_csv(file.path(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
     readr::write_csv(file.path(tmp_dir, .))
   })
 

@@ -129,6 +129,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
 
       data <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
         (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+        dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("location_key", "date", tidyselect::starts_with(glue::glue("new_{google_pattern}"))) |>
@@ -138,7 +139,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
                             values_to = out_name) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date) + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(data)
     },
@@ -146,6 +147,15 @@ google_covid_19_metric <- function(google_pattern, out_name) {
   )
 }
 
+
+# The functions below generate `FeatureHandler`s for the feature store.
+# by keeping them here as separate files, we can use them in our testing framework to check that everything
+# works as expected
+google_covid_19_hospital_   <- function() google_covid_19_metric("hospitalized_patients", "n_hospital")
+google_covid_19_deaths_     <- function() google_covid_19_metric("deceased", "n_deaths")
+google_covid_19_positive_   <- function() google_covid_19_metric("confirmed", "n_positive")
+google_covid_19_icu_        <- function() google_covid_19_metric("intensive_care_patients", "n_icu")
+google_covid_19_ventilator_ <- function() google_covid_19_metric("ventilator_patients", "n_ventilator")
 
 
 google_covid_19_population_ <- function() {
@@ -175,17 +185,6 @@ google_covid_19_population_ <- function() {
     key_join = key_join_sum
   )
 }
-
-
-
-# The functions below generate `FeatureHandler`s for the feature store.
-# by keeping them here as separate files, we can use them in our testing framework to check that everything
-# works as expected
-google_covid_19_hospital_   <- function() google_covid_19_metric("hospitalized_patients", "n_hospital")
-google_covid_19_deaths_     <- function() google_covid_19_metric("deceased", "n_deaths")
-google_covid_19_positive_   <- function() google_covid_19_metric("confirmed", "n_positive")
-google_covid_19_icu_        <- function() google_covid_19_metric("intensive_care_patients", "n_icu")
-google_covid_19_ventilator_ <- function() google_covid_19_metric("ventilator_patients", "n_ventilator")
 
 
 google_covid_19_age_group_  <- function() {
@@ -278,11 +277,12 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
 
       out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
         (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+        dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
                       "min_temp" = "minimum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date) + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(out)
     },
@@ -300,11 +300,12 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
 
       out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
         (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+        dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
                       "max_temp" = "maximum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date) + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(out)
     },
