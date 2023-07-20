@@ -3,6 +3,8 @@
 diseasystore_case_definition <- function(case_definition) {
 
   case_definition |>
+    stringr::str_replace_all("_", " ") |>
+    stringr::str_replace_all("(?<=[a-z])([A-Z])", " \\1") |>
     stringr::str_to_title() |>
     stringr::str_replace_all(" ", "") |>
     stringr::str_replace_all("-", "") |>
