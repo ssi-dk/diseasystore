@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/google_covid_19_data.html">diseasystore: Google COVID-19 data</a>
     <a class="dropdown-item" href="../articles/quick_start.html">Quick start</a>
   </div>
 </li>
@@ -59,6 +60,162 @@
           <code><a href="DiseasystoreBase.html">DiseasystoreBase</a></code> 
         </dt>
         <dd>diseasystore base handler</dd>
+      </dl><dl><dt>
+          
+          <code><a href="DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> 
+        </dt>
+        <dd>feature store handler of Google COVID-19 data features</dd>
+      </dl><dl><dt>
+          
+          <code><a href="FeatureHandler.html">FeatureHandler</a></code> 
+        </dt>
+        <dd>FeatureHandler</dd>
+      </dl><dl><dt>
+          
+          <code><a href="aggregators.html">key_join_sum()</a></code> <code><a href="aggregators.html">key_join_max()</a></code> <code><a href="aggregators.html">key_join_min()</a></code> <code><a href="aggregators.html">key_join_count()</a></code> 
+        </dt>
+        <dd>Feature aggregators</dd>
+      </dl><dl><dt>
+          
+          <code><a href="available_diseasystores.html">available_diseasystores()</a></code> 
+        </dt>
+        <dd>Detect available diseasystores</dd>
+      </dl><dl><dt>
+          
+          <code><a href="digest_internal.html">mg_digest_to_checksum_native_md5()</a></code> <code><a href="digest_internal.html">mg_digest_to_checksum_internal()</a></code> <code><a href="digest_internal.html">mg_digest_to_checksum_internal()</a></code> 
+        </dt>
+        <dd>Some backends have native md5 support, these use this function</dd>
+      </dl><dl><dt>
+          
+          <code><a href="diseasystore_case_definition.html">diseasystore_case_definition()</a></code> 
+        </dt>
+        <dd>Transform case definition to PascalCase</dd>
+      </dl><dl><dt>
+          
+          <code><a href="diseasystore_exists.html">diseasystore_exists()</a></code> 
+        </dt>
+        <dd>Check for the existence of a <code>diseasystore</code> for the case definition</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_diseasystore.html">get_diseasystore()</a></code> 
+        </dt>
+        <dd>Get the <code>diseasystore</code> for the case definition</dd>
+      </dl><dl><dt>
+          
+          <code><a href="joins.html">mg_inner_join()</a></code> 
+        </dt>
+        <dd>SQL Joins</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_Logger.html">mg_Logger</a></code> 
+        </dt>
+        <dd>Create an object for logging database operations</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_age_labels.html">mg_age_labels()</a></code> 
+        </dt>
+        <dd>Provides mg_age_labels that follows the mg standard</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_assert_data_like.html">mg_assert_data_like()</a></code> 
+        </dt>
+        <dd>checkmate helper: Assert "generic" data.table/data.frame/tbl/tibble type</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_assert_dbtable_like.html">mg_assert_dbtable_like()</a></code> 
+        </dt>
+        <dd>checkmate helper: Assert for "generic" db_table type</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_assert_id_like.html">mg_assert_id_like()</a></code> 
+        </dt>
+        <dd>checkmate helper: Assert for "generic" mg_id structure</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_assert_timestamp_like.html">mg_assert_timestamp_like()</a></code> 
+        </dt>
+        <dd>checkmate helper: Assert "generic" timestamp type</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_create_logs_if_missing.html">mg_create_logs_if_missing()</a></code> 
+        </dt>
+        <dd>Create a table with the mg log structure if it does not exists</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_create_table.html">mg_create_table()</a></code> 
+        </dt>
+        <dd>Create a historical table from input data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_db_timestamp.html">mg_db_timestamp()</a></code> <code><a href="mg_db_timestamp.html">mg_db_timestamp()</a></code> 
+        </dt>
+        <dd>Determine the type of timestamps the DB supports</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_digest_to_checksum.html">mg_digest_to_checksum()</a></code> 
+        </dt>
+        <dd>Computes an MD5 checksum from columns</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_filter_keys.html">mg_filter_keys()</a></code> 
+        </dt>
+        <dd>Filters .data according to all records in the filter</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_get_table.html">mg_get_table()</a></code> 
+        </dt>
+        <dd>Gets a named table from a given schema</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_get_tables.html">mg_get_tables()</a></code> 
+        </dt>
+        <dd>Gets the available tables</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_id.html">mg_id()</a></code> 
+        </dt>
+        <dd>Convenience function for DBI::Id</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_interlace_sql.html">mg_interlace_sql()</a></code> 
+        </dt>
+        <dd>Combine any number of sql queries, where each has their own time axis of
+validity (valid_from and valid_until)</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_is.historical.html">mg_is.historical()</a></code> 
+        </dt>
+        <dd>Checks if table contains historical data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_join_warn.html">mg_join_warn()</a></code> 
+        </dt>
+        <dd>A warning to users that SQL does not match on NA by default</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_join_warn_experimental.html">mg_join_warn_experimental()</a></code> 
+        </dt>
+        <dd>A warning to users that SQL does not match on NA by default</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_nrow.html">mg_nrow()</a></code> 
+        </dt>
+        <dd>mg_nrow() but also works on remote tables</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_slice_time.html">mg_slice_time()</a></code> 
+        </dt>
+        <dd>Slices a data object based on time / date</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_table_exists.html">mg_table_exists()</a></code> 
+        </dt>
+        <dd>Check if table exists in db</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mg_update_snapshot.html">mg_update_snapshot()</a></code> 
+        </dt>
+        <dd>Update a historical table</dd>
       </dl></div>
   </main></div>
 

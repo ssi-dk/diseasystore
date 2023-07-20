@@ -12,7 +12,7 @@ It defines the primary methods of each feature stores as well as all of the publ
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,6 +26,7 @@ It defines the primary methods of each feature stores as well as all of the publ
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/google_covid_19_data.html">diseasystore: Google COVID-19 data</a>
     <a class="dropdown-item" href="../articles/quick_start.html">Quick start</a>
   </div>
 </li>
@@ -61,6 +62,11 @@ A list that maps features known by the feature store to the corresponding featur
 that compute the features.</p></dd>
 
 
+<dt><code>available_features</code></dt>
+<dd><p>(<code>character</code>)<br>
+A list of available features in the feature store</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -81,8 +87,8 @@ that compute the features.</p></dd>
 <span>  start_date <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  end_date <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  slice_ts <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  source_conn <span class="op">=</span> <span class="va">private</span><span class="op">$</span><span class="va">source_conn</span>,</span>
-<span>  target_conn <span class="op">=</span> <span class="va">private</span><span class="op">$</span><span class="va">target_conn</span>,</span>
+<span>  source_conn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  target_conn <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -148,9 +154,9 @@ Boolean that controls enables debugging information.</p></dd>
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span></span>
 <span>  <span class="va">feature</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="va">private</span>, <span class="st">"start_date"</span><span class="op">)</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="va">private</span>, <span class="st">"end_date"</span><span class="op">)</span>,</span>
-<span>  slice_ts <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/pluck.html" class="external-link">pluck</a></span><span class="op">(</span><span class="va">private</span>, <span class="st">"slice_ts"</span><span class="op">)</span></span>
+<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op">%.%</span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op">%.%</span> <span class="va">end_date</span>,</span>
+<span>  slice_ts <span class="op">=</span> <span class="va">private</span> <span class="op">%.%</span> <span class="va">slice_ts</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
