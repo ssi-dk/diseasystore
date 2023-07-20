@@ -12,8 +12,6 @@ mg_db_timestamp(timestamp, conn)
 \method{mg_db_timestamp}{default}(timestamp, conn)
 
 \method{mg_db_timestamp}{SQLiteConnection}(timestamp, conn)
-
-mg_db_timestamp(timestamp, conn)
 }
 \arguments{
 \item{timestamp}{The timestamp to be transformed to the DB type. Can be character.}
@@ -21,7 +19,5 @@ mg_db_timestamp(timestamp, conn)
 \item{conn}{A \code{DBIConnection} to the DB where the timestamp should be stored}
 }
 \description{
-Determine the type of timestamps the DB supports
-
 Determine the type of timestamps the DB supports
 }
