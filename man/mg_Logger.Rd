@@ -2,23 +2,30 @@
 % Please edit documentation in R/mg_reexports.R
 \name{mg_Logger}
 \alias{mg_Logger}
-\title{Create an object for logging database operations}
+\title{mg_Logger}
 \description{
 Create an object for logging database operations
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{log_path}}{(\code{character(1)})\cr
+A directory where log file is written (if this is not NULL). Defaults to \code{getOption("mg.log_path")}.}
 
-Create an object for logging database operations
+\item{\code{log_filename}}{(\code{character(1)})\cr
+The name (basename) of the log file.}
 
-Create an object for logging database operations
+\item{\code{log_tbl}}{The DB table used for logging. Class is connection-specific, but inherits from \code{tbl_dbi}.}
 
-Create an object for logging database operations
+\item{\code{start_time}}{(\code{POSIXct(1)})\cr
+The time at which data processing was started.}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-mg_Logger-new}{\code{mg_Logger$new()}}
-\item \href{#method-mg_Logger-generate_filename}{\code{mg_Logger$generate_filename()}}
-\item \href{#method-mg_Logger-generate_log_entry}{\code{mg_Logger$generate_log_entry()}}
-\item \href{#method-mg_Logger-log_format}{\code{mg_Logger$log_format()}}
 \item \href{#method-mg_Logger-log_info}{\code{mg_Logger$log_info()}}
 \item \href{#method-mg_Logger-log_warn}{\code{mg_Logger$log_warn()}}
 \item \href{#method-mg_Logger-log_error}{\code{mg_Logger$log_error()}}
@@ -30,217 +37,112 @@ Create an object for logging database operations
 \if{html}{\out{<a id="method-mg_Logger-new"></a>}}
 \if{latex}{\out{\hypertarget{method-mg_Logger-new}{}}}
 \subsection{Method \code{new()}}{
+Create a new mg_Logger object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$new(
   db_tablestring = NULL,
-  log_db = getOption("mg.log_db"),
+  log_table_id = getOption("mg.log_table_id"),
   log_conn = NULL,
   log_path = getOption("mg.log_path"),
   ts = NULL,
-  tic = Sys.time()
+  start_time = Sys.time()
 )}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{log_db}}{The specification to where db logs are stored ("schema.table").
-If NULL, no db logs are created.}
+\item{\code{db_tablestring}}{A string specifying the table being updated}
 
-\item{\code{log_path}}{Path to a directory of log files.}
+\item{\code{log_table_id}}{A \code{\link[DBI:Id]{DBI::Id()}} object or a character string readable by \link{mg_id}, specifying the location of the log table.}
+
+\item{\code{log_conn}}{A database connection inheriting from \code{DBIConnection}}
 
 \item{\code{log_path}}{The path where logs are stored.
 If NULL, no file logs are created.}
+
+\item{\code{ts}}{A timestamp describing the data being processed (≠ current time)}
+
+\item{\code{start_time}}{The time at which data processing was started (defaults to \code{\link[=Sys.time]{Sys.time()}})}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-generate_filename"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-generate_filename}{}}}
-\subsection{Method \code{generate_filename()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$generate_filename(db_tablestring = self$db_tablestring, ts = self$ts)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-generate_log_entry"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-generate_log_entry}{}}}
-\subsection{Method \code{generate_log_entry()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$generate_log_entry()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-log_format"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-log_format}{}}}
-\subsection{Method \code{log_format()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_format(..., tic = NULL, log_type = NULL)}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mg_Logger-log_info"></a>}}
 \if{latex}{\out{\hypertarget{method-mg_Logger-log_info}{}}}
 \subsection{Method \code{log_info()}}{
+Write a line to log file
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_info(..., tic = Sys.time(), log_type = "INFO")}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-log_warn"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-log_warn}{}}}
-\subsection{Method \code{log_warn()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_warn(..., log_type = "WARNING")}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-log_error"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-log_error}{}}}
-\subsection{Method \code{log_error()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_error(..., log_type = "ERROR")}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-log_to_db"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-log_to_db}{}}}
-\subsection{Method \code{log_to_db()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_to_db(...)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$clone(deep = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{deep}}{Whether to make a deep clone.}
+\item{\code{...}}{One or more character strings to be concatenated}
+
+\item{\code{tic}}{The timestamp used by the log entry (default Sys.time())}
+
+\item{\code{log_type}}{A character string which describes the severity of the log message}
 }
 \if{html}{\out{</div>}}
 }
-}
-}
-\section{Methods}{
-\subsection{Public methods}{
-\itemize{
-\item \href{#method-mg_Logger-new}{\code{mg_Logger$new()}}
-\item \href{#method-mg_Logger-generate_filename}{\code{mg_Logger$generate_filename()}}
-\item \href{#method-mg_Logger-generate_log_entry}{\code{mg_Logger$generate_log_entry()}}
-\item \href{#method-mg_Logger-log_format}{\code{mg_Logger$log_format()}}
-\item \href{#method-mg_Logger-log_info}{\code{mg_Logger$log_info()}}
-\item \href{#method-mg_Logger-log_warn}{\code{mg_Logger$log_warn()}}
-\item \href{#method-mg_Logger-log_error}{\code{mg_Logger$log_error()}}
-\item \href{#method-mg_Logger-log_to_db}{\code{mg_Logger$log_to_db()}}
-\item \href{#method-mg_Logger-clone}{\code{mg_Logger$clone()}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-new"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-new}{}}}
-\subsection{Method \code{new()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$new(
-  db_tablestring = NULL,
-  log_db = getOption("mg.log_db"),
-  log_conn = NULL,
-  log_path = getOption("mg.log_path"),
-  ts = NULL,
-  tic = Sys.time()
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{log_db}}{The specification to where db logs are stored ("schema.table").
-If NULL, no db logs are created.}
-
-\item{\code{log_path}}{Path to a directory of log files.}
-
-\item{\code{log_path}}{The path where logs are stored.
-If NULL, no file logs are created.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-generate_filename"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-generate_filename}{}}}
-\subsection{Method \code{generate_filename()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$generate_filename(db_tablestring = self$db_tablestring, ts = self$ts)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-generate_log_entry"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-generate_log_entry}{}}}
-\subsection{Method \code{generate_log_entry()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$generate_log_entry()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-log_format"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-log_format}{}}}
-\subsection{Method \code{log_format()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_format(..., tic = NULL, log_type = NULL)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-mg_Logger-log_info"></a>}}
-\if{latex}{\out{\hypertarget{method-mg_Logger-log_info}{}}}
-\subsection{Method \code{log_info()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_info(..., tic = Sys.time(), log_type = "INFO")}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mg_Logger-log_warn"></a>}}
 \if{latex}{\out{\hypertarget{method-mg_Logger-log_warn}{}}}
 \subsection{Method \code{log_warn()}}{
+Write a warning to log file and generate warning.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_warn(..., log_type = "WARNING")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{One or more character strings to be concatenated}
+
+\item{\code{log_type}}{A character string which describes the severity of the log message}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mg_Logger-log_error"></a>}}
 \if{latex}{\out{\hypertarget{method-mg_Logger-log_error}{}}}
 \subsection{Method \code{log_error()}}{
+Write an error to log file and stop execution
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_error(..., log_type = "ERROR")}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{One or more character strings to be concatenated}
+
+\item{\code{log_type}}{A character string which describes the severity of the log message}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mg_Logger-log_to_db"></a>}}
 \if{latex}{\out{\hypertarget{method-mg_Logger-log_to_db}{}}}
 \subsection{Method \code{log_to_db()}}{
+Write or update log table
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_to_db(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Name-value pairs with which to update the log table}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mg_Logger-clone"></a>}}

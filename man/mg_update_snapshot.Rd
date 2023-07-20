@@ -13,7 +13,7 @@ mg_update_snapshot(
   message = NULL,
   tic = Sys.time(),
   log_path = getOption("mg.log_path"),
-  log_db = getOption("mg.log_db"),
+  log_table_id = getOption("mg.log_table_id"),
   enforce_chronological_order = TRUE
 )
 }
@@ -36,8 +36,7 @@ mg_update_snapshot(
 \item{log_path}{The path where logs are stored.
 If NULL, no file logs are created.}
 
-\item{log_db}{The specification to where db logs are stored ("schema.table").
-If NULL, no db logs are created.}
+\item{log_table_id}{A \code{\link[DBI:Id]{DBI::Id()}} object or a character string readable by \link{mg_id}, specifying the location of the log table.}
 
 \item{enforce_chronological_order}{A logical that controls whether or not to check if timestamp of update is prior to timestamps in the DB}
 }

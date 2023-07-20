@@ -28,6 +28,7 @@ Imports:
     purrr,
     readr,
     rlang,
+    R6,
     stringr,
     testthat,
     tidyr,

@@ -1,7 +1,6 @@
 #' @keywords internal
 "_PACKAGE"
 
-## usethis namespace: start
 #' @import checkmate
 #' @import DBI
 #' @import dplyr
@@ -11,9 +10,11 @@
 #' @import purrr
 #' @importFrom readr read_csv
 #' @importFrom rlang as_label
+#' @importFrom rlang .data
+#' @import R6
 #' @import stringr
 #' @import tidyr
 #' @import tidyselect
 #' @importFrom zoo as.Date
-## usethis namespace: end
 NULL
+
