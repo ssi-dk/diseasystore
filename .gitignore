@@ -5,4 +5,4 @@
 .DS_Store
 inst/doc
 docs
-tests/testthat/testdata
+data-raw
