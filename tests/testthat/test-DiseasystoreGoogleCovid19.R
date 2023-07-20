@@ -19,7 +19,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Then we download the first n rows of each data set of interest
   google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
   purrr::walk(google_files, ~ {
-    readr::read_csv(file.path(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+    readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
     readr::write_csv(file.path(tmp_dir, .))
   })
 
