@@ -6,7 +6,10 @@ test_that("DiseasystoreGoogleCovid19 works", {
   options(diseasystore.DiseasystoreGoogleCovid19.source_conn = tmp_dir)
 
   sqlite_path <- file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")
-  if (file.exists(sqlite_path)) unlink(sqlite_path)
+  if (file.exists(sqlite_path)) {
+    closeAllConnections()
+    file.remove(sqlite_path)
+  }
   target_conn <- \() dbConnect(RSQLite::SQLite(), sqlite_path)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 
