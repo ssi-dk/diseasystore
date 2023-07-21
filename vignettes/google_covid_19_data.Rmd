@@ -22,20 +22,29 @@ The Google COVID-19 data repository is a comprehensive open repository of COVID-
 This vignette shows how to use this data with the `diseasy` and `diseasystore` packages.
 
 First, it is a good idea to copy the relevant Google COVID-19 data files locally and store that location as an option for the package.
-```{r download, eval=FALSE}
-options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "/local/file/path") # Should not end with "/"
+```{r download_data, eval=FALSE}
+options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "/local/file/path")
+
+# Ensure folder exists
+if (!dir.exists(options() %.% diseasystore.DiseasystoreGoogleCovid19.source_conn)) {
+  dir.create(options() %.% diseasystore.DiseasystoreGoogleCovid19.source_conn,
+             recursive = TRUE, showWarnings = FALSE)
+}
 
 # Define the Google files to download
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 
 # Download each file and compress them to reduce storage
 #' \dontrun{
-purrr::walk(google_files, ~ {
-  url      <- paste0(getOption("diseasystore.DiseasystoreGoogleCovid19.remote_conn"), .)
-  destfile <- file.path(getOption("diseasystore.DiseasystoreGoogleCovid19.source_conn"), .)
-  download.file(url, destfile)
-  R.utils::gzip(destfile)
-})
+purrr::walk(google_files,
+  ~ {
+      url      <- paste0(getOption("diseasystore.DiseasystoreGoogleCovid19.remote_conn"), .)
+      destfile <- file.path(getOption("diseasystore.DiseasystoreGoogleCovid19.source_conn"), .)
+      if (!file.exists(paste0(destfile, ".gz"))) {
+        download.file(url, destfile)
+        R.utils::gzip(destfile)
+      }
+    })
 #' }
 ```
 
@@ -43,21 +52,35 @@ The `diseasystores` require a data base to store its features in.
 These should be configured before use and can be stored in the packages options.
 NOTE: a global DB can also be configured using `options(diseasystore.target_conn = ...)` instead.
 
-```{r init_diseasystore, eval=FALSE}
+```{r configure_diseasystore, eval=FALSE}
 
 # We will store the target_conn as a function that opens a DBIconnection to the DB
-target_conn <- \() dbConnect(RSQLite::SQLite(), "/local/file/path/diseasystore_google_covid_19.sqlite")
+target_conn <- \() DBI::dbConnect(RSQLite::SQLite(), "/local/file/path/diseasystore_google_covid_19.sqlite")
 options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 ```
 
 
 Once the files are downloaded and the target DB is configured, we can run the `diseasystore` that uses the Google COVID-19 data.
 
-```{r using_diseasystore, eval=FALSE}
+```{r initializing_diseasystore, eval=FALSE}
 
 # For ease of use, we can define a period of interest:
 start_date <- as.Date("2020-01-01")
 end_date   <- as.Date("2020-06-01")
 
 fs <- DiseasystoreGoogleCovid19$new(start_date, end_date)
+```
+
+The feature store is designed to work with the `diseasy` package, which utilizes it to couple data as requested.
+However, we can also use the feature store directly to get data.
+
+```{r using_diseasystore, eval=FALSE}
+
+# We can see all the available features in the feature store
+print(fs$available_features)
+
+# And then retrieve each feature from the feature store
+#' \dontrun{
+fs$get_feature("n_hospital")
+#' }
 ```
