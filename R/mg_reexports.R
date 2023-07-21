@@ -513,7 +513,6 @@ mg_digest_to_checksum_internal.tibble           <- mg_digest_to_checksum_native_
 
 
 
-
 #' Create a historical table from input data
 #'
 #' @name mg_create_table
@@ -979,6 +978,7 @@ mg_nrow <- function(.data) {
 
 
 
+
 #' @title mg_Logger
 #' @description
 #' Create an object for logging database operations
@@ -1123,7 +1123,6 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
 
       return(filename)
     },
-
 
     generate_log_entry = function() {
       # Create a row for log in question

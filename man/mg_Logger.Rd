@@ -67,6 +67,7 @@ If NULL, no file logs are created.}
 }
 \if{html}{\out{</div>}}
 }
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-mg_Logger-log_info"></a>}}
@@ -76,6 +77,7 @@ Write a line to log file
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_info(..., tic = Sys.time(), log_type = "INFO")}\if{html}{\out{</div>}}
 }
+
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
@@ -94,6 +96,7 @@ Write a line to log file
 \if{latex}{\out{\hypertarget{method-mg_Logger-log_warn}{}}}
 \subsection{Method \code{log_warn()}}{
 Write a warning to log file and generate warning.
+
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{mg_Logger$log_warn(..., log_type = "WARNING")}\if{html}{\out{</div>}}
 }

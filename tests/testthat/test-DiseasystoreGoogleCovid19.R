@@ -11,6 +11,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
     closeAllConnections()
     stopifnot("Could not delete SQLite DB before tests" = file.remove(sqlite_path))
   }
+
   target_conn <- \() dbConnect(RSQLite::SQLite(), sqlite_path)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 

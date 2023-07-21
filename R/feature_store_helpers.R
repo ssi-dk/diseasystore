@@ -21,6 +21,7 @@ available_diseasystores <- function() {
     purrr::discard(~ . %in% c("DiseasystoreBase", "DiseasystoreGeneric"))
 }
 
+
 #' Check for the existence of a `diseasystore` for the case definition
 #' @template case_definition
 #' @export
@@ -32,6 +33,7 @@ diseasystore_exists <- function(case_definition) {
   return(diseasystore_case_definition(case_definition) %in% available_diseasystores())
 
 }
+
 
 #' Get the `diseasystore` for the case definition
 #' @template case_definition
