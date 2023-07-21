@@ -27,6 +27,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                           source_conn = NULL, target_conn = NULL,
                           verbose = TRUE) {
 
+      # Validate input
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, null.ok = TRUE, add = coll)
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
@@ -98,7 +99,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Load the available features
       fs_map <- self %.% fs_map
 
-      # Check that the feature is implemented
+      # Validate input
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(feature, unlist(fs_map), add = coll)
       checkmate::assert_date(start_date, any.missing = FALSE, add = coll)
@@ -196,7 +197,17 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   These are then joined to the observable feature before aggregation is performed.
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
-    key_join_features = function(observable, aggregation) {
+
+      # Validate input
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_character(observable, add = coll)
+      checkmate::assert(
+        checkmate::check_character(aggregation),
+        checkmate::check_class(aggregation, "quosure"),
+        checkmate::check_class(aggregation, "quosures"),
+        add = coll
+      )
+      checkmate::reportAssertions(coll)
 
       # Store the fs_map
       fs_map <- self %.% fs_map
