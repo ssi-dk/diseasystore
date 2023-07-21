@@ -195,8 +195,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @param aggregation (`list`(`quosures`))\cr
     #'   Expressions in aggregation evaluated to find appropriate features.
     #'   These are then joined to the observable feature before aggregation is performed.
+    #' @template start_date
+    #' @template end_date
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
+    key_join_features = function(observable, aggregation,
+                                 start_date = private %.% start_date,
+                                 end_date   = private %.% end_date) {
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
@@ -207,10 +212,16 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         checkmate::check_class(aggregation, "quosures"),
         add = coll
       )
+      checkmate::assert_date(start_date, add = coll)
+      checkmate::assert_date(end_date, add = coll)
       checkmate::reportAssertions(coll)
 
       # Store the fs_map
       fs_map <- self %.% fs_map
+
+      # We start by copying the study_dates to the conn to ensure SQLite compatibility
+      study_dates <- data.frame(valid_from = start_date, valid_until = end_date + lubridate::days(1)) %>%
+        copy_to(private %.% target_conn, ., overwrite = TRUE)
 
       # Determine which features are affected by an aggregation
       if (!is.null(aggregation)) {
@@ -239,25 +250,40 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                              ~ ifelse(.y == "", .x, .y)) |>
           unname()
 
+        # Check aggregation features are not observables
+        stopifnot("Aggregation features cannot be observables (must not start with 'n_')" =
+                    purrr::none(aggregation_names, ~ startsWith(., "n_")))
+
         # Fetch requested aggregation features from the feature store
         aggregation_data <- aggregation_features |>
           unique() |>
           purrr::map(
-            ~ self$get_feature(.x) |>
-              dplyr::mutate(valid_from  = pmax(valid_from, # Simplify interlacing
-                                               start_date, na.rm = TRUE),
-                            valid_until = pmin(valid_until,
-                                               as.Date(as.Date(end_date) + lubridate::days(1)), na.rm = TRUE)))
+            ~ {
+              # Fetch the requested aggregation feature from the feature store and truncate to the start
+              #  and end dates to simplify the interlaced output
+              self$get_feature(.x, start_date, end_date) |>
+                dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
+                dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d),
+                              "valid_until" = dplyr::coalesce(
+                                pmin(.data$valid_until, .data$valid_until.d),
+                                .data$valid_until.d)) |>
+                dplyr::select(!ends_with(".d"))
+          })
       } else {
         aggregation_features <- NULL
         aggregation_names <- NULL
         aggregation_data <- NULL
       }
 
-      # Fetch the requested observable from the feature store
-      observable_data <- self$get_feature(observable) |>
-        dplyr::mutate(valid_from  = pmax(valid_from,  start_date, na.rm = TRUE), # Simplify interlacing
-                      valid_until = pmin(valid_until, as.Date(as.Date(end_date) + lubridate::days(1)), na.rm = TRUE))
+      # Fetch the requested observable from the feature store and truncate to the start and end dates
+      # to simplify the interlaced output
+      observable_data <- self$get_feature(observable, start_date, end_date) |>
+        dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
+        dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d),
+                      "valid_until" = dplyr::coalesce(
+                        pmin(.data$valid_until, .data$valid_until.d),
+                        .data$valid_until.d)) |>
+        dplyr::select(!ends_with(".d"))
 
       # Determine the keys
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
@@ -273,7 +299,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, aggregation_data) |>
-        private$key_join_filter(aggregation_features) |>
+        fs$key_join_filter(aggregation_features) |>
         dplyr::compute() |>
         dplyr::group_by(!!!aggregation)
 
@@ -307,8 +333,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       if (!is.null(aggregation)) {
         all_combi <- out |>
+          dplyr::ungroup() |>
           dplyr::distinct(!!!aggregation) |>
-          dplyr::full_join(all_dates, by = character(), copy = TRUE) |>
+          dplyr::cross_join(all_dates, copy = TRUE) |>
           dplyr::compute()
       } else {
         all_combi <- all_dates

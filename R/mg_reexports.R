@@ -218,7 +218,6 @@ mg_slice_time <- function(.data, slice_ts, from_ts = from_ts, until_ts = until_t
 
 #' SQL Joins
 #'
-#' @name joins
 #'
 #' @description Overloads the dplyr *_join to accept an na_by argument.
 #' By default, joining using SQL does not match on NA / NULL.
@@ -255,7 +254,83 @@ mg_inner_join <- function(x, y, by = NULL, na_by = NULL, ...) {
 
 
 
-# This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
+#' @name mg_reexports
+#' @export
+mg_left_join <- function(x, y, by = NULL, na_by = NULL, ...) {
+
+  # Check arguments
+  mg_assert_data_like(x)
+  mg_assert_data_like(y)
+  checkmate::assert_character(by, null.ok = TRUE)
+  checkmate::assert_character(na_by, null.ok = TRUE)
+
+  if (is.null(na_by)) {
+    if (inherits(x, "tbl_dbi") || inherits(y, "tbl_dbi")) mg_join_warn()
+    return(dplyr::left_join(x, y, by = by, ...))
+  } else {
+    mg_join_warn_experimental()
+    sql_on <- mg_join_na_sql(by, na_by)
+    renamer <- mg_select_na_sql(x, y, by, na_by)
+    return(dplyr::left_join(x, y, suffix = c(".x", ".y"), sql_on = sql_on, ...) |>
+             dplyr::rename(!!renamer) |>
+             dplyr::select(tidyselect::all_of(names(renamer))))
+
+
+  }
+}
+
+
+
+#' dbplyr and SQLite does not work right now for right_joins it seems
+#' so we "fix" it by doing a left join on SQLiteConnections
+mg_mg_right_join <- function(x, y, sql_on, renamer, ...) {
+  UseMethod("mg_mg_right_join")
+}
+
+
+#'
+mg_mg_right_join.tbl_dbi <- function(x, y, sql_on, renamer, ...) {
+  dplyr::right_join(x, y, suffix = c(".y", ".x"), sql_on = sql_on, ...) |>
+    dplyr::rename(!!renamer) |>
+    dplyr::select(tidyselect::all_of(names(renamer)))
+}
+
+
+#'
+mg_mg_right_join.tbl_SQLiteConnection <- function(x, y, sql_on, renamer, ...) {
+  dplyr::left_join(y, x, suffix = c(".y", ".x"), sql_on = sql_on, ...) |>
+    dplyr::rename(!!renamer) |>
+    dplyr::select(tidyselect::all_of(names(renamer)))
+}
+
+
+
+#' @name mg_reexports
+#' @export
+mg_right_join <- function(x, y, by = NULL, na_by = NULL, ...) {
+
+  # Check arguments
+  mg_assert_data_like(x)
+  mg_assert_data_like(y)
+  checkmate::assert_character(by, null.ok = TRUE)
+  checkmate::assert_character(na_by, null.ok = TRUE)
+
+  if (is.null(na_by)) {
+    if (inherits(x, "tbl_dbi") || inherits(y, "tbl_dbi")) mg_join_warn()
+    return(dplyr::right_join(x, y, by = by, ...))
+  } else {
+    mg_join_warn_experimental()
+    sql_on <- mg_join_na_sql(by, na_by)
+    renamer <- mg_select_na_sql(x, y, by, na_by, left = FALSE)
+
+    # Seems like mg_right_join does not work for SQLite, so we'll do a left join for now
+    mg_mg_right_join(x, y, sql_on, renamer, ...)
+  }
+}
+
+
+
+#' This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
 mg_join_na_sql <- function(by, na_by) {
   sql_on <- ""
   if (!missing(by)) {
@@ -280,7 +355,8 @@ mg_join_na_sql <- function(by, na_by) {
 }
 
 
-# Get colnames from
+
+#' Get colnames from
 mg_select_na_sql <- function(x, y, by, na_by, left = TRUE) {
 
   all_by <- c(by, na_by) # Variables to be common after join
@@ -510,7 +586,6 @@ md5 <- openssl::md5
 
 
 #' Some backends have native md5 support, these use this function
-#' @rdname digest_internal
 #' @importFrom rlang `:=`
 mg_digest_to_checksum_native_md5 <- function(.data, col) {
 
@@ -522,7 +597,6 @@ mg_digest_to_checksum_native_md5 <- function(.data, col) {
 }
 
 
-#' @name digest_internal
 #' @template .data
 #' @param col The name of column the checksums will be placed in
 mg_digest_to_checksum_internal <- function(.data, col) {
@@ -530,7 +604,6 @@ mg_digest_to_checksum_internal <- function(.data, col) {
 }
 
 
-#' @rdname digest_internal
 #' @importFrom rlang `:=` .data
 mg_digest_to_checksum_internal.default <- function(.data, col) {
 
@@ -550,15 +623,12 @@ mg_digest_to_checksum_internal.default <- function(.data, col) {
 }
 
 
-#' @rdname digest_internal
 mg_digest_to_checksum_internal.tbl_PqConnection <- mg_digest_to_checksum_native_md5
 
 
-#' @rdname digest_internal
 mg_digest_to_checksum_internal.data.frame       <- mg_digest_to_checksum_native_md5
 
 
-#' @rdname digest_internal
 mg_digest_to_checksum_internal.tibble           <- mg_digest_to_checksum_native_md5
 
 
