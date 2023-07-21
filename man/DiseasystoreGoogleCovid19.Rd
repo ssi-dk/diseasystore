@@ -2,9 +2,11 @@
 % Please edit documentation in R/DiseasystoreGoogleCovid19.R
 \name{DiseasystoreGoogleCovid19}
 \alias{DiseasystoreGoogleCovid19}
-\title{feature store handler of Google COVID-19 data features}
+\title{feature store handler of Google Health COVID-19 Open Data features}
 \description{
-TODO
+This \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} brings support for using the Google
+Health COVID 19 Open Data repository.
+See the vignette("google_covid_19_data") for details on how to configure the feature store
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
