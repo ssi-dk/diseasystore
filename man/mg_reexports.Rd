@@ -9,12 +9,23 @@
 \alias{mg_slice_time}
 \alias{mg_inner_join}
 \alias{mg_left_join}
+\alias{mg_mg_right_join}
+\alias{mg_mg_right_join.tbl_dbi}
+\alias{mg_mg_right_join.tbl_SQLiteConnection}
 \alias{mg_right_join}
+\alias{mg_join_na_sql}
+\alias{mg_select_na_sql}
+\alias{mg_join_warn}
+\alias{mg_join_warn_experimental}
 \alias{mg_interlace_sql}
 \alias{mg_digest_to_checksum}
+\alias{mg_digest_to_checksum_native_md5}
+\alias{mg_digest_to_checksum_internal}
+\alias{mg_digest_to_checksum_internal.default}
 \alias{mg_create_table}
 \alias{mg_update_snapshot}
 \alias{mg_filter_keys}
+\alias{mg_db_timestamp}
 \alias{mg_is.historical}
 \alias{mg_nrow}
 \alias{mg_Logger}
@@ -45,11 +56,31 @@ mg_inner_join(x, y, by = NULL, na_by = NULL, ...)
 
 mg_left_join(x, y, by = NULL, na_by = NULL, ...)
 
+mg_mg_right_join(x, y, sql_on, renamer, ...)
+
+\method{mg_mg_right_join}{tbl_dbi}(x, y, sql_on, renamer, ...)
+
+\method{mg_mg_right_join}{tbl_SQLiteConnection}(x, y, sql_on, renamer, ...)
+
 mg_right_join(x, y, by = NULL, na_by = NULL, ...)
+
+mg_join_na_sql(by, na_by)
+
+mg_select_na_sql(x, y, by, na_by, left = TRUE)
+
+mg_join_warn()
+
+mg_join_warn_experimental()
 
 mg_interlace_sql(tables, by = NULL, colnames = NULL)
 
 mg_digest_to_checksum(.data, col = "checksum", exclude = NULL, warn = TRUE)
+
+mg_digest_to_checksum_native_md5(.data, col)
+
+mg_digest_to_checksum_internal(.data, col)
+
+\method{mg_digest_to_checksum_internal}{default}(.data, col)
 
 mg_create_table(.data, conn = NULL, db_table_id = NULL, temporary = TRUE, ...)
 
@@ -67,6 +98,8 @@ mg_update_snapshot(
 )
 
 mg_filter_keys(.data, filters, by = NULL, na_by = NULL)
+
+mg_db_timestamp(timestamp, conn)
 
 mg_is.historical(.data)
 
@@ -122,7 +155,7 @@ names by supplying the arguments as a list
 colnames must be named in same order as as given in tables
 (i.e. t1, t2, t3, ...).}
 
-\item{col}{Name of the column to put the checksums in}
+\item{col}{The name of column the checksums will be placed in}
 
 \item{exclude}{Columns to exclude from the checksum generation}
 
