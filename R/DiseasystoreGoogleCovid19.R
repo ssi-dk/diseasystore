@@ -18,9 +18,13 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
     #' @template .data
     #' @param aggregation_features (`character`)\cr
     #'   A list of the features included in the aggregation process.
+    #' @template start_date
+    #' @template end_date
     #' @return
     #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, aggregation_features) {
+    key_join_filter = function(.data, aggregation_features,
+                               start_date = private %.% start_date,
+                               end_date = private %.% end_date) {
 
       # The Google data contains surplus data depending on the aggregation.
       # Ie. some individuals are counted more than once.
@@ -34,7 +38,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
           !(aggregation_features %in% c("country_id", "country", "region_id", "region", "subregion_id", "subregion")))) {
 
         # If no spatial aggregation is requested, use the largest available per country
-        filter_level <- fs$get_feature("country_id") |>
+        filter_level <- self$get_feature("country_id") |>
           dplyr::group_by(country_id) |>
           dplyr::slice_min(aggregation_level) |>
           dplyr::ungroup() |>

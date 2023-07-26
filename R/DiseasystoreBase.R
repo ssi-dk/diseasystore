@@ -299,7 +299,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, aggregation_data) |>
-        fs$key_join_filter(aggregation_features) |>
+        self$key_join_filter(aggregation_features, start_date, end_date) |>
         dplyr::compute() |>
         dplyr::group_by(!!!aggregation)
 
