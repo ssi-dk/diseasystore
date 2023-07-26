@@ -263,7 +263,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
               #  and end dates to simplify the interlaced output
               self$get_feature(.x, start_date, end_date) |>
                 dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
-                dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d),
+                dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d, na.rm = TRUE),
                               "valid_until" = dplyr::coalesce(
                                 pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
                                 .data$valid_until.d)) |>
@@ -279,7 +279,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # to simplify the interlaced output
       observable_data <- self$get_feature(observable, start_date, end_date) |>
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
-        dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d),
+        dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d, na.rm = TRUE),
                       "valid_until" = dplyr::coalesce(
                         pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
                         .data$valid_until.d)) |>
