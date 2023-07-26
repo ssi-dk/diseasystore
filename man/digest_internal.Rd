@@ -21,8 +21,6 @@ mg_digest_to_checksum_internal(.data, col)
 \method{mg_digest_to_checksum_internal}{data.frame}(.data, col)
 
 \method{mg_digest_to_checksum_internal}{tibble}(.data, col)
-
-mg_digest_to_checksum_internal(.data, col)
 }
 \arguments{
 \item{.data}{\cr

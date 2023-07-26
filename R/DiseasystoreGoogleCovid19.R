@@ -129,8 +129,9 @@ google_covid_19_metric <- function(google_pattern, out_name) {
 
       data <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
         (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
-        dplyr::filter(date >= as.Date("2020-01-01"),
-                      !!start_date <= date, date <= !!end_date) |>
+        dplyr::mutate("date" = as.Date(.data$date)) |>
+        dplyr::filter(.data$date >= as.Date("2020-01-01"),
+                      {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("location_key", "date", tidyselect::starts_with(glue::glue("new_{google_pattern}"))) |>
         tidyr::pivot_longer(-c("location_key", "date"),
                             names_to = c("tmp", "key_age_bin"),
@@ -138,7 +139,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
                             values_to = out_name) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate(valid_from = date, valid_until = as.Date(date + lubridate::days(1)))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(data)
     },
@@ -147,9 +148,8 @@ google_covid_19_metric <- function(google_pattern, out_name) {
 }
 
 
-
 # The functions below generate `FeatureHandler`s for the feature store.
-# by keeping them here as seperate files, we can use them in our testing framework to check that everything
+# by keeping them here as separate files, we can use them in our testing framework to check that everything
 # works as expected
 google_covid_19_hospital_   <- function() google_covid_19_metric("hospitalized_patients", "n_hospital")
 google_covid_19_deaths_     <- function() google_covid_19_metric("deceased", "n_deaths")
@@ -186,6 +186,7 @@ google_covid_19_population_ <- function() {
   )
 }
 
+
 google_covid_19_age_group_  <- function() {
     FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn) {
@@ -201,7 +202,7 @@ google_covid_19_age_group_  <- function() {
         # We need a map between age_bin and age_group
         age_bin_map <- by_age |>
           dplyr::group_by(.data$location_key) |>
-          dplyr::select("location_key", starts_with("age_bin")) |>
+          dplyr::select("location_key", tidyselect::starts_with("age_bin")) |>
           dplyr::distinct() |>
           dplyr::left_join(dplyr::select(by_age, "location_key", "date", tidyselect::starts_with("age_bin")),
                            by = colnames(dplyr::select(by_age, "location_key", tidyselect::starts_with("age_bin"))),
@@ -230,7 +231,7 @@ google_covid_19_age_group_  <- function() {
         # And finally copy to the DB
         out <- age_bin_map |>
           dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
-          dplyr::mutate(valid_from = as.Date("2020-01-01"), valid_until = as.Date(NA))
+          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
 
         return(out)
       },
@@ -258,7 +259,7 @@ google_covid_19_index_      <- function() {
                          "subregion"    = .data$subregion2_name,
                          .data$aggregation_level) |>
         tidyr::unite("region_id", "country_code", "subregion1_code", na.rm = TRUE) |>
-        dplyr::mutate(valid_from = as.Date("2020-01-01"), valid_until = as.Date(NA))
+        dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
 
       return(out)
     },
@@ -276,11 +277,12 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
 
       out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
         (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
-        dplyr::filter(!!start_date <= date, date <= !!end_date) |>
+        dplyr::mutate("date" = as.Date(.data$date)) |>
+        dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
                       "min_temp" = "minimum_temperature_celsius") |>
-        dplyr::mutate(valid_from = .data$date, valid_until = as.Date(.data$date + lubridate::days(1)))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(out)
     },
@@ -298,11 +300,12 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
 
       out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
         (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
-        dplyr::filter(!!start_date <= date, date <= !!end_date) |>
+        dplyr::mutate("date" = as.Date(.data$date)) |>
+        dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
                       "max_temp" = "maximum_temperature_celsius") |>
-        dplyr::mutate(valid_from = .data$date, valid_until = as.Date(.data$date + lubridate::days(1)))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(out)
     },

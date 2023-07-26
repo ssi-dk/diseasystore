@@ -303,60 +303,6 @@ mg_select_na_sql <- function(x, y, by, na_by, left = TRUE) {
 
 
 
-# This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
-mg_join_na_sql <- function(by, na_by) {
-  sql_on <- ""
-  if (!missing(by)) {
-    for (i in seq_along(by)) {
-      sql_on <- paste0(sql_on, '"LHS"."', by[i], '" = "RHS"."', by[i], '"')
-      if (i < length(by) || !missing(na_by)) {
-        sql_on <- paste(sql_on, "\nAND ")
-      }
-    }
-  }
-
-  if (!missing(na_by)) {
-    for (i in seq_along(na_by)) {
-      sql_on <- paste0(sql_on, '("LHS"."', na_by[i], '" IS NOT DISTINCT FROM "RHS"."', na_by[i], '")')
-      if (i < length(na_by)) {
-        sql_on <- paste(sql_on, "\nAND ")
-      }
-    }
-  }
-
-  return(sql_on)
-}
-
-
-# Get colnames from
-mg_select_na_sql <- function(x, y, by, na_by, left = TRUE) {
-
-  all_by <- c(by, na_by) # Variables to be common after join
-  cxy <- dplyr::setdiff(dplyr::intersect(colnames(x), colnames(y)), all_by)   # Duplicate columns after join
-  cx  <- dplyr::setdiff(colnames(x), colnames(y)) # Variables only in x
-  cy  <- dplyr::setdiff(colnames(y), colnames(x)) # Variables only in y
-
-  vars <- list(all_by, cx, cy, cxy, cxy)
-
-  renamer <- \(suffix) suffix |> purrr::map(~ purrr::partial(\(x, suffix) paste0(x, suffix), suffix = .))
-
-  sql_select <- vars |>
-    purrr::map2(renamer(list(ifelse(left, ".x", ".y"), "", "", ".x", ".y")), ~ purrr::map(.x, .y)) |>
-    purrr::map(~ purrr::reduce(., c, .init = character(0))) |>
-    purrr::reduce(c)
-
-  sql_names <- vars |>
-    purrr::map2(renamer(list("", "", "", ".x", ".y")), ~ purrr::map(.x, .y)) |>
-    purrr::map(~ purrr::reduce(., c, .init = character(0))) |>
-    purrr::reduce(c)
-
-  names(sql_select) <- sql_names
-
-  return(sql_select)
-}
-
-
-
 #' A warning to users that SQL does not match on NA by default
 mg_join_warn <- function() {
   if (testthat::is_testing() || !interactive()) return()
@@ -567,15 +513,6 @@ mg_digest_to_checksum_internal.tibble           <- mg_digest_to_checksum_native_
 
 
 
-
-#' @name digest_internal
-#' @template .data
-#' @param col The name of column the checksums will be placed in
-mg_digest_to_checksum_internal <- function(.data, col) {
-  UseMethod("mg_digest_to_checksum_internal")
-}
-
-
 #' Create a historical table from input data
 #'
 #' @name mg_create_table
@@ -688,7 +625,7 @@ methods::setMethod("mg_getTableSignature", "NULL", function(.data, conn) {
 #'   A timestamp when computation began. If not supplied, it will be created at call-time.
 #'   (Used to more accurately convey how long runtime of the update process has been)
 #' @template log_path
-#' @template log_db
+#' @template log_table_id
 #' @param enforce_chronological_order
 #'   A logical that controls whether or not to check if timestamp of update is prior to timestamps in the DB
 #' @return NULL
@@ -696,7 +633,7 @@ methods::setMethod("mg_getTableSignature", "NULL", function(.data, conn) {
 #' @importFrom rlang .data
 #' @export
 mg_update_snapshot <- function(.data, conn, db_table, timestamp, filters = NULL, message = NULL, tic = Sys.time(),
-                            log_path = getOption("mg.log_path"), log_db = getOption("mg.log_db"),
+                            log_path = getOption("mg.log_path"), log_table_id = getOption("mg.log_table_id"),
                             enforce_chronological_order = TRUE) {
 
   # Check arguments
@@ -730,11 +667,11 @@ mg_update_snapshot <- function(.data, conn, db_table, timestamp, filters = NULL,
   # Initialize logger
   logger <- mg_Logger$new(
     db_tablestring = db_table_name,
-    log_db = log_db,
+    log_table_id = log_table_id,
     log_conn = conn,
     log_path = log_path,
     ts = timestamp,
-    tic = tic
+    start_time = tic
   )
 
   logger$log_to_db(start_time = !!mg_db_timestamp(tic, conn))
@@ -1010,15 +947,6 @@ mg_db_timestamp.SQLiteConnection <- function(timestamp, conn) {
 
 
 
-#' Determine the type of timestamps the DB supports
-#' @name mg_db_timestamp
-#' @param timestamp The timestamp to be transformed to the DB type. Can be character.
-#' @param conn A `DBIConnection` to the DB where the timestamp should be stored
-mg_db_timestamp <- function(timestamp, conn) {
-  UseMethod("mg_db_timestamp", conn)
-}
-
-
 #' Checks if table contains historical data
 #'
 #' @template .data
@@ -1050,126 +978,119 @@ mg_nrow <- function(.data) {
 
 
 
+
+#' @title mg_Logger
+#' @description
 #' Create an object for logging database operations
-#' @param log_path Path to a directory of log files.
+#'
+#' @param db_tablestring A string specifying the table being updated
+#' @template log_table_id
+#' @template log_path
+#' @param ts A timestamp describing the data being processed (`r "\U2260"` current time)
+#' @param start_time The time at which data processing was started (defaults to [Sys.time()])
 #'
 #' @export
 mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
   public = list(
-    # Arguments to be given by user
-    db_tablestring = NULL,
-    log_path = NULL,
-    ts = NULL,
 
-    # Attributes to define at initialization
-    filename = NULL,
-    log_db = NULL,
-    log_conn = NULL,
+    #' @field log_path (`character(1)`)\cr
+    #' A directory where log file is written (if this is not NULL). Defaults to `getOption("mg.log_path")`.
+    log_path = NULL,
+
+    #' @field log_filename (`character(1)`)\cr
+    #' The name (basename) of the log file.
+    log_filename = NULL,
+
+    #' @field log_tbl
+    #' The DB table used for logging. Class is connection-specific, but inherits from `tbl_dbi`.
+    log_tbl = NULL,
+
+    #' @field start_time (`POSIXct(1)`)\cr
+    #' The time at which data processing was started.
     start_time = NULL,
 
-    #' @template log_path
-    #' @template log_db
+    #' @description
+    #' Create a new mg_Logger object
+    #' @param log_conn A database connection inheriting from `DBIConnection`
     initialize = function(db_tablestring = NULL,
-                          log_db   = getOption("mg.log_db"),
+                          log_table_id   = getOption("mg.log_table_id"),
                           log_conn = NULL,
                           log_path = getOption("mg.log_path"),
                           ts = NULL,
-                          tic = Sys.time()
+                          start_time = Sys.time()
                           ) {
 
       # Initialize logger
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(db_tablestring, add = coll)
-      checkmate::assert_character(log_db, null.ok = TRUE, add = coll)
+      mg_assert_id_like(log_table_id, null.ok = TRUE, add = coll)
       checkmate::assert_class(log_conn, "DBIConnection", null.ok = TRUE, add = coll)
       checkmate::assert_character(log_path, null.ok = TRUE, add = coll)
       mg_assert_timestamp_like(ts, add = coll)
-      checkmate::assert_posixct(tic, add = coll)
+      checkmate::assert_posixct(start_time, add = coll)
       checkmate::reportAssertions(coll)
 
-      self$ts <- ts
-      self$start_time <- tic
+      private$ts <- ts
+      self$start_time <- start_time
       lockBinding("start_time", self)
 
-      if (!is.null(log_db)) self$log_db <- mg_create_logs_if_missing(log_db, log_conn)
-      self$log_conn <- log_conn
-      self$log_path <- log_path
-      self$db_tablestring <- db_tablestring
-      self$filename <- self$generate_filename(db_tablestring)
-      self$generate_log_entry()
-
-      stopifnot("Log file for given timestamp already exists!" = !file.exists(file.path(self$log_path, self$filename)))
-    },
-
-
-    generate_filename = function(db_tablestring = self$db_tablestring,
-                                 ts = self$ts) {
-
-      # If we are not producing a file log, we provide a random string to key by
-      if (is.null(self$log_path)) return(basename(tempfile(tmpdir = "", pattern = "")))
-
-
-      start_format <- format(self$start_time, "%Y%m%d.%H%M")
-
-      if (is.character(ts)) ts <- as.Date(ts)
-      ts_format <- format(ts, "%Y_%m_%d")
-      filename <- sprintf(
-        "%s.%s.%s.log",
-        start_format,
-        ts_format,
-        db_tablestring
-      )
-
-      return(filename)
-    },
-
-    generate_log_entry = function() {
-
-      # If we not producing a db log, create entry
-      if (!is.null(self$log_db)) {
-        dplyr::rows_append(
-          x = self$log_db,
-          y = data.frame(log_file = self$filename),
-          copy = TRUE,
-          in_place = TRUE)
+      if (!is.null(log_table_id)) {
+        self$log_tbl <- mg_create_logs_if_missing(log_table_id, log_conn)
       }
+      private$log_conn <- log_conn
 
-      return()
+      self$log_path <- log_path
+      private$db_tablestring <- db_tablestring
+      self$log_filename <- private$generate_filename()
+      lockBinding("log_filename", self)
+
+      # Create a line in log DB for mg_Logger
+      private$generate_log_entry()
+
+      stopifnot("Log file for given timestamp already exists!" = !file.exists(file.path(self$log_path, self$log_filename)))
     },
 
-    log_format = function(..., tic = NULL, log_type = NULL) {
-      ts_str <- if (is.null(tic)) tic else stringr::str_replace(format(tic, "%F %H:%M:%OS3", locale = "en"), "[.]", ",")
-      return(paste(ts_str, Sys.getenv("USER"), log_type, paste(...), sep = " - "))
-    },
-
+    #' @description
+    #' Write a line to log file
+    #' @param ... `r log_dots <- "One or more character strings to be concatenated"; log_dots`
+    #' @param tic The timestamp used by the log entry (default Sys.time())
+    #' @param log_type `r log_type <- "A character string which describes the severity of the log message"; log_type`
     log_info = function(..., tic = Sys.time(), log_type = "INFO") {
 
       # Writes log file (if set)
       if (!is.null(self$log_path)) {
-        sink(file = file.path(self$log_path, self$filename), split = TRUE, append = TRUE, type = "output")
+        sink(file = file.path(self$log_path, self$log_filename), split = TRUE, append = TRUE, type = "output")
       }
 
-      cat(self$log_format(..., tic = tic, log_type = log_type), "\n", sep = "")
+      cat(private$log_format(..., tic = tic, log_type = log_type), "\n", sep = "")
 
       if (!is.null(self$log_path)) sink()
     },
 
+    #' @description Write a warning to log file and generate warning.
+    #' @param ... `r log_dots`
+    #' @param log_type `r log_type`
     log_warn = function(..., log_type = "WARNING") {
       self$log_info(..., log_type = log_type)
-      warning(self$log_format(..., log_type = log_type))
+      warning(private$log_format(..., log_type = log_type))
     },
 
+    #' @description Write an error to log file and stop execution
+    #' @param ... `r log_dots`
+    #' @param log_type `r log_type`
     log_error = function(..., log_type = "ERROR") {
       self$log_info(..., log_type = log_type)
-      stop(self$log_format(..., log_type = log_type))
+      stop(private$log_format(..., log_type = log_type))
     },
 
+    #' @description Write or update log table
+    #' @param ... Name-value pairs with which to update the log table
     log_to_db = function(...) {
-      if (is.null(self$log_db)) return()
+      if (is.null(self$log_tbl)) return()
 
       dplyr::rows_patch(
-        x = self$log_db,
-        y = dplyr::copy_to(self$log_conn, data.frame(log_file = self$filename), overwrite = TRUE) |>
+        x = self$log_tbl,
+        y = dplyr::copy_to(private$log_conn, data.frame(log_file = self$log_filename), overwrite = TRUE) |>
           dplyr::mutate(...),
         by = "log_file",
         copy = TRUE,
@@ -1177,71 +1098,19 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
         unmatched = "ignore"
       )
     }
-  )
-)
+  ),
+  private = list(
 
-
-
-#' Create an object for logging database operations
-#' @param log_path Path to a directory of log files.
-#'
-#' @export
-mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
-  public = list(
-    # Arguments to be given by user
     db_tablestring = NULL,
-    log_path = NULL,
+    log_conn = NULL,
     ts = NULL,
 
-    # Attributes to define at initialization
-    filename = NULL,
-    log_db = NULL,
-    log_conn = NULL,
-    start_time = NULL,
-
-    #' @template log_path
-    #' @template log_db
-    initialize = function(db_tablestring = NULL,
-                          log_db   = getOption("mg.log_db"),
-                          log_conn = NULL,
-                          log_path = getOption("mg.log_path"),
-                          ts = NULL,
-                          tic = Sys.time()
-                          ) {
-
-      # Initialize logger
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_character(db_tablestring, add = coll)
-      checkmate::assert_character(log_db, null.ok = TRUE, add = coll)
-      checkmate::assert_class(log_conn, "DBIConnection", null.ok = TRUE, add = coll)
-      checkmate::assert_character(log_path, null.ok = TRUE, add = coll)
-      mg_assert_timestamp_like(ts, add = coll)
-      checkmate::assert_posixct(tic, add = coll)
-      checkmate::reportAssertions(coll)
-
-      self$ts <- ts
-      self$start_time <- tic
-      lockBinding("start_time", self)
-
-      if (!is.null(log_db)) self$log_db <- mg_create_logs_if_missing(log_db, log_conn)
-      self$log_conn <- log_conn
-      self$log_path <- log_path
-      self$db_tablestring <- db_tablestring
-      self$filename <- self$generate_filename(db_tablestring)
-      self$generate_log_entry()
-
-      stopifnot("Log file for given timestamp already exists!" = !file.exists(file.path(self$log_path, self$filename)))
-    },
-
-
-    generate_filename = function(db_tablestring = self$db_tablestring,
-                                 ts = self$ts) {
-
+    generate_filename = function() {
       # If we are not producing a file log, we provide a random string to key by
       if (is.null(self$log_path)) return(basename(tempfile(tmpdir = "", pattern = "")))
 
-
       start_format <- format(self$start_time, "%Y%m%d.%H%M")
+      ts <- private$ts
 
       if (is.character(ts)) ts <- as.Date(ts)
       ts_format <- format(ts, "%Y_%m_%d")
@@ -1249,19 +1118,18 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
         "%s.%s.%s.log",
         start_format,
         ts_format,
-        db_tablestring
+        private$db_tablestring
       )
 
       return(filename)
     },
 
     generate_log_entry = function() {
-
-      # If we not producing a db log, create entry
-      if (!is.null(self$log_db)) {
+      # Create a row for log in question
+      if (!is.null(self$log_tbl)) {
         dplyr::rows_append(
-          x = self$log_db,
-          y = data.frame(log_file = self$filename),
+          x = self$log_tbl,
+          y = data.frame(log_file = self$log_filename),
           copy = TRUE,
           in_place = TRUE)
       }
@@ -1270,44 +1138,13 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
     },
 
     log_format = function(..., tic = NULL, log_type = NULL) {
-      ts_str <- if (is.null(tic)) tic else stringr::str_replace(format(tic, "%F %H:%M:%OS3", locale = "en"), "[.]", ",")
-      return(paste(ts_str, Sys.getenv("USER"), log_type, paste(...), sep = " - "))
-    },
-
-    log_info = function(..., tic = Sys.time(), log_type = "INFO") {
-
-      # Writes log file (if set)
-      if (!is.null(self$log_path)) {
-        sink(file = file.path(self$log_path, self$filename), split = TRUE, append = TRUE, type = "output")
+      ts_str <- if (is.null(tic)) {
+        self$start_time
+      } else {
+        stringr::str_replace(format(tic, "%F %H:%M:%OS3", locale = "en"), "[.]", ",")
       }
 
-      cat(self$log_format(..., tic = tic, log_type = log_type), "\n", sep = "")
-
-      if (!is.null(self$log_path)) sink()
-    },
-
-    log_warn = function(..., log_type = "WARNING") {
-      self$log_info(..., log_type = log_type)
-      warning(self$log_format(..., log_type = log_type))
-    },
-
-    log_error = function(..., log_type = "ERROR") {
-      self$log_info(..., log_type = log_type)
-      stop(self$log_format(..., log_type = log_type))
-    },
-
-    log_to_db = function(...) {
-      if (is.null(self$log_db)) return()
-
-      dplyr::rows_patch(
-        x = self$log_db,
-        y = dplyr::copy_to(self$log_conn, data.frame(log_file = self$filename), overwrite = TRUE) |>
-          dplyr::mutate(...),
-        by = "log_file",
-        copy = TRUE,
-        in_place = TRUE,
-        unmatched = "ignore"
-      )
+      return(paste(ts_str, Sys.info()[["user"]], log_type, paste(...), sep = " - "))
     }
   )
 )
@@ -1319,6 +1156,8 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
 #' @param log_table A specification of where the logs should exist ("schema.table")
 #' @export
 mg_create_logs_if_missing <- function(log_table, conn) {
+
+  checkmate::assert_class(conn, "DBIConnection")
 
   if (!mg_table_exists(conn, log_table)) {
     log_signature <- data.frame(date = as.POSIXct(NA),

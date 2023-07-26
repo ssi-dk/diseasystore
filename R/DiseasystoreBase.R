@@ -151,7 +151,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                              timestamp = slice_ts,
                              message = glue::glue("fs-range: {start_date} - {end_date}"),
                              log_path = NULL, # no log file, but DB logging still enabled
-                             log_db = paste0(private %.% target_schema, "logs", collapse = "."),
+                             log_table_id = paste0(private %.% target_schema, "logs", collapse = "."),
                              enforce_chronological_order = FALSE))
       })
 
@@ -253,7 +253,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Merge and prepare for counting
-      out <- interlace(observable_data, aggregation_data) |>
+      out <- truncate_interlace(observable_data, aggregation_data) |>
         private$key_join_filter(aggregation_features) |>
         dplyr::compute() |>
         dplyr::group_by(!!!aggregation)
