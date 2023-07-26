@@ -41,9 +41,9 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
 
       # Set the functions of the FeatureHandler
       purrr::walk2(args, names(args), ~ {
-          dot_name <- paste0(".", .y)
-          purrr::pluck(private, dot_name) <- .x
-        })
+        dot_name <- paste0(".", .y)
+        purrr::pluck(private, dot_name) <- .x
+      })
     }
   ),
 

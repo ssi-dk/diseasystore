@@ -59,16 +59,15 @@ interlace <- function(primary, secondary = NULL) {
 
   # Find all secondary information that is vaild while primary information is valid
   secondary_truncated <- secondary |>
-    purrr::map(
-      ~ {
-          common_keys <- intersect(primary_keys, colnames(.x)[startsWith(colnames(.x), "key_")])
-          dplyr::right_join(x = .x, y = primary, suffix = c(".x", ""), by = common_keys) |>
-            dplyr::filter((valid_from  < valid_until.x) | is.null(valid_from.x), # Match within validity OR no match
-                          (valid_until > valid_from.x)  | is.null(valid_until) | is.null(valid_until.x)) |>
-            dplyr::mutate(valid_from  = pmax(valid_from,  valid_from.x,  na.rm = TRUE),
-                          valid_until = pmin(valid_until, valid_until.x, na.rm = TRUE)) |>
-            dplyr::select(-tidyselect::ends_with(".x"))
-      })
+    purrr::map(~ {
+      common_keys <- intersect(primary_keys, colnames(.x)[startsWith(colnames(.x), "key_")])
+      dplyr::right_join(x = .x, y = primary, suffix = c(".x", ""), by = common_keys) |>
+        dplyr::filter((valid_from  < valid_until.x) | is.null(valid_from.x), # Match within validity OR no match
+                      (valid_until > valid_from.x)  | is.null(valid_until) | is.null(valid_until.x)) |>
+        dplyr::mutate(valid_from  = pmax(valid_from,  valid_from.x,  na.rm = TRUE),
+                      valid_until = pmin(valid_until, valid_until.x, na.rm = TRUE)) |>
+        dplyr::select(-tidyselect::ends_with(".x"))
+    })
 
   # With the secondary data truncated, we can interlace and return
   out <- mg_interlace_sql(secondary_truncated, by = purrr::pluck(primary_keys, 1))
