@@ -309,7 +309,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                            ~ purrr::pluck(private, names(fs_map)[fs_map == .x]) %.% key_join))
 
       if (length(unique(key_join_aggregators)) > 1) {
-        stop("Aggregation features have different aggregators. Cannot combine.")
+        stop("(At least one) aggregation feature does not match observable aggregator. Not implemented yet.")
       }
 
       key_join_aggregator <- purrr::pluck(key_join_aggregators, 1)

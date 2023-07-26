@@ -49,9 +49,9 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
       } else if (aggregation_features %in% c("country_id", "country")) {
         return(.data |> dplyr::filter(key_location == country_id))
       } else if (aggregation_features %in% c("region_id", "region")) {
-        return(.data |> dplyr::filter(key_location == paste(country_id, region_id, sep = "_")))
+        return(.data |> dplyr::filter(key_location == region_id))
       } else if (aggregation_features %in% c("subregion_id", "subregion")) {
-        return(.data |> dplyr::filter(key_location == paste(country_id, region_id, subregion_id, sep = "_")))
+        return(.data |> dplyr::filter(key_location == subregion_id))
       }
     }
   ),
@@ -266,6 +266,8 @@ google_covid_19_index_      <- function() {
                          "subregion"    = .data$subregion2_name,
                          .data$aggregation_level) |>
         tidyr::unite("region_id", "country_code", "subregion1_code", na.rm = TRUE) |>
+        dplyr::mutate(region_id    = dplyr::if_else(country_id   == region_id,    NA, region_id),
+                      subregion_id = dplyr::if_else(key_location != subregion_id, NA, subregion_id)) |>
         dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
 
       return(out)
