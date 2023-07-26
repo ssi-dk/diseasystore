@@ -74,6 +74,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 
     #' @description
+    #'   Closes the open DB connection when removing the object
+    finalize = function() {
+      purrr::walk(list(private %.% target_conn, private %.% source_conn),
+      ~ if (inherits(., "DBIConnection")) DBI::dbDisconnect(.))
+    },
+
+
+    #' @description
     #'   Computes, stores, and returns the requested feature for the study period.
     #' @param feature (`character`)\cr
     #'   The name of a feature defined in the feature store.

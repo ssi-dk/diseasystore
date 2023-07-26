@@ -2,9 +2,11 @@
 % Please edit documentation in R/DiseasystoreGoogleCovid19.R
 \name{DiseasystoreGoogleCovid19}
 \alias{DiseasystoreGoogleCovid19}
-\title{feature store handler of Google COVID-19 data features}
+\title{feature store handler of Google Health COVID-19 Open Data features}
 \description{
-TODO
+This \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} brings support for using the Google
+Health COVID 19 Open Data repository.
+See the vignette("google_covid_19_data") for details on how to configure the feature store
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
@@ -19,6 +21,7 @@ TODO
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="finalize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-finalize'><code>diseasystore::DiseasystoreBase$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>

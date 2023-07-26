@@ -1,6 +1,8 @@
 #' @title FeatureHandler
 #'
-#' @description TODO
+#' @description
+#'   This `FeatureHandler` [R6][R6::R6Class] handles indiviual features for the feature stores.
+#'   They define the three methods associated with features (`compute`, `get` and `key_join`).
 #' @export
 FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
   classname = "FeatureHandler",
