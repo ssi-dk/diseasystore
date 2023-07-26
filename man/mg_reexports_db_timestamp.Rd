@@ -3,15 +3,9 @@
 \name{mg_reexports_db_timestamp}
 \alias{mg_reexports_db_timestamp}
 \alias{mg_db_timestamp}
-\alias{mg_db_timestamp.default}
-\alias{mg_db_timestamp.SQLiteConnection}
 \title{Determine the type of timestamps the DB supports}
 \usage{
 mg_db_timestamp(timestamp, conn)
-
-\method{mg_db_timestamp}{default}(timestamp, conn)
-
-\method{mg_db_timestamp}{SQLiteConnection}(timestamp, conn)
 }
 \arguments{
 \item{timestamp}{The timestamp to be transformed to the DB type. Can be character.}

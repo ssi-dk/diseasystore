@@ -36,7 +36,12 @@ This function implements an intermediate filtering in the aggregation pipeline.
 For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
 The \code{key_join_filter} is inserted into the aggregation pipeline to remove this double counting.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(.data, aggregation_features)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(
+  .data,
+  aggregation_features,
+  start_date = private \%.\% start_date,
+  end_date = private \%.\% end_date
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -47,6 +52,12 @@ The data object to perform the operation on}
 
 \item{\code{aggregation_features}}{(\code{character})\cr
 A list of the features included in the aggregation process.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
 }
 \if{html}{\out{</div>}}
 }

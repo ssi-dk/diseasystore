@@ -54,6 +54,12 @@ Study period start.}
 \item{\code{start_date}}{(\code{Date})\cr
 Study period start.}
 
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end.}
 
@@ -118,6 +124,12 @@ Study period start.}
 \item{\code{start_date}}{(\code{Date})\cr
 Study period start.}
 
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end.}
 
@@ -143,7 +155,12 @@ A tbl_dbi with the requested feature for the study period.
 Joins various features from feature store assuming a primary feature (observable)
 that contains keys to witch the secondary features (defined by aggregation) can be joined.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(observable, aggregation)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(
+  observable,
+  aggregation,
+  start_date = private \%.\% start_date,
+  end_date = private \%.\% end_date
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -155,6 +172,24 @@ The name of a feature defined in the feature store}
 \item{\code{aggregation}}{(\code{list}(\code{quosures}))\cr
 Expressions in aggregation evaluated to find appropriate features.
 These are then joined to the observable feature before aggregation is performed.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
 }
 \if{html}{\out{</div>}}
 }
