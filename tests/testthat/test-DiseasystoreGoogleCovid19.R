@@ -117,12 +117,21 @@ test_that("DiseasystoreGoogleCovid19 works", {
               aggregation = available_aggregations) |>
     purrr::pwalk(
       ~ {
-          print(paste(as.character(..1), as.character(..2)))
-          output <- fs$key_join_features(observable = as.character(..1),
-                               aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))))
 
-          print(output)
-          key_join_features_tester(output)
+          # This code may fail (gracefully) in some cases. These we catch here
+          output <- tryCatch({
+            fs$key_join_features(observable = as.character(..1),
+                                 aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))))
+          }, error = function(e) {
+            expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
+                                          "Not implemented yet."))
+            return(NULL)
+          })
+
+          # If the code does not fail, we test the output
+          if (!is.null(output)) {
+            key_join_features_tester(dplyr::collect(output))
+          }
       }
     )
 
