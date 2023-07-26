@@ -1,8 +1,8 @@
 ---
-title: "diseasystore: Google COVID-19 data"
+title: "diseasystore: Google Health COVID-19 Open Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{diseasystore: Google COVID-19 data}
+  %\VignetteIndexEntry{diseasystore: Google Health COVID-19 Open Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
