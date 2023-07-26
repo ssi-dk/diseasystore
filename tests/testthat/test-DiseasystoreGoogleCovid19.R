@@ -77,11 +77,12 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Attempt to get features from the feature store (using different dates)
   # then check that they match the expected value from the generators
-  start_date <- as.Date("2020-04-01")
-  end_date   <- as.Date("2020-11-30")
   purrr::walk2(fs$available_features, names(fs$fs_map),
    ~ {
-       feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
+      start_date <- as.Date("2020-04-01")
+      end_date   <- as.Date("2020-11-30")
+
+      feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
          dplyr::collect() |>
          mg_digest_to_checksum() |>
          dplyr::pull("checksum") |>
@@ -101,6 +102,31 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
        expect_identical(feature, reference)
      })
+
+  # Attempt to perform the possible key_joins
+  available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
+  available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
+
+  key_join_features_tester <- function(output) {
+    # The output dates should match start and end date
+    expect_true(min(output$date) == start_date)
+    expect_true(max(output$date) == end_date)
+  }
+
+  expand.grid(observable  = available_observables,
+              aggregation = available_aggregations) |>
+    purrr::pwalk(
+      ~ {
+          print(paste(as.character(..1), as.character(..2)))
+          output <- fs$key_join_features(observable = as.character(..1),
+                               aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))))
+
+          print(output)
+          key_join_features_tester(output)
+      }
+    )
+
+  fs$key_join_features("n_population", rlang::quos(region_id))
 
   # Cleanup
   rm(fs)
