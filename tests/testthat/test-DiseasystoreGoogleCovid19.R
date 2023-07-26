@@ -19,8 +19,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Then we download the first n rows of each data set of interest
   google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
   purrr::walk(google_files, ~ {
-    readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-    readr::write_csv(file.path(tmp_dir, .))
+      readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |> # nolint: indentation_linter
+      readr::write_csv(file.path(tmp_dir, .))
   })
 
   start_date <- as.Date("2020-03-01")
@@ -37,70 +37,99 @@ test_that("DiseasystoreGoogleCovid19 works", {
   feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
     purrr::map(~ purrr::pluck(private, .))
 
-  purrr::walk(feature_handlers,
-    ~ {
-        expect_class(.x, "FeatureHandler")
-        checkmate::expect_function(.x %.% compute)
-        checkmate::expect_function(.x %.% get)
-        checkmate::expect_function(.x %.% key_join)
-    })
+  purrr::walk(feature_handlers, ~ {
+    expect_class(.x, "FeatureHandler")
+    checkmate::expect_function(.x %.% compute)
+    checkmate::expect_function(.x %.% get)
+    checkmate::expect_function(.x %.% key_join)
+  })
 
   # Attempt to get features from the feature store
   # then check that they match the expected value from the generators
-  purrr::walk2(fs$available_features, names(fs$fs_map),
-    ~ {
-        feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect()
+  purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
+    feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
+      dplyr::collect()
 
-        feature_checksum <- feature |>
-          mg_digest_to_checksum() |>
-          dplyr::pull("checksum") |>
-          sort()
+    feature_checksum <- feature |>
+      mg_digest_to_checksum() |>
+      dplyr::pull("checksum") |>
+      sort()
 
-        reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+    reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
 
-        reference <- reference_generator(start_date  = start_date,
-                                         end_date    = end_date,
-                                         slice_ts    = fs$.__enclos_env__$private$slice_ts,
-                                         source_conn = fs$.__enclos_env__$private$source_conn) %>%
-          dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
-          dplyr::collect()
+    reference <- reference_generator(start_date  = start_date,
+                                     end_date    = end_date,
+                                     slice_ts    = fs$.__enclos_env__$private$slice_ts,
+                                     source_conn = fs$.__enclos_env__$private$source_conn) %>%
+      dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
+      dplyr::collect()
 
-        reference_checksum <- reference |>
-          mg_digest_to_checksum() |>
-          dplyr::pull("checksum") |>
-          sort()
+    reference_checksum <- reference |>
+      mg_digest_to_checksum() |>
+      dplyr::pull("checksum") |>
+      sort()
 
-        expect_identical(feature_checksum, reference_checksum)
-    })
+    expect_identical(feature_checksum, reference_checksum)
+  })
 
 
   # Attempt to get features from the feature store (using different dates)
   # then check that they match the expected value from the generators
-  start_date <- as.Date("2020-04-01")
-  end_date   <- as.Date("2020-11-30")
-  purrr::walk2(fs$available_features, names(fs$fs_map),
-   ~ {
-       feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
-         dplyr::collect() |>
-         mg_digest_to_checksum() |>
-         dplyr::pull("checksum") |>
-         sort()
+  purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
+    start_date <- as.Date("2020-04-01")
+    end_date   <- as.Date("2020-11-30")
 
-       reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+    feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
+      dplyr::collect() |>
+      mg_digest_to_checksum() |>
+      dplyr::pull("checksum") |>
+      sort()
 
-       reference <- reference_generator(start_date  = start_date,
-                                        end_date    = end_date,
-                                        slice_ts    = fs$.__enclos_env__$private$slice_ts,
-                                        source_conn = fs$.__enclos_env__$private$source_conn) %>%
-         dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
-         dplyr::collect() |>
-         mg_digest_to_checksum() |>
-         dplyr::pull("checksum") |>
-         sort()
+    reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
 
-       expect_identical(feature, reference)
-     })
+    reference <- reference_generator(start_date  = start_date,
+                                     end_date    = end_date,
+                                     slice_ts    = fs$.__enclos_env__$private$slice_ts,
+                                     source_conn = fs$.__enclos_env__$private$source_conn) %>%
+      dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
+      dplyr::collect() |>
+      mg_digest_to_checksum() |>
+      dplyr::pull("checksum") |>
+      sort()
+
+    expect_identical(feature, reference)
+  })
+
+  # Attempt to perform the possible key_joins
+  available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
+  available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
+
+  key_join_features_tester <- function(output) {
+    # The output dates should match start and end date
+    expect_true(min(output$date) == start_date)
+    expect_true(max(output$date) == end_date)
+  }
+
+  expand.grid(observable  = available_observables,
+              aggregation = available_aggregations) |>
+    purrr::pwalk(~ {
+      # This code may fail (gracefully) in some cases. These we catch here
+      output <- tryCatch({
+        fs$key_join_features(observable = as.character(..1),
+                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))))
+      }, error = function(e) {
+        expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
+                                      "Not implemented yet."))
+        return(NULL)
+      })
+
+      # If the code does not fail, we test the output
+      if (!is.null(output)) {
+        key_join_features_tester(dplyr::collect(output))
+      }
+    })
+
+  fs$key_join_features("n_population", rlang::quos(region_id))
 
   # Cleanup
   rm(fs)

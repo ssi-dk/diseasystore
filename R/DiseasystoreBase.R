@@ -27,6 +27,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                           source_conn = NULL, target_conn = NULL,
                           verbose = TRUE) {
 
+      # Validate input
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, null.ok = TRUE, add = coll)
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
@@ -77,7 +78,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   Closes the open DB connection when removing the object
     finalize = function() {
       purrr::walk(list(private %.% target_conn, private %.% source_conn),
-      ~ if (inherits(., "DBIConnection")) DBI::dbDisconnect(.))
+                  ~ if (inherits(., "DBIConnection")) DBI::dbDisconnect(.))
     },
 
 
@@ -98,7 +99,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Load the available features
       fs_map <- self %.% fs_map
 
-      # Check that the feature is implemented
+      # Validate input
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(feature, unlist(fs_map), add = coll)
       checkmate::assert_date(start_date, any.missing = FALSE, add = coll)
@@ -124,8 +125,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Inform that we are computing features
       tic <- Sys.time()
       if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
-          cat(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
-                         "please wait..."))
+        cat(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
+                       "please wait..."))
       }
 
       # Call the feature loader on the dates
@@ -138,21 +139,20 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
         # Check it table is copied to target DB
         if (!inherits(fs_feature, "tbl_dbi") ||
-          !identical(private %.% source_conn, private %.% target_conn)) {
+              !identical(private %.% source_conn, private %.% target_conn)) {
           fs_feature <- dplyr::copy_to(private %.% target_conn, fs_feature, "fs_tmp", overwrite = TRUE)
         }
 
         # Add the existing computed data for given slice_ts
         if (mg_table_exists(private %.% target_conn, target_table)) {
-          fs_updated_feature <- dplyr::union(
-            mg_get_table(private %.% target_conn, target_table, slice_ts = slice_ts),
-            fs_feature)
+          fs_updated_feature <-
+            dplyr::union(mg_get_table(private %.% target_conn, target_table, slice_ts = slice_ts), fs_feature)
         } else {
           fs_updated_feature <- fs_feature
         }
 
         # Commit to DB
-        capture.output(
+        capture.output({
           mg_update_snapshot(.data = fs_updated_feature,
                              conn = private %.% target_conn,
                              db_table = target_table,
@@ -160,7 +160,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                              message = glue::glue("fs-range: {start_date} - {end_date}"),
                              log_path = NULL, # no log file, but DB logging still enabled
                              log_table_id = paste0(private %.% target_schema, "logs", collapse = "."),
-                             enforce_chronological_order = FALSE))
+                             enforce_chronological_order = FALSE)
+        })
       })
 
       # Inform how long has elapsed for updating data
@@ -194,12 +195,33 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @param aggregation (`list`(`quosures`))\cr
     #'   Expressions in aggregation evaluated to find appropriate features.
     #'   These are then joined to the observable feature before aggregation is performed.
+    #' @template start_date
+    #' @template end_date
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
-    key_join_features = function(observable, aggregation) {
+    key_join_features = function(observable, aggregation,
+                                 start_date = private %.% start_date,
+                                 end_date   = private %.% end_date) {
+
+      # Validate input
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_character(observable, add = coll)
+      checkmate::assert(
+        checkmate::check_character(aggregation),
+        checkmate::check_class(aggregation, "quosure"),
+        checkmate::check_class(aggregation, "quosures"),
+        add = coll
+      )
+      checkmate::assert_date(start_date, add = coll)
+      checkmate::assert_date(end_date, add = coll)
+      checkmate::reportAssertions(coll)
 
       # Store the fs_map
       fs_map <- self %.% fs_map
+
+      # We start by copying the study_dates to the conn to ensure SQLite compatibility
+      study_dates <- data.frame(valid_from = start_date, valid_until = end_date + lubridate::days(1)) %>%
+        copy_to(private %.% target_conn, ., overwrite = TRUE)
 
       # Determine which features are affected by an aggregation
       if (!is.null(aggregation)) {
@@ -228,25 +250,39 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                              ~ ifelse(.y == "", .x, .y)) |>
           unname()
 
+        # Check aggregation features are not observables
+        stopifnot("Aggregation features cannot be observables (must not start with 'n_')" =
+                    purrr::none(aggregation_names, ~ startsWith(., "n_")))
+
         # Fetch requested aggregation features from the feature store
         aggregation_data <- aggregation_features |>
           unique() |>
-          purrr::map(
-            ~ self$get_feature(.x) |>
-              dplyr::mutate(valid_from  = pmax(valid_from, # Simplify interlacing
-                                               start_date, na.rm = TRUE),
-                            valid_until = pmin(valid_until,
-                                               as.Date(as.Date(end_date) + lubridate::days(1)), na.rm = TRUE)))
+          purrr::map(~ {
+            # Fetch the requested aggregation feature from the feature store and truncate to the start
+            #  and end dates to simplify the interlaced output
+            self$get_feature(.x, start_date, end_date) |>
+              dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
+              dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d, na.rm = TRUE),
+                            "valid_until" =
+                              dplyr::coalesce(pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
+                                              .data$valid_until.d)) |>
+              dplyr::select(!ends_with(".d"))
+          })
       } else {
         aggregation_features <- NULL
         aggregation_names <- NULL
         aggregation_data <- NULL
       }
 
-      # Fetch the requested observable from the feature store
-      observable_data <- self$get_feature(observable) |>
-        dplyr::mutate(valid_from  = pmax(valid_from,  start_date, na.rm = TRUE), # Simplify interlacing
-                      valid_until = pmin(valid_until, as.Date(as.Date(end_date) + lubridate::days(1)), na.rm = TRUE))
+      # Fetch the requested observable from the feature store and truncate to the start and end dates
+      # to simplify the interlaced output
+      observable_data <- self$get_feature(observable, start_date, end_date) |>
+        dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
+        dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d, na.rm = TRUE),
+                      "valid_until" =
+                        dplyr::coalesce(pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
+                                        .data$valid_until.d)) |>
+        dplyr::select(!ends_with(".d"))
 
       # Determine the keys
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
@@ -262,7 +298,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, aggregation_data) |>
-        private$key_join_filter(aggregation_features) |>
+        self$key_join_filter(aggregation_features, start_date, end_date) |>
         dplyr::compute() |>
         dplyr::group_by(!!!aggregation)
 
@@ -272,7 +308,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                            ~ purrr::pluck(private, names(fs_map)[fs_map == .x]) %.% key_join))
 
       if (length(unique(key_join_aggregators)) > 1) {
-        stop("Aggregation features have different aggregators. Cannot combine.")
+        stop("(At least one) aggregation feature does not match observable aggregator. Not implemented yet.")
       }
 
       key_join_aggregator <- purrr::pluck(key_join_aggregators, 1)
@@ -296,8 +332,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       if (!is.null(aggregation)) {
         all_combi <- out |>
+          dplyr::ungroup() |>
           dplyr::distinct(!!!aggregation) |>
-          dplyr::full_join(all_dates, by = character(), copy = TRUE) |>
+          dplyr::cross_join(all_dates, copy = TRUE) |>
           dplyr::compute()
       } else {
         all_combi <- all_dates
@@ -408,12 +445,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       if (nrow(potentially_ongoing) > 0) {
         err <- glue::glue("db: {target_table} is potentially being updated on the specified date interval. ",
-                         "Aborting...")
+                          "Aborting...")
         cat(err)
 
         potentially_ongoing |>
           purrr::pmap(~ mg_printr(glue::glue("{..1} started updating {round(..2)} minutes ago. ",
-                                              "Releasing lock after 30 minutes")))
+                                             "Releasing lock after 30 minutes")))
         stop(err)
       }
 

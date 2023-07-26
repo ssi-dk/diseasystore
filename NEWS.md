@@ -1,3 +1,16 @@
+# diseasystore 0.0.0.9005
+
+Features:
+* New mg function reexports
+
+Fixes:
+* Fixed issues with key_join_features
+* Fixed issues with key_join_filter
+* Removed na.rm warnings
+
+Testing:
+* Added tests for key_join_features
+
 # diseasystore 0.0.0.9004
 
 Features

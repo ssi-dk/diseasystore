@@ -18,9 +18,13 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
     #' @template .data
     #' @param aggregation_features (`character`)\cr
     #'   A list of the features included in the aggregation process.
+    #' @template start_date
+    #' @template end_date
     #' @return
     #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, aggregation_features) {
+    key_join_filter = function(.data, aggregation_features,
+                               start_date = private %.% start_date,
+                               end_date = private %.% end_date) {
 
       # The Google data contains surplus data depending on the aggregation.
       # Ie. some individuals are counted more than once.
@@ -30,11 +34,11 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
       # Manually perform filtering
       if (is.null(aggregation_features) ||
-         (!is.null(aggregation_features) &&
-          aggregation_features %in% c("country_id", "country", "region_id", "region", "subregion_id", "subregion"))) {
+            (!is.null(aggregation_features) && !(aggregation_features %in% c("country_id", "country", "region_id",
+                                                                             "region", "subregion_id", "subregion")))) {
 
         # If no spatial aggregation is requested, use the largest available per country
-        filter_level <- fs$get_feature("country_id") |>
+        filter_level <- self$get_feature("country_id") |>
           dplyr::group_by(country_id) |>
           dplyr::slice_min(aggregation_level) |>
           dplyr::ungroup() |>
@@ -45,9 +49,9 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
       } else if (aggregation_features %in% c("country_id", "country")) {
         return(.data |> dplyr::filter(key_location == country_id))
       } else if (aggregation_features %in% c("region_id", "region")) {
-        return(.data |> dplyr::filter(key_location == paste(country_id, region_id, sep = "_")))
+        return(.data |> dplyr::filter(key_location == region_id))
       } else if (aggregation_features %in% c("subregion_id", "subregion")) {
-        return(.data |> dplyr::filter(key_location == paste(country_id, region_id, subregion_id, sep = "_")))
+        return(.data |> dplyr::filter(key_location == subregion_id))
       }
     }
   ),
@@ -191,55 +195,55 @@ google_covid_19_population_ <- function() {
 
 
 google_covid_19_age_group_  <- function() {
-    FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+  FeatureHandler$new(
+    compute = function(start_date, end_date, slice_ts, source_conn) {
 
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
-        checkmate::reportAssertions(coll)
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
+      checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::reportAssertions(coll)
 
-        by_age <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
-          (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))()
+      by_age <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
+        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))()
 
-        # We need a map between age_bin and age_group
-        age_bin_map <- by_age |>
-          dplyr::group_by(.data$location_key) |>
-          dplyr::select("location_key", tidyselect::starts_with("age_bin")) |>
-          dplyr::distinct() |>
-          dplyr::left_join(dplyr::select(by_age, "location_key", "date", tidyselect::starts_with("age_bin")),
-                           by = colnames(dplyr::select(by_age, "location_key", tidyselect::starts_with("age_bin"))),
-                           multiple = "first")
+      # We need a map between age_bin and age_group
+      age_bin_map <- by_age |>
+        dplyr::group_by(.data$location_key) |>
+        dplyr::select("location_key", tidyselect::starts_with("age_bin")) |>
+        dplyr::distinct() |>
+        dplyr::left_join(dplyr::select(by_age, "location_key", "date", tidyselect::starts_with("age_bin")),
+                         by = colnames(dplyr::select(by_age, "location_key", tidyselect::starts_with("age_bin"))),
+                         multiple = "first")
 
-        # Some regions changes age aggregation. Discard for now
-        age_bin_map <- age_bin_map |>
-          dplyr::select("location_key") |>
-          dplyr::filter(dplyr::n() == 1) |>
-          dplyr::inner_join(age_bin_map, by = "location_key")
+      # Some regions changes age aggregation. Discard for now
+      age_bin_map <- age_bin_map |>
+        dplyr::select("location_key") |>
+        dplyr::filter(dplyr::n() == 1) |>
+        dplyr::inner_join(age_bin_map, by = "location_key")
 
-        # With these filtered, we map age_bins to age_groups
-        age_bin_map <- age_bin_map |>
-          dplyr::select("location_key", "date", tidyselect::everything()) |>
-          tidyr::pivot_longer(!c("location_key", "date"),
-                              names_to = c("tmp", "age_bin"),
-                              names_sep = "_bin_",
-                              values_to = "age_group") |>
-          dplyr::mutate(age_group_lower = as.numeric(stringr::str_extract(.data$age_group, r"{^\d*}"))) |>
-          dplyr::group_modify(~ {
-            na_bins <- is.na(.x$age_group_lower)
-            data.frame(age_bin = .x$age_bin[!na_bins],
-                       age_group = mg_age_labels(.x$age_group_lower[!na_bins]))
-          })
+      # With these filtered, we map age_bins to age_groups
+      age_bin_map <- age_bin_map |>
+        dplyr::select("location_key", "date", tidyselect::everything()) |>
+        tidyr::pivot_longer(!c("location_key", "date"),
+                            names_to = c("tmp", "age_bin"),
+                            names_sep = "_bin_",
+                            values_to = "age_group") |>
+        dplyr::mutate(age_group_lower = as.numeric(stringr::str_extract(.data$age_group, r"{^\d*}"))) |>
+        dplyr::group_modify(~ {
+          na_bins <- is.na(.x$age_group_lower)
+          data.frame(age_bin = .x$age_bin[!na_bins],
+                     age_group = mg_age_labels(.x$age_group_lower[!na_bins]))
+        })
 
-        # And finally copy to the DB
-        out <- age_bin_map |>
-          dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
+      # And finally copy to the DB
+      out <- age_bin_map |>
+        dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
+        dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
 
-        return(out)
-      },
-      key_join = key_join_sum
-    )
+      return(out)
+    },
+    key_join = key_join_sum
+  )
 }
 
 google_covid_19_index_      <- function() {
@@ -262,6 +266,10 @@ google_covid_19_index_      <- function() {
                          "subregion"    = .data$subregion2_name,
                          .data$aggregation_level) |>
         tidyr::unite("region_id", "country_code", "subregion1_code", na.rm = TRUE) |>
+        dplyr::mutate(region_id    = dplyr::if_else(.data$country_id == .data$region_id,
+                                                    NA, .data$region_id),
+                      subregion_id = dplyr::if_else(.data$key_location != .data$subregion_id,
+                                                    NA, .data$subregion_id)) |>
         dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
 
       return(out)

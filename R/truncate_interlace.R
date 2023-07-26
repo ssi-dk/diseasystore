@@ -21,22 +21,21 @@ truncate_interlace <- function(primary, secondary = NULL) {
 
   # Find all secondary information that is vaild while primary information is valid
   secondary_truncated <- secondary |>
-    purrr::map(
-      \(s) {
-        # First we find keys that are common with current secondary table and the primary table
-        common_keys <- intersect(primary_keys, colnames(s)[startsWith(colnames(s), "key_")])
+    purrr::map(~ {
+      # First we find keys that are common with current secondary table and the primary table
+      common_keys <- intersect(primary_keys, colnames(.x)[startsWith(colnames(.x), "key_")])
 
-        # We then join the tables by these keys and truncate the secondary table to validity range of the primary
-        dplyr::right_join(x = s, y = primary, suffix = c(".s", ""), by = common_keys) |>
-          dplyr::filter((.data$valid_from  < .data$valid_until.s) |   # Keep secondary records
-                          is.na(.data$valid_until.s),                 # that is within validity
-                        (.data$valid_until > .data$valid_from.s)  |   # of the primary data.
-                          is.na(.data$valid_until) |
-                          is.na(.data$valid_until.s)) |>
-          dplyr::mutate("valid_from"  = pmax(.data$valid_from,  .data$valid_from.s,  na.rm = TRUE),
-                        "valid_until" = pmin(.data$valid_until, .data$valid_until.s, na.rm = TRUE)) |>
-          dplyr::select(-tidyselect::ends_with(".s"))
-      })
+      # We then join the tables by these keys and truncate the secondary table to validity range of the primary
+      dplyr::right_join(x = .x, y = primary, suffix = c(".x", ""), by = common_keys) |>
+        dplyr::filter((.data$valid_from  < .data$valid_until.x) |   # Keep secondary records
+                        is.na(.data$valid_until.x),                 # that is within validity
+                      (.data$valid_until > .data$valid_from.x)  |   # of the primary data.
+                        is.na(.data$valid_until) |
+                        is.na(.data$valid_until.x)) |>
+        dplyr::mutate("valid_from"  = pmax(.data$valid_from,  .data$valid_from.x,  na.rm = TRUE),
+                      "valid_until" = pmin(.data$valid_until, .data$valid_until.x, na.rm = TRUE)) |>
+        dplyr::select(-tidyselect::ends_with(".x"))
+    })
 
   # With the secondary data truncated, we can interlace and return
   out <- mg_interlace_sql(secondary_truncated, by = purrr::pluck(primary_keys, 1))

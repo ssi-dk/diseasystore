@@ -10,41 +10,40 @@ test_that("truncate_interlace works", {
   z <- dplyr::select(data, key_name, qsec)
 
   # In x, the mpg was changed on 2000-01-01 for all but the first 10 cars
-  x <- list(
-    utils::head(x, 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
-    utils::tail(x, base::nrow(x) - 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2000-01-01")),
-    utils::tail(x, base::nrow(x) - 10) |>
-      dplyr::mutate("mpg" = 0.9 * mpg,
-                    "valid_from" = as.Date("2000-01-01"), "valid_until" = as.Date(NA))) |>
+  x <- list(utils::head(x, 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+            utils::tail(x, base::nrow(x) - 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2000-01-01")),
+            utils::tail(x, base::nrow(x) - 10) |>
+              dplyr::mutate("mpg" = 0.9 * mpg,
+                            "valid_from" = as.Date("2000-01-01"), "valid_until" = as.Date(NA))) |>
     purrr::reduce(union_all) %>%
     dplyr::copy_to(conn, ., name = "x", overwrite = TRUE)
 
   # In y, the wt was changed on 2010-01-01 for all but the last 10 cars
-  y <- list(
-    utils::head(y, base::nrow(y) - 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
-    utils::tail(y, 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2010-01-01")),
-    utils::tail(y, 10) |>
-      dplyr::mutate(wt = 1.1 * wt,
-                    "valid_from" = as.Date("2010-01-01"), "valid_until" = as.Date(NA))) |>
+  y <- list(utils::head(y, base::nrow(y) - 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+            utils::tail(y, 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2010-01-01")),
+            utils::tail(y, 10) |>
+              dplyr::mutate(wt = 1.1 * wt,
+                            "valid_from" = as.Date("2010-01-01"), "valid_until" = as.Date(NA))) |>
     purrr::reduce(union_all) %>%
     dplyr::copy_to(conn, ., name = "y", overwrite = TRUE)
 
 
   # In z, the qsec was changed on 2020-01-01 for all but the last and first 10 cars
-  z <- list(
-    utils::head(z, base::nrow(z) - 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
-    utils::tail(z, 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
-    utils::head(z, base::nrow(z) - 10) |> utils::tail(base::nrow(z) - 10) |>
-      dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2020-01-01")),
-    utils::head(z, base::nrow(z) - 10) |> utils::tail(base::nrow(z) - 10) |>
-      dplyr::mutate(qsec = 1.1 * qsec,
-                    "valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))) |>
+  z <- list(utils::head(z, base::nrow(z) - 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+            utils::tail(z, 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+            utils::head(z, base::nrow(z) - 10) |>
+              utils::tail(base::nrow(z) - 10) |>
+              dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2020-01-01")),
+            utils::head(z, base::nrow(z) - 10) |>
+              utils::tail(base::nrow(z) - 10) |>
+              dplyr::mutate(qsec = 1.1 * qsec,
+                            "valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))) |>
     purrr::reduce(union_all) %>%
     dplyr::copy_to(conn, ., name = "z", overwrite = TRUE)
 
