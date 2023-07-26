@@ -115,6 +115,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Create log table
       mg_create_logs_if_missing(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)
 
+      # Create log table
+      mg_create_logs_if_missing(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)
+
       # Determine which dates need to be computed
       target_table <- paste0(c(private %.% target_schema, feature_loader), collapse = ".")
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
@@ -485,8 +488,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       return(new_ranges)
     }
-  ),
+  )
 )
+
+# Set default options for the package related to the diseasystores
+options(diseasystore.source_conn = NULL)
+options(diseasystore.target_conn = NULL)
 
 # Set default options for the package related to the diseasystores
 options(diseasystore.source_conn = NULL)

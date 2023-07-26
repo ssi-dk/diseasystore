@@ -122,8 +122,8 @@ test_that("truncate_interlace works", {
 
 
   # Check that list conversion works
-  expect_identical(truncate_interlace(x, y),
-                   truncate_interlace(x, list(y)))
+  expect_identical(truncate_interlace(x, y)       |> dplyr::collect(),
+                   truncate_interlace(x, list(y)) |> dplyr::collect())
 
   # Clean up
   DBI::dbDisconnect(conn)
