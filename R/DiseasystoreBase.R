@@ -265,7 +265,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                 dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
                 dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d),
                               "valid_until" = dplyr::coalesce(
-                                pmin(.data$valid_until, .data$valid_until.d),
+                                pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
                                 .data$valid_until.d)) |>
                 dplyr::select(!ends_with(".d"))
           })
@@ -281,7 +281,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
         dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d),
                       "valid_until" = dplyr::coalesce(
-                        pmin(.data$valid_until, .data$valid_until.d),
+                        pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
                         .data$valid_until.d)) |>
         dplyr::select(!ends_with(".d"))
 
