@@ -17,7 +17,16 @@ diseasystore_case_definition <- function(case_definition) {
 #' Detect available diseasystores
 #' @export
 available_diseasystores <- function() {
-  ls("package:diseasystore") |>
+  # Get all installed packages that has the ^diseasystore.* pattern
+  available_diseasystores <- purrr::keep(search(), ~ stringr::str_detect(., ":diseasystore\\.*"))
+
+  # Give warning if none is found
+  if (length(available_diseasystores) == 0) stop("No diseasystores found. Have you attached the libraries?")
+
+  # Show available feature stores
+  available_diseasystores |>
+    purrr::map(ls) |>
+    purrr::reduce(c) |>
     purrr::keep(~ startsWith(., "Diseasystore")) |>
     purrr::discard(~ . %in% c("DiseasystoreBase", "DiseasystoreGeneric"))
 }
