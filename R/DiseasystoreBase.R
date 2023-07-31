@@ -372,6 +372,24 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::collect()
 
       return(data)
+    },
+
+
+    #' @description
+    #'   This function implements an intermediate filtering in the aggregation pipeline.
+    #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+    #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
+    #' @template .data
+    #' @param aggregation_features (`character`)\cr
+    #'   A list of the features included in the aggregation process.
+    #' @template start_date
+    #' @template end_date
+    #' @return
+    #'   A subset of `.data` filtered to remove double counting
+    key_join_filter = function(.data, aggregation_features,
+                               start_date = private %.% start_date,
+                               end_date = private %.% end_date) {
+      return(.data) # By default, no filtering is performed
     }
   ),
 
@@ -514,6 +532,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       return(new_ranges)
     },
+
+    initialize_feature_handlers = function() NULL
   )
 )
 
