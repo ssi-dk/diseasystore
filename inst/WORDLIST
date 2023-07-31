@@ -1,6 +1,8 @@
 backends
 
 cloneable
+CMD
+codecov
 conn
 COVID
 covid
@@ -21,6 +23,7 @@ dtplyr
 Engbo
 
 FeatureHandler
+FeatureHandlers
 
 Lasse
 

@@ -201,6 +201,15 @@ colnames must be named in same order as as given in tables
 
 \item{warn}{Flag to warn if target column already exists in data}
 
+\item{data}{A data frame.}
+
+\item{sep}{Separator to use between values.}
+
+\item{remove}{If \code{TRUE}, remove input columns from output data frame.}
+
+\item{na.rm}{If \code{TRUE}, missing values will be removed prior to uniting
+each value.}
+
 \item{temporary}{Should the table be created as a temporary table?}
 
 \item{db_table}{Object to test if is of class "tbl_dbi" or character on form "schema.table"}
@@ -265,8 +274,6 @@ If no na_by is given, the function defaults to using dplyr::}_join
 
 The function "interlaces" the queries and combines their validity time axes
 onto a single time axis
-
-dplyr-like unite
 
 If filter = NULL, not filtering is done
 If filter is different from NULL, the .data is filtered by a mg_inner_join using all columns of the filter:

@@ -696,10 +696,9 @@ mg_digest_to_checksum_internal.tibble           <- mg_digest_to_checksum_native_
 
 
 
-#' unite for tbl_dbi
+#' tidyr::unite for tbl_dbi
 #'
-#' @description
-#' dplyr-like unite
+#' @inheritParams tidyr::unite
 #' @exportS3Method tidyr::unite tbl_dbi
 #' @name mg_reexports
 unite.tbl_dbi <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FALSE) { # nolint: object_name_linter

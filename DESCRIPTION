@@ -37,8 +37,9 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    spelling,
     RSQLite,
-    RPostgres
+    RPostgres,
+    tibble,
+    spelling
 VignetteBuilder: knitr
 Config/testthat/edition: 3
