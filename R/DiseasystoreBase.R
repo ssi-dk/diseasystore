@@ -19,12 +19,15 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   Can be `DBIConnection` or file path depending on the `diseasystore`.
     #' @param target_conn (`DBIConnection`)\cr
     #'   A database connection to store the computed features in.
+    #' @param target_schema (`character`)\cr
+    #'   The schema to place the feature store in.
+    #'   If the database backend does not support schema, the tables will be prefixed with target_schema
     #' @param verbose (`boolean`)\cr
     #'   Boolean that controls enables debugging information.
     #' @return
     #'   A new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
     initialize = function(start_date = NULL, end_date = NULL, slice_ts = NULL,
-                          source_conn = NULL, target_conn = NULL,
+                          source_conn = NULL, target_conn = NULL, target_schema = NULL,
                           verbose = TRUE) {
 
       # Validate input
@@ -71,13 +74,20 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         private$target_conn <- target_conn
       }
 
-      if (inherits(private %.% target_conn, "PqConnection")) {
-        private$target_schema <- "fs"
+      if (is.null(target_schema)) {
+        private$target_schema <- list(class(self)[1], NULL) |>
+          purrr::map(~ getOption(paste(c("diseasystore", .x, "target_schema"), collapse = "."))) |>
+          purrr::keep(purrr::negate(is.null)) |>
+          purrr::pluck(1)
+        if (is.null(private %.% target_schema)) {
+          private$target_schema <- "ds" # Default to "ds"
+        }
+      } else {
+        private$target_schema <- target_schema
       }
 
       # Initialize the feature handlers
       private$initialize_feature_handlers()
-
     },
 
 
@@ -509,4 +519,5 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 rlang::on_load({
   options(diseasystore.source_conn = NULL)
   options(diseasystore.target_conn = NULL)
+  options(diseasystore.target_schema = NULL)
 })

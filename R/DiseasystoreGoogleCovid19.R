@@ -331,4 +331,5 @@ rlang::on_load({
   options(diseasystore.DiseasystoreGoogleCovid19.remote_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
   options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = NULL)
+  options(diseasystore.DiseasystoreGoogleCovid19.target_schema = NULL)
 })
