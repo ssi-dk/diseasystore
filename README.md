@@ -1,4 +1,6 @@
 # diseasystore <img src="man/figures/logo.png" align="right" height="138" />
+[![codecov](https://codecov.io/gh/RasmusSkytte/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D)](https://codecov.io/gh/RasmusSkytte/diseasystore)
+
 The "diseasystore" is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness.
 The package forms the data-backbone of the "diseasy" package.
 # A modular feature store
