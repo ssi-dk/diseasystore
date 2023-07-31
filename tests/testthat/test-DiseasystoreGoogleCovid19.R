@@ -27,7 +27,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   end_date   <- as.Date("2020-12-31")
   fs <- DiseasystoreGoogleCovid19$new(start_date = start_date,
                                       end_date   = end_date,
-                                      verbose = FALSE)
+                                      verbose = !testthat::is_testing())
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
@@ -61,7 +61,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
                                      end_date    = end_date,
                                      slice_ts    = fs$.__enclos_env__$private$slice_ts,
                                      source_conn = fs$.__enclos_env__$private$source_conn) %>%
-      dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
+      dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., overwrite = TRUE) |>
       dplyr::collect()
 
     reference_checksum <- reference |>
