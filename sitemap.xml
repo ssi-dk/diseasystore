@@ -40,9 +40,6 @@
     <loc>https://rasmusskytte.github.io/diseasystore/reference/available_diseasystores.html</loc>
   </url>
   <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/digest_internal.html</loc>
-  </url>
-  <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore-package.html</loc>
   </url>
   <url>
@@ -55,75 +52,15 @@
     <loc>https://rasmusskytte.github.io/diseasystore/reference/get_diseasystore.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/grapes-.-grapes.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/joins.html</loc>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_reexports.html</loc>
   </url>
   <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_Logger.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_age_labels.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_assert_data_like.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_assert_dbtable_like.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_assert_id_like.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_assert_timestamp_like.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_create_logs_if_missing.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_create_table.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_db_timestamp.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_digest_to_checksum.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_filter_keys.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_get_table.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_get_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_id.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_interlace_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_is.historical.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_join_warn.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_join_warn_experimental.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_nrow.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_slice_time.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_table_exists.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_update_snapshot.html</loc>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/truncate_interlace.html</loc>
   </url>
 </urlset>

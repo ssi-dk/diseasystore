@@ -12,7 +12,7 @@ It defines the primary methods of each feature stores as well as all of the publ
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,7 +26,7 @@ It defines the primary methods of each feature stores as well as all of the publ
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/google_covid_19_data.html">diseasystore: Google COVID-19 data</a>
+    <a class="dropdown-item" href="../articles/google_covid_19_data.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="../articles/quick_start.html">Quick start</a>
   </div>
 </li>
@@ -76,8 +76,10 @@ A list of available features in the feature store</p></dd>
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-DiseasystoreBase-new"><code>DiseasystoreBase$new()</code></a></p></li>
+<li><p><a href="#method-DiseasystoreBase-finalize"><code>DiseasystoreBase$finalize()</code></a></p></li>
 <li><p><a href="#method-DiseasystoreBase-get_feature"><code>DiseasystoreBase$get_feature()</code></a></p></li>
 <li><p><a href="#method-DiseasystoreBase-key_join_features"><code>DiseasystoreBase$key_join_features()</code></a></p></li>
+<li><p><a href="#method-DiseasystoreBase-key_join_filter"><code>DiseasystoreBase$key_join_filter()</code></a></p></li>
 <li><p><a href="#method-DiseasystoreBase-clone"><code>DiseasystoreBase$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-DiseasystoreBase-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -89,6 +91,7 @@ A list of available features in the feature store</p></dd>
 <span>  slice_ts <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  source_conn <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  target_conn <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  target_schema <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -103,6 +106,26 @@ Study period start.</p></dd>
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
 Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
 
 
 <dt><code>end_date</code></dt>
@@ -136,6 +159,12 @@ Can be <code>DBIConnection</code> or file path depending on the <code>diseasysto
 A database connection to store the computed features in.</p></dd>
 
 
+<dt><code>target_schema</code></dt>
+<dd><p>(<code>character</code>)<br>
+The schema to place the feature store in.
+If the database backend does not support schema, the tables will be prefixed with target_schema</p></dd>
+
+
 <dt><code>verbose</code></dt>
 <dd><p>(<code>boolean</code>)<br>
 Boolean that controls enables debugging information.</p></dd>
@@ -148,15 +177,23 @@ Boolean that controls enables debugging information.</p></dd>
 <p>A new instance of the <code>DiseasystoreBase</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
+</div><p></p><hr><a id="method-DiseasystoreBase-finalize"></a><div class="section">
+<h3 id="method-finalize-">Method <code>finalize()</code><a class="anchor" aria-label="anchor" href="#method-finalize-"></a></h3>
+<p>Closes the open DB connection when removing the object</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">finalize</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-DiseasystoreBase-get_feature"></a><div class="section">
 <h3 id="method-get-feature-">Method <code>get_feature()</code><a class="anchor" aria-label="anchor" href="#method-get-feature-"></a></h3>
 <p>Computes, stores, and returns the requested feature for the study period.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span></span>
 <span>  <span class="va">feature</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op">%.%</span> <span class="va">start_date</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op">%.%</span> <span class="va">end_date</span>,</span>
-<span>  slice_ts <span class="op">=</span> <span class="va">private</span> <span class="op">%.%</span> <span class="va">slice_ts</span></span>
+<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span>,</span>
+<span>  slice_ts <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">slice_ts</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -175,6 +212,26 @@ Study period start.</p></dd>
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
 Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
 
 
 <dt><code>end_date</code></dt>
@@ -208,8 +265,13 @@ Date to slice the database on (used if source_conn is a database)</p></dd>
 <h3 id="method-key-join-features-">Method <code>key_join_features()</code><a class="anchor" aria-label="anchor" href="#method-key-join-features-"></a></h3>
 <p>Joins various features from feature store assuming a primary feature (observable)
 that contains keys to witch the secondary features (defined by aggregation) can be joined.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span><span class="va">observable</span>, <span class="va">aggregation</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span></span>
+<span>  <span class="va">observable</span>,</span>
+<span>  <span class="va">aggregation</span>,</span>
+<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -225,6 +287,46 @@ Expressions in aggregation evaluated to find appropriate features.
 These are then joined to the observable feature before aggregation is performed.</p></dd>
 
 
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
 </dl><p></p></div>
 </div>
 <div class="section">
@@ -232,15 +334,88 @@ These are then joined to the observable feature before aggregation is performed.
 <p>A tbl_dbi with the requested joined features for the study period.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasystoreBase-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><hr><a id="method-DiseasystoreBase-key_join_filter"></a><div class="section">
+<h3 id="method-key-join-filter-">Method <code>key_join_filter()</code><a class="anchor" aria-label="anchor" href="#method-key-join-filter-"></a></h3>
+<p>This function implements an intermediate filtering in the aggregation pipeline.
+For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+The <code>key_join_filter</code> is inserted into the aggregation pipeline to remove this double counting.</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_filter</span><span class="op">(</span></span>
+<span>  <span class="va">.data</span>,</span>
+<span>  <span class="va">aggregation_features</span>,</span>
+<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>.data</code></dt>
+<dd><p><br>
+The data object to perform the operation on</p></dd>
+
+
+<dt><code>aggregation_features</code></dt>
+<dd><p>(<code>character</code>)<br>
+A list of the features included in the aggregation process.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
+<p>A subset of <code>.data</code> filtered to remove double counting</p>
+</div>
+
+</div><p></p><hr><a id="method-DiseasystoreBase-clone"></a><div class="section">
+<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

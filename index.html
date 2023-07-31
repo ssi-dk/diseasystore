@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/google_covid_19_data.html">diseasystore: Google COVID-19 data</a>
+    <a class="dropdown-item" href="articles/google_covid_19_data.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="articles/quick_start.html">Quick start</a>
   </div>
 </li>
@@ -72,18 +72,14 @@
 <img src="logo.png" class="logo" alt=""><h1 id="diseasystore-">diseasystore <a class="anchor" aria-label="anchor" href="#diseasystore-"></a>
 </h1>
 </div>
-<p>The “diseasystore” is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness.</p>
-</div>
-<div class="section level1">
-<h1 id="a-modular-feature-store">A modular feature store<a class="anchor" aria-label="anchor" href="#a-modular-feature-store"></a>
-</h1>
-<p>The “diseasystore” is modularly built using R6 classes. Different diseases are specified by a “case_definition” which implements a feature store that has access to all relevant disease data for the given case definition. Generic disease data for one case definition is also available for other case definitions reducing the overhead of the data storage.</p>
+<p><a href="https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://codecov.io/gh/RasmusSkytte/diseasystore" class="external-link"><img src="https://codecov.io/gh/RasmusSkytte/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D" alt="codecov"></a></p>
+<p>The “diseasystore” is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness. The package forms the data-backbone of the “diseasy” package. # A modular feature store The “diseasystore” is modularly built using R6 classes. Different diseases are handled by individual feature stores that have access to all relevant disease data for the given disease.</p>
 </div>
 <div class="section level1">
 <h1 id="handling-of-diverse-data-sources">Handling of diverse data sources<a class="anchor" aria-label="anchor" href="#handling-of-diverse-data-sources"></a>
 </h1>
-<p>Data for different diseases will typically be structured in different ways. The “diseasystore” includes examples for how to implement your own disease data set.</p>
-<p>The “diseasystore” is designed to handled both individual level data (preferred) or semi-aggregated data. If the data is at the individual level, the feature store is fully dynamics and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
+<p>Data for different diseases will typically be structured in different ways. The “diseasystore” currently implements the Google Health COVID-19 Open Repository with more one the way.</p>
+<p>The “diseasystore” is designed to handled both individual level data (examples to come) or semi-aggregated (typically public) data. If the data is at the individual level, the feature store is fully dynamic and and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
 </div>
 
   </main><aside class="col-md-3"><div class="license">
