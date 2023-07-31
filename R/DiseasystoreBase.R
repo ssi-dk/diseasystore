@@ -120,13 +120,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       feature_loader <- names(fs_map[fs_map == feature])
 
       # Create log table
-      mg_create_logs_if_missing(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)
-
-      # Create log table
-      mg_create_logs_if_missing(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)
+      mg_create_logs_if_missing(paste(c(private %.% target_schema, "logs"), collapse = "."), private %.% target_conn)
 
       # Determine which dates need to be computed
-      target_table <- paste0(c(private %.% target_schema, feature_loader), collapse = ".")
+      target_table <- paste(c(private %.% target_schema, feature_loader), collapse = ".")
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date = start_date,
                                                         end_date   = end_date,
@@ -169,7 +166,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                              timestamp = slice_ts,
                              message = glue::glue("fs-range: {start_date} - {end_date}"),
                              log_path = NULL, # no log file, but DB logging still enabled
-                             log_table_id = paste0(private %.% target_schema, "logs", collapse = "."),
+                             log_table_id = paste(c(private %.% target_schema, "logs"), collapse = "."),
                              enforce_chronological_order = FALSE)
         })
       })
@@ -427,7 +424,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(private %.% target_conn,
-                         mg_id(paste0(private %.% target_schema, "logs", collapse = "."), private %.% target_conn)) |>
+                         mg_id(paste(c(private %.% target_schema, "logs"), collapse = "."), private %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
         dplyr::filter(target_table == !!target_table, date == !!slice_ts)
