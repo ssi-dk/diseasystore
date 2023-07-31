@@ -95,7 +95,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   Closes the open DB connection when removing the object
     finalize = function() {
       purrr::walk(list(private %.% target_conn, private %.% source_conn),
-                  ~ if (inherits(., "DBIConnection")) DBI::dbDisconnect(.))
+                  ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
+                    DBI::dbDisconnect(.)
+                  })
     },
 
 
@@ -224,9 +226,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(observable, add = coll)
       checkmate::assert(
-        checkmate::check_character(aggregation),
-        checkmate::check_class(aggregation, "quosure"),
-        checkmate::check_class(aggregation, "quosures"),
+        checkmate::check_character(aggregation, null.ok = TRUE),
+        checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
+        checkmate::check_class(aggregation, "quosures", null.ok = TRUE),
         add = coll
       )
       checkmate::assert_date(start_date, add = coll)
