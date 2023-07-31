@@ -486,15 +486,25 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # it even breaks the type so hard, that we need to supply the origin also (which for some reason is not default)
       # so we use the zoo::as.Date, since this is reasonably configured...
 
+      # Early return, if no new dates are found
+      if (length(new_dates) == 0) {
+        return(tibble::tibble(start_date = as.Date(character(0)), end_date = as.Date(character(0))))
+      }
+
       # Reduce to single intervals
       new_ranges <- tibble::tibble(date = new_dates) |>
-        dplyr::mutate(diff = as.numeric(difftime(date, dplyr::lag(date), units = "days"))) |>
-        dplyr::filter(is.na(diff) | diff > 1 | dplyr::row_number() == dplyr::n()) |>
-        dplyr::transmute(start_date = date, end_date = dplyr::lead(date)) |>
-        dplyr::filter(dplyr::if_all(.cols = tidyselect::everything(), .fns = ~!is.na(.)))
+        dplyr::mutate(next_date_diff = as.numeric(difftime(dplyr::lead(.data$date), .data$date, units = "days")),
+                      prev_date_diff = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
+                      first_in_segment = dplyr::if_else(is.na(next_date_diff) | next_date_diff > 1, FALSE, TRUE) |
+                                           dplyr::if_else(is.na(prev_date_diff) | prev_date_diff > 1, TRUE, FALSE)) |> # nolint: indentation_linter
+        dplyr::group_by(cumsum(.data$first_in_segment)) |>
+        dplyr::summarise(start_date = min(.data$date, na.rm = TRUE),
+                         end_date   = max(.data$date, na.rm = TRUE),
+                         .groups = "drop") |>
+        dplyr::select(start_date, end_date)
 
       return(new_ranges)
-    }
+    },
   )
 )
 
