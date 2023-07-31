@@ -45,23 +45,30 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Set the internal paths
       if (is.null(source_conn)) {
         private$source_conn <- list(class(self)[1], NULL) |>
-          purrr::map(~ getOption(paste("diseasystore", ., "source_conn", sep = "."))) |>
+          purrr::map(~ getOption(paste(c("diseasystore", .x, "source_conn"), collapse = "."))) |>
           purrr::keep(purrr::negate(is.null)) |>
           purrr::pluck(1)
+        if (is.function(private %.% source_conn)) private$source_conn <- private$source_conn()
         if (is.null(private %.% source_conn)) stop("source_conn option not defined for ", class(self)[1])
+      } else {
+        private$source_conn <- source_conn
       }
-
 
       if (is.null(target_conn)) {
         private$target_conn <- list(class(self)[1], NULL) |>
-          purrr::map(~ getOption(paste("diseasystore", ., "target_conn", sep = "."))) |>
+          purrr::map(~ getOption(paste(c("diseasystore", .x, "target_conn"), collapse = "."))) |>
           purrr::keep(purrr::negate(is.null)) |>
           purrr::pluck(1)
+        if (is.function(private %.% target_conn)) private$target_conn <- private$target_conn()
         if (is.null(private %.% target_conn)) {
-          stop("target_conn option not defined for ", class(self)[1])
-        } else {
-          private$target_conn <- private$target_conn() # Open the connection
+          if (inherits(private %.% source_conn, "DBIConnection")) {
+            private$target_conn <- private %.% source_conn # Default to using same connection
+          } else {
+            stop("target_conn option not defined for ", class(self)[1])
+          }
         }
+      } else {
+        private$target_conn <- target_conn
       }
 
       if (inherits(private %.% target_conn, "PqConnection")) {
