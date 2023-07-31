@@ -3,12 +3,101 @@
 
 
 
+#' Opens connection to the database
+#'
+#' Connects to the specified dbname of host:port using user and password from given arguments.
+#' Certain drivers may use credentials stored in a file, such as ~/.pgpass (PostgreSQL)
+#'
+#' @param drv
+#'   An object that inherits from DBIDriver or an existing DBIConnection (default: RPostgres::Postgres())
+#' @param host
+#'   Character string giving the ip of the host to connect to
+#' @param port
+#'   Host port to connect to (numeric)
+#' @param dbname
+#'   Name of the database located at the host
+#' @param user
+#'   Username to login with
+#' @param password
+#'   Password to login with
+#' @param timezone
+#'   Sets the timezone of DBI::dbConnect()
+#' @param timezone_out
+#'   Sets the timezone_out of DBI::dbConnect()
+#' @param ...
+#'  Additional parameters sent to DBI::dbConnect()
+#' @return
+#'   An object that inherits from DBIConnection driver specified in drv
+#' @export
+#' @rdname mg_reexports
+mg_get_connection <- function(drv = RPostgres::Postgres(),
+                           host = NULL,
+                           port = NULL,
+                           dbname = NULL,
+                           user = NULL,
+                           password = NULL,
+                           timezone = NULL,
+                           timezone_out = NULL,
+                           ...) {
+
+  # Check arguments
+  checkmate::assert_character(host, pattern = r"{^\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}$}", null.ok = TRUE)
+  checkmate::assert_numeric(port, null.ok = TRUE)
+  checkmate::assert_character(dbname,   null.ok = TRUE)
+  checkmate::assert_character(user,     null.ok = TRUE)
+  checkmate::assert_character(password, null.ok = TRUE)
+  checkmate::assert_character(timezone, null.ok = TRUE)
+  checkmate::assert_character(timezone_out, null.ok = TRUE)
+
+  # Set PostgreSQL-specific options
+  if (inherits(drv, "PqDriver")) {
+    if (is.null(timezone)) timezone <- Sys.timezone()
+    if (is.null(timezone_out)) timezone_out <- timezone
+  }
+
+  # Default SQLite connections to temporary on-disk database
+  if (inherits(drv, "SQLiteDriver") && is.null(dbname)) dbname <- ""
+
+  # Check if connection can be established given these settings
+  can_connect <- DBI::dbCanConnect(drv = drv, ...)
+  if (!can_connect) stop("Could not connect to database with the given parameters: ", attr(can_connect, "reason"))
+
+  conn <- DBI::dbConnect(drv = drv,
+                         dbname = dbname,
+                         host = host,
+                         port = port,
+                         user = user,
+                         password = password,
+                         timezone = timezone,
+                         timezone_out = timezone_out,
+                         ...,
+                         bigint = "integer", # R has poor integer64 integration, which is the default return
+                         check_interrupts = TRUE)
+
+  # Check connection
+  if (mg_nrow(mg_get_tables(conn)) == 0) {
+    warn_str <- "No tables found. Check user permissions / database configuration"
+    args <- c(as.list(environment()), list(...))
+    set_args <- args[names(args) %in% c("dbname", "host", "port", "user", "password")]
+
+    if (length(set_args) > 0) {
+      warn_str <- paste0(warn_str, ":\n  ")
+      warn_str <- paste0(warn_str, paste(names(set_args), set_args, sep = ": ", collapse = "\n  "))
+    }
+    warning(warn_str)
+  }
+
+  return(conn)
+}
+
+
 #' Gets the available tables
 #'
 #' @template conn
 #' @param pattern A regex pattern with which to subset the returned tables
 #' @return A data.frame containing table names in the DB
 #' @export
+#' @name mg_reexports
 mg_get_tables <- function(conn, pattern = NULL) {
 
   # Check arguments
@@ -77,6 +166,7 @@ mg_get_tables <- function(conn, pattern = NULL) {
 #' @return
 #'   A "lazy" dataframe (tbl_lazy) generated using dbplyr
 #' @export
+#' @name mg_reexports
 mg_get_table <- function(conn, db_table_id = NULL, slice_ts = NA, include_slice_info = FALSE) {
 
   # Check arguments
@@ -130,6 +220,7 @@ mg_get_table <- function(conn, db_table_id = NULL, slice_ts = NA, include_slice_
 #' @template conn
 #' @template db_table_id
 #' @export
+#' @name mg_reexports
 mg_table_exists <- function(conn, db_table_id) {
 
   # Check arguments
@@ -160,6 +251,7 @@ mg_table_exists <- function(conn, db_table_id) {
 #' @template conn
 #' @seealso [DBI::Id] which this function wraps.
 #' @export
+#' @name mg_reexports
 mg_id <- function(db_table_id, conn = NULL) {
 
   # Check if already Id
@@ -194,6 +286,7 @@ mg_id <- function(db_table_id, conn = NULL) {
 #' @param until_ts The name of the column in .data specifying valid until time (note: must be unquoted)
 #' @template .data_return
 #' @export
+#' @name mg_reexports
 mg_slice_time <- function(.data, slice_ts, from_ts = from_ts, until_ts = until_ts) {
 
   # Check arguments
@@ -213,7 +306,6 @@ mg_slice_time <- function(.data, slice_ts, from_ts = from_ts, until_ts = until_t
 
 #' SQL Joins
 #'
-#' @name joins
 #'
 #' @description Overloads the dplyr *_join to accept an na_by argument.
 #' By default, joining using SQL does not match on NA / NULL.
@@ -221,11 +313,12 @@ mg_slice_time <- function(.data, slice_ts, from_ts = from_ts, until_ts = until_t
 #' This function does the matching more efficiently.
 #' If a column contains NA / NULL, give the argument to na_by to match during the join
 #' If no na_by is given, the function defaults to using dplyr::*_join
-#' @inheritParams dplyr::left_join
+#' @inheritParams dbplyr::join.tbl_sql
 #' @param na_by columns that should match on NA
 #' @seealso [dplyr::mutate-joins] which this function wraps.
 #' @seealso [dbplyr::join.tbl_sql] which this function wraps.
 #' @export
+#' @name mg_reexports
 mg_inner_join <- function(x, y, by = NULL, na_by = NULL, ...) {
 
   # Check arguments
@@ -249,7 +342,92 @@ mg_inner_join <- function(x, y, by = NULL, na_by = NULL, ...) {
 
 
 
-# This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
+#' @export
+#' @name mg_reexports
+mg_left_join <- function(x, y, by = NULL, na_by = NULL, ...) {
+
+  # Check arguments
+  mg_assert_data_like(x)
+  mg_assert_data_like(y)
+  checkmate::assert_character(by, null.ok = TRUE)
+  checkmate::assert_character(na_by, null.ok = TRUE)
+
+  if (is.null(na_by)) {
+    if (inherits(x, "tbl_dbi") || inherits(y, "tbl_dbi")) mg_join_warn()
+    return(dplyr::left_join(x, y, by = by, ...))
+  } else {
+    mg_join_warn_experimental()
+    sql_on <- mg_join_na_sql(by, na_by)
+    renamer <- mg_select_na_sql(x, y, by, na_by)
+    return(dplyr::left_join(x, y, suffix = c(".x", ".y"), sql_on = sql_on, ...) |>
+             dplyr::rename(!!renamer) |>
+             dplyr::select(tidyselect::all_of(names(renamer))))
+
+
+  }
+}
+
+
+
+#' dbplyr and SQLite does not work right now for right_joins it seems
+#' so we "fix" it by doing a left join on SQLiteConnections
+#' @inheritParams dbplyr::join.tbl_sql
+#' @param renamer named list generated by mg_select_na_sql
+#' @name mg_reexports
+mg_mg_right_join <- function(x, y, sql_on, renamer, ...) {
+  UseMethod("mg_mg_right_join")
+}
+
+
+#' @inheritParams mg_mg_right_join
+#' @name mg_reexports
+mg_mg_right_join.tbl_dbi <- function(x, y, sql_on, renamer, ...) {
+  dplyr::right_join(x, y, suffix = c(".y", ".x"), sql_on = sql_on, ...) |>
+    dplyr::rename(!!renamer) |>
+    dplyr::select(tidyselect::all_of(names(renamer)))
+}
+
+
+#' @inheritParams mg_mg_right_join
+#' @name mg_reexports
+mg_mg_right_join.tbl_SQLiteConnection <- function(x, y, sql_on, renamer, ...) {
+  dplyr::left_join(y, x, suffix = c(".y", ".x"), sql_on = sql_on, ...) |>
+    dplyr::rename(!!renamer) |>
+    dplyr::select(tidyselect::all_of(names(renamer)))
+}
+
+
+
+#' @export
+#' @name mg_reexports
+mg_right_join <- function(x, y, by = NULL, na_by = NULL, ...) {
+
+  # Check arguments
+  mg_assert_data_like(x)
+  mg_assert_data_like(y)
+  checkmate::assert_character(by, null.ok = TRUE)
+  checkmate::assert_character(na_by, null.ok = TRUE)
+
+  if (is.null(na_by)) {
+    if (inherits(x, "tbl_dbi") || inherits(y, "tbl_dbi")) mg_join_warn()
+    return(dplyr::right_join(x, y, by = by, ...))
+  } else {
+    mg_join_warn_experimental()
+    sql_on <- mg_join_na_sql(by, na_by)
+    renamer <- mg_select_na_sql(x, y, by, na_by, left = FALSE)
+
+    # Seems like mg_right_join does not work for SQLite, so we'll do a left join for now
+    mg_mg_right_join(x, y, sql_on, renamer, ...)
+  }
+}
+
+
+
+#' Generate sql_on statement for na joins
+#' @details
+#'   This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
+#' @inheritParams mg_left_join
+#' @name mg_reexports
 mg_join_na_sql <- function(by, na_by) {
   sql_on <- ""
   if (!missing(by)) {
@@ -274,61 +452,11 @@ mg_join_na_sql <- function(by, na_by) {
 }
 
 
-# Get colnames from
-mg_select_na_sql <- function(x, y, by, na_by, left = TRUE) {
 
-  all_by <- c(by, na_by) # Variables to be common after join
-  cxy <- dplyr::setdiff(dplyr::intersect(colnames(x), colnames(y)), all_by)   # Duplicate columns after join
-  cx  <- dplyr::setdiff(colnames(x), colnames(y)) # Variables only in x
-  cy  <- dplyr::setdiff(colnames(y), colnames(x)) # Variables only in y
-
-  vars <- list(all_by, cx, cy, cxy, cxy)
-
-  renamer <- \(suffix) suffix |> purrr::map(~ purrr::partial(\(x, suffix) paste0(x, suffix), suffix = .))
-
-  sql_select <- vars |>
-    purrr::map2(renamer(list(ifelse(left, ".x", ".y"), "", "", ".x", ".y")), ~ purrr::map(.x, .y)) |>
-    purrr::map(~ purrr::reduce(., c, .init = character(0))) |>
-    purrr::reduce(c)
-
-  sql_names <- vars |>
-    purrr::map2(renamer(list("", "", "", ".x", ".y")), ~ purrr::map(.x, .y)) |>
-    purrr::map(~ purrr::reduce(., c, .init = character(0))) |>
-    purrr::reduce(c)
-
-  names(sql_select) <- sql_names
-
-  return(sql_select)
-}
-
-
-
-# This function generates a much faster sql statement for NA join compared to dbplyr's _join with na_matches = "na".
-mg_join_na_sql <- function(by, na_by) {
-  sql_on <- ""
-  if (!missing(by)) {
-    for (i in seq_along(by)) {
-      sql_on <- paste0(sql_on, '"LHS"."', by[i], '" = "RHS"."', by[i], '"')
-      if (i < length(by) || !missing(na_by)) {
-        sql_on <- paste(sql_on, "\nAND ")
-      }
-    }
-  }
-
-  if (!missing(na_by)) {
-    for (i in seq_along(na_by)) {
-      sql_on <- paste0(sql_on, '("LHS"."', na_by[i], '" IS NOT DISTINCT FROM "RHS"."', na_by[i], '")')
-      if (i < length(na_by)) {
-        sql_on <- paste(sql_on, "\nAND ")
-      }
-    }
-  }
-
-  return(sql_on)
-}
-
-
-# Get colnames from
+#' Get colnames to select
+#' @inheritParams mg_left_join
+#' @param left Boolean that control if joins is left (alternatively right) join
+#' @name mg_reexports
 mg_select_na_sql <- function(x, y, by, na_by, left = TRUE) {
 
   all_by <- c(by, na_by) # Variables to be common after join
@@ -358,6 +486,7 @@ mg_select_na_sql <- function(x, y, by, na_by, left = TRUE) {
 
 
 #' A warning to users that SQL does not match on NA by default
+#' @name mg_reexports
 mg_join_warn <- function() {
   if (testthat::is_testing() || !interactive()) return()
   if (identical(parent.frame(n = 2), globalenv())) {
@@ -371,6 +500,7 @@ mg_join_warn <- function() {
 
 
 #' A warning to users that SQL does not match on NA by default
+#' @name mg_reexports
 mg_join_warn_experimental <- function() {
   if (testthat::is_testing() || !interactive()) return()
   if (identical(parent.frame(n = 2), globalenv())) {
@@ -400,6 +530,7 @@ mg_join_warn_experimental <- function() {
 #' @return          The combination of input queries with a single, interlaced
 #'                  valid_from / valid_until time axis
 #' @export
+#' @name mg_reexports
 mg_interlace_sql <- function(tables, by = NULL, colnames = NULL) {
 
   # Check arguments
@@ -472,7 +603,6 @@ mg_interlace_sql <- function(tables, by = NULL, colnames = NULL) {
 
 #' Computes an MD5 checksum from columns
 #'
-#' @name mg_digest_to_checksum
 #'
 #' @template .data
 #' @param col Name of the column to put the checksums in
@@ -481,6 +611,7 @@ mg_interlace_sql <- function(tables, by = NULL, colnames = NULL) {
 #'
 #' @importFrom rlang `:=`
 #' @export
+#' @name mg_reexports
 mg_digest_to_checksum <- function(.data, col = "checksum", exclude = NULL, warn = TRUE) {
 
   # Check arguments
@@ -514,8 +645,8 @@ md5 <- openssl::md5
 
 
 #' Some backends have native md5 support, these use this function
-#' @rdname digest_internal
 #' @importFrom rlang `:=`
+#' @name mg_reexports
 mg_digest_to_checksum_native_md5 <- function(.data, col) {
 
   .data <- .data |>
@@ -526,16 +657,16 @@ mg_digest_to_checksum_native_md5 <- function(.data, col) {
 }
 
 
-#' @name digest_internal
 #' @template .data
 #' @param col The name of column the checksums will be placed in
+#' @name mg_reexports
 mg_digest_to_checksum_internal <- function(.data, col) {
   UseMethod("mg_digest_to_checksum_internal")
 }
 
 
-#' @rdname digest_internal
 #' @importFrom rlang `:=` .data
+#' @name mg_reexports
 mg_digest_to_checksum_internal.default <- function(.data, col) {
 
   # Compute checksums locally then join back onto original data
@@ -554,31 +685,63 @@ mg_digest_to_checksum_internal.default <- function(.data, col) {
 }
 
 
-#' @rdname digest_internal
 mg_digest_to_checksum_internal.tbl_PqConnection <- mg_digest_to_checksum_native_md5
 
 
-#' @rdname digest_internal
 mg_digest_to_checksum_internal.data.frame       <- mg_digest_to_checksum_native_md5
 
 
-#' @rdname digest_internal
 mg_digest_to_checksum_internal.tibble           <- mg_digest_to_checksum_native_md5
 
 
 
 
-#' @name digest_internal
-#' @template .data
-#' @param col The name of column the checksums will be placed in
-mg_digest_to_checksum_internal <- function(.data, col) {
-  UseMethod("mg_digest_to_checksum_internal")
+#' tidyr::unite for tbl_dbi
+#'
+#' @inheritParams tidyr::unite
+#' @exportS3Method tidyr::unite tbl_dbi
+#' @name mg_reexports
+unite.tbl_dbi <- function(data, col, ..., sep = "_", remove = TRUE, na.rm = FALSE) { # nolint: object_name_linter
+
+  # Check arguments
+  checkmate::assert_class(data, "tbl_dbi")
+  #checkmate::assert_character(col) # I am not sure exactly what inputs tidyr::unite takes, so I cannot write a check
+  checkmate::assert_character(sep)
+  checkmate::assert_logical(remove)
+  checkmate::assert_logical(na.rm)
+
+  # Code below is adapted from tidyr::unite.data.frame
+  rlang::check_dots_unnamed()
+
+  if (rlang::dots_n(...) == 0) {
+    from_vars <- rlang::set_names(seq_along(data), names(data))
+  } else {
+    from_vars <- colnames(dplyr::select(data, ...))
+  }
+
+  # We need add some support for how tidyr::unite accepts input of "col"
+  col <- rlang::as_string(rlang::ensym(col))
+
+  col_symbols <- purrr::map(from_vars, as.symbol)
+
+  # We need to determine where col should be placed
+  first_from <- which(colnames(data) %in% from_vars)[1]
+
+  out <- data |>
+    dplyr::mutate({{col}} := NULLIF(paste(!!!col_symbols, sep = sep), ""), .before = !!first_from)
+
+  if (remove) out <- out |> dplyr::select(!tidyselect::all_of(from_vars))
+
+  return(out)
 }
+# Modified from
+# https://stackoverflow.com/questions/48536983/how-to-concatenate-strings-of-multiple-  -- continued below
+# columns-from-table-in-sql-server-using-dp
+
 
 
 #' Create a historical table from input data
 #'
-#' @name mg_create_table
 #'
 #' @template .data
 #' @template conn
@@ -587,6 +750,7 @@ mg_digest_to_checksum_internal <- function(.data, col) {
 #' @param ... Other arguments passed to [DBI::dbCreateTable()]
 #' @returns Invisibly returns the table as it looks on the destination (or locally if conn is NULL)
 #' @export
+#' @name mg_reexports
 mg_create_table <- function(.data, conn = NULL, db_table_id = NULL, temporary = TRUE, ...) {
 
   checkmate::assert_class(.data, "data.frame")
@@ -688,15 +852,16 @@ methods::setMethod("mg_getTableSignature", "NULL", function(.data, conn) {
 #'   A timestamp when computation began. If not supplied, it will be created at call-time.
 #'   (Used to more accurately convey how long runtime of the update process has been)
 #' @template log_path
-#' @template log_db
+#' @template log_table_id
 #' @param enforce_chronological_order
 #'   A logical that controls whether or not to check if timestamp of update is prior to timestamps in the DB
 #' @return NULL
 #' @seealso mg_filter_keys
 #' @importFrom rlang .data
 #' @export
+#' @name mg_reexports
 mg_update_snapshot <- function(.data, conn, db_table, timestamp, filters = NULL, message = NULL, tic = Sys.time(),
-                            log_path = getOption("mg.log_path"), log_db = getOption("mg.log_db"),
+                            log_path = getOption("mg.log_path"), log_table_id = getOption("mg.log_table_id"),
                             enforce_chronological_order = TRUE) {
 
   # Check arguments
@@ -730,11 +895,11 @@ mg_update_snapshot <- function(.data, conn, db_table, timestamp, filters = NULL,
   # Initialize logger
   logger <- mg_Logger$new(
     db_tablestring = db_table_name,
-    log_db = log_db,
+    log_table_id = log_table_id,
     log_conn = conn,
     log_path = log_path,
     ts = timestamp,
-    tic = tic
+    start_time = tic
   )
 
   logger$log_to_db(start_time = !!mg_db_timestamp(tic, conn))
@@ -954,6 +1119,7 @@ mg_update_snapshot <- function(.data, conn, db_table, timestamp, filters = NULL,
 #' @param na_by   passed to mg_inner_join if different from NULL
 #' @template .data_return
 #' @export
+#' @name mg_reexports
 mg_filter_keys <- function(.data, filters, by = NULL, na_by = NULL) {
 
   # Check arguments
@@ -985,21 +1151,19 @@ mg_filter_keys <- function(.data, filters, by = NULL, na_by = NULL) {
 
 
 #' Determine the type of timestamps the DB supports
-#' @name mg_db_timestamp
 #' @param timestamp The timestamp to be transformed to the DB type. Can be character.
 #' @param conn A `DBIConnection` to the DB where the timestamp should be stored
+#' @name mg_reexports
 mg_db_timestamp <- function(timestamp, conn) {
   UseMethod("mg_db_timestamp", conn)
 }
 
 
-#' @rdname mg_db_timestamp
 mg_db_timestamp.default <- function(timestamp, conn) {
   return(dbplyr::translate_sql(as.POSIXct(!!timestamp), con = conn))
 }
 
 
-#' @rdname mg_db_timestamp
 mg_db_timestamp.SQLiteConnection <- function(timestamp, conn) {
   if (is.na(timestamp)) {
     dbplyr::translate_sql(NA_character_, con = conn)
@@ -1010,20 +1174,12 @@ mg_db_timestamp.SQLiteConnection <- function(timestamp, conn) {
 
 
 
-#' Determine the type of timestamps the DB supports
-#' @name mg_db_timestamp
-#' @param timestamp The timestamp to be transformed to the DB type. Can be character.
-#' @param conn A `DBIConnection` to the DB where the timestamp should be stored
-mg_db_timestamp <- function(timestamp, conn) {
-  UseMethod("mg_db_timestamp", conn)
-}
-
-
 #' Checks if table contains historical data
 #'
 #' @template .data
 #' @return TRUE if .data contains the columns: "checksum", "from_ts", and "until_ts". FALSE otherwise
 #' @export
+#' @name mg_reexports
 mg_is.historical <- function(.data) { # nolint: object_name_linter
 
   # Check arguments
@@ -1040,6 +1196,7 @@ mg_is.historical <- function(.data) { # nolint: object_name_linter
 #' @param .data lazy_query to parse
 #' @return The number of records in the object
 #' @export
+#' @name mg_reexports
 mg_nrow <- function(.data) {
   if (inherits(.data, "tbl_dbi")) {
     return(dplyr::pull(dplyr::count(dplyr::ungroup(.data))))
@@ -1050,126 +1207,119 @@ mg_nrow <- function(.data) {
 
 
 
+#' @title mg_Logger
+#' @description
 #' Create an object for logging database operations
-#' @param log_path Path to a directory of log files.
+#'
+#' @param db_tablestring A string specifying the table being updated
+#' @template log_table_id
+#' @template log_path
+#' @param ts A timestamp describing the data being processed (`r "\U2260"` current time)
+#' @param start_time The time at which data processing was started (defaults to [Sys.time()])
 #'
 #' @export
 mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
   public = list(
-    # Arguments to be given by user
-    db_tablestring = NULL,
-    log_path = NULL,
-    ts = NULL,
 
-    # Attributes to define at initialization
-    filename = NULL,
-    log_db = NULL,
-    log_conn = NULL,
+    #' @field log_path (`character(1)`)\cr
+    #' A directory where log file is written (if this is not NULL). Defaults to `getOption("mg.log_path")`.
+    log_path = NULL,
+
+    #' @field log_filename (`character(1)`)\cr
+    #' The name (basename) of the log file.
+    log_filename = NULL,
+
+    #' @field log_tbl
+    #' The DB table used for logging. Class is connection-specific, but inherits from `tbl_dbi`.
+    log_tbl = NULL,
+
+    #' @field start_time (`POSIXct(1)`)\cr
+    #' The time at which data processing was started.
     start_time = NULL,
 
-    #' @template log_path
-    #' @template log_db
+    #' @description
+    #' Create a new mg_Logger object
+    #' @param log_conn A database connection inheriting from `DBIConnection`
     initialize = function(db_tablestring = NULL,
-                          log_db   = getOption("mg.log_db"),
+                          log_table_id   = getOption("mg.log_table_id"),
                           log_conn = NULL,
                           log_path = getOption("mg.log_path"),
                           ts = NULL,
-                          tic = Sys.time()
+                          start_time = Sys.time()
                           ) {
 
       # Initialize logger
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_character(db_tablestring, add = coll)
-      checkmate::assert_character(log_db, null.ok = TRUE, add = coll)
+      mg_assert_id_like(log_table_id, null.ok = TRUE, add = coll)
       checkmate::assert_class(log_conn, "DBIConnection", null.ok = TRUE, add = coll)
       checkmate::assert_character(log_path, null.ok = TRUE, add = coll)
       mg_assert_timestamp_like(ts, add = coll)
-      checkmate::assert_posixct(tic, add = coll)
+      checkmate::assert_posixct(start_time, add = coll)
       checkmate::reportAssertions(coll)
 
-      self$ts <- ts
-      self$start_time <- tic
+      private$ts <- ts
+      self$start_time <- start_time
       lockBinding("start_time", self)
 
-      if (!is.null(log_db)) self$log_db <- mg_create_logs_if_missing(log_db, log_conn)
-      self$log_conn <- log_conn
-      self$log_path <- log_path
-      self$db_tablestring <- db_tablestring
-      self$filename <- self$generate_filename(db_tablestring)
-      self$generate_log_entry()
-
-      stopifnot("Log file for given timestamp already exists!" = !file.exists(file.path(self$log_path, self$filename)))
-    },
-
-
-    generate_filename = function(db_tablestring = self$db_tablestring,
-                                 ts = self$ts) {
-
-      # If we are not producing a file log, we provide a random string to key by
-      if (is.null(self$log_path)) return(basename(tempfile(tmpdir = "", pattern = "")))
-
-
-      start_format <- format(self$start_time, "%Y%m%d.%H%M")
-
-      if (is.character(ts)) ts <- as.Date(ts)
-      ts_format <- format(ts, "%Y_%m_%d")
-      filename <- sprintf(
-        "%s.%s.%s.log",
-        start_format,
-        ts_format,
-        db_tablestring
-      )
-
-      return(filename)
-    },
-
-    generate_log_entry = function() {
-
-      # If we not producing a db log, create entry
-      if (!is.null(self$log_db)) {
-        dplyr::rows_append(
-          x = self$log_db,
-          y = data.frame(log_file = self$filename),
-          copy = TRUE,
-          in_place = TRUE)
+      if (!is.null(log_table_id)) {
+        self$log_tbl <- mg_create_logs_if_missing(log_table_id, log_conn)
       }
+      private$log_conn <- log_conn
 
-      return()
+      self$log_path <- log_path
+      private$db_tablestring <- db_tablestring
+      self$log_filename <- private$generate_filename()
+      lockBinding("log_filename", self)
+
+      # Create a line in log DB for mg_Logger
+      private$generate_log_entry()
+
+      stopifnot("Log file for given timestamp already exists!" = !file.exists(file.path(self$log_path, self$log_filename)))
     },
 
-    log_format = function(..., tic = NULL, log_type = NULL) {
-      ts_str <- if (is.null(tic)) tic else stringr::str_replace(format(tic, "%F %H:%M:%OS3", locale = "en"), "[.]", ",")
-      return(paste(ts_str, Sys.getenv("USER"), log_type, paste(...), sep = " - "))
-    },
-
+    #' @description
+    #' Write a line to log file
+    #' @param ... `r log_dots <- "One or more character strings to be concatenated"; log_dots`
+    #' @param tic The timestamp used by the log entry (default Sys.time())
+#' @name mg_reexports
+    #' @param log_type `r log_type <- "A character string which describes the severity of the log message"; log_type`
     log_info = function(..., tic = Sys.time(), log_type = "INFO") {
 
       # Writes log file (if set)
       if (!is.null(self$log_path)) {
-        sink(file = file.path(self$log_path, self$filename), split = TRUE, append = TRUE, type = "output")
+        sink(file = file.path(self$log_path, self$log_filename), split = TRUE, append = TRUE, type = "output")
       }
 
-      cat(self$log_format(..., tic = tic, log_type = log_type), "\n", sep = "")
+      cat(private$log_format(..., tic = tic, log_type = log_type), "\n", sep = "")
 
       if (!is.null(self$log_path)) sink()
     },
 
+    #' @description Write a warning to log file and generate warning.
+    #' @param ... `r log_dots`
+    #' @param log_type `r log_type`
     log_warn = function(..., log_type = "WARNING") {
       self$log_info(..., log_type = log_type)
-      warning(self$log_format(..., log_type = log_type))
+      warning(private$log_format(..., log_type = log_type))
     },
 
+    #' @description Write an error to log file and stop execution
+    #' @param ... `r log_dots`
+    #' @param log_type `r log_type`
     log_error = function(..., log_type = "ERROR") {
       self$log_info(..., log_type = log_type)
-      stop(self$log_format(..., log_type = log_type))
+      stop(private$log_format(..., log_type = log_type))
     },
 
+    #' @description Write or update log table
+    #' @param ... Name-value pairs with which to update the log table
     log_to_db = function(...) {
-      if (is.null(self$log_db)) return()
+      if (is.null(self$log_tbl)) return()
 
       dplyr::rows_patch(
-        x = self$log_db,
-        y = dplyr::copy_to(self$log_conn, data.frame(log_file = self$filename), overwrite = TRUE) |>
+        x = self$log_tbl,
+        y = dplyr::copy_to(private$log_conn, data.frame(log_file = self$log_filename), overwrite = TRUE) |>
           dplyr::mutate(...),
         by = "log_file",
         copy = TRUE,
@@ -1177,71 +1327,19 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
         unmatched = "ignore"
       )
     }
-  )
-)
+  ),
+  private = list(
 
-
-
-#' Create an object for logging database operations
-#' @param log_path Path to a directory of log files.
-#'
-#' @export
-mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
-  public = list(
-    # Arguments to be given by user
     db_tablestring = NULL,
-    log_path = NULL,
+    log_conn = NULL,
     ts = NULL,
 
-    # Attributes to define at initialization
-    filename = NULL,
-    log_db = NULL,
-    log_conn = NULL,
-    start_time = NULL,
-
-    #' @template log_path
-    #' @template log_db
-    initialize = function(db_tablestring = NULL,
-                          log_db   = getOption("mg.log_db"),
-                          log_conn = NULL,
-                          log_path = getOption("mg.log_path"),
-                          ts = NULL,
-                          tic = Sys.time()
-                          ) {
-
-      # Initialize logger
-      coll <- checkmate::makeAssertCollection()
-      checkmate::assert_character(db_tablestring, add = coll)
-      checkmate::assert_character(log_db, null.ok = TRUE, add = coll)
-      checkmate::assert_class(log_conn, "DBIConnection", null.ok = TRUE, add = coll)
-      checkmate::assert_character(log_path, null.ok = TRUE, add = coll)
-      mg_assert_timestamp_like(ts, add = coll)
-      checkmate::assert_posixct(tic, add = coll)
-      checkmate::reportAssertions(coll)
-
-      self$ts <- ts
-      self$start_time <- tic
-      lockBinding("start_time", self)
-
-      if (!is.null(log_db)) self$log_db <- mg_create_logs_if_missing(log_db, log_conn)
-      self$log_conn <- log_conn
-      self$log_path <- log_path
-      self$db_tablestring <- db_tablestring
-      self$filename <- self$generate_filename(db_tablestring)
-      self$generate_log_entry()
-
-      stopifnot("Log file for given timestamp already exists!" = !file.exists(file.path(self$log_path, self$filename)))
-    },
-
-
-    generate_filename = function(db_tablestring = self$db_tablestring,
-                                 ts = self$ts) {
-
+    generate_filename = function() {
       # If we are not producing a file log, we provide a random string to key by
       if (is.null(self$log_path)) return(basename(tempfile(tmpdir = "", pattern = "")))
 
-
       start_format <- format(self$start_time, "%Y%m%d.%H%M")
+      ts <- private$ts
 
       if (is.character(ts)) ts <- as.Date(ts)
       ts_format <- format(ts, "%Y_%m_%d")
@@ -1249,19 +1347,19 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
         "%s.%s.%s.log",
         start_format,
         ts_format,
-        db_tablestring
+        private$db_tablestring
       )
 
       return(filename)
     },
 
-    generate_log_entry = function() {
 
-      # If we not producing a db log, create entry
-      if (!is.null(self$log_db)) {
+    generate_log_entry = function() {
+      # Create a row for log in question
+      if (!is.null(self$log_tbl)) {
         dplyr::rows_append(
-          x = self$log_db,
-          y = data.frame(log_file = self$filename),
+          x = self$log_tbl,
+          y = data.frame(log_file = self$log_filename),
           copy = TRUE,
           in_place = TRUE)
       }
@@ -1270,44 +1368,13 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
     },
 
     log_format = function(..., tic = NULL, log_type = NULL) {
-      ts_str <- if (is.null(tic)) tic else stringr::str_replace(format(tic, "%F %H:%M:%OS3", locale = "en"), "[.]", ",")
-      return(paste(ts_str, Sys.getenv("USER"), log_type, paste(...), sep = " - "))
-    },
-
-    log_info = function(..., tic = Sys.time(), log_type = "INFO") {
-
-      # Writes log file (if set)
-      if (!is.null(self$log_path)) {
-        sink(file = file.path(self$log_path, self$filename), split = TRUE, append = TRUE, type = "output")
+      ts_str <- if (is.null(tic)) {
+        self$start_time
+      } else {
+        stringr::str_replace(format(tic, "%F %H:%M:%OS3", locale = "en"), "[.]", ",")
       }
 
-      cat(self$log_format(..., tic = tic, log_type = log_type), "\n", sep = "")
-
-      if (!is.null(self$log_path)) sink()
-    },
-
-    log_warn = function(..., log_type = "WARNING") {
-      self$log_info(..., log_type = log_type)
-      warning(self$log_format(..., log_type = log_type))
-    },
-
-    log_error = function(..., log_type = "ERROR") {
-      self$log_info(..., log_type = log_type)
-      stop(self$log_format(..., log_type = log_type))
-    },
-
-    log_to_db = function(...) {
-      if (is.null(self$log_db)) return()
-
-      dplyr::rows_patch(
-        x = self$log_db,
-        y = dplyr::copy_to(self$log_conn, data.frame(log_file = self$filename), overwrite = TRUE) |>
-          dplyr::mutate(...),
-        by = "log_file",
-        copy = TRUE,
-        in_place = TRUE,
-        unmatched = "ignore"
-      )
+      return(paste(ts_str, Sys.info()[["user"]], log_type, paste(...), sep = " - "))
     }
   )
 )
@@ -1318,7 +1385,10 @@ mg_Logger <- R6::R6Class("mg_Logger", #nolint: object_name_linter
 #' @template conn
 #' @param log_table A specification of where the logs should exist ("schema.table")
 #' @export
+#' @name mg_reexports
 mg_create_logs_if_missing <- function(log_table, conn) {
+
+  checkmate::assert_class(conn, "DBIConnection")
 
   if (!mg_table_exists(conn, log_table)) {
     log_signature <- data.frame(date = as.POSIXct(NA),
@@ -1344,6 +1414,7 @@ mg_create_logs_if_missing <- function(log_table, conn) {
 #' @template age_cuts
 #' @return A vector of labels with zero-padded numerics so they can be sorted easily
 #' @export
+#' @name mg_reexports
 mg_age_labels <- function(age_cuts) {
   checkmate::assert_numeric(age_cuts, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE)
 
@@ -1362,6 +1433,7 @@ mg_age_labels <- function(age_cuts) {
 #' @param ...      Parameters passed to checkmate::check_*
 #' @param add      `AssertCollection` to add assertions to
 #' @export
+#' @name mg_reexports
 mg_assert_dbtable_like <- function(db_table, ..., add = NULL) {
   checkmate::assert(
     checkmate::check_character(db_table, pattern = r"{^\w*.\w*$}", ...),
@@ -1377,6 +1449,7 @@ mg_assert_dbtable_like <- function(db_table, ..., add = NULL) {
 #' @param ...       parameters passed to checkmate::check_*
 #' @param add       `AssertCollection` to add assertions to
 #' @export
+#' @name mg_reexports
 mg_assert_timestamp_like <- function(timestamp, ..., add = NULL) {
   checkmate::assert(
     checkmate::check_posixct(timestamp, ...),
@@ -1392,6 +1465,7 @@ mg_assert_timestamp_like <- function(timestamp, ..., add = NULL) {
 #' @param ...   Parameters passed to checkmate::check_*
 #' @param add   `AssertCollection` to add assertions to
 #' @export
+#' @name mg_reexports
 mg_assert_data_like <- function(.data, ..., add = NULL) {
   checkmate::assert(
     checkmate::check_class(.data, "tbl_dbi", ...),
@@ -1408,6 +1482,7 @@ mg_assert_data_like <- function(.data, ..., add = NULL) {
 #' @param ...  Parameters passed to checkmate::check_*
 #' @param add `AssertCollection` to add assertions to
 #' @export
+#' @name mg_reexports
 mg_assert_id_like <- function(mg_id, ..., add = NULL) {
   checkmate::assert(
     checkmate::check_character(mg_id, ...),

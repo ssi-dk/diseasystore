@@ -4,7 +4,8 @@
 \alias{FeatureHandler}
 \title{FeatureHandler}
 \description{
-TODO
+This \code{FeatureHandler} \link[R6:R6Class]{R6} handles individual features for the feature stores.
+They define the three methods associated with features (\code{compute}, \code{get} and \code{key_join}).
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}

@@ -1,6 +1,8 @@
 #' @title FeatureHandler
 #'
-#' @description TODO
+#' @description
+#'   This `FeatureHandler` [R6][R6::R6Class] handles individual features for the feature stores.
+#'   They define the three methods associated with features (`compute`, `get` and `key_join`).
 #' @export
 FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
   classname = "FeatureHandler",
@@ -39,9 +41,9 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
 
       # Set the functions of the FeatureHandler
       purrr::walk2(args, names(args), ~ {
-          dot_name <- paste0(".", .y)
-          purrr::pluck(private, dot_name) <- .x
-        })
+        dot_name <- paste0(".", .y)
+        purrr::pluck(private, dot_name) <- .x
+      })
     }
   ),
 

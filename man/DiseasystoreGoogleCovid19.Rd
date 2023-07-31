@@ -2,9 +2,11 @@
 % Please edit documentation in R/DiseasystoreGoogleCovid19.R
 \name{DiseasystoreGoogleCovid19}
 \alias{DiseasystoreGoogleCovid19}
-\title{feature store handler of Google COVID-19 data features}
+\title{feature store handler of Google Health COVID-19 Open Data features}
 \description{
-TODO
+This \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} brings support for using the Google
+Health COVID-19 Open Data repository.
+See the vignette("google_covid_19_data") for details on how to configure the feature store
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
@@ -19,6 +21,7 @@ TODO
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="finalize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-finalize'><code>diseasystore::DiseasystoreBase$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
@@ -33,7 +36,12 @@ This function implements an intermediate filtering in the aggregation pipeline.
 For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
 The \code{key_join_filter} is inserted into the aggregation pipeline to remove this double counting.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(.data, aggregation_features)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(
+  .data,
+  aggregation_features,
+  start_date = private \%.\% start_date,
+  end_date = private \%.\% end_date
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -44,6 +52,12 @@ The data object to perform the operation on}
 
 \item{\code{aggregation_features}}{(\code{character})\cr
 A list of the features included in the aggregation process.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
 }
 \if{html}{\out{</div>}}
 }

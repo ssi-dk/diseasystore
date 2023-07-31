@@ -1,6 +1,6 @@
 Package: diseasystore
 Title: feature store handler for the diseasy framework
-Version: 0.0.0.9002
+Version: 0.1.0
 Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-5860-3838")),
@@ -28,6 +28,7 @@ Imports:
     purrr,
     readr,
     rlang,
+    R6,
     stringr,
     testthat,
     tidyr,
@@ -36,7 +37,9 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    spelling,
-    RSQLite
+    RSQLite,
+    RPostgres,
+    tibble,
+    spelling
 VignetteBuilder: knitr
 Config/testthat/edition: 3
