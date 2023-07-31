@@ -1,4 +1,5 @@
 # diseasystore <img src="man/figures/logo.png" align="right" height="138" />
+[![R-CMD-check](https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/RasmusSkytte/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D)](https://codecov.io/gh/RasmusSkytte/diseasystore)
 
 The "diseasystore" is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness.
