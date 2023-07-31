@@ -4,7 +4,7 @@
 \alias{FeatureHandler}
 \title{FeatureHandler}
 \description{
-This \code{FeatureHandler} \link[R6:R6Class]{R6} handles indiviual features for the feature stores.
+This \code{FeatureHandler} \link[R6:R6Class]{R6} handles individual features for the feature stores.
 They define the three methods associated with features (\code{compute}, \code{get} and \code{key_join}).
 }
 \section{Active bindings}{

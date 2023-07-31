@@ -30,7 +30,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
                                       verbose = FALSE)
 
   # Check feature store has been created
-  expect_class(fs, "DiseasystoreGoogleCovid19")
+  checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
 
   # Check all FeatureHandlers have been initialized
   private <- fs$.__enclos_env__$private
@@ -38,7 +38,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
     purrr::map(~ purrr::pluck(private, .))
 
   purrr::walk(feature_handlers, ~ {
-    expect_class(.x, "FeatureHandler")
+    checkmate::expect_class(.x, "FeatureHandler")
     checkmate::expect_function(.x %.% compute)
     checkmate::expect_function(.x %.% get)
     checkmate::expect_function(.x %.% key_join)
@@ -128,8 +128,6 @@ test_that("DiseasystoreGoogleCovid19 works", {
         key_join_features_tester(dplyr::collect(output))
       }
     })
-
-  fs$key_join_features("n_population", rlang::quos(region_id))
 
   # Cleanup
   rm(fs)

@@ -38,6 +38,7 @@ Suggests:
     knitr,
     rmarkdown,
     spelling,
-    RSQLite
+    RSQLite,
+    RPostgres
 VignetteBuilder: knitr
 Config/testthat/edition: 3

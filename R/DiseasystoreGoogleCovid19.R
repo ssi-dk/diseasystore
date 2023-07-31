@@ -2,7 +2,7 @@
 #'
 #' @description
 #'   This `DiseasystoreGoogleCovid19` [R6][R6::R6Class] brings support for using the Google
-#'   Health COVID 19 Open Data repository.
+#'   Health COVID-19 Open Data repository.
 #'   See the vignette("google_covid_19_data") for details on how to configure the feature store
 #' @export
 DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.

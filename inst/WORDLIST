@@ -3,6 +3,7 @@ backends
 cloneable
 conn
 COVID
+covid
 colname
 
 db
@@ -11,6 +12,8 @@ DBIConnection
 DBIDriver
 dbplyr
 diseasy
+DiseasystoreBase
+DiseasystoreGoogleCovid
 diseasystores
 dplyr
 dtplyr
@@ -23,6 +26,7 @@ Lasse
 
 tbl
 tibble
+TODOs
 ts
 
 md
@@ -36,6 +40,20 @@ POSIXct
 
 Rasmus
 regex
+rm
 
 Skytte
 sql
+
+
+PostgreSQL
+Postgres
+RPostgres
+Sys
+dbConnect
+dbname
+drv
+ip
+pgpass
+timezone
+dbplyr's

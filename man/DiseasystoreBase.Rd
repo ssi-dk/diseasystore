@@ -26,6 +26,7 @@ A list of available features in the feature store}
 \item \href{#method-DiseasystoreBase-finalize}{\code{DiseasystoreBase$finalize()}}
 \item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
 \item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
+\item \href{#method-DiseasystoreBase-key_join_filter}{\code{DiseasystoreBase$key_join_filter()}}
 \item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
 }
 }
@@ -41,6 +42,7 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
   slice_ts = NULL,
   source_conn = NULL,
   target_conn = NULL,
+  target_schema = NULL,
   verbose = TRUE
 )}\if{html}{\out{</div>}}
 }
@@ -56,6 +58,12 @@ Study period start.}
 
 \item{\code{start_date}}{(\code{Date})\cr
 Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
 
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end.}
@@ -78,6 +86,10 @@ Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
 \item{\code{target_conn}}{(\code{DBIConnection})\cr
 A database connection to store the computed features in.}
+
+\item{\code{target_schema}}{(\code{character})\cr
+The schema to place the feature store in.
+If the database backend does not support schema, the tables will be prefixed with target_schema}
 
 \item{\code{verbose}}{(\code{boolean})\cr
 Boolean that controls enables debugging information.}
@@ -126,6 +138,12 @@ Study period start.}
 
 \item{\code{start_date}}{(\code{Date})\cr
 Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
 
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end.}
@@ -182,6 +200,12 @@ Study period start.}
 \item{\code{start_date}}{(\code{Date})\cr
 Study period start.}
 
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end.}
 
@@ -195,6 +219,61 @@ Study period end.}
 }
 \subsection{Returns}{
 A tbl_dbi with the requested joined features for the study period.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasystoreBase-key_join_filter"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreBase-key_join_filter}{}}}
+\subsection{Method \code{key_join_filter()}}{
+This function implements an intermediate filtering in the aggregation pipeline.
+For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+The \code{key_join_filter} is inserted into the aggregation pipeline to remove this double counting.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_filter(
+  .data,
+  aggregation_features,
+  start_date = private \%.\% start_date,
+  end_date = private \%.\% end_date
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{.data}}{\cr
+The data object to perform the operation on}
+
+\item{\code{aggregation_features}}{(\code{character})\cr
+A list of the features included in the aggregation process.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A subset of \code{.data} filtered to remove double counting
 }
 }
 \if{html}{\out{<hr>}}

@@ -1,7 +1,7 @@
 # diseasystore 0.0.0.9005
 
 Features:
-* New mg function reexports
+* New mg function re-exports
 
 Fixes:
 * Fixed issues with key_join_features
@@ -20,13 +20,13 @@ Features
 Documentation
 * Updated README
 * Grouped all mg function into single doc entry
-* Improvied vignette google_covid_19_data
-* Removed TODO's in DiseasystoreCovid19 and FeatureHandler
+* Improved vignette google_covid_19_data
+* Removed TODOs in DiseasystoreGoogleCovid19 and FeatureHandler
 
 # diseasystore 0.0.0.9003
 
 Features
-* New mg reexports (functions are now fully documented)
+* New mg re-exports (functions are now fully documented)
 * interlace renamed to truncate_interlace
 
 Fixes
@@ -48,7 +48,7 @@ Features
 * Exported functions from mg to diseasystore
 * Added the FeatureHandler class to handle individual feature computations
 * Added a set of aggregators for the FeatureHandler
-* Added the DiseasystoreCovid19 feature store
+* Added the DiseasystoreGoogleCovid19 feature store
 * Updates to DiseasystoreBase to work with subclasses
 * Added a informative operator to access data `%.%`
 * Added active binding to DiseasystoreBase that shows available features

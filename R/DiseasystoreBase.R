@@ -491,10 +491,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
   )
 )
 
-# Set default options for the package related to the diseasystores
-options(diseasystore.source_conn = NULL)
-options(diseasystore.target_conn = NULL)
-
-# Set default options for the package related to the diseasystores
-options(diseasystore.source_conn = NULL)
-options(diseasystore.target_conn = NULL)
+# Set default options for the package related to the Google COVID-19 store
+rlang::on_load({
+  options(diseasystore.source_conn = NULL)
+  options(diseasystore.target_conn = NULL)
+})

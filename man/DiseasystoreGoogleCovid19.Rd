@@ -5,7 +5,7 @@
 \title{feature store handler of Google Health COVID-19 Open Data features}
 \description{
 This \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} brings support for using the Google
-Health COVID 19 Open Data repository.
+Health COVID-19 Open Data repository.
 See the vignette("google_covid_19_data") for details on how to configure the feature store
 }
 \section{Super class}{
