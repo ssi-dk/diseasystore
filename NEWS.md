@@ -1,74 +1,22 @@
-# diseasystore 0.0.0.9005
+# diseasystore 0.1.0
 
 Features:
-* New mg function re-exports
-
-Fixes:
-* Fixed issues with key_join_features
-* Fixed issues with key_join_filter
-* Removed na.rm warnings
+* DiseasystoreBase: A base class for the diseasystores
+  * R6 class that defines the interface for the diseasystores
+* DiseasystoreGoogleCovid19: A feature store that uses the Google COVID-19 Open Data repository
+  * R6 class that builds on the base class to provide interface to the Google COVID-19 data
+* FeatureHandler: A simple class to handle individual feature computations
+  * Defines the interface for each individual feature in the diseasystores
+* Aggregators: A set of aggregators for the FeatureHandlers to use
+* Added a informative operator to access data `%.%`
+  * Gives error instead of NULL if element does not exist
+* A number of useful DB functions re-exported from internal package (to be released)
 
 Testing:
-* Added tests for key_join_features
-
-# diseasystore 0.0.0.9004
-
-Features
-* Added a destructor to DiseasystoreBase
-* Documented and exported %.% operator
+* Most package functions are tested here
+  * (Re-exported functions from internal package are tested elsewhere)
 
 Documentation
-* Updated README
-* Grouped all mg function into single doc entry
-* Improved vignette google_covid_19_data
-* Removed TODOs in DiseasystoreGoogleCovid19 and FeatureHandler
-
-# diseasystore 0.0.0.9003
-
-Features
-* New mg re-exports (functions are now fully documented)
-* interlace renamed to truncate_interlace
-
-Fixes
-* diseasystore_case_definition now works with snake_case
-
-Testing
-* Resolved the test failure for code coverage
-* Added tests for the aggregators
-* Added tests for truncate_interlace
-* Added tests for feature_store_helpers
-
-Documentation
-* Added documentation for truncate_interlace
-
-
-# diseasystore 0.0.0.9002
-
-Features
-* Exported functions from mg to diseasystore
-* Added the FeatureHandler class to handle individual feature computations
-* Added a set of aggregators for the FeatureHandler
-* Added the DiseasystoreGoogleCovid19 feature store
-* Updates to DiseasystoreBase to work with subclasses
-* Added a informative operator to access data `%.%`
-* Added active binding to DiseasystoreBase that shows available features
-
-Testing
-* Added tests for DiseasystoreGoogleCovid19
-  * Test that features are generated as expected by FeatureHandler
-  * Tests for different ranges of dates
-
-# diseasystore 0.0.0.9001
-
-Features
-* Added a base class for the diseasystores
-
-Fixes
-* Added authors to DESCRIPTION
-
-Chores
-* Resolved lint issues
-
-# diseasystore 0.0.0.9000
-
-* Added a `NEWS.md` file to track changes to the package.
+* The functions are fully documented
+* Vignette for the Google COVID-19 data is included
+  * vignette("google_covid_19_data")
