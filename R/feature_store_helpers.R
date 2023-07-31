@@ -1,5 +1,6 @@
 #' Transform case definition to PascalCase
 #' @template case_definition
+#' @export
 diseasystore_case_definition <- function(case_definition) {
 
   case_definition |>
