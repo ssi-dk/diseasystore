@@ -38,7 +38,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
                                                                              "region", "subregion_id", "subregion")))) {
 
         # If no spatial aggregation is requested, use the largest available per country
-        filter_level <- self$get_feature("country_id") |>
+        filter_level <- self$get_feature("country_id", start_date, end_date) |>
           dplyr::group_by(country_id) |>
           dplyr::slice_min(aggregation_level) |>
           dplyr::ungroup() |>

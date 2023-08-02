@@ -23,11 +23,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
       readr::write_csv(file.path(tmp_dir, .))
   })
 
-  start_date <- as.Date("2020-03-01")
-  end_date   <- as.Date("2020-12-31")
-  fs <- DiseasystoreGoogleCovid19$new(start_date = start_date,
-                                      end_date   = end_date,
-                                      verbose = !testthat::is_testing())
+  # Initialize without start_date and end_date
+  fs <- DiseasystoreGoogleCovid19$new(verbose = !testthat::is_testing())
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
@@ -47,6 +44,9 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Attempt to get features from the feature store
   # then check that they match the expected value from the generators
   purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
+    start_date <- as.Date("2020-03-01")
+    end_date   <- as.Date("2020-12-31")
+
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect()
 
@@ -104,6 +104,10 @@ test_that("DiseasystoreGoogleCovid19 works", {
   available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
   available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
 
+  # Set start and end dates for the rest of the tests
+  start_date <- as.Date("2020-03-01")
+  end_date   <- as.Date("2020-12-31")
+
   key_join_features_tester <- function(output) {
     # The output dates should match start and end date
     expect_true(min(output$date) == start_date)
@@ -116,7 +120,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
       # This code may fail (gracefully) in some cases. These we catch here
       output <- tryCatch({
         fs$key_join_features(observable = as.character(..1),
-                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))))
+                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                             start_date, end_date)
       }, error = function(e) {
         expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
                                       "Not implemented yet."))

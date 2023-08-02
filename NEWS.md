@@ -1,3 +1,8 @@
+# diseasystore 0.1.1
+
+Fixes:
+* DiseasystoreGoogleCovid19: fixed issue with start_date and end_date not being passed within key_join_filter()
+
 # diseasystore 0.1.0
 
 Features:
