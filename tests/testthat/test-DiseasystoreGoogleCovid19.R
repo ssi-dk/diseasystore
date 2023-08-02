@@ -114,6 +114,13 @@ test_that("DiseasystoreGoogleCovid19 works", {
     expect_true(max(output$date) == end_date)
   }
 
+  # First check we can aggregate without an aggregation
+  purrr::walk(available_observables,
+              ~ expect_no_error(fs$key_join_features(observable = as.character(.),
+                                                     aggregation = NULL,
+                                                     start_date, end_date)))
+
+  # Then test combinations with non-NULL aggregations
   expand.grid(observable  = available_observables,
               aggregation = available_aggregations) |>
     purrr::pwalk(~ {

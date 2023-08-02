@@ -2,6 +2,8 @@
 
 Fixes:
 * DiseasystoreGoogleCovid19: fixed issue with start_date and end_date not being passed within key_join_filter()
+* DiseasystoreGoogleCovid19: fixed conversion of boolean to numeric for "n_ventilator"
+* key_join_features: changing to dplyr::\*_joins instead of mg_\*_joings
 
 # diseasystore 0.1.0
 

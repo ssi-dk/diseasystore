@@ -224,7 +224,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_character(observable, add = coll)
+      checkmate::assert_choice(observable, purrr::keep(self$available_features, ~ startsWith(., "n_")), add = coll)
       checkmate::assert(
         checkmate::check_character(aggregation, null.ok = TRUE),
         checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
@@ -361,8 +361,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Aggregate across dates
       data <- t_add |>
-        mg_right_join(all_combi, by = "date", na_by = aggregation_names, copy = is.null(aggregation)) |>
-        mg_left_join(t_remove,  by = "date", na_by = aggregation_names) |>
+        dplyr::right_join(all_combi, by = c("date", aggregation_names), na_matches = "na",
+         copy = is.null(aggregation)) |>
+        dplyr::left_join(t_remove,  by = c("date", aggregation_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
         dplyr::group_by(tidyselect::across(tidyselect::all_of(aggregation_names))) |>
         dbplyr::window_order(date) |>

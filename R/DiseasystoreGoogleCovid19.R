@@ -143,7 +143,8 @@ google_covid_19_metric <- function(google_pattern, out_name) {
         tidyr::pivot_longer(-c("location_key", "date"),
                             names_to = c("tmp", "key_age_bin"),
                             names_sep = "_age_",
-                            values_to = out_name) |>
+                            values_to = out_name,
+                            values_transform = as.numeric) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
         dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
