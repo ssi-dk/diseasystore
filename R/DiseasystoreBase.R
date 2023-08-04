@@ -362,7 +362,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Aggregate across dates
       data <- t_add |>
         dplyr::right_join(all_combi, by = c("date", aggregation_names), na_matches = "na",
-         copy = is.null(aggregation)) |>
+                          copy = is.null(aggregation)) |>
         dplyr::left_join(t_remove,  by = c("date", aggregation_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
         dplyr::group_by(tidyselect::across(tidyselect::all_of(aggregation_names))) |>
@@ -411,7 +411,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (!is.null(fs_specific)) {
 
           # We need to transform case definition to snake case
-          fs_case_definition <- self %.% case_definition |>
+          fs_case_definition <- private$.case_definition |>
             stringr::str_to_lower() |>
             stringr::str_replace_all(" ", "_") |>
             stringr::str_replace_all("-", "_")
@@ -446,7 +446,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   A human readable case_definition of the feature store. Read only.
     case_definition = function(value) {
       if (missing(value)) {
-        return(private %.% .case_definition)
+        return(private$.case_definition)
       } else {
         private$read_only_error("case_definition")
       }
@@ -554,7 +554,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       return(new_ranges)
     },
 
-    initialize_feature_handlers = function() NULL
+    initialize_feature_handlers = function() NULL,
+
+    # @param field The name of the field that is read only
+    read_only_error = function(field) {
+      stop(glue::glue("`${field}` is read only"), call. = FALSE)
+    }
   )
 )
 
