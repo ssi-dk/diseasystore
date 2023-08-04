@@ -400,7 +400,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   A list that maps features known by the feature store to the corresponding feature handlers
     #'   that compute the features. Read only.
     fs_map = purrr::partial(
-      .f = diseasyutils::active_binding,
+      .f = active_binding,
       name = "fs_map",
       expr = {
         # Generic features are named generic_ in the db
@@ -432,7 +432,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @field available_features (`character`)\cr
     #'   A list of available features in the feature store. Read only.
     available_features = purrr::partial(
-      .f = diseasyutils::active_binding,
+      .f = active_binding,
       name = "available_features",
       expr = return(unlist(self$fs_map, use.names = FALSE))),
 
@@ -440,7 +440,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @field case_definition (`character`)\cr
     #'   A human readable case_definition of the feature store. Read only.
     case_definition = purrr::partial(
-      .f = diseasyutils::active_binding,
+      .f = active_binding,
       name = "case_definition",
       expr = return(private$.case_definition))
   ),
