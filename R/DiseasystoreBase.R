@@ -399,9 +399,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @field fs_map (`named list`(`character`))\cr
     #'   A list that maps features known by the feature store to the corresponding feature handlers
     #'   that compute the features. Read only.
-    fs_map = function(value) {
-
-      if (missing(value)) {
+    fs_map = purrr::partial(
+      .f = diseasyutils::active_binding,
+      name = "fs_map",
+      expr = {
         # Generic features are named generic_ in the db
         fs_generic <- private %.% fs_generic
         if (!is.null(fs_generic)) names(fs_generic) <- paste("generic", names(fs_generic), sep = "_")
@@ -425,32 +426,23 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
         return(c(fs_generic, fs_specific))
 
-      } else {
-        private$read_only_error("fs_map")
-      }
-    },
+      }),
 
 
     #' @field available_features (`character`)\cr
     #'   A list of available features in the feature store. Read only.
-    available_features = function(value) {
-      if (missing(value)) {
-        return(unlist(self$fs_map, use.names = FALSE))
-      } else {
-        private$read_only_error("available_features")
-      }
-    },
+    available_features = purrr::partial(
+      .f = diseasyutils::active_binding,
+      name = "available_features",
+      expr = return(unlist(self$fs_map, use.names = FALSE))),
 
 
     #' @field case_definition (`character`)\cr
     #'   A human readable case_definition of the feature store. Read only.
-    case_definition = function(value) {
-      if (missing(value)) {
-        return(private$.case_definition)
-      } else {
-        private$read_only_error("case_definition")
-      }
-    }
+    case_definition = purrr::partial(
+      .f = diseasyutils::active_binding,
+      name = "case_definition",
+      expr = return(private$.case_definition))
   ),
 
   private = list(
