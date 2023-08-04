@@ -240,7 +240,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = end_date + lubridate::days(1)) %>%
-        copy_to(private %.% target_conn, ., overwrite = TRUE)
+        dplyr::copy_to(private %.% target_conn, ., overwrite = TRUE)
 
       # Determine which features are affected by an aggregation
       if (!is.null(aggregation)) {
