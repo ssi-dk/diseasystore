@@ -398,44 +398,64 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
     #' @field fs_map (`named list`(`character`))\cr
     #'   A list that maps features known by the feature store to the corresponding feature handlers
-    #'   that compute the features.
-    fs_map = function() {
+    #'   that compute the features. Read only.
+    fs_map = function(value) {
 
-      # Generic features are named generic_ in the db
-      fs_generic <- private %.% fs_generic
-      if (!is.null(fs_generic)) names(fs_generic) <- paste("generic", names(fs_generic), sep = "_")
+      if (missing(value)) {
+        # Generic features are named generic_ in the db
+        fs_generic <- private %.% fs_generic
+        if (!is.null(fs_generic)) names(fs_generic) <- paste("generic", names(fs_generic), sep = "_")
 
-      # Specific features are named by the case definition of the feature store
-      fs_specific <- private %.% fs_specific
-      if (!is.null(fs_specific)) {
+        # Specific features are named by the case definition of the feature store
+        fs_specific <- private %.% fs_specific
+        if (!is.null(fs_specific)) {
 
-        # We need to transform case definition to snake case
-        fs_case_definition <- private %.% case_definition |>
-          stringr::str_to_lower() |>
-          stringr::str_replace_all(" ", "_") |>
-          stringr::str_replace_all("-", "_")
+          # We need to transform case definition to snake case
+          fs_case_definition <- self %.% case_definition |>
+            stringr::str_to_lower() |>
+            stringr::str_replace_all(" ", "_") |>
+            stringr::str_replace_all("-", "_")
 
 
-        # Then we can paste it together
-        names(fs_specific) <- names(fs_specific) |>
-          purrr::map_chr(~ glue::glue_collapse(sep = "_",
-                                               x = c(fs_case_definition, .x)))
+          # Then we can paste it together
+          names(fs_specific) <- names(fs_specific) |>
+            purrr::map_chr(~ glue::glue_collapse(sep = "_",
+                                                 x = c(fs_case_definition, .x)))
+        }
+
+        return(c(fs_generic, fs_specific))
+
+      } else {
+        private$read_only_error("fs_map")
       }
-
-      return(c(fs_generic, fs_specific))
     },
 
 
     #' @field available_features (`character`)\cr
-    #'   A list of available features in the feature store
-    available_features = function() {
-      return(unlist(self$fs_map, use.names = FALSE))
+    #'   A list of available features in the feature store. Read only.
+    available_features = function(value) {
+      if (missing(value)) {
+        return(unlist(self$fs_map, use.names = FALSE))
+      } else {
+        private$read_only_error("available_features")
+      }
+    },
+
+
+    #' @field case_definition (`character`)\cr
+    #'   A human readable case_definition of the feature store. Read only.
+    case_definition = function(value) {
+      if (missing(value)) {
+        return(private %.% .case_definition)
+      } else {
+        private$read_only_error("case_definition")
+      }
     }
   ),
 
   private = list(
 
-    case_definition = NULL,
+    .case_definition = NULL,
 
     start_date = NULL,
     end_date   = NULL,

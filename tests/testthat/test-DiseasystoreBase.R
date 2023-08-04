@@ -96,3 +96,46 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
                tibble::tibble(start_date = c(!!start_date - lubridate::days(2), !!end_date + lubridate::days(1)),
                               end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(2))))
 })
+
+
+test_that("active binding: fs_map works", {
+  m <- DiseasystoreBase$new(source_conn = "", target_conn = "")
+
+  # Retrieve the fs_map
+  expect_equal(m$fs_map, NULL)
+
+  # Try to set the fs_map
+  expect_equal(tryCatch(m$fs_map <- list("testing" = "n_positive"), error = \(e) e),
+               simpleError("`$fs_map` is read only"))
+  expect_equal(m$fs_map, NULL)
+  rm(m)
+})
+
+
+test_that("active binding: available_features works", {
+  m <- DiseasystoreBase$new(source_conn = "", target_conn = "")
+
+  # Retrieve the available_features
+  expect_equal(m$available_features, NULL)
+
+  # Try to set the available_features
+  # test_that cannot capture this error, so we have to hack it
+  expect_equal(tryCatch(m$available_features <- list("n_test", "n_positive"), error = \(e) e),
+               simpleError("`$available_features` is read only"))
+  expect_equal(m$available_features, NULL)
+  rm(m)
+})
+
+
+test_that("active binding: case_definition works", {
+  m <- DiseasystoreBase$new(source_conn = "", target_conn = "")
+
+  # Retrieve the case_definition
+  expect_equal(m$case_definition, NULL)
+
+  # Try to set the case_definition
+  expect_equal(tryCatch(m$case_definition <- "test", error = \(e) e),
+               simpleError("`$case_definition` is read only"))
+  expect_equal(m$case_definition, NULL)
+  rm(m)
+})

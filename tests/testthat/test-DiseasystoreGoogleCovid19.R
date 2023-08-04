@@ -28,6 +28,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
+  expect_equal(fs %.% case_definition, "Google COVID-19")
 
   # Check all FeatureHandlers have been initialized
   private <- fs$.__enclos_env__$private
