@@ -67,7 +67,7 @@ get_diseasystore <- function(case_definition) {
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))
   env_name <- as.character(substitute(env))
-  if (is.environment(env)) env <- as.list(env)
+  if (is.environment(env)) env <- as.list(env, all.names = TRUE)
   if (!(field_name %in% names(env))) {
     stop(field_name, " not found in ", env_name)
   }
