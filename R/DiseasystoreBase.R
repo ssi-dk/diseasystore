@@ -224,13 +224,15 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(observable, purrr::keep(self$available_features, ~ startsWith(., "n_")), add = coll)
+      checkmate::assert_choice(
+        observable,
+        purrr::keep(self$available_features, ~ startsWith(., "n_") | endsWith(., "_temperature")),
+        add = coll)
       checkmate::assert(
         checkmate::check_character(aggregation, null.ok = TRUE),
         checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
         checkmate::check_class(aggregation, "quosures", null.ok = TRUE),
-        add = coll
-      )
+        add = coll)
       checkmate::assert_date(start_date, add = coll)
       checkmate::assert_date(end_date, add = coll)
       checkmate::reportAssertions(coll)
