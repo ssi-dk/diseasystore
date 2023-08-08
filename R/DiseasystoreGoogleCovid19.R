@@ -71,8 +71,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
                        "positive"        = "n_positive",
                        "icu"             = "n_icu",
                        "ventilator"      = "n_ventilator",
-                       "min_temperature" = "min_temp",
-                       "max_temperature" = "max_temp"),
+                       "min_temperature" = "min_temperature",
+                       "max_temperature" = "max_temperature"),
     .case_definition = "Google COVID-19",
 
     source_conn = NULL,
@@ -293,7 +293,7 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
-                      "min_temp" = "minimum_temperature_celsius") |>
+                      "min_temperature" = "minimum_temperature_celsius") |>
         dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(out)
@@ -316,7 +316,7 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
-                      "max_temp" = "maximum_temperature_celsius") |>
+                      "max_temperature" = "maximum_temperature_celsius") |>
         dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
 
       return(out)
