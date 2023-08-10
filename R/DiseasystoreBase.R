@@ -35,50 +35,44 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       checkmate::reportAssertions(coll)
 
       # Set internals
-      if (!is.null(slice_ts))   private$slice_ts   <- slice_ts
-      if (!is.null(start_date)) private$start_date <- start_date
-      if (!is.null(end_date))   private$end_date   <- end_date
+      if (!is.null(slice_ts))   private$.slice_ts   <- slice_ts
+      if (!is.null(start_date)) private$.start_date <- start_date
+      if (!is.null(end_date))   private$.end_date   <- end_date
       private$verbose <- verbose
 
       # Set the internal paths
       if (is.null(source_conn)) {
-        private$source_conn <- list(class(self)[1], NULL) |>
+        private$.source_conn <- list(class(self)[1], NULL) |>
           purrr::map(~ getOption(paste(c("diseasystore", .x, "source_conn"), collapse = "."))) |>
           purrr::keep(purrr::negate(is.null)) |>
           purrr::pluck(1)
-        if (is.function(private %.% source_conn)) private$source_conn <- private$source_conn()
-        if (is.null(private %.% source_conn)) stop("source_conn option not defined for ", class(self)[1])
+        if (is.function(self %.% source_conn)) private$.source_conn <- private$.source_conn()
       } else {
-        private$source_conn <- source_conn
+        private$.source_conn <- source_conn
       }
 
+
       if (is.null(target_conn)) {
-        private$target_conn <- list(class(self)[1], NULL) |>
+        private$.target_conn <- list(class(self)[1], NULL) |>
           purrr::map(~ getOption(paste(c("diseasystore", .x, "target_conn"), collapse = "."))) |>
           purrr::keep(purrr::negate(is.null)) |>
           purrr::pluck(1)
-        if (is.function(private %.% target_conn)) private$target_conn <- private$target_conn()
-        if (is.null(private %.% target_conn)) {
-          if (inherits(private %.% source_conn, "DBIConnection")) {
-            private$target_conn <- private %.% source_conn # Default to using same connection
-          } else {
-            stop("target_conn option not defined for ", class(self)[1])
-          }
-        }
+        if (is.function(self %.% target_conn)) private$.target_conn <- private$.target_conn()
       } else {
-        private$target_conn <- target_conn
+        private$.target_conn <- target_conn
       }
 
+
       if (is.null(target_schema)) {
-        private$target_schema <- list(class(self)[1], NULL) |>
+        private$.target_schema <- list(class(self)[1], NULL) |>
           purrr::map(~ getOption(paste(c("diseasystore", .x, "target_schema"), collapse = "."))) |>
           purrr::keep(purrr::negate(is.null)) |>
           purrr::pluck(1)
-        if (is.null(private %.% target_schema)) {
-          private$target_schema <- "ds" # Default to "ds"
+        if (is.null(self %.% target_schema)) {
+          private$.target_schema <- "ds" # Default to "ds"
         }
       } else {
-        private$target_schema <- target_schema
+        private$.target_schema <- target_schema
       }
 
       # Initialize the feature handlers
@@ -106,9 +100,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @return
     #'   A tbl_dbi with the requested feature for the study period.
     get_feature = function(feature,
-                           start_date = private %.% start_date,
-                           end_date   = private %.% end_date,
-                           slice_ts   = private %.% slice_ts) {
+                           start_date = self %.% start_date,
+                           end_date   = self %.% end_date,
+                           slice_ts   = self %.% slice_ts) {
 
       # Load the available features
       fs_map <- self %.% fs_map
@@ -119,18 +113,18 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       checkmate::assert_date(start_date, any.missing = FALSE, add = coll)
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", add = coll)
-      checkmate::assert(!is.null(private %.% source_conn), add = coll)
-      checkmate::assert(!is.null(private %.% target_conn), add = coll)
+      checkmate::assert(!is.null(self %.% source_conn), add = coll)
+      checkmate::assert(!is.null(self %.% target_conn), add = coll)
       checkmate::reportAssertions(coll)
 
       # Determine which feature_loader should be called
       feature_loader <- names(fs_map[fs_map == feature])
 
       # Create log table
-      mg_create_logs_if_missing(paste(c(private %.% target_schema, "logs"), collapse = "."), private %.% target_conn)
+      mg_create_logs_if_missing(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)
 
       # Determine which dates need to be computed
-      target_table <- paste(c(private %.% target_schema, feature_loader), collapse = ".")
+      target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date = start_date,
                                                         end_date   = end_date,
@@ -149,18 +143,18 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         # Compute the feature for the date range
         fs_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
                               args = list(start_date = ..1, end_date = ..2,
-                                          slice_ts = slice_ts, source_conn = private %.% source_conn))
+                                          slice_ts = slice_ts, source_conn = self %.% source_conn))
 
         # Check it table is copied to target DB
         if (!inherits(fs_feature, "tbl_dbi") ||
-              !identical(private %.% source_conn, private %.% target_conn)) {
-          fs_feature <- dplyr::copy_to(private %.% target_conn, fs_feature, "fs_tmp", overwrite = TRUE)
+              !identical(self %.% source_conn, self %.% target_conn)) {
+          fs_feature <- dplyr::copy_to(self %.% target_conn, fs_feature, "fs_tmp", overwrite = TRUE)
         }
 
         # Add the existing computed data for given slice_ts
-        if (mg_table_exists(private %.% target_conn, target_table)) {
+        if (mg_table_exists(self %.% target_conn, target_table)) {
           fs_updated_feature <-
-            dplyr::union(mg_get_table(private %.% target_conn, target_table, slice_ts = slice_ts), fs_feature)
+            dplyr::union(mg_get_table(self %.% target_conn, target_table, slice_ts = slice_ts), fs_feature)
         } else {
           fs_updated_feature <- fs_feature
         }
@@ -168,12 +162,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         # Commit to DB
         capture.output({
           mg_update_snapshot(.data = fs_updated_feature,
-                             conn = private %.% target_conn,
+                             conn = self %.% target_conn,
                              db_table = target_table,
                              timestamp = slice_ts,
                              message = glue::glue("fs-range: {start_date} - {end_date}"),
                              log_path = NULL, # no log file, but DB logging still enabled
-                             log_table_id = paste(c(private %.% target_schema, "logs"), collapse = "."),
+                             log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
                              enforce_chronological_order = FALSE)
         })
       })
@@ -187,13 +181,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Finally, return the data to the user
       out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
                      args = list(target_table = target_table,
-                                 slice_ts = slice_ts, target_conn = private %.% target_conn))
+                                 slice_ts = slice_ts, target_conn = self %.% target_conn))
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       dplyr::inner_join(out,
                         data.frame(valid_from = start_date, valid_until = end_date) %>%
-                          dplyr::copy_to(private %.% target_conn, ., "fs_tmp", overwrite = TRUE),
+                          dplyr::copy_to(self %.% target_conn, ., "fs_tmp", overwrite = TRUE),
                         sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
                                   ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                         suffix = c("", ".p")) |>
@@ -214,8 +208,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
     key_join_features = function(observable, aggregation,
-                                 start_date = private %.% start_date,
-                                 end_date   = private %.% end_date) {
+                                 start_date = self %.% start_date,
+                                 end_date   = self %.% end_date) {
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
@@ -237,7 +231,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = end_date + lubridate::days(1)) %>%
-        dplyr::copy_to(private %.% target_conn, ., overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, ., overwrite = TRUE)
 
       # Determine which features are affected by an aggregation
       if (!is.null(aggregation)) {
@@ -385,8 +379,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @return
     #'   A subset of `.data` filtered to remove double counting
     key_join_filter = function(.data, aggregation_features,
-                               start_date = private %.% start_date,
-                               end_date = private %.% end_date) {
+                               start_date = self %.% start_date,
+                               end_date   = self %.% end_date) {
       return(.data) # By default, no filtering is performed
     }
   ),
@@ -397,9 +391,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   A list that maps features known by the feature store to the corresponding feature handlers
     #'   that compute the features. Read only.
     fs_map = purrr::partial(
-      .f = active_binding,
+      .f = active_binding, # nolint start: indentation_linter
       name = "fs_map",
-      expr = {
+      expr = {  # nolint: indentation_linter
         # Generic features are named generic_ in the db
         fs_generic <- private %.% fs_generic
         if (!is.null(fs_generic)) names(fs_generic) <- paste("generic", names(fs_generic), sep = "_")
@@ -409,7 +403,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (!is.null(fs_specific)) {
 
           # We need to transform case definition to snake case
-          fs_case_definition <- private$.case_definition |>
+          fs_case_definition <- self$case_definition |>
             stringr::str_to_lower() |>
             stringr::str_replace_all(" ", "_") |>
             stringr::str_replace_all("-", "_")
@@ -422,14 +416,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         }
 
         return(c(fs_generic, fs_specific))
-
-      }),
+      }), # nolint end
 
 
     #' @field available_features (`character`)\cr
     #'   A list of available features in the feature store. Read only.
     available_features = purrr::partial(
-      .f = active_binding,
+      .f = active_binding, # nolint: indentation_linter
       name = "available_features",
       expr = return(unlist(self$fs_map, use.names = FALSE))),
 
@@ -437,34 +430,89 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @field case_definition (`character`)\cr
     #'   A human readable case_definition of the feature store. Read only.
     case_definition = purrr::partial(
-      .f = active_binding,
+      .f = active_binding, # nolint: indentation_linter
       name = "case_definition",
-      expr = return(private$.case_definition))
+      expr = return(private$.case_definition)),
+
+
+    #' @templateVar read_only TRUE
+    #' @template source_conn
+    source_conn = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "source_conn",
+      expr = {
+        if (!is.null(private$.source_conn)) {
+          return(private$.source_conn)
+        } else {
+          return(private$.target_conn)
+        }
+    }),
+
+
+    #' @templateVar read_only TRUE
+    #' @template target_conn
+    target_conn = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "target_conn",
+      expr = return(private$.target_conn)),
+
+
+    #' @templateVar read_only TRUE
+    #' @template target_schema
+    target_schema = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "target_schema",
+      expr = return(private$.target_schema)),
+
+
+    #' @templateVar read_only TRUE
+    #' @template start_date
+    start_date = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "start_date",
+      expr = return(private$.start_date)),
+
+
+    #' @templateVar read_only TRUE
+    #' @template end_date
+    end_date = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "end_date",
+      expr = return(private$.end_date)),
+
+
+    #' @templateVar read_only TRUE
+    #' @template slice_ts
+    slice_ts = purrr::partial(
+      .f = active_binding, # nolint: indentation_linter
+      name = "slice_ts",
+      expr = return(private$.slice_ts))
   ),
 
   private = list(
 
     .case_definition = NULL,
+    .source_conn     = NULL,
+    .target_conn     = NULL,
+    .target_schema   = NULL,
 
-    start_date = NULL,
-    end_date   = NULL,
-    slice_ts   = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
+    .start_date = NULL,
+    .end_date   = NULL,
+    .slice_ts   = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
 
     fs_generic  = NULL, # Must be implemented in child classes
     fs_specific = NULL, # Must be implemented in child classes
     fs_key_map  = NULL, # Must be implemented in child classes
 
-    target_conn   = NULL, # Must be implemented in child classes
-    source_conn   = NULL, # Must be implemented in child classes
-    target_schema = NULL,
+
 
     verbose = TRUE,
 
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Get a list of the logs for the target_table on the slice_ts
-      logs <- dplyr::tbl(private %.% target_conn,
-                         mg_id(paste(c(private %.% target_schema, "logs"), collapse = "."), private %.% target_conn)) |>
+      logs <- dplyr::tbl(self %.% target_conn,
+                         mg_id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
         dplyr::filter(target_table == !!target_table, date == !!slice_ts)

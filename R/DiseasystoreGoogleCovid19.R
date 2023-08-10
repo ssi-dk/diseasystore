@@ -75,8 +75,6 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
                        "max_temperature" = "max_temperature"),
     .case_definition = "Google COVID-19",
 
-    source_conn = NULL,
-
     google_covid_19_population       = NULL,
     google_covid_19_index            = NULL,
     google_covid_19_hospital         = NULL,
