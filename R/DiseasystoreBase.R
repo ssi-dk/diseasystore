@@ -63,6 +63,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
 
+      # Check source and target conn has been set correctly
+      if (is.null(self %.% source_conn)) stop("source_conn option not defined for ", class(self)[1])
+      if (is.null(self %.% target_conn)) stop("target_conn option not defined for ", class(self)[1])
+      checkmate::assert_class(self %.% target_conn, "DBIConnection")
+
+
       if (is.null(target_schema)) {
         private$.target_schema <- list(class(self)[1], NULL) |>
           purrr::map(~ getOption(paste(c("diseasystore", .x, "target_schema"), collapse = "."))) |>
@@ -74,6 +80,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       } else {
         private$.target_schema <- target_schema
       }
+      checkmate::assert_character(self %.% target_schema)
 
       # Initialize the feature handlers
       private$initialize_feature_handlers()
@@ -83,10 +90,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @description
     #'   Closes the open DB connection when removing the object
     finalize = function() {
-      purrr::walk(list(private %.% target_conn, private %.% source_conn),
-                  ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
-                    DBI::dbDisconnect(.)
-                  })
+      # purrr::walk(list(self %.% target_conn, self %.% source_conn),
+      #             ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
+      #               DBI::dbDisconnect(.)
+      #             })
     },
 
 

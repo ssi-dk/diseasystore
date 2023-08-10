@@ -1,6 +1,7 @@
 test_that("DiseasystoreBase works", {
 
   # Test different initialization of the base module
+
   # 1)
   expect_error(DiseasystoreBase$new(), regexp = "source_conn option not defined")
 
@@ -10,47 +11,53 @@ test_that("DiseasystoreBase works", {
   # 3)
   options(diseasystore.source_conn = "")
   expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
+  options(diseasystore.source_conn = NULL)
 
   # 4)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = "")
-  expect_null(fs$.__enclos_env__$private$start_date)
-  expect_null(fs$.__enclos_env__$private$end_date)
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  expect_null(fs %.% start_date)
+  expect_null(fs %.% end_date)
   rm(fs)
 
   # 5)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = "",
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(),
                              start_date = as.Date("2020-03-01"))
-  expect_identical(fs$.__enclos_env__$private$start_date, as.Date("2020-03-01"))
-  expect_null(fs$.__enclos_env__$private$end_date)
+  expect_identical(fs %.% start_date, as.Date("2020-03-01"))
+  expect_null(fs %.% end_date)
   rm(fs)
 
   # 6)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = "",
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(),
                              start_date = as.Date("2020-03-01"),
                              end_date   = as.Date("2020-06-01"))
-  expect_identical(fs$.__enclos_env__$private$start_date, as.Date("2020-03-01"))
-  expect_identical(fs$.__enclos_env__$private$end_date,   as.Date("2020-06-01"))
+  expect_identical(fs %.% start_date, as.Date("2020-03-01"))
+  expect_identical(fs %.% end_date,   as.Date("2020-06-01"))
   rm(fs)
 
   # 7)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_postgres())
-  expect_identical(fs$.__enclos_env__$private$target_schema, "ds")
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  expect_identical(fs %.% target_schema, "ds")
   rm(fs)
 
   # 8)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_postgres(), target_schema = "test")
-  expect_identical(fs$.__enclos_env__$private$target_schema, "test")
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
+  expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
   # 9)
   options(diseasystore.target_schema = "test")
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_postgres())
-  expect_identical(fs$.__enclos_env__$private$target_schema, "test")
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
   # 10)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = "", target_schema = "test")
-  expect_identical(fs$.__enclos_env__$private$target_schema, "test")
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
+  expect_identical(fs %.% target_schema, "test")
+  rm(fs)
+
+  # 11)
+  fs <- DiseasystoreBase$new(target_conn = dbplyr::simulate_dbi())
+  expect_identical(fs %.% target_conn, fs %.% source_conn)
   rm(fs)
 
 })
@@ -99,7 +106,7 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
 
 
 test_that("active binding: fs_map works", {
-  m <- DiseasystoreBase$new(source_conn = "", target_conn = "")
+  m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the fs_map
   expect_equal(m$fs_map, NULL)
@@ -113,7 +120,7 @@ test_that("active binding: fs_map works", {
 
 
 test_that("active binding: available_features works", {
-  m <- DiseasystoreBase$new(source_conn = "", target_conn = "")
+  m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the available_features
   expect_equal(m$available_features, NULL)
@@ -128,7 +135,7 @@ test_that("active binding: available_features works", {
 
 
 test_that("active binding: case_definition works", {
-  m <- DiseasystoreBase$new(source_conn = "", target_conn = "")
+  m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the case_definition
   expect_equal(m$case_definition, NULL)
