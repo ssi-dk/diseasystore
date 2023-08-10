@@ -24,7 +24,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   })
 
   # Initialize without start_date and end_date
-  fs <- DiseasystoreGoogleCovid19$new(verbose = !testthat::is_testing())
+  expect_no_error(fs <- DiseasystoreGoogleCovid19$new(verbose = !testthat::is_testing()))
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
@@ -60,9 +60,9 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
     reference <- reference_generator(start_date  = start_date,
                                      end_date    = end_date,
-                                     slice_ts    = fs$.__enclos_env__$private$slice_ts,
-                                     source_conn = fs$.__enclos_env__$private$source_conn) %>%
-      dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., overwrite = TRUE) |>
+                                     slice_ts    = fs %.% slice_ts,
+                                     source_conn = fs %.% source_conn) %>%
+      dplyr::copy_to(fs %.% target_conn, ., overwrite = TRUE) |>
       dplyr::collect()
 
     reference_checksum <- reference |>
@@ -90,9 +90,9 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
     reference <- reference_generator(start_date  = start_date,
                                      end_date    = end_date,
-                                     slice_ts    = fs$.__enclos_env__$private$slice_ts,
-                                     source_conn = fs$.__enclos_env__$private$source_conn) %>%
-      dplyr::copy_to(fs$.__enclos_env__$private$target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
+                                     slice_ts    = fs %.% slice_ts,
+                                     source_conn = fs %.% source_conn) %>%
+      dplyr::copy_to(fs %.% target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
       dplyr::collect() |>
       mg_digest_to_checksum() |>
       dplyr::pull("checksum") |>
@@ -105,15 +105,15 @@ test_that("DiseasystoreGoogleCovid19 works", {
   available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
   available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
 
-  # Set start and end dates for the rest of the tests
-  start_date <- as.Date("2020-03-01")
-  end_date   <- as.Date("2020-12-31")
-
-  key_join_features_tester <- function(output) {
+  key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
     expect_true(min(output$date) == start_date)
     expect_true(max(output$date) == end_date)
   }
+
+  # Set start and end dates for the rest of the tests
+  start_date <- as.Date("2020-03-01")
+  end_date   <- as.Date("2020-12-31")
 
   # First check we can aggregate without an aggregation
   purrr::walk(available_observables,
@@ -138,7 +138,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
       # If the code does not fail, we test the output
       if (!is.null(output)) {
-        key_join_features_tester(dplyr::collect(output))
+        key_join_features_tester(dplyr::collect(output), start_date, end_date)
       }
     })
 

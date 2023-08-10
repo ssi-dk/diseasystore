@@ -54,45 +54,65 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end. Read only.}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
-Date to slice the database on (used if source_conn is a database)}
+Date to slice the database on (used if source_conn is a database). Read only.}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
-Date to slice the database on (used if source_conn is a database)}
+Date to slice the database on (used if source_conn is a database). Read only.}
+
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
+Date to slice the database on (used if source_conn is a database). Read only.}
 
 \item{\code{source_conn}}{\cr
-Used to specify where data is located.
+Used to specify where data is located. Read only.
+Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
+
+\item{\code{source_conn}}{\cr
+Used to specify where data is located. Read only.
 Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
 \item{\code{target_conn}}{(\code{DBIConnection})\cr
-A database connection to store the computed features in.}
+A database connection to store the computed features in. Read only.}
+
+\item{\code{target_conn}}{(\code{DBIConnection})\cr
+A database connection to store the computed features in. Read only.}
 
 \item{\code{target_schema}}{(\code{character})\cr
-The schema to place the feature store in.
-If the database backend does not support schema, the tables will be prefixed with target_schema}
+The schema to place the feature store in. Read only.
+If the database backend does not support schema, the tables will be prefixed with target_schema.}
+
+\item{\code{target_schema}}{(\code{character})\cr
+The schema to place the feature store in. Read only.
+If the database backend does not support schema, the tables will be prefixed with target_schema.}
 
 \item{\code{verbose}}{(\code{boolean})\cr
 Boolean that controls enables debugging information.}
@@ -121,9 +141,9 @@ Computes, stores, and returns the requested feature for the study period.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$get_feature(
   feature,
-  start_date = private \%.\% start_date,
-  end_date = private \%.\% end_date,
-  slice_ts = private \%.\% slice_ts
+  start_date = self \%.\% start_date,
+  end_date = self \%.\% end_date,
+  slice_ts = self \%.\% slice_ts
 )}\if{html}{\out{</div>}}
 }
 
@@ -134,34 +154,43 @@ Computes, stores, and returns the requested feature for the study period.
 The name of a feature defined in the feature store.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end. Read only.}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
-Date to slice the database on (used if source_conn is a database)}
+Date to slice the database on (used if source_conn is a database). Read only.}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
-Date to slice the database on (used if source_conn is a database)}
+Date to slice the database on (used if source_conn is a database). Read only.}
+
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr
+Date to slice the database on (used if source_conn is a database). Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -179,8 +208,8 @@ that contains keys to witch the secondary features (defined by aggregation) can 
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(
   observable,
   aggregation,
-  start_date = private \%.\% start_date,
-  end_date = private \%.\% end_date
+  start_date = self \%.\% start_date,
+  end_date = self \%.\% end_date
 )}\if{html}{\out{</div>}}
 }
 
@@ -195,28 +224,34 @@ Expressions in aggregation evaluated to find appropriate features.
 These are then joined to the observable feature before aggregation is performed.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end. Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -235,8 +270,8 @@ The \code{key_join_filter} is inserted into the aggregation pipeline to remove t
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_filter(
   .data,
   aggregation_features,
-  start_date = private \%.\% start_date,
-  end_date = private \%.\% end_date
+  start_date = self \%.\% start_date,
+  end_date = self \%.\% end_date
 )}\if{html}{\out{</div>}}
 }
 
@@ -250,28 +285,34 @@ The data object to perform the operation on}
 A list of the features included in the aggregation process.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
 
 \item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+Study period start. Read only.}
+
+\item{\code{start_date}}{(\code{Date})\cr
+Study period start. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+Study period end. Read only.}
+
+\item{\code{end_date}}{(\code{Date})\cr
+Study period end. Read only.}
 }
 \if{html}{\out{</div>}}
 }
