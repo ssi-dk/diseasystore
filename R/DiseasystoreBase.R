@@ -14,14 +14,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @template start_date
     #' @template end_date
     #' @template slice_ts
-    #' @param source_conn \cr
-    #'   Used to specify where data is located.
-    #'   Can be `DBIConnection` or file path depending on the `diseasystore`.
-    #' @param target_conn (`DBIConnection`)\cr
-    #'   A database connection to store the computed features in.
-    #' @param target_schema (`character`)\cr
-    #'   The schema to place the feature store in.
-    #'   If the database backend does not support schema, the tables will be prefixed with target_schema
+    #' @template source_conn
+    #' @template target_conn
+    #' @template target_schema
     #' @param verbose (`boolean`)\cr
     #'   Boolean that controls enables debugging information.
     #' @return
