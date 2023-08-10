@@ -16,3 +16,14 @@ active_binding <- function(value, expr, name) {
 read_only_error <- function(field) {
   stop(glue::glue("`${field}` is read only"), call. = FALSE)
 }
+
+
+#' cat printing with default new line
+#' @param ...  The normal input to cat
+#' @param file Path of an output file to append the output to
+#' @param sep The separator given to cat
+printr <- function(..., file = "/dev/null", sep = "") {
+  sink(file = file, split = TRUE, append = TRUE, type = "output")
+  cat(..., "\n", sep = sep)
+  sink()
+}

@@ -496,8 +496,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         cat(err)
 
         potentially_ongoing |>
-          purrr::pmap(~ mg_printr(glue::glue("{..1} started updating {round(..2)} minutes ago. ",
-                                             "Releasing lock after 30 minutes")))
+          purrr::pmap(~ printr(glue::glue("{..1} started updating {round(..2)} minutes ago. ",
+                                          "Releasing lock after 30 minutes")))
         stop(err)
       }
 
