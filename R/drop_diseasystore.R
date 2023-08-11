@@ -4,7 +4,7 @@
 #' @param schema Schema the diseasystore uses to store data in
 #' @param conn DB connection
 #' @export
-drop_featurestore <- function(pattern = ".*", schema = "ds", conn = diseasystore::mg_get_connection()) {
+drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = diseasystore::mg_get_connection()) {
 
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_character(pattern, add = coll)
