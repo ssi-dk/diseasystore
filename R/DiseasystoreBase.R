@@ -42,10 +42,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Set the internal paths
       if (is.null(source_conn)) {
-        private$.source_conn <- list(class(self)[1], NULL) |>
-          purrr::map(~ getOption(paste(c("diseasystore", .x, "source_conn"), collapse = "."))) |>
-          purrr::keep(purrr::negate(is.null)) |>
-          purrr::pluck(1)
+        private$.source_conn <- diseasyoption("source_conn", self)
         if (is.function(self %.% source_conn)) private$.source_conn <- private$.source_conn()
       } else {
         private$.source_conn <- source_conn
@@ -53,10 +50,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 
       if (is.null(target_conn)) {
-        private$.target_conn <- list(class(self)[1], NULL) |>
-          purrr::map(~ getOption(paste(c("diseasystore", .x, "target_conn"), collapse = "."))) |>
-          purrr::keep(purrr::negate(is.null)) |>
-          purrr::pluck(1)
+        private$.target_conn <- diseasyoption("target_conn", self)
         if (is.function(self %.% target_conn)) private$.target_conn <- private$.target_conn()
       } else {
         private$.target_conn <- target_conn
@@ -70,10 +64,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 
       if (is.null(target_schema)) {
-        private$.target_schema <- list(class(self)[1], NULL) |>
-          purrr::map(~ getOption(paste(c("diseasystore", .x, "target_schema"), collapse = "."))) |>
-          purrr::keep(purrr::negate(is.null)) |>
-          purrr::pluck(1)
+        private$.target_schema <- diseasyoption("target_schema", self)
         if (is.null(self %.% target_schema)) {
           private$.target_schema <- "ds" # Default to "ds"
         }
@@ -609,7 +600,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 # Set default options for the package related to the Google COVID-19 store
 rlang::on_load({
-  options(diseasystore.source_conn = NULL)
-  options(diseasystore.target_conn = NULL)
-  options(diseasystore.target_schema = NULL)
+  options(diseasystore.source_conn = "")
+  options(diseasystore.target_conn = "")
+  options(diseasystore.target_schema = "")
 })

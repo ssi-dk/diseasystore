@@ -6,28 +6,28 @@ test_that("DiseasystoreBase works", {
   expect_error(DiseasystoreBase$new(), regexp = "source_conn option not defined")
 
   # 2)
-  expect_error(DiseasystoreBase$new(source_conn = ""), regexp = "target_conn option not defined")
+  expect_error(DiseasystoreBase$new(source_conn = "/some/path"), regexp = "target_conn option not defined")
 
   # 3)
-  options(diseasystore.source_conn = "")
+  options(diseasystore.source_conn = "/some/path")
   expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
   options(diseasystore.source_conn = NULL)
 
   # 4)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
   expect_null(fs %.% start_date)
   expect_null(fs %.% end_date)
   rm(fs)
 
   # 5)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(),
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(),
                              start_date = as.Date("2020-03-01"))
   expect_identical(fs %.% start_date, as.Date("2020-03-01"))
   expect_null(fs %.% end_date)
   rm(fs)
 
   # 6)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(),
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(),
                              start_date = as.Date("2020-03-01"),
                              end_date   = as.Date("2020-06-01"))
   expect_identical(fs %.% start_date, as.Date("2020-03-01"))
@@ -35,23 +35,23 @@ test_that("DiseasystoreBase works", {
   rm(fs)
 
   # 7)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
   expect_identical(fs %.% target_schema, "ds")
   rm(fs)
 
   # 8)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
   expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
   # 9)
   options(diseasystore.target_schema = "test")
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
   expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
   # 10)
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
   expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
@@ -70,8 +70,8 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
-  logs <- mg_create_logs_if_missing("test.logs", conn)
+  fs <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = "test_ds")
+  logs <- mg_create_logs_if_missing("test_ds.logs", conn)
   rows_append(logs, data.frame(date = slice_ts,
                                table = "test",
                                message = glue::glue("fs-range: {start_date} - {end_date}"),

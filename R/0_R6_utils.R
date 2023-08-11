@@ -27,3 +27,21 @@ printr <- function(..., file = "/dev/null", sep = "") {
   cat(..., "\n", sep = sep)
   sink()
 }
+
+
+#' Helper function to get option
+#' @param option (`character`)\cr
+#'   Name of the option to get
+#' @param self (`R6::R6class Diseasy* instance`)\cr
+#'   The object the option applies to.
+diseasyoption <- function(option, self) {
+  base_class <- stringr::str_extract(class(self)[1], r"{^([A-Z][a-z]*)}") |>
+    stringr::str_to_lower()
+
+  list(class(self)[1], NULL) |>
+    purrr::map(~ paste(c(base_class, .x, option), collapse = ".")) |>
+    purrr::map(getOption) |>
+    purrr::keep(purrr::negate(is.null)) |>
+    purrr::discard(~ is.character(.) && . == "") |>
+    purrr::pluck(1)
+}
