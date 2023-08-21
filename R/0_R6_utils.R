@@ -35,7 +35,7 @@ printr <- function(..., file = "/dev/null", sep = "") {
 #' @param self (`R6::R6class Diseasy* instance`)\cr
 #'   The object the option applies to.
 diseasyoption <- function(option, self) {
-  base_class <- stringr::str_extract(class(self)[1], r"{^([A-Z][a-z]*)}") |>
+  base_class <- stringr::str_extract(class(self)[1], r"{^([A-Z][a-z]*)}") |> # nolint: object_usage_linter
     stringr::str_to_lower()
 
   list(class(self)[1], NULL) |>
