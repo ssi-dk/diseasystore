@@ -1,11 +1,34 @@
 # diseasystore 0.1.1
 
-Fixes:
-* DiseasystoreGoogleCovid19: fixed issue with start_date and end_date not being passed within key_join_filter()
-* DiseasystoreGoogleCovid19: fixed conversion of boolean to numeric for "n_ventilator"
-* key_join_features: changing to dplyr::\*_joins instead of mg_\*_joins
+Features:
+* drop_diseasystore: A function to remove data from a feature store
 
-# diseasystore 0.1.0
+* DiseasystoreBase:
+  * Added checks to target_conn and source_conn when initializing
+  * Improved and added active bindings
+  * Added error message to truncate_interlace if no common keys found
+  * Tagged features named "\*temperature" as observables
+
+* DiseasystoreGoogleCovid19:
+  * Renamed "\*_temp" observables to "\*_temperature"
+
+Fixes:
+* DiseasystoreBase:
+  * All options now properly exported
+
+* DiseasystoreGoogleCovid19:
+  * Fixed issue with start_date and end_date not being passed within key_join_filter()
+  * Fixed conversion of boolean to numeric for "n_ventilator"
+  * All options now properly exported
+
+* key_join_features:
+  * Changed to dplyr::\*\_joins instead of mg_\*_joins
+
+Documentation:
+* Improved documentation templates
+
+
+# diseasystore 0.1
 
 Features:
 * DiseasystoreBase: A base class for the diseasystores
