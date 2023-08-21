@@ -105,6 +105,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
   available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
 
+
   key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
     expect_true(min(output$date) == start_date)

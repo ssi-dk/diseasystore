@@ -90,5 +90,4 @@ test_that("%.% works", {
   expect_identical(d %.% b, 3)
   expect_identical(d %.% .c, 4)
   expect_error(d %.% d, "d not found in d")
-
 })

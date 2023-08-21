@@ -48,7 +48,6 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         private$.source_conn <- source_conn
       }
 
-
       if (is.null(target_conn)) {
         private$.target_conn <- diseasyoption("target_conn", self)
         if (is.function(self %.% target_conn)) private$.target_conn <- private$.target_conn()
@@ -123,6 +122,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Determine which dates need to be computed
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
+
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date = start_date,
                                                         end_date   = end_date,
