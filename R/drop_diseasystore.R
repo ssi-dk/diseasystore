@@ -22,7 +22,7 @@ drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = diseasystore
 
   # Check if logs is in the table, if yes, all tables must be deleted
   if ("logs" %in% tables_to_delete &&
-      !identical(tables_to_delete, purrr::keep(tables, ~ stringr::str_detect(., glue::glue("^{schema}\\..*"))))) {
+        !identical(tables_to_delete, purrr::keep(tables, ~ stringr::str_detect(., glue::glue("^{schema}\\..*"))))) {
     stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire featurestore is dropped."))
   }
 

@@ -24,7 +24,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   })
 
   # Initialize without start_date and end_date
-  expect_no_error(fs <- DiseasystoreGoogleCovid19$new(verbose = !testthat::is_testing()))
+  expect_no_error(fs <- DiseasystoreGoogleCovid19$new(verbose = FALSE))
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")

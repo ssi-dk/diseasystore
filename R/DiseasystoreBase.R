@@ -219,11 +219,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Validate input
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(
-        observable,
+        observable, # nolint: identation_linter
         purrr::keep(self$available_features, ~ startsWith(., "n_") | endsWith(., "_temperature")),
         add = coll)
       checkmate::assert(
-        checkmate::check_character(aggregation, null.ok = TRUE),
+        checkmate::check_character(aggregation, null.ok = TRUE), # nolint: indentation_linter
         checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
         checkmate::check_class(aggregation, "quosures", null.ok = TRUE),
         add = coll)
@@ -451,7 +451,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         } else {
           return(private$.target_conn)
         }
-    }),
+      }),
 
 
     #' @templateVar read_only TRUE
