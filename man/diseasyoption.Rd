@@ -10,7 +10,7 @@ diseasyoption(option, self)
 \item{option}{(\code{character})\cr
 Name of the option to get}
 
-\item{self}{(\verb{Diseasy*})\cr
+\item{self}{(\verb{R6::R6class Diseasy* instance})\cr
 The object the option applies to.}
 }
 \description{
