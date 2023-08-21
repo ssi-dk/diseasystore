@@ -81,10 +81,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @description
     #'   Closes the open DB connection when removing the object
     finalize = function() {
-      # purrr::walk(list(self %.% target_conn, self %.% source_conn),
-      #             ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
-      #               DBI::dbDisconnect(.)
-      #             })
+      purrr::walk(list(self %.% target_conn, self %.% source_conn),
+                  ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
+                    DBI::dbDisconnect(.)
+                  })
     },
 
 
