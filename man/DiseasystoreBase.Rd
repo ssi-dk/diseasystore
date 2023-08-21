@@ -77,18 +77,6 @@ Study period end. Read only.}
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end. Read only.}
 
-\item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
-
-\item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
-
-\item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
-
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end. Read only.}
 
@@ -125,10 +113,6 @@ If the database backend does not support schema, the tables will be prefixed wit
 \item{\code{target_schema}}{(\code{character})\cr
 The schema to place the feature store in. Read only.
 If the database backend does not support schema, the tables will be prefixed with target_schema.}
-
-\item{\code{target_schema}}{(\code{character})\cr
-The schema to place the feature store in.
-If the database backend does not support schema, the tables will be prefixed with target_schema}
 
 \item{\code{verbose}}{(\code{boolean})\cr
 Boolean that controls enables debugging information.}
@@ -189,18 +173,6 @@ Study period end. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end. Read only.}
-
-\item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
-
-\item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
-
-\item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
 
 \item{\code{end_date}}{(\code{Date})\cr
 Study period end. Read only.}
