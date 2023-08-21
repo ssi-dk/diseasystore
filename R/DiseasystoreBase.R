@@ -151,8 +151,15 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
         # Add the existing computed data for given slice_ts
         if (mg_table_exists(self %.% target_conn, target_table)) {
-          fs_updated_feature <-
-            dplyr::union(mg_get_table(self %.% target_conn, target_table, slice_ts = slice_ts), fs_feature)
+          fs_existing <- dplyr::tbl(self %.% target_conn, mg_id(target_table, self %.% target_conn))
+
+          if (mg_is.historical(fs_existing)) {
+            fs_existing <- fs_existing |>
+              dplyr::filter(.data$from_ts == slice_ts) |>
+              dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts")))
+          }
+
+          fs_updated_feature <- dplyr::union(fs_existing, fs_feature)
         } else {
           fs_updated_feature <- fs_feature
         }
