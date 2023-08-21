@@ -596,12 +596,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       return(new_ranges)
     },
 
-    initialize_feature_handlers = function() NULL,
-
-    # @param field The name of the field that is read only
-    read_only_error = function(field) {
-      stop(glue::glue("`${field}` is read only"), call. = FALSE)
-    }
+    initialize_feature_handlers = function() NULL
   )
 )
 
