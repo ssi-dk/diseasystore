@@ -3,6 +3,7 @@
 
 #' @import checkmate
 #' @import DBI
+#' @importFrom dbplyr window_order
 #' @import dplyr
 #' @import glue
 #' @importFrom lubridate today

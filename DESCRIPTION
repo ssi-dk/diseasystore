@@ -23,14 +23,12 @@ Imports:
     dplyr,
     glue,
     lubridate,
-    methods,
-    openssl,
     purrr,
     readr,
     rlang,
     R6,
+    SCDB,
     stringr,
-    testthat,
     tidyr,
     tidyselect,
     zoo
@@ -39,6 +37,7 @@ Suggests:
     rmarkdown,
     RSQLite,
     RPostgres,
+    testthat (>= 3.0.0),
     tibble,
     spelling
 VignetteBuilder: knitr

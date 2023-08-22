@@ -118,7 +118,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       feature_loader <- names(fs_map[fs_map == feature])
 
       # Create log table
-      mg_create_logs_if_missing(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)
+      SCDB::create_logs_if_missing(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)
 
       # Determine which dates need to be computed
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
@@ -150,10 +150,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         }
 
         # Add the existing computed data for given slice_ts
-        if (mg_table_exists(self %.% target_conn, target_table)) {
-          fs_existing <- dplyr::tbl(self %.% target_conn, mg_id(target_table, self %.% target_conn))
+        if (SCDB::table_exists(self %.% target_conn, target_table)) {
+          fs_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn))
 
-          if (mg_is.historical(fs_existing)) {
+          if (SCDB::is.historical(fs_existing)) {
             fs_existing <- fs_existing |>
               dplyr::filter(.data$from_ts == slice_ts) |>
               dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts")))
@@ -166,14 +166,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
         # Commit to DB
         capture.output({
-          mg_update_snapshot(.data = fs_updated_feature,
-                             conn = self %.% target_conn,
-                             db_table = target_table,
-                             timestamp = slice_ts,
-                             message = glue::glue("fs-range: {start_date} - {end_date}"),
-                             log_path = NULL, # no log file, but DB logging still enabled
-                             log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
-                             enforce_chronological_order = FALSE)
+          SCDB::update_snapshot(.data = fs_updated_feature,
+                                conn = self %.% target_conn,
+                                db_table = target_table,
+                                timestamp = slice_ts,
+                                message = glue::glue("fs-range: {start_date} - {end_date}"),
+                                log_path = NULL, # no log file, but DB logging still enabled
+                                log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
+                                enforce_chronological_order = FALSE)
         })
       })
 
@@ -517,7 +517,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,
-                         mg_id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)) |>
+                         SCDB::id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
         dplyr::filter(target_table == !!target_table, date == !!slice_ts)
@@ -555,7 +555,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Determine the dates covered on this slice_ts
-      if (mg_nrow(logs) > 0) {
+      if (SCDB::nrow(logs) > 0) {
         fs_dates <- logs |>
           dplyr::select(fs_start_date, fs_end_date) |>
           purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = as.Date(fs_start_date),

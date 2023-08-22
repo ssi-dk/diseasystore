@@ -54,3 +54,20 @@ get_diseasystore <- function(case_definition) {
 
   return(get(diseasystore_case_definition(case_definition)))
 }
+
+
+#' Provides age_labels that follows the mg standard
+#' @template age_cuts
+#' @return A vector of labels with zero-padded numerics so they can be sorted easily
+#' @examples
+#' age_labels(c(5, 12, 20, 30))
+#' @export
+age_labels <- function(age_cuts) {
+  checkmate::assert_numeric(age_cuts, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE)
+
+  age_cuts <- age_cuts[age_cuts > 0 & is.finite(age_cuts)]
+  width <- nchar(as.character(max(c(0, age_cuts))))
+  stringr::str_c(stringr::str_pad(c(0, age_cuts), width, pad = "0"),
+                 c(rep("-", length(age_cuts)), "+"),
+                 c(stringr::str_pad(age_cuts - 1, width, pad = "0"), ""))
+}
