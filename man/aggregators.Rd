@@ -17,8 +17,7 @@ key_join_min(.data, feature)
 key_join_count(.data, feature)
 }
 \arguments{
-\item{.data}{\cr
-The data object to perform the operation on}
+\item{.data}{.data\crThe data object to perform the operation on}
 
 \item{feature}{(\code{character})\cr
 Name of the feature to perform the aggregation over}

@@ -15,11 +15,11 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
     #'   This function implements an intermediate filtering in the aggregation pipeline.
     #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
     #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
-    #' @template .data
+    #' @param .data `r rd_.data()`
     #' @param aggregation_features (`character`)\cr
     #'   A list of the features included in the aggregation process.
-    #' @template start_date
-    #' @template end_date
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
     #' @return
     #'   A subset of `.data` filtered to remove double counting
     key_join_filter = function(.data, aggregation_features,
