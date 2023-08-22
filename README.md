@@ -1,6 +1,7 @@
 # diseasystore <img src="man/figures/logo.png" align="right" height="138" />
-[![R-CMD-check](https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml)
-[![codecov](https://codecov.io/gh/RasmusSkytte/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D)](https://codecov.io/gh/RasmusSkytte/diseasystore)
+[![CRAN status](https://www.r-pkg.org/badges/version/diseasystore)](https://CRAN.R-project.org/package=diseasystore)
+[![R-CMD-check](https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/ssi-dk/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D)](https://codecov.io/gh/ssi-dk/diseasystore)
 
 The `diseasystore` is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness.
 The package forms the data-backbone of the `diseasy` package.
@@ -22,5 +23,5 @@ You can install the development version of `diseasystore` from [GitHub](https://
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("RasmusSkytte/diseasystore")
+devtools::install_github("ssi-dk/diseasystore")
 ```
