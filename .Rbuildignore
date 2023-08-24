@@ -7,3 +7,4 @@
 .lintr
 man-roxygen
 ^LICENSE\.md$
+^cran-comments\.md$
