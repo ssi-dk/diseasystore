@@ -52,7 +52,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
       dplyr::collect()
 
     feature_checksum <- feature |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
@@ -66,7 +66,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
       dplyr::collect()
 
     reference_checksum <- reference |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
@@ -82,7 +82,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect() |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
@@ -94,7 +94,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
                                      source_conn = fs %.% source_conn) %>%
       dplyr::copy_to(fs %.% target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
       dplyr::collect() |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 

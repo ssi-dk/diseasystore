@@ -4,11 +4,7 @@
 \alias{drop_diseasystore}
 \title{Drop feature stores from DB}
 \usage{
-drop_diseasystore(
-  pattern = ".*",
-  schema = "ds",
-  conn = diseasystore::mg_get_connection()
-)
+drop_diseasystore(pattern = ".*", schema = "ds", conn = SCDB::get_connection())
 }
 \arguments{
 \item{pattern}{Pattern to match the tables by}

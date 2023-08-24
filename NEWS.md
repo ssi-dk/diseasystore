@@ -11,6 +11,7 @@ Features:
 * drop_diseasystore: A function to remove data from a feature store
 * Added a informative operator to access data `%.%`
   * Gives error instead of NULL if element does not exist
+* age_labels: A function to generate human-readable and sortable age groupings
 
 Testing:
 * Most package functions are tested here
