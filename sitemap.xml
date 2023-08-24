@@ -34,10 +34,16 @@
     <loc>https://rasmusskytte.github.io/diseasystore/reference/FeatureHandler.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/active_binding.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/aggregators.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/available_diseasystores.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasyoption.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore-package.html</loc>
@@ -47,6 +53,9 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore_exists.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/drop_diseasystore.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/get_diseasystore.html</loc>
@@ -59,6 +68,12 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_reexports.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/printr.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/read_only_error.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/truncate_interlace.html</loc>

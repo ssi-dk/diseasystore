@@ -12,7 +12,7 @@ It defines the primary methods of each feature stores as well as all of the publ
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,12 +59,17 @@ It defines the primary methods of each feature stores as well as all of the publ
     <p></p><div class="r6-active-bindings"><dl><dt><code>fs_map</code></dt>
 <dd><p>(<code>named list</code>(<code>character</code>))<br>
 A list that maps features known by the feature store to the corresponding feature handlers
-that compute the features.</p></dd>
+that compute the features. Read only.</p></dd>
 
 
 <dt><code>available_features</code></dt>
 <dd><p>(<code>character</code>)<br>
-A list of available features in the feature store</p></dd>
+A list of available features in the feature store. Read only.</p></dd>
+
+
+<dt><code>case_definition</code></dt>
+<dd><p>(<code>character</code>)<br>
+A human readable case_definition of the feature store. Read only.</p></dd>
 
 
 </dl><p></p></div>
@@ -100,69 +105,101 @@ A list of available features in the feature store</p></dd>
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database)</p></dd>
+Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
 
 
 <dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database)</p></dd>
+Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
+
+
+<dt><code>slice_ts</code></dt>
+<dd><p>(<code>Date</code> or <code>character</code>)<br>
+Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
 
 
 <dt><code>source_conn</code></dt>
 <dd><p><br>
-Used to specify where data is located.
+Used to specify where data is located. Read only.
+Can be <code>DBIConnection</code> or file path depending on the <code>diseasystore</code>.</p></dd>
+
+
+<dt><code>source_conn</code></dt>
+<dd><p><br>
+Used to specify where data is located. Read only.
 Can be <code>DBIConnection</code> or file path depending on the <code>diseasystore</code>.</p></dd>
 
 
 <dt><code>target_conn</code></dt>
 <dd><p>(<code>DBIConnection</code>)<br>
-A database connection to store the computed features in.</p></dd>
+A database connection to store the computed features in. Read only.</p></dd>
+
+
+<dt><code>target_conn</code></dt>
+<dd><p>(<code>DBIConnection</code>)<br>
+A database connection to store the computed features in. Read only.</p></dd>
 
 
 <dt><code>target_schema</code></dt>
 <dd><p>(<code>character</code>)<br>
-The schema to place the feature store in.
-If the database backend does not support schema, the tables will be prefixed with target_schema</p></dd>
+The schema to place the feature store in. Read only.
+If the database backend does not support schema, the tables will be prefixed with target_schema.</p></dd>
+
+
+<dt><code>target_schema</code></dt>
+<dd><p>(<code>character</code>)<br>
+The schema to place the feature store in. Read only.
+If the database backend does not support schema, the tables will be prefixed with target_schema.</p></dd>
 
 
 <dt><code>verbose</code></dt>
@@ -191,9 +228,9 @@ Boolean that controls enables debugging information.</p></dd>
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span></span>
 <span>  <span class="va">feature</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span>,</span>
-<span>  slice_ts <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">slice_ts</span></span>
+<span>  start_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span>,</span>
+<span>  slice_ts <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">slice_ts</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -206,52 +243,67 @@ The name of a feature defined in the feature store.</p></dd>
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database)</p></dd>
+Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
 
 
 <dt><code>slice_ts</code></dt>
 <dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database)</p></dd>
+Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
+
+
+<dt><code>slice_ts</code></dt>
+<dd><p>(<code>Date</code> or <code>character</code>)<br>
+Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
 
 
 </dl><p></p></div>
@@ -269,8 +321,8 @@ that contains keys to witch the secondary features (defined by aggregation) can 
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span></span>
 <span>  <span class="va">observable</span>,</span>
 <span>  <span class="va">aggregation</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
+<span>  start_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -289,42 +341,52 @@ These are then joined to the observable feature before aggregation is performed.
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end. Read only.</p></dd>
 
 
 </dl><p></p></div>
@@ -343,8 +405,8 @@ The <code>key_join_filter</code> is inserted into the aggregation pipeline to re
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_filter</span><span class="op">(</span></span>
 <span>  <span class="va">.data</span>,</span>
 <span>  <span class="va">aggregation_features</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
+<span>  start_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -362,42 +424,52 @@ A list of the features included in the aggregation process.</p></dd>
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>start_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period start.</p></dd>
+Study period start. Read only.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period start. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
 
 
 <dt><code>end_date</code></dt>
 <dd><p>(<code>Date</code>)<br>
-Study period end.</p></dd>
+Study period end. Read only.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>(<code>Date</code>)<br>
+Study period end. Read only.</p></dd>
 
 
 </dl><p></p></div>

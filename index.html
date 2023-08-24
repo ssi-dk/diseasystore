@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,16 +72,24 @@
 <img src="logo.png" class="logo" alt=""><h1 id="diseasystore-">diseasystore <a class="anchor" aria-label="anchor" href="#diseasystore-"></a>
 </h1>
 </div>
-<p><a href="https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/RasmusSkytte/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://codecov.io/gh/RasmusSkytte/diseasystore" class="external-link"><img src="https://codecov.io/gh/RasmusSkytte/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D" alt="codecov"></a></p>
-<p>The “diseasystore” is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness. The package forms the data-backbone of the “diseasy” package. # A modular feature store The “diseasystore” is modularly built using R6 classes. Different diseases are handled by individual feature stores that have access to all relevant disease data for the given disease.</p>
+<p><a href="https://CRAN.R-project.org/package=diseasystore" class="external-link"><img src="https://www.r-pkg.org/badges/version/diseasystore" alt="CRAN status"></a> <a href="https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://codecov.io/gh/ssi-dk/diseasystore" class="external-link"><img src="https://codecov.io/gh/ssi-dk/diseasystore/branch/main/graph/badge.svg?token=ZAUHJPQ28D" alt="codecov"></a></p>
+<p>The <code>diseasystore</code> is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness. The package forms the data-backbone of the <code>diseasy</code> package. ## A modular feature store The <code>diseasystore</code> is modularly built using R6 classes. Different diseases are handled by individual feature stores that have access to all relevant disease data for the given disease.</p>
+<div class="section level2">
+<h2 id="handling-of-diverse-data-sources">Handling of diverse data sources<a class="anchor" aria-label="anchor" href="#handling-of-diverse-data-sources"></a>
+</h2>
+<p>Data for different diseases will typically be structured in different ways. The <code>diseasystore</code> currently implements the Google Health COVID-19 Open Repository with more one the way.</p>
+<p>The <code>diseasystore</code> is designed to handled both individual level data (examples to come) or semi-aggregated (typically public) data.</p>
+<p>If the data is at the individual level, the feature store is fully dynamic and and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
 </div>
-<div class="section level1">
-<h1 id="handling-of-diverse-data-sources">Handling of diverse data sources<a class="anchor" aria-label="anchor" href="#handling-of-diverse-data-sources"></a>
-</h1>
-<p>Data for different diseases will typically be structured in different ways. The “diseasystore” currently implements the Google Health COVID-19 Open Repository with more one the way.</p>
-<p>The “diseasystore” is designed to handled both individual level data (examples to come) or semi-aggregated (typically public) data. If the data is at the individual level, the feature store is fully dynamic and and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the development version of <code>diseasystore</code> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ssi-dk/diseasystore"</span><span class="op">)</span></span></code></pre></div>
 </div>
-
+</div>
   </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
