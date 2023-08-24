@@ -1,4 +1,4 @@
-# diseasystore 0.1.0
+# diseasystore 0.1
 
 Features:
 * DiseasystoreBase: A base class for the diseasystores
@@ -8,13 +8,12 @@ Features:
 * FeatureHandler: A simple class to handle individual feature computations
   * Defines the interface for each individual feature in the diseasystores
 * Aggregators: A set of aggregators for the FeatureHandlers to use
+* drop_diseasystore: A function to remove data from a feature store
 * Added a informative operator to access data `%.%`
   * Gives error instead of NULL if element does not exist
-* A number of useful DB functions re-exported from internal package (to be released)
 
 Testing:
 * Most package functions are tested here
-  * (Re-exported functions from internal package are tested elsewhere)
 
 Documentation
 * The functions are fully documented

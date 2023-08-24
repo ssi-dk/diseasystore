@@ -11,7 +11,7 @@
 key_join_sum <- function(.data, feature) {
   return(dplyr::summarize(.data,
                           dplyr::across(.cols = tidyselect::all_of(feature),
-                                        .fns = list(n = ~ sum(., na.rm = TRUE)),
+                                        .fns = list(n = ~ sum(as.numeric(.), na.rm = TRUE)),
                                         .names = "{.fn}"),
                           .groups = "drop"))
 }
@@ -21,7 +21,7 @@ key_join_sum <- function(.data, feature) {
 key_join_max <- function(.data, feature) {
   return(dplyr::summarize(.data,
                           dplyr::across(.cols = tidyselect::all_of(feature),
-                                        .fns = list(n = ~ max(., na.rm = TRUE)),
+                                        .fns = list(n = ~ max(as.numeric(.), na.rm = TRUE)),
                                         .names = "{.fn}"),
                           .groups = "drop"))
 }
@@ -31,7 +31,7 @@ key_join_max <- function(.data, feature) {
 key_join_min <- function(.data, feature) {
   return(dplyr::summarize(.data,
                           dplyr::across(.cols = tidyselect::all_of(feature),
-                                        .fns = list(n = ~ min(., na.rm = TRUE)),
+                                        .fns = list(n = ~ min(as.numeric(.), na.rm = TRUE)),
                                         .names = "{.fn}"),
                           .groups = "drop"))
 }
