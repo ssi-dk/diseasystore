@@ -7,8 +7,7 @@
 diseasystore_exists(case_definition)
 }
 \arguments{
-\item{case_definition}{(\code{character})\cr
-A character string that controls which feature store to get data from.}
+\item{case_definition}{case_definition (\code{character})\cr A character string that controls which feature store to get data from.}
 }
 \description{
 Check for the existence of a \code{diseasystore} for the case definition
