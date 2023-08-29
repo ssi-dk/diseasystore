@@ -47,17 +47,14 @@ The \code{key_join_filter} is inserted into the aggregation pipeline to remove t
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{.data}}{\cr
-The data object to perform the operation on}
+\item{\code{.data}}{.data\cr The data object to perform the operation on}
 
 \item{\code{aggregation_features}}{(\code{character})\cr
 A list of the features included in the aggregation process.}
 
-\item{\code{start_date}}{(\code{Date})\cr
-Study period start.}
+\item{\code{start_date}}{start_date (\code{Date})\cr Study period start.}
 
-\item{\code{end_date}}{(\code{Date})\cr
-Study period end.}
+\item{\code{end_date}}{end_date (\code{Date})\cr Study period end.}
 }
 \if{html}{\out{</div>}}
 }
