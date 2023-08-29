@@ -30,6 +30,15 @@ test_that("DiseasystoreGoogleCovid19 works", {
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
   expect_equal(fs %.% case_definition, "Google COVID-19")
 
+
+  # SCDB v0.1 gives a warning if database has no tables when used. We suppress this warning here
+  # if this warning is no longer cast, remove this test
+  expect_warning(SCDB::get_tables(fs$target_conn),
+                 "No tables found. Check user privileges / database configuration")
+  dplyr::copy_to(fs$target_conn, mtcars)
+  expect_no_warning(SCDB::get_tables(fs$target_conn))
+
+
   # Check all FeatureHandlers have been initialized
   private <- fs$.__enclos_env__$private
   feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
