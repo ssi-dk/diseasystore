@@ -28,15 +28,15 @@ truncate_interlace <- function(primary, secondary = NULL) {
       if (length(common_keys) == 0) stop("No common keys found to interlace by!")
 
       # We then join the tables by these keys and truncate the secondary table to validity range of the primary
-      dplyr::right_join(x = .x, y = primary, suffix = c(".x", ""), by = common_keys) |>
-        dplyr::filter((.data$valid_from  < .data$valid_until.x) |   # Keep secondary records
-                        is.na(.data$valid_until.x),                 # that is within validity
-                      (.data$valid_until > .data$valid_from.x)  |   # of the primary data.
+      dplyr::left_join(x = primary, y = ., suffix = c("", ".y"), by = common_keys) |>
+        dplyr::filter((.data$valid_from  < .data$valid_until.y) |   # Keep secondary records
+                        is.na(.data$valid_until.y),                 # that is within validity
+                      (.data$valid_until > .data$valid_from.y)  |   # of the primary data.
                         is.na(.data$valid_until) |
-                        is.na(.data$valid_until.x)) |>
-        dplyr::mutate("valid_from"  = pmax(.data$valid_from,  .data$valid_from.x,  na.rm = TRUE),
-                      "valid_until" = pmin(.data$valid_until, .data$valid_until.x, na.rm = TRUE)) |>
-        dplyr::select(-tidyselect::ends_with(".x"))
+                        is.na(.data$valid_until.y)) |>
+        dplyr::mutate("valid_from"  = pmax(.data$valid_from,  .data$valid_from.y,  na.rm = TRUE),
+                      "valid_until" = pmin(.data$valid_until, .data$valid_until.y, na.rm = TRUE)) |>
+        dplyr::select(-tidyselect::ends_with(".y"))
     })
 
   # With the secondary data truncated, we can interlace and return
