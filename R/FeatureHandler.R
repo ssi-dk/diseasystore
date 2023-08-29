@@ -3,6 +3,45 @@
 #' @description
 #'   This `FeatureHandler` [R6][R6::R6Class] handles individual features for the feature stores.
 #'   They define the three methods associated with features (`compute`, `get` and `key_join`).
+#' @examples
+#'   # The FeatureHandler is typically configured as part of making a new Diseasystore.
+#'   # Most often, we need only specifiy `compute` and `key_join` to get a functioning FeatureHandler
+#'
+#'   # In this example we use mtcars as the basis for our features
+#'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
+#'
+#'   # We use mtcars as our basis. First we add the rownames as an actual column
+#'   data <- dplyr::mutate(mtcars, key_name = rownames(mtcars), .before = dplyr::everything())
+#'
+#'   # Then we add some imaginary times where these cars were produced
+#'   data <- dplyr::mutate(data,
+#'                         production_start = as.Date(Sys.Date()) + floor(runif(nrow(mtcars)) * 100),
+#'                         production_end   = production_start + floor(runif(nrow(mtcars)) * 365))
+#'
+#'   dplyr::copy_to(conn, data, "mtcars")
+#'
+#'   # In this example, the feature we want is the "maximum miles per galon"
+#'   # The feature in question in the mtcars dataset is then "mpg" and when we need to reduce
+#'   # our data set, we want to use the "max()" function.
+#'
+#'   # We first write a compute function for the mpg in our modified mtcars dataset
+#'   # Our goal is to get the mpg of all cars that were in production at the between start/end_date
+#'   compute_mpg <- function(start_date, end_date, slice_ts, source_conn) {
+#'     out <- SCDB::get_table(source_conn, "mtcars", slice_ts = slice_ts) |>
+#'       dplyr::filter({{ start_date }} <= .data$production_end,
+#'                     .data$production_start <= {{ end_date }}) |>
+#'       dplyr::transmute("key_name", "mpg",
+#'                        "valid_from" = "production_start",
+#'                        "valid_until" = "production_end")
+#'
+#'     return(out)
+#'   }
+#'
+#'   # We can now combine into our FeatureHandler
+#'   fh_max_mpg <- FeatureHandler$new(compute = compute_mpg, key_join = key_join_max)
+#'
+#' @return
+#'   A new instance of the `FeatureHandler` [R6][R6::R6Class] class.
 #' @export
 FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
   classname = "FeatureHandler",

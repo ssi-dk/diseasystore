@@ -3,10 +3,18 @@
 \name{DiseasystoreGoogleCovid19}
 \alias{DiseasystoreGoogleCovid19}
 \title{feature store handler of Google Health COVID-19 Open Data features}
+\value{
+A new instance of the \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} class.
+}
 \description{
 This \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} brings support for using the Google
 Health COVID-19 Open Data repository.
 See the vignette("google_covid_19_data") for details on how to configure the feature store
+}
+\examples{
+  ds <- DiseasystoreGoogleCovid19$new(source_conn = ".",
+                                      target_conn = DBI::dbConnect(RSQLite::SQLite()))
+
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}

@@ -3,6 +3,11 @@
 #' @param pattern Pattern to match the tables by
 #' @param schema Schema the diseasystore uses to store data in
 #' @param conn DB connection
+#' @return No return value, called for side effects
+#' @examples
+#'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
+#'
+#'   drop_diseasystore(conn = conn)
 #' @export
 drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = SCDB::get_connection()) {
 

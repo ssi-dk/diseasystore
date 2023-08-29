@@ -3,9 +3,20 @@
 \name{DiseasystoreBase}
 \alias{DiseasystoreBase}
 \title{diseasystore base handler}
+\value{
+A new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} class.
+}
 \description{
 This \code{DiseasystoreBase} \link[R6:R6Class]{R6} class forms the basis of all feature stores.
 It defines the primary methods of each feature stores as well as all of the public methods.
+}
+\examples{
+  # DiseasystoreBase is mostly used as the basis of other, more specific, classes
+  # The DiseasystoreBase can be initialized individually if needed.
+
+  ds <- DiseasystoreBase$new(source_conn = NULL,
+                             target_conn = DBI::dbConnect(RSQLite::SQLite()))
+
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}

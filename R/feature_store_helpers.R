@@ -1,5 +1,8 @@
 #' Transform case definition to PascalCase
 #' @param case_definition `r rd_case_definition()`
+#' @return The given case_definition formatted to match a Diseasystore
+#' @examples
+#'   diseasystore_case_definition("Google COVID-19")  # DiseasystoreGoogleCovid19
 #' @export
 diseasystore_case_definition <- function(case_definition) {
 
@@ -15,6 +18,9 @@ diseasystore_case_definition <- function(case_definition) {
 
 
 #' Detect available diseasystores
+#' @return The installed diseasystores on the search path
+#' @examples
+#'   available_diseasystores()  # DiseasystoreGoogleCovid19 + more from other packages
 #' @export
 available_diseasystores <- function() {
   # Get all installed packages that has the ^diseasystore.* pattern
@@ -34,6 +40,10 @@ available_diseasystores <- function() {
 
 #' Check for the existence of a `diseasystore` for the case definition
 #' @param case_definition `r rd_case_definition()`
+#' @return TRUE if the given case_definition can be matched to a diseasystore on the search path. FALSE otherwise.
+#' @examples
+#'   diseasystore_exists("Google COVID-19")  # TRUE
+#'   diseasystore_exists("Non existent diseasystore")  # FALSE
 #' @export
 diseasystore_exists <- function(case_definition) {
 
@@ -47,6 +57,9 @@ diseasystore_exists <- function(case_definition) {
 
 #' Get the `diseasystore` for the case definition
 #' @param case_definition `r rd_case_definition()`
+#' @return The diseasystore generator for the diseasystore matching the given case_definition
+#' @examples
+#'   ds <- get_diseasystore("Google COVID-19")  # Returns the DiseasystoreGoogleCovid19 generator
 #' @export
 get_diseasystore <- function(case_definition) {
 

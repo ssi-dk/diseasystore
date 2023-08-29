@@ -6,6 +6,12 @@
 \usage{
 available_diseasystores()
 }
+\value{
+The installed diseasystores on the search path
+}
 \description{
 Detect available diseasystores
+}
+\examples{
+  available_diseasystores()  # DiseasystoreGoogleCovid19 + more from other packages
 }
