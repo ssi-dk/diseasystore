@@ -4,15 +4,28 @@
 \alias{diseasyoption}
 \title{Helper function to get option}
 \usage{
-diseasyoption(option, self)
+diseasyoption(option, class = "DiseasystoreBase")
 }
 \arguments{
 \item{option}{(\code{character})\cr
 Name of the option to get}
 
-\item{self}{(\verb{R6::R6class Diseasy* instance})\cr
-The object the option applies to.}
+\item{class}{(\code{character} or \verb{R6::R6class Diseasy* instance})\cr
+Either the classname or the object the option applies to.}
+}
+\value{
+The most specific option within the diseasy framework for the given option and class
 }
 \description{
 Helper function to get option
+}
+\examples{
+  # Retrieve default option for source conn
+  diseasyoption("source_conn")
+
+  # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
+  diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
+
+  # Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore
+  diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 }

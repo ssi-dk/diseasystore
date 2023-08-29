@@ -1,5 +1,6 @@
 backends
 
+classname
 cloneable
 CMD
 codecov
@@ -47,16 +48,3 @@ rm
 
 Skytte
 sql
-
-
-PostgreSQL
-Postgres
-RPostgres
-Sys
-dbConnect
-dbname
-drv
-ip
-pgpass
-timezone
-dbplyr's
