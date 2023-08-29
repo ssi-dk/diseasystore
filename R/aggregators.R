@@ -4,7 +4,7 @@
 #' Feature aggregators
 #'
 #' @name aggregators
-#' @template .data
+#' @param .data `r rd_.data()`
 #' @param feature (`character`)\cr
 #'   Name of the feature to perform the aggregation over
 #' @export

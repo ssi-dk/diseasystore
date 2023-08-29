@@ -1,5 +1,5 @@
 #' Transform case definition to PascalCase
-#' @template case_definition
+#' @param case_definition `r rd_case_definition()`
 #' @export
 diseasystore_case_definition <- function(case_definition) {
 
@@ -33,7 +33,7 @@ available_diseasystores <- function() {
 
 
 #' Check for the existence of a `diseasystore` for the case definition
-#' @template case_definition
+#' @param case_definition `r rd_case_definition()`
 #' @export
 diseasystore_exists <- function(case_definition) {
 
@@ -46,7 +46,7 @@ diseasystore_exists <- function(case_definition) {
 
 
 #' Get the `diseasystore` for the case definition
-#' @template case_definition
+#' @param case_definition `r rd_case_definition()`
 #' @export
 get_diseasystore <- function(case_definition) {
 

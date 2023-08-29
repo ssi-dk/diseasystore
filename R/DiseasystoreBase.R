@@ -11,12 +11,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
     #' @description
     #'   Creates a new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
-    #' @template start_date
-    #' @template end_date
-    #' @template slice_ts
-    #' @template source_conn
-    #' @template target_conn
-    #' @template target_schema
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
+    #' @param slice_ts `r rd_slice_ts()`
+    #' @param source_conn `r rd_source_conn()`
+    #' @param target_conn `r rd_target_conn()`
+    #' @param target_schema `r rd_target_schema()`
     #' @param verbose (`boolean`)\cr
     #'   Boolean that controls enables debugging information.
     #' @return
@@ -91,9 +91,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   Computes, stores, and returns the requested feature for the study period.
     #' @param feature (`character`)\cr
     #'   The name of a feature defined in the feature store.
-    #' @template start_date
-    #' @template end_date
-    #' @template slice_ts
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
+    #' @param slice_ts `r rd_slice_ts()`
     #' @return
     #'   A tbl_dbi with the requested feature for the study period.
     get_feature = function(feature,
@@ -208,8 +208,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @param aggregation (`list`(`quosures`))\cr
     #'   Expressions in aggregation evaluated to find appropriate features.
     #'   These are then joined to the observable feature before aggregation is performed.
-    #' @template start_date
-    #' @template end_date
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
     key_join_features = function(observable, aggregation,
@@ -376,11 +376,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   This function implements an intermediate filtering in the aggregation pipeline.
     #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
     #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
-    #' @template .data
+    #' @param .data `r rd_.data()`
     #' @param aggregation_features (`character`)\cr
     #'   A list of the features included in the aggregation process.
-    #' @template start_date
-    #' @template end_date
+    #' @param start_date `r rd_start_date()`
+    #' @param end_date `r rd_end_date()`
     #' @return
     #'   A subset of `.data` filtered to remove double counting
     key_join_filter = function(.data, aggregation_features,
@@ -440,8 +440,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       expr = return(private$.case_definition)),
 
 
-    #' @templateVar read_only TRUE
-    #' @template source_conn
+    #' @field source_conn `r rd_source_conn("field")`
     source_conn = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "source_conn",
@@ -454,40 +453,35 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }),
 
 
-    #' @templateVar read_only TRUE
-    #' @template target_conn
+    #' @field target_conn `r rd_target_conn("field")`
     target_conn = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "target_conn",
       expr = return(private$.target_conn)),
 
 
-    #' @templateVar read_only TRUE
-    #' @template target_schema
+    #' @field target_schema `r rd_target_schema("field")`
     target_schema = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "target_schema",
       expr = return(private$.target_schema)),
 
 
-    #' @templateVar read_only TRUE
-    #' @template start_date
+    #' @field start_date `r rd_start_date("field")`
     start_date = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "start_date",
       expr = return(private$.start_date)),
 
 
-    #' @templateVar read_only TRUE
-    #' @template end_date
+    #' @field end_date `r rd_end_date("field")`
     end_date = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "end_date",
       expr = return(private$.end_date)),
 
 
-    #' @templateVar read_only TRUE
-    #' @template slice_ts
+    #' @field slice_ts `r rd_slice_ts("field")`
     slice_ts = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "slice_ts",
