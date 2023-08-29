@@ -72,6 +72,30 @@ A list of available features in the feature store. Read only.</p></dd>
 A human readable case_definition of the feature store. Read only.</p></dd>
 
 
+<dt><code>source_conn</code></dt>
+<dd><p>source_conn<br> Used to specify where data is located.  Read only. Can be <code>DBIConnection</code> or file path depending on the <code>diseasystore</code>.</p></dd>
+
+
+<dt><code>target_conn</code></dt>
+<dd><p>target_conn (<code>DBIConnection</code>)<br> A database connection to store the computed features in.  Read only.</p></dd>
+
+
+<dt><code>target_schema</code></dt>
+<dd><p>target_schema (<code>character</code>)<br> The schema to place the feature store in.  Read only. If the database backend does not support schema, the tables will be prefixed with target_schema.</p></dd>
+
+
+<dt><code>start_date</code></dt>
+<dd><p>start_date (<code>Date</code>)<br> Study period start.  Read only.</p></dd>
+
+
+<dt><code>end_date</code></dt>
+<dd><p>end_date (<code>Date</code>)<br> Study period end.  Read only.</p></dd>
+
+
+<dt><code>slice_ts</code></dt>
+<dd><p>slice_ts (<code>Date</code> or <code>character</code>)<br> Date to slice the database on (used if source_conn is a database).  Read only.</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -104,102 +128,27 @@ A human readable case_definition of the feature store. Read only.</p></dd>
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
+<dd><p>start_date (<code>Date</code>)<br> Study period start.</p></dd>
 
 
 <dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
+<dd><p>end_date (<code>Date</code>)<br> Study period end.</p></dd>
 
 
 <dt><code>slice_ts</code></dt>
-<dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
-
-
-<dt><code>slice_ts</code></dt>
-<dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
-
-
-<dt><code>slice_ts</code></dt>
-<dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
+<dd><p>slice_ts (<code>Date</code> or <code>character</code>)<br> Date to slice the database on (used if source_conn is a database).</p></dd>
 
 
 <dt><code>source_conn</code></dt>
-<dd><p><br>
-Used to specify where data is located. Read only.
-Can be <code>DBIConnection</code> or file path depending on the <code>diseasystore</code>.</p></dd>
-
-
-<dt><code>source_conn</code></dt>
-<dd><p><br>
-Used to specify where data is located. Read only.
-Can be <code>DBIConnection</code> or file path depending on the <code>diseasystore</code>.</p></dd>
+<dd><p>source_conn<br> Used to specify where data is located.  Can be <code>DBIConnection</code> or file path depending on the <code>diseasystore</code>.</p></dd>
 
 
 <dt><code>target_conn</code></dt>
-<dd><p>(<code>DBIConnection</code>)<br>
-A database connection to store the computed features in. Read only.</p></dd>
-
-
-<dt><code>target_conn</code></dt>
-<dd><p>(<code>DBIConnection</code>)<br>
-A database connection to store the computed features in. Read only.</p></dd>
+<dd><p>target_conn (<code>DBIConnection</code>)<br> A database connection to store the computed features in.</p></dd>
 
 
 <dt><code>target_schema</code></dt>
-<dd><p>(<code>character</code>)<br>
-The schema to place the feature store in. Read only.
-If the database backend does not support schema, the tables will be prefixed with target_schema.</p></dd>
-
-
-<dt><code>target_schema</code></dt>
-<dd><p>(<code>character</code>)<br>
-The schema to place the feature store in. Read only.
-If the database backend does not support schema, the tables will be prefixed with target_schema.</p></dd>
+<dd><p>target_schema (<code>character</code>)<br> The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with target_schema.</p></dd>
 
 
 <dt><code>verbose</code></dt>
@@ -242,68 +191,15 @@ The name of a feature defined in the feature store.</p></dd>
 
 
 <dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
+<dd><p>start_date (<code>Date</code>)<br> Study period start.</p></dd>
 
 
 <dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
+<dd><p>end_date (<code>Date</code>)<br> Study period end.</p></dd>
 
 
 <dt><code>slice_ts</code></dt>
-<dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
-
-
-<dt><code>slice_ts</code></dt>
-<dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
-
-
-<dt><code>slice_ts</code></dt>
-<dd><p>(<code>Date</code> or <code>character</code>)<br>
-Date to slice the database on (used if source_conn is a database). Read only.</p></dd>
+<dd><p>slice_ts (<code>Date</code> or <code>character</code>)<br> Date to slice the database on (used if source_conn is a database).</p></dd>
 
 
 </dl><p></p></div>
@@ -340,53 +236,11 @@ These are then joined to the observable feature before aggregation is performed.
 
 
 <dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
+<dd><p>start_date (<code>Date</code>)<br> Study period start.</p></dd>
 
 
 <dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
+<dd><p>end_date (<code>Date</code>)<br> Study period end.</p></dd>
 
 
 </dl><p></p></div>
@@ -413,8 +267,7 @@ The <code>key_join_filter</code> is inserted into the aggregation pipeline to re
 <div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>.data</code></dt>
-<dd><p><br>
-The data object to perform the operation on</p></dd>
+<dd><p>.data<br> The data object to perform the operation on</p></dd>
 
 
 <dt><code>aggregation_features</code></dt>
@@ -423,53 +276,11 @@ A list of the features included in the aggregation process.</p></dd>
 
 
 <dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period start. Read only.</p></dd>
+<dd><p>start_date (<code>Date</code>)<br> Study period start.</p></dd>
 
 
 <dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br>
-Study period end. Read only.</p></dd>
+<dd><p>end_date (<code>Date</code>)<br> Study period end.</p></dd>
 
 
 </dl><p></p></div>
