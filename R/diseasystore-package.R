@@ -4,6 +4,7 @@
 #' @import checkmate
 #' @import DBI
 #' @import dplyr
+#' @importFrom dbplyr window_order
 #' @import glue
 #' @importFrom lubridate today
 #' @importFrom lubridate days

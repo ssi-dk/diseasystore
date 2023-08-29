@@ -231,7 +231,7 @@ google_covid_19_age_group_  <- function() {
         dplyr::group_modify(~ {
           na_bins <- is.na(.x$age_group_lower)
           data.frame(age_bin = .x$age_bin[!na_bins],
-                     age_group = mg_age_labels(.x$age_group_lower[!na_bins]))
+                     age_group = diseasystore::age_labels(.x$age_group_lower[!na_bins]))
         })
 
       # And finally copy to the DB

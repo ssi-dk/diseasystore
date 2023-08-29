@@ -19,18 +19,16 @@ Language: en-GB
 Imports:
     checkmate,
     DBI,
-    dbplyr,
     dplyr,
+    dbplyr,
     glue,
     lubridate,
-    methods,
-    openssl,
     purrr,
     readr,
     rlang,
     R6,
+    SCDB,
     stringr,
-    testthat,
     tidyr,
     tidyselect,
     zoo
@@ -40,6 +38,7 @@ Suggests:
     RSQLite,
     RPostgres,
     tibble,
+    testthat (>= 3.0.0),
     spelling
 VignetteBuilder: knitr
 Config/testthat/edition: 3

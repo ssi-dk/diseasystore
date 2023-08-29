@@ -4,7 +4,7 @@
 #' @param schema Schema the diseasystore uses to store data in
 #' @param conn DB connection
 #' @export
-drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = diseasystore::mg_get_connection()) {
+drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = SCDB::get_connection()) {
 
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_character(pattern, add = coll)
@@ -13,7 +13,7 @@ drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = diseasystore
   checkmate::reportAssertions(coll)
 
   # Get tables to delete
-  tables <- diseasystore::mg_get_tables(conn, pattern) |>
+  tables <- SCDB::get_tables(conn, pattern) |>
     tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE) |>
     dplyr::pull("db_table_id")
 
@@ -27,16 +27,16 @@ drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = diseasystore
   }
 
   tables_to_delete |>
-    purrr::walk(~ DBI::dbRemoveTable(conn, diseasystore::mg_id(.x, conn = conn)))
+    purrr::walk(~ DBI::dbRemoveTable(conn, SCDB::id(.x, conn = conn)))
 
   # Delete from logs
-  if (diseasystore::mg_table_exists(conn, glue::glue("{schema}.logs"))) {
-    log_records_to_delete <- diseasystore::mg_get_table(conn, glue::glue("{schema}.logs")) |>
+  if (SCDB::table_exists(conn, glue::glue("{schema}.logs"))) {
+    log_records_to_delete <- SCDB::get_table(conn, glue::glue("{schema}.logs")) |>
       tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE) |>
       dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
       dplyr::select(!"db_table_id")
 
-    dplyr::rows_delete(dplyr::tbl(diseasystore::mg_id(glue::glue("{schema}.logs"), conn)),
+    dplyr::rows_delete(dplyr::tbl(SCDB::id(glue::glue("{schema}.logs"), conn)),
                        log_records_to_delete,
                        by = "log_file")
   }
