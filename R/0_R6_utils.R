@@ -32,13 +32,29 @@ printr <- function(..., file = "/dev/null", sep = "") {
 #' Helper function to get option
 #' @param option (`character`)\cr
 #'   Name of the option to get
-#' @param self (`R6::R6class Diseasy* instance`)\cr
-#'   The object the option applies to.
-diseasyoption <- function(option, self) {
-  base_class <- stringr::str_extract(class(self)[1], r"{^([A-Z][a-z]*)}") |> # nolint: object_usage_linter
+#' @param class (`character` or `R6::R6class Diseasy* instance`)\cr
+#'   Either the classname or the object the option applies to.
+#' @return The most specific option within the diseasy framework for the given option and class
+#' @examples
+#'   # Retrieve default option for source conn
+#'   diseasyoption("source_conn")
+#'
+#'   # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
+#'   diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
+#'
+#'   # Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore
+#'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
+#' @export
+diseasyoption <- function(option, class = "DiseasystoreBase") {
+
+  if (!is.character(class)) {
+    class <- base::class(class)[1]
+  }
+
+  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |> # nolint: object_usage_linter
     stringr::str_to_lower()
 
-  list(class(self)[1], NULL) |>
+  list(class, NULL) |>
     purrr::map(~ paste(c(base_class, .x, option), collapse = ".")) |>
     purrr::map(getOption) |>
     purrr::keep(purrr::negate(is.null)) |>
