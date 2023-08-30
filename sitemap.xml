@@ -37,6 +37,9 @@
     <loc>https://rasmusskytte.github.io/diseasystore/reference/active_binding.html</loc>
   </url>
   <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/age_labels.html</loc>
+  </url>
+  <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/aggregators.html</loc>
   </url>
   <url>
@@ -65,9 +68,6 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/mg_reexports.html</loc>
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/printr.html</loc>
