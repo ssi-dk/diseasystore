@@ -30,6 +30,15 @@ test_that("DiseasystoreGoogleCovid19 works", {
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
   expect_equal(fs %.% case_definition, "Google COVID-19")
 
+
+  # SCDB v0.1 gives a warning if database has no tables when used. We suppress this warning here
+  # if this warning is no longer cast, remove this test
+  expect_warning(SCDB::get_tables(fs$target_conn),
+                 "No tables found. Check user privileges / database configuration")
+  dplyr::copy_to(fs$target_conn, mtcars)
+  expect_no_warning(SCDB::get_tables(fs$target_conn))
+
+
   # Check all FeatureHandlers have been initialized
   private <- fs$.__enclos_env__$private
   feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
@@ -52,7 +61,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
       dplyr::collect()
 
     feature_checksum <- feature |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
@@ -66,7 +75,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
       dplyr::collect()
 
     reference_checksum <- reference |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
@@ -82,7 +91,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect() |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
@@ -94,7 +103,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
                                      source_conn = fs %.% source_conn) %>%
       dplyr::copy_to(fs %.% target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
       dplyr::collect() |>
-      mg_digest_to_checksum() |>
+      SCDB::digest_to_checksum() |>
       dplyr::pull("checksum") |>
       sort()
 
