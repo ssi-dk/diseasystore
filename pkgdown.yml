@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   google_covid_19_data: google_covid_19_data.html
   quick_start: quick_start.html
-last_built: 2023-09-01T07:56Z
+last_built: 2023-09-01T08:34Z
 urls:
   reference: https://rasmusskytte.github.io/diseasystore/reference
   article: https://rasmusskytte.github.io/diseasystore/articles

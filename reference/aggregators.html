@@ -72,7 +72,33 @@
 Name of the feature to perform the aggregation over</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
 
+<p>A dplyr::summarize to aggregate the features together using the given function (sum/max/min/count)</p>
+    </div>
+
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># Primarily used within the framework but can be used individually:</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">mtcars</span>, key_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>, .before <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu">key_join_sum</span><span class="op">(</span><span class="va">data</span>, <span class="st">"mpg"</span><span class="op">)</span>    <span class="co"># sum(mtcars$mpg)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 642.9</span>
+<span class="r-in"><span>  <span class="fu">key_join_max</span><span class="op">(</span><span class="va">data</span>, <span class="st">"mpg"</span><span class="op">)</span>    <span class="co"># max(mtcars$mpg)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 33.9</span>
+<span class="r-in"><span>  <span class="fu">key_join_min</span><span class="op">(</span><span class="va">data</span>, <span class="st">"mpg"</span><span class="op">)</span>    <span class="co"># min(mtcars$mpg)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 10.4</span>
+<span class="r-in"><span>  <span class="fu">key_join_count</span><span class="op">(</span><span class="va">data</span>, <span class="st">"mpg"</span><span class="op">)</span>  <span class="co"># nrow(mtcars)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 32</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

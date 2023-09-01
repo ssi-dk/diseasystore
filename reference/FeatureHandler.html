@@ -55,6 +55,14 @@ They define the three methods associated with features (<code>compute</code>, <c
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A new instance of the <code>FeatureHandler</code></p>
+<p></p>
+<p><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
+    </div>
+    <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
     <p></p><div class="r6-active-bindings"><dl><dt><code>compute</code></dt>
 <dd><p>(<code>function</code>)<br>
@@ -136,6 +144,46 @@ One of the aggregators from <code><a href="aggregators.html">aggregators()</a></
 
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># The FeatureHandler is typically configured as part of making a new Diseasystore.</span></span></span>
+<span class="r-in"><span>  <span class="co"># Most often, we need only specifiy `compute` and `key_join` to get a functioning FeatureHandler</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># In this example we use mtcars as the basis for our features</span></span></span>
+<span class="r-in"><span>  <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_connection.html" class="external-link">get_connection</a></span><span class="op">(</span>drv <span class="op">=</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># We use mtcars as our basis. First we add the rownames as an actual column</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">mtcars</span>, key_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>, .before <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Then we add some imaginary times where these cars were produced</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">data</span>,</span></span>
+<span class="r-in"><span>                        production_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                        production_end   <span class="op">=</span> <span class="va">production_start</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">365</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">conn</span>, <span class="va">data</span>, <span class="st">"mtcars"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># In this example, the feature we want is the "maximum miles per galon"</span></span></span>
+<span class="r-in"><span>  <span class="co"># The feature in question in the mtcars dataset is then "mpg" and when we need to reduce</span></span></span>
+<span class="r-in"><span>  <span class="co"># our data set, we want to use the "max()" function.</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># We first write a compute function for the mpg in our modified mtcars dataset</span></span></span>
+<span class="r-in"><span>  <span class="co"># Our goal is to get the mpg of all cars that were in production at the between start/end_date</span></span></span>
+<span class="r-in"><span>  <span class="va">compute_mpg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">start_date</span>, <span class="va">end_date</span>, <span class="va">slice_ts</span>, <span class="va">source_conn</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_table.html" class="external-link">get_table</a></span><span class="op">(</span><span class="va">source_conn</span>, <span class="st">"mtcars"</span>, slice_ts <span class="op">=</span> <span class="va">slice_ts</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">{</span><span class="op">{</span> <span class="va">start_date</span> <span class="op">}</span><span class="op">}</span> <span class="op">&lt;=</span> <span class="va">.data</span><span class="op">$</span><span class="va">production_end</span>,</span></span>
+<span class="r-in"><span>                    <span class="va">.data</span><span class="op">$</span><span class="va">production_start</span> <span class="op">&lt;=</span> <span class="op">{</span><span class="op">{</span> <span class="va">end_date</span> <span class="op">}</span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span><span class="st">"key_name"</span>, <span class="st">"mpg"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"valid_from"</span> <span class="op">=</span> <span class="st">"production_start"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"valid_until"</span> <span class="op">=</span> <span class="st">"production_end"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">out</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># We can now combine into our FeatureHandler</span></span></span>
+<span class="r-in"><span>  <span class="va">fh_max_mpg</span> <span class="op">&lt;-</span> <span class="va">FeatureHandler</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>compute <span class="op">=</span> <span class="va">compute_mpg</span>, key_join <span class="op">=</span> <span class="va">key_join_max</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
