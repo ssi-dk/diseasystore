@@ -9,6 +9,13 @@ diseasystore_exists(case_definition)
 \arguments{
 \item{case_definition}{case_definition (\code{character})\cr A character string that controls which feature store to get data from.}
 }
+\value{
+TRUE if the given case_definition can be matched to a diseasystore on the search path. FALSE otherwise.
+}
 \description{
 Check for the existence of a \code{diseasystore} for the case definition
+}
+\examples{
+  diseasystore_exists("Google COVID-19")  # TRUE
+  diseasystore_exists("Non existent diseasystore")  # FALSE
 }

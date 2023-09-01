@@ -2,6 +2,7 @@
 #' @param value The value attempted to be set
 #' @param expr  The expression to execute when called
 #' @param name  The name of the active binding
+#' @noRd
 active_binding <- function(value, expr, name) {
   if (missing(value)) {
     eval.parent(expr, n = 1)
@@ -13,6 +14,7 @@ active_binding <- function(value, expr, name) {
 
 #' Helper function to produce a "read only" error
 #' @param field The name of the field that is read only
+#' @noRd
 read_only_error <- function(field) {
   stop(glue::glue("`${field}` is read only"), call. = FALSE)
 }
@@ -22,6 +24,7 @@ read_only_error <- function(field) {
 #' @param ...  The normal input to cat
 #' @param file Path of an output file to append the output to
 #' @param sep The separator given to cat
+#' @noRd
 printr <- function(..., file = "/dev/null", sep = "") {
   sink(file = file, split = TRUE, append = TRUE, type = "output")
   cat(..., "\n", sep = sep)
@@ -70,6 +73,16 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
 #'   The name of the field to pick from `env`
 #' @return
 #'   Error if the `field` does not exist in `env`, otherwise it returns `field`
+#' @examples
+#'  t <- list(a = 1, b = 2)
+#'
+#'  t$a       # 1
+#'  t %.% a   # 1
+#'
+#'  t$c # NULL
+#'  \dontrun{
+#'  t %.% c # ERROR a not found in t
+#'  }
 #' @export
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))

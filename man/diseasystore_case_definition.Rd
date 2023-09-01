@@ -9,6 +9,12 @@ diseasystore_case_definition(case_definition)
 \arguments{
 \item{case_definition}{case_definition (\code{character})\cr A character string that controls which feature store to get data from.}
 }
+\value{
+The given case_definition formatted to match a Diseasystore
+}
 \description{
 Transform case definition to PascalCase
+}
+\examples{
+  diseasystore_case_definition("Google COVID-19")  # DiseasystoreGoogleCovid19
 }

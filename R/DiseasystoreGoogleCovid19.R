@@ -4,6 +4,12 @@
 #'   This `DiseasystoreGoogleCovid19` [R6][R6::R6Class] brings support for using the Google
 #'   Health COVID-19 Open Data repository.
 #'   See the vignette("google_covid_19_data") for details on how to configure the feature store
+#' @examples
+#'   ds <- DiseasystoreGoogleCovid19$new(source_conn = ".",
+#'                                       target_conn = DBI::dbConnect(RSQLite::SQLite()))
+#'
+#' @return
+#'   A new instance of the `DiseasystoreGoogleCovid19` [R6][R6::R6Class] class.
 #' @export
 DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
   classname = "DiseasystoreGoogleCovid19",

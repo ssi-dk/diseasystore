@@ -13,6 +13,14 @@ drop_diseasystore(pattern = ".*", schema = "ds", conn = SCDB::get_connection())
 
 \item{conn}{DB connection}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Drop feature stores from DB
+}
+\examples{
+  conn <- SCDB::get_connection(drv = RSQLite::SQLite())
+
+  drop_diseasystore(conn = conn)
 }

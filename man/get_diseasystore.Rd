@@ -9,6 +9,12 @@ get_diseasystore(case_definition)
 \arguments{
 \item{case_definition}{case_definition (\code{character})\cr A character string that controls which feature store to get data from.}
 }
+\value{
+The diseasystore generator for the diseasystore matching the given case_definition
+}
 \description{
 Get the \code{diseasystore} for the case definition
+}
+\examples{
+  ds <- get_diseasystore("Google COVID-19")  # Returns the DiseasystoreGoogleCovid19 generator
 }
