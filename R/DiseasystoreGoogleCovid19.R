@@ -199,7 +199,7 @@ google_covid_19_population_ <- function() {
 }
 
 
-google_covid_19_age_group_  <- function() {
+google_covid_19_age_group_ <- function() {
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
 
@@ -251,7 +251,7 @@ google_covid_19_age_group_  <- function() {
   )
 }
 
-google_covid_19_index_      <- function() {
+google_covid_19_index_ <- function() {
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()

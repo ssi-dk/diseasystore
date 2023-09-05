@@ -19,8 +19,8 @@ Language: en-GB
 Imports:
     checkmate,
     DBI,
-    dplyr,
     dbplyr,
+    dplyr,
     glue,
     lubridate,
     purrr,
