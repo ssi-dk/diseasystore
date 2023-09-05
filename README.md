@@ -23,5 +23,5 @@ You can install the development version of `diseasystore` from [GitHub](https://
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ssi-dk/diseasystore")
+devtools::install_github("ssi-dk/diseasystore") # Use "ssi-dk/diseasystore@*release" to install the latest release version
 ```
