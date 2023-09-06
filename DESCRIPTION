@@ -1,5 +1,5 @@
 Package: diseasystore
-Title: feature store handler for the diseasy framework
+Title: Feature Stores For The `diseasy` Framework
 Version: 0.1
 Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
@@ -19,8 +19,8 @@ Language: en-GB
 Imports:
     checkmate,
     DBI,
-    dplyr,
     dbplyr,
+    dplyr,
     glue,
     lubridate,
     purrr,
@@ -33,6 +33,7 @@ Imports:
     tidyselect,
     zoo
 Suggests:
+    devtools,
     knitr,
     rmarkdown,
     RSQLite,

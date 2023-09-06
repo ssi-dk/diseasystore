@@ -66,6 +66,40 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
 }
 
 
+#' Parse a connection option/object
+#' @param conn (`function` or `DBIConnection` or `character`)
+#' @param type (`character`)\cr
+#'   Either "source_conn" or "target_conn"
+#' @details
+#'   Evaluates given conn if is a function
+#' @noRd
+parse_diseasyconn <- function(conn, type = "source_conn") {
+  coll <- checkmate::makeAssertCollection()
+  checkmate::assert(
+    checkmate::check_function(conn, null.ok = TRUE),
+    checkmate::check_class(conn, "DBIConnection", null.ok = TRUE),
+    checkmate::check_character(conn, len = 1, null.ok = TRUE),
+    add = coll
+  )
+  checkmate::assert_choice(type, c("source_conn", "target_conn"), add = coll)
+  checkmate::reportAssertions(coll)
+
+  if (is.null(conn)) {
+    return(conn)
+  } else if (is.function(conn)) {
+    tryCatch(conn <- conn(),
+             error = \(e) stop("`conn` could not be parsed!"))
+    return(conn)
+  } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {
+    return(conn)
+  } else if (type == "source_conn") {
+    return(conn)
+  } else {
+    stop("`conn` could not be parsed!")
+  }
+}
+
+
 #' Existence aware pick operator
 #' @param env (`object`)\cr
 #'   The object or environment to attempt to pick from
