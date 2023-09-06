@@ -4,7 +4,7 @@
 \name{diseasystore-package}
 \alias{diseasystore}
 \alias{diseasystore-package}
-\title{diseasystore: feature store handler for the diseasy framework}
+\title{diseasystore: Feature Stores For The `diseasy` Framework}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
