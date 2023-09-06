@@ -51,3 +51,52 @@ test_that("%.% works", {
   expect_identical(d %.% .c, 4)
   expect_error(d %.% d, "d not found in d")
 })
+
+
+
+
+test_that("parse_diseasyconn works", {
+
+  # Define different types of conn
+  valid_function_conn <- \() DBI::dbConnect(RSQLite::SQLite())
+  invalid_function_conn <- mean
+
+  valid_str_conn <- "test_conn"
+
+  null_conn <- NULL
+
+  # Test inputs for source_conn
+  expect_no_condition(conn <- parse_diseasyconn(valid_function_conn, type = "source_conn"))
+  expect_class(conn, "DBIConnection")
+  DBI::dbDisconnect(conn)
+
+
+  expect_error(parse_diseasyconn(invalid_function_conn, type = "source_conn"),
+               class = "simpleError", regexp = "`conn` could not be parsed!")
+
+
+  expect_no_condition(conn <- parse_diseasyconn(valid_str_conn, type = "source_conn"))
+  expect_identical(conn, valid_str_conn)
+
+
+  expect_no_condition(conn <- parse_diseasyconn(null_conn, type = "source_conn"))
+  expect_null(conn)
+
+
+  # Test inputs for target_conn
+  expect_no_condition(conn <- parse_diseasyconn(valid_function_conn, type = "target_conn"))
+  expect_class(conn, "DBIConnection")
+  DBI::dbDisconnect(conn)
+
+
+  expect_error(parse_diseasyconn(invalid_function_conn, type = "target_conn"),
+               class = "simpleError", regexp = "`conn` could not be parsed!")
+
+
+  expect_error(parse_diseasyconn(valid_str_conn, type = "target_conn"),
+               class = "simpleError", regexp = "`conn` could not be parsed!")
+
+
+  expect_no_condition(conn <- parse_diseasyconn(null_conn, type = "target_conn"))
+  expect_null(conn)
+})
