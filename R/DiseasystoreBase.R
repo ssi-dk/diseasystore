@@ -138,8 +138,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Inform that we are computing features
       tic <- Sys.time()
       if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
-        cat(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
-                       "please wait..."))
+        message(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
+                           "please wait..."))
       }
 
       # Call the feature loader on the dates
@@ -186,8 +186,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Inform how long has elapsed for updating data
       if (private$verbose && nrow(fs_missing_ranges) > 0) {
-        cat(glue::glue("feature: {feature} updated ",
-                       "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
+        message(glue::glue("feature: {feature} updated ",
+                           "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
       }
 
       # Finally, return the data to the user
