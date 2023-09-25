@@ -12,7 +12,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
     stopifnot("Could not delete SQLite DB before tests" = file.remove(sqlite_path))
   }
 
-  target_conn <- \() dbConnect(RSQLite::SQLite(), sqlite_path)
+  target_conn <- \() DBI::dbConnect(RSQLite::SQLite(), sqlite_path)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 
 
@@ -111,9 +111,10 @@ test_that("DiseasystoreGoogleCovid19 works", {
   })
 
   # Attempt to perform the possible key_joins
-  available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
-  available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
-
+  available_observables  <- fs$available_features |>
+    purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
+  available_aggregations <- fs$available_features |>
+    purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
   key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date

@@ -224,16 +224,19 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                  end_date   = self %.% end_date) {
 
       # Validate input
+      available_observables  <- self$available_features |>
+        purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
+      available_aggregations <- self$available_features |>
+        purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
+
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(
-        observable, # nolint: identation_linter
-        purrr::keep(self$available_features, ~ startsWith(., "n_") | endsWith(., "_temperature")),
-        add = coll)
+      checkmate::assert_choice(observable, available_observables, add = coll)
       checkmate::assert(
-        checkmate::check_character(aggregation, null.ok = TRUE), # nolint: indentation_linter
+        checkmate::check_choice(aggregation, available_aggregations, null.ok = TRUE),
         checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
         checkmate::check_class(aggregation, "quosures", null.ok = TRUE),
-        add = coll)
+        add = coll
+      )
       checkmate::assert_date(start_date, add = coll)
       checkmate::assert_date(end_date, add = coll)
       checkmate::reportAssertions(coll)
@@ -261,7 +264,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (is.null(aggregation_features)) {
           err <- glue::glue("Aggregation variable not found. ",
                             "Available aggregation variables are: ",
-                            "{toString(fs_map[!startsWith(unlist(fs_map), 'n_')])}")
+                            "{toString(available_aggregations)}")
           private$lg$error(err)
           stop(err)
         }
@@ -273,8 +276,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           unname()
 
         # Check aggregation features are not observables
-        stopifnot("Aggregation features cannot be observables (must not start with 'n_')" =
-                    purrr::none(aggregation_names, ~ startsWith(., "n_")))
+        stopifnot("Aggregation features cannot be observables" =
+                    purrr::none(aggregation_names, ~ . %in% available_observables))
 
         # Fetch requested aggregation features from the feature store
         aggregation_data <- aggregation_features |>
