@@ -87,7 +87,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # then check that they match the expected value from the generators
   purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
     start_date <- as.Date("2020-04-01")
-    end_date   <- as.Date("2020-11-30")
+    end_date   <- as.Date("2021-01-31")
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect() |>
