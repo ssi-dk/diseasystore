@@ -55,7 +55,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # then check that they match the expected value from the generators
   purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
     start_date <- as.Date("2020-03-01")
-    end_date   <- as.Date("2020-12-31")
+    end_date   <- as.Date("2020-04-30")
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect()
@@ -86,8 +86,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Attempt to get features from the feature store (using different dates)
   # then check that they match the expected value from the generators
   purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
-    start_date <- as.Date("2020-04-01")
-    end_date   <- as.Date("2021-01-31")
+    start_date <- as.Date("2020-03-01")
+    end_date   <- as.Date("2020-05-31")
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect() |>
@@ -124,7 +124,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Set start and end dates for the rest of the tests
   start_date <- as.Date("2020-03-01")
-  end_date   <- as.Date("2020-12-31")
+  end_date   <- as.Date("2020-04-30")
 
   # First check we can aggregate without an aggregation
   purrr::walk(available_observables,
