@@ -153,6 +153,51 @@ test_that("DiseasystoreGoogleCovid19 works", {
       }
     })
 
+
+  # Test key_join with malformed inputs
+  expand.grid(observable  = available_observables,
+              aggregation = "non_existent_aggregation") |>
+    purrr::pwalk(~ {
+      # This code may fail (gracefully) in some cases. These we catch here
+      output <- tryCatch({
+        fs$key_join_features(observable = as.character(..1),
+                             aggregation = ..2,
+                             start_date, end_date)
+      }, error = function(e) {
+        checkmate::expect_character(e$message, pattern = "Must be element of set")
+        return(NULL)
+      })
+
+      # If the code does not fail, we test the output
+      if (!is.null(output)) {
+        key_join_features_tester(dplyr::collect(output), start_date, end_date)
+      }
+    })
+
+
+  expand.grid(observable  = available_observables,
+              aggregation = "test = non_existent_aggregation") |>
+    purrr::pwalk(~ {
+      # This code may fail (gracefully) in some cases. These we catch here
+      output <- tryCatch({
+        fs$key_join_features(observable = as.character(..1),
+                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                             start_date, end_date)
+      }, error = function(e) {
+        checkmate::expect_character(e$message,
+                                    pattern = glue::glue("Aggregation variable not found. ",
+                                                         "Available aggregation variables are: ",
+                                                         "{toString(available_aggregations)}"))
+        return(NULL)
+      })
+
+      # If the code does not fail, we test the output
+      if (!is.null(output)) {
+        key_join_features_tester(dplyr::collect(output), start_date, end_date)
+      }
+    })
+
+
   # Cleanup
   rm(fs)
 })
