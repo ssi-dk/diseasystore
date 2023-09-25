@@ -143,11 +143,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Call the feature loader on the dates
-      purrr::pwalk(fs_missing_ranges |> dplyr::mutate(r_id = dplyr::row_number()), ~ {
+      purrr::pwalk(fs_missing_ranges, ~ {
+
+        start_date <- ..1
+        end_date   <- ..2
 
         # Compute the feature for the date range
         fs_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
-                              args = list(start_date = ..1, end_date = ..2,
+                              args = list(start_date = start_date, end_date = end_date,
                                           slice_ts = slice_ts, source_conn = self %.% source_conn))
 
         # Check it table is copied to target DB
@@ -163,10 +166,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           if (SCDB::is.historical(fs_existing)) {
             fs_existing <- fs_existing |>
               dplyr::filter(.data$from_ts == slice_ts) |>
-              dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts")))
+              dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
+              dplyr::filter(.data$valid_until < start_date, .data$valid_from < end_date)
           }
 
-          fs_updated_feature <- dplyr::union(fs_existing, fs_feature)
+          fs_updated_feature <- dplyr::union_all(fs_existing, fs_feature) |> dplyr::compute()
         } else {
           fs_updated_feature <- fs_feature
         }
@@ -265,7 +269,6 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           err <- glue::glue("Aggregation variable not found. ",
                             "Available aggregation variables are: ",
                             "{toString(available_aggregations)}")
-          private$lg$error(err)
           stop(err)
         }
 
