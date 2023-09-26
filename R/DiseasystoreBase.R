@@ -125,7 +125,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       feature_loader <- names(fs_map[fs_map == feature])
 
       # Create log table
-      SCDB::create_logs_if_missing(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)
+      SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
+                                   conn = self %.% target_conn)
 
       # Determine which dates need to be computed
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
@@ -177,14 +178,17 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
         # Commit to DB
         capture.output({
-          SCDB::update_snapshot(.data = fs_updated_feature,
-                                conn = self %.% target_conn,
-                                db_table = target_table,
-                                timestamp = slice_ts,
-                                message = glue::glue("fs-range: {start_date} - {end_date}"),
-                                log_path = NULL, # no log file, but DB logging still enabled
-                                log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
-                                enforce_chronological_order = FALSE)
+          SCDB::update_snapshot(
+            .data = fs_updated_feature,
+            conn = self %.% target_conn,
+            db_table = target_table,
+            timestamp = slice_ts,
+            message = glue::glue("fs-range: {start_date} - {end_date}"),
+            logger = SCDB::Logger$new(output_to_console = FALSE,
+                                      log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
+                                      log_conn = self %.% target_conn),
+            enforce_chronological_order = FALSE
+          )
         })
       })
 
