@@ -53,13 +53,13 @@ test_that("%.% works", {
 })
 
 
-
-
 test_that("parse_diseasyconn works", {
 
   # Define different types of conn
   valid_function_conn <- \() DBI::dbConnect(RSQLite::SQLite())
   invalid_function_conn <- mean
+
+  valid_dbi_conn <- valid_function_conn()
 
   valid_str_conn <- "test_conn"
 
@@ -74,6 +74,9 @@ test_that("parse_diseasyconn works", {
   expect_error(parse_diseasyconn(invalid_function_conn, type = "source_conn"),
                class = "simpleError", regexp = "`conn` could not be parsed!")
 
+
+  expect_no_condition(conn <- parse_diseasyconn(valid_dbi_conn, type = "source_conn"))
+  expect_identical(conn, valid_dbi_conn)
 
   expect_no_condition(conn <- parse_diseasyconn(valid_str_conn, type = "source_conn"))
   expect_identical(conn, valid_str_conn)
@@ -91,6 +94,10 @@ test_that("parse_diseasyconn works", {
 
   expect_error(parse_diseasyconn(invalid_function_conn, type = "target_conn"),
                class = "simpleError", regexp = "`conn` could not be parsed!")
+
+
+  expect_no_condition(conn <- parse_diseasyconn(valid_dbi_conn, type = "target_conn"))
+  expect_identical(conn, valid_dbi_conn)
 
 
   expect_error(parse_diseasyconn(valid_str_conn, type = "target_conn"),

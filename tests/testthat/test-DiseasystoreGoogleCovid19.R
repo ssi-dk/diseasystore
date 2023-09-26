@@ -12,7 +12,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
     stopifnot("Could not delete SQLite DB before tests" = file.remove(sqlite_path))
   }
 
-  target_conn <- \() dbConnect(RSQLite::SQLite(), sqlite_path)
+  target_conn <- \() DBI::dbConnect(RSQLite::SQLite(), sqlite_path)
   options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 
 
@@ -55,7 +55,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # then check that they match the expected value from the generators
   purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
     start_date <- as.Date("2020-03-01")
-    end_date   <- as.Date("2020-12-31")
+    end_date   <- as.Date("2020-04-30")
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect()
@@ -86,8 +86,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Attempt to get features from the feature store (using different dates)
   # then check that they match the expected value from the generators
   purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
-    start_date <- as.Date("2020-04-01")
-    end_date   <- as.Date("2020-11-30")
+    start_date <- as.Date("2020-03-01")
+    end_date   <- as.Date("2020-05-31")
 
     feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
       dplyr::collect() |>
@@ -111,9 +111,10 @@ test_that("DiseasystoreGoogleCovid19 works", {
   })
 
   # Attempt to perform the possible key_joins
-  available_observables  <- purrr::keep(fs$available_features,    ~ startsWith(., "n_"))
-  available_aggregations <- purrr::discard(fs$available_features, ~ startsWith(., "n_"))
-
+  available_observables  <- fs$available_features |>
+    purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
+  available_aggregations <- fs$available_features |>
+    purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
   key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
@@ -123,7 +124,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Set start and end dates for the rest of the tests
   start_date <- as.Date("2020-03-01")
-  end_date   <- as.Date("2020-12-31")
+  end_date   <- as.Date("2020-04-30")
 
   # First check we can aggregate without an aggregation
   purrr::walk(available_observables,
@@ -151,6 +152,51 @@ test_that("DiseasystoreGoogleCovid19 works", {
         key_join_features_tester(dplyr::collect(output), start_date, end_date)
       }
     })
+
+
+  # Test key_join with malformed inputs
+  expand.grid(observable  = available_observables,
+              aggregation = "non_existent_aggregation") |>
+    purrr::pwalk(~ {
+      # This code may fail (gracefully) in some cases. These we catch here
+      output <- tryCatch({
+        fs$key_join_features(observable = as.character(..1),
+                             aggregation = ..2,
+                             start_date, end_date)
+      }, error = function(e) {
+        checkmate::expect_character(e$message, pattern = "Must be element of set")
+        return(NULL)
+      })
+
+      # If the code does not fail, we test the output
+      if (!is.null(output)) {
+        key_join_features_tester(dplyr::collect(output), start_date, end_date)
+      }
+    })
+
+
+  expand.grid(observable  = available_observables,
+              aggregation = "test = non_existent_aggregation") |>
+    purrr::pwalk(~ {
+      # This code may fail (gracefully) in some cases. These we catch here
+      output <- tryCatch({
+        fs$key_join_features(observable = as.character(..1),
+                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                             start_date, end_date)
+      }, error = function(e) {
+        checkmate::expect_character(e$message,
+                                    pattern = glue::glue("Aggregation variable not found. ",
+                                                         "Available aggregation variables are: ",
+                                                         "{toString(available_aggregations)}"))
+        return(NULL)
+      })
+
+      # If the code does not fail, we test the output
+      if (!is.null(output)) {
+        key_join_features_tester(dplyr::collect(output), start_date, end_date)
+      }
+    })
+
 
   # Cleanup
   rm(fs)

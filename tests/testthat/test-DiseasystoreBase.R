@@ -35,27 +35,37 @@ test_that("DiseasystoreBase works", {
   rm(fs)
 
   # 7)
+  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(),
+                             start_date = as.Date("2020-03-01"),
+                             end_date   = as.Date("2020-06-01"),
+                             slice_ts   = "2021-01-01 09:00:00")
+  expect_identical(fs %.% start_date, as.Date("2020-03-01"))
+  expect_identical(fs %.% end_date,   as.Date("2020-06-01"))
+  expect_identical(fs %.% slice_ts,   "2021-01-01 09:00:00")
+  rm(fs)
+
+  # 8)
   fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
   expect_identical(fs %.% target_schema, "ds")
   rm(fs)
 
-  # 8)
+  # 9)
   fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
   expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
-  # 9)
+  # 10)
   options(diseasystore.target_schema = "test")
   fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
   expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
-  # 10)
+  # 11)
   fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
   expect_identical(fs %.% target_schema, "test")
   rm(fs)
 
-  # 11)
+  # 12)
   fs <- DiseasystoreBase$new(target_conn = dbplyr::simulate_dbi())
   expect_identical(fs %.% target_conn, fs %.% source_conn)
   rm(fs)

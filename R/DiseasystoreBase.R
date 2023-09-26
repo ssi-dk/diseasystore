@@ -138,16 +138,19 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Inform that we are computing features
       tic <- Sys.time()
       if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
-        cat(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
-                       "please wait..."))
+        message(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
+                           "please wait..."))
       }
 
       # Call the feature loader on the dates
-      purrr::pwalk(fs_missing_ranges |> dplyr::mutate(r_id = dplyr::row_number()), ~ {
+      purrr::pwalk(fs_missing_ranges, ~ {
+
+        start_date <- ..1
+        end_date   <- ..2
 
         # Compute the feature for the date range
         fs_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
-                              args = list(start_date = ..1, end_date = ..2,
+                              args = list(start_date = start_date, end_date = end_date,
                                           slice_ts = slice_ts, source_conn = self %.% source_conn))
 
         # Check it table is copied to target DB
@@ -163,10 +166,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           if (SCDB::is.historical(fs_existing)) {
             fs_existing <- fs_existing |>
               dplyr::filter(.data$from_ts == slice_ts) |>
-              dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts")))
+              dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
+              dplyr::filter(.data$valid_until < start_date, .data$valid_from < end_date)
           }
 
-          fs_updated_feature <- dplyr::union(fs_existing, fs_feature)
+          fs_updated_feature <- dplyr::union_all(fs_existing, fs_feature) |> dplyr::compute()
         } else {
           fs_updated_feature <- fs_feature
         }
@@ -186,8 +190,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Inform how long has elapsed for updating data
       if (private$verbose && nrow(fs_missing_ranges) > 0) {
-        cat(glue::glue("feature: {feature} updated ",
-                       "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
+        message(glue::glue("feature: {feature} updated ",
+                           "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
       }
 
       # Finally, return the data to the user
@@ -224,16 +228,19 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                  end_date   = self %.% end_date) {
 
       # Validate input
+      available_observables  <- self$available_features |>
+        purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
+      available_aggregations <- self$available_features |>
+        purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
+
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(
-        observable, # nolint: identation_linter
-        purrr::keep(self$available_features, ~ startsWith(., "n_") | endsWith(., "_temperature")),
-        add = coll)
+      checkmate::assert_choice(observable, available_observables, add = coll)
       checkmate::assert(
-        checkmate::check_character(aggregation, null.ok = TRUE), # nolint: indentation_linter
+        checkmate::check_choice(aggregation, available_aggregations, null.ok = TRUE),
         checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
         checkmate::check_class(aggregation, "quosures", null.ok = TRUE),
-        add = coll)
+        add = coll
+      )
       checkmate::assert_date(start_date, add = coll)
       checkmate::assert_date(end_date, add = coll)
       checkmate::reportAssertions(coll)
@@ -261,8 +268,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (is.null(aggregation_features)) {
           err <- glue::glue("Aggregation variable not found. ",
                             "Available aggregation variables are: ",
-                            "{toString(fs_map[!startsWith(unlist(fs_map), 'n_')])}")
-          private$lg$error(err)
+                            "{toString(available_aggregations)}")
           stop(err)
         }
 
@@ -273,8 +279,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           unname()
 
         # Check aggregation features are not observables
-        stopifnot("Aggregation features cannot be observables (must not start with 'n_')" =
-                    purrr::none(aggregation_names, ~ startsWith(., "n_")))
+        stopifnot("Aggregation features cannot be observables" =
+                    purrr::none(aggregation_names, ~ . %in% available_observables))
 
         # Fetch requested aggregation features from the feature store
         aggregation_data <- aggregation_features |>
