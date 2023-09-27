@@ -183,7 +183,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
             conn = self %.% target_conn,
             db_table = target_table,
             timestamp = slice_ts,
-            message = glue::glue("fs-range: {start_date} - {end_date}"),
+            message = glue::glue("ds-range: {start_date} - {end_date}"),
             logger = SCDB::Logger$new(output_to_console = FALSE,
                                       log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
                                       log_conn = self %.% target_conn),
@@ -547,7 +547,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Determine the date ranges used
       logs <- logs |>
-        dplyr::mutate(fs_start_date = stringr::str_extract(message, "(?<=fs-range: )([0-9]{4}-[0-9]{2}-[0-9]{2})"),
+        dplyr::mutate(fs_start_date = stringr::str_extract(message, "(?<=ds-range: )([0-9]{4}-[0-9]{2}-[0-9]{2})"),
                       fs_end_date   = stringr::str_extract(message, "([0-9]{4}-[0-9]{2}-[0-9]{2})$")) |>
         dplyr::mutate(across(.cols = c("fs_start_date", "fs_end_date"), .fns = as.Date))
 
@@ -624,6 +624,6 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 rlang::on_load({
   options("diseasystore.source_conn" = "")
   options("diseasystore.target_conn" = "")
-  options("diseasystore.target_schema" = "")
+  options("diseasystore.target_schema" = "ds")
   options("diseasystore.verbose" = TRUE)
 })

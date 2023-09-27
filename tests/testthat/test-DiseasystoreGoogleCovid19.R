@@ -1,217 +1,208 @@
 test_that("DiseasystoreGoogleCovid19 works", {
 
-  # Check we can use the Google API directly
-  if (curl::has_internet()) {
-    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
-      target_conn = DBI::dbConnect(RSQLite::SQLite()),
-      start_date = as.Date("2020-03-01"),
-      end_date = as.Date("2020-03-01"),
-      verbose = FALSE
-    ))
-
-    ds$available_features |>
-      purrr::walk(~ expect_no_error(ds$get_feature(.)))
-  }
-
-
-  # Then we create a temporary directory for the Google COVID-19 data
-  remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
-
-  tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
-  options(diseasystore.DiseasystoreGoogleCovid19.source_conn = tmp_dir)
-
-  sqlite_path <- file.path(tmp_dir, "diseasystore_google_covid_19.sqlite")
-  if (file.exists(sqlite_path)) {
-    closeAllConnections()
-    stopifnot("Could not delete SQLite DB before tests" = file.remove(sqlite_path))
-  }
-
-  target_conn <- \() DBI::dbConnect(RSQLite::SQLite(), sqlite_path)
-  options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
-
-
-  # Then we download the first n rows of each data set of interest
+  # We assume the data is made available to us in a "testdata" folder
+  # If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
   google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-  purrr::walk(google_files, ~ {
-      readr::read_csv(paste0(remote_conn, .), n_max = 1000, show_col_types = FALSE, progress = FALSE) |> # nolint: indentation_linter
-      readr::write_csv(file.path(tmp_dir, .))
-  })
+  local_conn <- "testdata"
 
-  # Initialize without start_date and end_date
-  expect_no_error(fs <- DiseasystoreGoogleCovid19$new(verbose = FALSE))
+  # Check that the files are available
+  test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
 
-  # Check feature store has been created
-  checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
-  expect_equal(fs %.% case_definition, "Google COVID-19")
+  if (test_data_missing && curl::has_internet()) {
+
+    # Ensure download folder exists
+    if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
+
+    # Then we download the first n rows of each data set of interest
+    remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
+    purrr::walk(google_files, \(file) {
+      paste0(remote_conn, file) |>
+        readr::read_csv(n_max = 100, show_col_types = FALSE, progress = FALSE) |>
+        readr::write_csv(file.path(local_conn, file))
+    })
+  }
+
+  # Check that the files are available after attempting to download
+  if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
+    stop("DiseasystoreGoogleCovid19: test data not available and could not be downloaded")
+  }
+
+  # Configure the location of the data
+  options(diseasystore.DiseasystoreGoogleCovid19.source_conn = local_conn)
+
+  # Test the diseasystore on the available backends
+  for (conn in get_test_conns()) {
+
+    # Set the current conn to be used
+    options(diseasystore.DiseasystoreGoogleCovid19.target_conn = conn)
+
+    # Initialize without start_date and end_date
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE))
+
+    # Check feature store has been created
+    checkmate::expect_class(ds, "DiseasystoreGoogleCovid19")
+    expect_equal(ds %.% case_definition, "Google COVID-19")
+
+    # Check all FeatureHandlers have been initialized
+    private <- ds$.__enclos_env__$private
+    feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
+      purrr::map(~ purrr::pluck(private, .))
+
+    purrr::walk(feature_handlers, ~ {
+      checkmate::expect_class(.x, "FeatureHandler")
+      checkmate::expect_function(.x %.% compute)
+      checkmate::expect_function(.x %.% get)
+      checkmate::expect_function(.x %.% key_join)
+    })
+
+    # Attempt to get features from the feature store
+    # then check that they match the expected value from the generators
+    purrr::walk2(ds$available_features, names(ds$fs_map), ~ {
+      start_date <- as.Date("2020-03-01")
+      end_date   <- as.Date("2020-04-30")
+
+      feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        dplyr::collect()
+
+      feature_checksum <- feature |>
+        SCDB::digest_to_checksum() |>
+        dplyr::pull("checksum") |>
+        sort()
+
+      reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+
+      reference <- reference_generator(start_date  = start_date,
+                                       end_date    = end_date,
+                                       slice_ts    = ds %.% slice_ts,
+                                       source_conn = ds %.% source_conn) %>%
+        dplyr::copy_to(ds %.% target_conn, ., overwrite = TRUE) |>
+        dplyr::collect()
+
+      reference_checksum <- reference |>
+        SCDB::digest_to_checksum() |>
+        dplyr::pull("checksum") |>
+        sort()
+
+      expect_identical(feature_checksum, reference_checksum)
+    })
 
 
-  # SCDB v0.1 gives a warning if database has no tables when used. We suppress this warning here
-  # if this warning is no longer cast, remove this test
-  expect_warning(SCDB::get_tables(fs$target_conn),
-                 "No tables found. Check user privileges / database configuration")
-  dplyr::copy_to(fs$target_conn, mtcars)
-  expect_no_warning(SCDB::get_tables(fs$target_conn))
+    # Attempt to get features from the feature store (using different dates)
+    # then check that they match the expected value from the generators
+    purrr::walk2(ds$available_features, names(ds$fs_map), ~ {
+      start_date <- as.Date("2020-03-01")
+      end_date   <- as.Date("2020-05-31")
 
+      feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        dplyr::collect() |>
+        SCDB::digest_to_checksum() |>
+        dplyr::pull("checksum") |>
+        sort()
 
-  # Check all FeatureHandlers have been initialized
-  private <- fs$.__enclos_env__$private
-  feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
-    purrr::map(~ purrr::pluck(private, .))
+      reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
 
-  purrr::walk(feature_handlers, ~ {
-    checkmate::expect_class(.x, "FeatureHandler")
-    checkmate::expect_function(.x %.% compute)
-    checkmate::expect_function(.x %.% get)
-    checkmate::expect_function(.x %.% key_join)
-  })
+      reference <- reference_generator(start_date  = start_date,
+                                       end_date    = end_date,
+                                       slice_ts    = ds %.% slice_ts,
+                                       source_conn = ds %.% source_conn) %>%
+        dplyr::copy_to(ds %.% target_conn, ., name = "ds_tmp", overwrite = TRUE) |>
+        dplyr::collect() |>
+        SCDB::digest_to_checksum() |>
+        dplyr::pull("checksum") |>
+        sort()
 
-  # Attempt to get features from the feature store
-  # then check that they match the expected value from the generators
-  purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
+      expect_identical(feature, reference)
+    })
+
+    # Attempt to perform the possible key_joins
+    available_observables  <- ds$available_features |>
+      purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
+    available_aggregations <- ds$available_features |>
+      purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
+
+    key_join_features_tester <- function(output, start_date, end_date) {
+      # The output dates should match start and end date
+      testthat::expect_true(min(output$date) == start_date)
+      testthat::expect_true(max(output$date) == end_date)
+    }
+
+    # Set start and end dates for the rest of the tests
     start_date <- as.Date("2020-03-01")
     end_date   <- as.Date("2020-04-30")
 
-    feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
-      dplyr::collect()
+    # First check we can aggregate without an aggregation
+    purrr::walk(available_observables,
+                ~ expect_no_error(ds$key_join_features(observable = as.character(.),
+                                                       aggregation = NULL,
+                                                       start_date, end_date)))
 
-    feature_checksum <- feature |>
-      SCDB::digest_to_checksum() |>
-      dplyr::pull("checksum") |>
-      sort()
+    # Then test combinations with non-NULL aggregations
+    expand.grid(observable  = available_observables,
+                aggregation = available_aggregations) |>
+      purrr::pwalk(~ {
+        # This code may fail (gracefully) in some cases. These we catch here
+        output <- tryCatch({
+          ds$key_join_features(observable = as.character(..1),
+                               aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                               start_date, end_date)
+        }, error = function(e) {
+          expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
+                                        "Not implemented yet."))
+          return(NULL)
+        })
 
-    reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
-
-    reference <- reference_generator(start_date  = start_date,
-                                     end_date    = end_date,
-                                     slice_ts    = fs %.% slice_ts,
-                                     source_conn = fs %.% source_conn) %>%
-      dplyr::copy_to(fs %.% target_conn, ., overwrite = TRUE) |>
-      dplyr::collect()
-
-    reference_checksum <- reference |>
-      SCDB::digest_to_checksum() |>
-      dplyr::pull("checksum") |>
-      sort()
-
-    expect_identical(feature_checksum, reference_checksum)
-  })
+        # If the code does not fail, we test the output
+        if (!is.null(output)) {
+          key_join_features_tester(dplyr::collect(output), start_date, end_date)
+        }
+      })
 
 
-  # Attempt to get features from the feature store (using different dates)
-  # then check that they match the expected value from the generators
-  purrr::walk2(fs$available_features, names(fs$fs_map), ~ {
-    start_date <- as.Date("2020-03-01")
-    end_date   <- as.Date("2020-05-31")
+    # Test key_join with malformed inputs
+    expand.grid(observable  = available_observables,
+                aggregation = "non_existent_aggregation") |>
+      purrr::pwalk(~ {
+        # This code may fail (gracefully) in some cases. These we catch here
+        output <- tryCatch({
+          ds$key_join_features(observable = as.character(..1),
+                               aggregation = ..2,
+                               start_date, end_date)
+        }, error = function(e) {
+          checkmate::expect_character(e$message, pattern = "Must be element of set")
+          return(NULL)
+        })
 
-    feature <- fs$get_feature(.x, start_date = start_date, end_date = end_date) |>
-      dplyr::collect() |>
-      SCDB::digest_to_checksum() |>
-      dplyr::pull("checksum") |>
-      sort()
+        # If the code does not fail, we test the output
+        if (!is.null(output)) {
+          key_join_features_tester(dplyr::collect(output), start_date, end_date)
+        }
+      })
 
-    reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
 
-    reference <- reference_generator(start_date  = start_date,
-                                     end_date    = end_date,
-                                     slice_ts    = fs %.% slice_ts,
-                                     source_conn = fs %.% source_conn) %>%
-      dplyr::copy_to(fs %.% target_conn, ., name = "fs_tmp", overwrite = TRUE) |>
-      dplyr::collect() |>
-      SCDB::digest_to_checksum() |>
-      dplyr::pull("checksum") |>
-      sort()
+    expand.grid(observable  = available_observables,
+                aggregation = "test = non_existent_aggregation") |>
+      purrr::pwalk(~ {
+        # This code may fail (gracefully) in some cases. These we catch here
+        output <- tryCatch({
+          ds$key_join_features(observable = as.character(..1),
+                               aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                               start_date, end_date)
+        }, error = function(e) {
+          checkmate::expect_character(e$message,
+                                      pattern = glue::glue("Aggregation variable not found. ",
+                                                           "Available aggregation variables are: ",
+                                                           "{toString(available_aggregations)}"))
+          return(NULL)
+        })
 
-    expect_identical(feature, reference)
-  })
+        # If the code does not fail, we test the output
+        if (!is.null(output)) {
+          key_join_features_tester(dplyr::collect(output), start_date, end_date)
+        }
+      })
 
-  # Attempt to perform the possible key_joins
-  available_observables  <- fs$available_features |>
-    purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-  available_aggregations <- fs$available_features |>
-    purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
-  key_join_features_tester <- function(output, start_date, end_date) {
-    # The output dates should match start and end date
-    expect_true(min(output$date) == start_date)
-    expect_true(max(output$date) == end_date)
+    # Cleanup
+    rm(ds)
   }
-
-  # Set start and end dates for the rest of the tests
-  start_date <- as.Date("2020-03-01")
-  end_date   <- as.Date("2020-04-30")
-
-  # First check we can aggregate without an aggregation
-  purrr::walk(available_observables,
-              ~ expect_no_error(fs$key_join_features(observable = as.character(.),
-                                                     aggregation = NULL,
-                                                     start_date, end_date)))
-
-  # Then test combinations with non-NULL aggregations
-  expand.grid(observable  = available_observables,
-              aggregation = available_aggregations) |>
-    purrr::pwalk(~ {
-      # This code may fail (gracefully) in some cases. These we catch here
-      output <- tryCatch({
-        fs$key_join_features(observable = as.character(..1),
-                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
-                             start_date, end_date)
-      }, error = function(e) {
-        expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
-                                      "Not implemented yet."))
-        return(NULL)
-      })
-
-      # If the code does not fail, we test the output
-      if (!is.null(output)) {
-        key_join_features_tester(dplyr::collect(output), start_date, end_date)
-      }
-    })
-
-
-  # Test key_join with malformed inputs
-  expand.grid(observable  = available_observables,
-              aggregation = "non_existent_aggregation") |>
-    purrr::pwalk(~ {
-      # This code may fail (gracefully) in some cases. These we catch here
-      output <- tryCatch({
-        fs$key_join_features(observable = as.character(..1),
-                             aggregation = ..2,
-                             start_date, end_date)
-      }, error = function(e) {
-        checkmate::expect_character(e$message, pattern = "Must be element of set")
-        return(NULL)
-      })
-
-      # If the code does not fail, we test the output
-      if (!is.null(output)) {
-        key_join_features_tester(dplyr::collect(output), start_date, end_date)
-      }
-    })
-
-
-  expand.grid(observable  = available_observables,
-              aggregation = "test = non_existent_aggregation") |>
-    purrr::pwalk(~ {
-      # This code may fail (gracefully) in some cases. These we catch here
-      output <- tryCatch({
-        fs$key_join_features(observable = as.character(..1),
-                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
-                             start_date, end_date)
-      }, error = function(e) {
-        checkmate::expect_character(e$message,
-                                    pattern = glue::glue("Aggregation variable not found. ",
-                                                         "Available aggregation variables are: ",
-                                                         "{toString(available_aggregations)}"))
-        return(NULL)
-      })
-
-      # If the code does not fail, we test the output
-      if (!is.null(output)) {
-        key_join_features_tester(dplyr::collect(output), start_date, end_date)
-      }
-    })
-
-
-  # Cleanup
-  rm(fs)
 })
