@@ -96,7 +96,7 @@ truncate_interlace <- function(primary, secondary = NULL) {
       if (length(common_keys) == 0) stop("No common keys found to interlace by!")
 
       # We then join the tables by these keys and truncate the secondary table to validity range of the primary
-      dplyr::left_join(x = primary, y = ., suffix = c("", ".y"), by = common_keys) |>
+      dplyr::left_join(x = primary, y = .x, suffix = c("", ".y"), by = common_keys) |>
         dplyr::filter((.data$valid_from  < .data$valid_until.y) |   # Keep secondary records
                         is.na(.data$valid_until.y),                 # that is within validity
                       (.data$valid_until > .data$valid_from.y)  |   # of the primary data.
