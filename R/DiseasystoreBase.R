@@ -319,6 +319,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine the keys
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
 
+      # Give warning if aggregation features are already in the observables data
+      existing_stratification <- intersect(names(observable_data), aggregation_features)
+      if (length(existing_stratification) > 0) {
+        warning("observable already stratified by: ", toString(existing_stratification), ". ",
+                "Output might be inconsistent.")
+      }
+
       # Map aggregation_data to observable_keys (if not already)
       if (!is.null(aggregation_data)) {
         aggregation_keys <- purrr::map(aggregation_data, ~ colnames(dplyr::select(., tidyselect::starts_with("key_"))))
