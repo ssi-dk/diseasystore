@@ -55,7 +55,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
 #'   A new instance of the `DiseasystoreGoogleCovid19` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
+DiseasystoreGoogleCovid19 <- R6::R6Class(                                                                               # nolint: object_name_linter.
   classname = "DiseasystoreGoogleCovid19",
   inherit = DiseasystoreBase,
 

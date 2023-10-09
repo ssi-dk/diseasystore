@@ -14,7 +14,7 @@
 #'   A new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
+DiseasystoreBase <- R6::R6Class(                                                                                        # nolint: object_name_linter
   classname = "DiseasystoreBase",
 
   public = list(
@@ -438,9 +438,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   A list that maps features known by the feature store to the corresponding feature handlers
     #'   that compute the features. Read only.
     ds_map = purrr::partial(
-      .f = active_binding, # nolint start: indentation_linter
+      .f = active_binding,                                                                                              # nolint start: indentation_linter
       name = "ds_map",
-      expr = {  # nolint: indentation_linter
+      expr = {
 
         # If the class is "DiseasystoreBase", we break the iteration, otherwise we recursively iterate deeper
         if (!exists("super")) {
@@ -448,13 +448,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         } else {
           return(c(super$.ds_map, private %.% .ds_map))
         }
-      }), # nolint end
+      }),                                                                                                               # nolint end
 
 
     #' @field available_features (`character`)\cr
     #'   A list of available features in the feature store. Read only.
     available_features = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "available_features",
       expr = return(names(self$ds_map))),
 
@@ -462,14 +462,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @field label (`character`)\cr
     #'   A human readable label of the feature store. Read only.
     label = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "label",
       expr = return(private$.label)),
 
 
     #' @field source_conn `r rd_source_conn("field")`
     source_conn = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "source_conn",
       expr = {
         if (!is.null(private$.source_conn)) {
@@ -482,35 +482,35 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
     #' @field target_conn `r rd_target_conn("field")`
     target_conn = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "target_conn",
       expr = return(private$.target_conn)),
 
 
     #' @field target_schema `r rd_target_schema("field")`
     target_schema = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "target_schema",
       expr = return(private$.target_schema)),
 
 
     #' @field start_date `r rd_start_date("field")`
     start_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "start_date",
       expr = return(private$.start_date)),
 
 
     #' @field end_date `r rd_end_date("field")`
     end_date = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "end_date",
       expr = return(private$.end_date)),
 
 
     #' @field slice_ts `r rd_slice_ts("field")`
     slice_ts = purrr::partial(
-      .f = active_binding, # nolint: indentation_linter
+      .f = active_binding,                                                                                              # nolint: indentation_linter
       name = "slice_ts",
       expr = return(private$.slice_ts))
   ),
