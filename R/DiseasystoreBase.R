@@ -51,16 +51,15 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Set the internal paths
       if (is.null(source_conn)) {
-        private$.source_conn <- parse_diseasyconn(diseasyoption("source_conn", self))
-      } else {
-        private$.source_conn <- source_conn
+        source_conn <- diseasyoption("source_conn", self)
       }
+      private$.source_conn <- parse_diseasyconn(source_conn)
+
 
       if (is.null(target_conn)) {
-        private$.target_conn <- parse_diseasyconn(diseasyoption("target_conn", self))
-      } else {
-        private$.target_conn <- target_conn
+        target_conn <- diseasyoption("target_conn", self)
       }
+      private$.target_conn <- parse_diseasyconn(target_conn)
 
 
       # Check source and target conn has been set correctly
