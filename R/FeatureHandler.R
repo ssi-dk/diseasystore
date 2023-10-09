@@ -43,7 +43,7 @@
 #' @return
 #'   A new instance of the `FeatureHandler` [R6][R6::R6Class] class.
 #' @export
-FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
+FeatureHandler <- R6::R6Class(                                                                                          # nolint: object_name_linter
   classname = "FeatureHandler",
 
   public = list(

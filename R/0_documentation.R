@@ -56,7 +56,7 @@ rd_end_date <- function(type = "param") {
 }
 
 
-rd_.data <- function(type = "param") { # nolint: object_name_linter
+rd_.data <- function(type = "param") {                                                                                  # nolint: object_name_linter
   checkmate::assert_choice(type, c("param", "field"))
   paste(".data\\cr",
         "The data object to perform the operation on",

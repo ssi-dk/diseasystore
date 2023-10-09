@@ -11,7 +11,7 @@
 #' @return
 #'   A new instance of the `DiseasystoreGoogleCovid19` [R6][R6::R6Class] class.
 #' @export
-DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
+DiseasystoreGoogleCovid19 <- R6::R6Class(                                                                               # nolint: object_name_linter
   classname = "DiseasystoreGoogleCovid19",
   inherit = DiseasystoreBase,
 
@@ -283,7 +283,7 @@ google_covid_19_index_ <- function() {
   )
 }
 
-google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
+google_covid_19_min_temperature_ <- function() {                                                                        # nolint: object_length_linter
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()
@@ -306,7 +306,7 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
   )
 }
 
-google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
+google_covid_19_max_temperature_ <- function() {                                                                        # nolint: object_length_linter
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()
