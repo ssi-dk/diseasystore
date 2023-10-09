@@ -51,7 +51,6 @@ jobs:
             any::testthat
             any::knitr
             any::rmarkdown
-            github::r-dbi/RSQLite
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
