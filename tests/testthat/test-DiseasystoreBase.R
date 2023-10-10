@@ -9,9 +9,9 @@ test_that("DiseasystoreBase works", {
   expect_error(DiseasystoreBase$new(source_conn = "/some/path"), regexp = "target_conn option not defined")
 
   # 3)
-  options(diseasystore.source_conn = "/some/path")
+  options("diseasystore.source_conn" = "/some/path")
   expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
-  options(diseasystore.source_conn = NULL)
+  options("diseasystore.source_conn" = NULL)
 
   # 4)
   fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())

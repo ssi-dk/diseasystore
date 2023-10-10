@@ -1,4 +1,4 @@
-test_that("Code contains no non-ascii characters", {
+test_that("Code contains no non-ASCII characters", {
   pkg_dir <- stringr::str_remove(getwd(), "/tests/testthat")
 
   r_files  <- list.files(path = file.path(pkg_dir, "R"),   pattern = r"{\.[Rr]$}",     full.names = TRUE)
@@ -9,9 +9,11 @@ test_that("Code contains no non-ascii characters", {
 
   for (file in files_to_check) {
     lines <- readLines(file, warn = FALSE)
-    has_non_ascii <- any(grepl(r"{[^\x00-\x7f]}", lines, perl = TRUE))
+    has_non_ascii <- purrr::some(lines, ~ stringr::str_detect(., r"{[^\x00-\x7f]}"))
     if (has_non_ascii) {
-      print(grepl(r"{[^\x00-\x7f]}", lines, perl = TRUE))
+      purrr::keep(lines, ~ stringr::str_detect(., r"{[^\x00-\x7f]}")) |>
+        purrr::map(~ stringr::str_extract(., r"{[^\x00-\x7f]}")) |>
+        purrr::walk(print)
     }
     expect_false(has_non_ascii, label = paste("File:", file))
   }
