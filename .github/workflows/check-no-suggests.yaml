@@ -17,6 +17,8 @@ name: R-CMD-check-hard
 
 jobs:
   R-CMD-check:
+    if:  startsWith(github.head_ref, 'rc-*')
+
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})

@@ -13,6 +13,8 @@ name: pkgdown
 
 jobs:
   pkgdown:
+    if:  startsWith(github.head_ref, 'rc-*')
+
     runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:

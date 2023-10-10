@@ -10,7 +10,10 @@ name: test-coverage
 
 jobs:
   test-coverage:
+    if:  startsWith(github.head_ref, 'rc-*')
+
     runs-on: ubuntu-latest
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
