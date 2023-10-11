@@ -431,7 +431,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (!is.null(fs_specific)) {
 
           # We need to transform case definition to snake case
-          diseasystore <- self$diseasystore_label |>
+          diseasystore <- self$label |>
             stringr::str_to_lower() |>
             stringr::str_replace_all(" ", "_") |>
             stringr::str_replace_all("-", "_")
@@ -455,12 +455,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       expr = return(unlist(self$fs_map, use.names = FALSE))),
 
 
-    #' @field diseasystore_label (`character`)\cr
-    #'   A human readable diseasystore_label of the feature store. Read only.
-    diseasystore_label = purrr::partial(
+    #' @field label (`character`)\cr
+    #'   A human readable label of the feature store. Read only.
+    label = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
-      name = "diseasystore_label",
-      expr = return(private$.diseasystore_label)),
+      name = "label",
+      expr = return(private$.label)),
 
 
     #' @field source_conn `r rd_source_conn("field")`
@@ -513,10 +513,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
   private = list(
 
-    .diseasystore_label = NULL,
-    .source_conn        = NULL,
-    .target_conn        = NULL,
-    .target_schema      = NULL,
+    .label         = NULL,
+    .source_conn   = NULL,
+    .target_conn   = NULL,
+    .target_schema = NULL,
 
     .start_date = NULL,
     .end_date   = NULL,

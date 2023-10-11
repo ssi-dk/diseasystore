@@ -4,10 +4,10 @@
 \alias{diseasystore_exists}
 \title{Check for the existence of a \code{diseasystore} for the case definition}
 \usage{
-diseasystore_exists(diseasystore_label)
+diseasystore_exists(label)
 }
 \arguments{
-\item{diseasystore_label}{(\code{character})\cr A character string that controls which feature store to get data from.}
+\item{label}{(\code{character})\cr A character string that controls which feature store to get data from.}
 }
 \value{
 TRUE if the given diseasystore can be matched to a diseasystore on the search path. FALSE otherwise.

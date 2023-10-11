@@ -145,15 +145,15 @@ test_that("active binding: available_features works", {
 })
 
 
-test_that("active binding: diseasystore_label works", {
+test_that("active binding: label works", {
   m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
-  # Retrieve the diseasystore_label
-  expect_equal(m$diseasystore_label, NULL)
+  # Retrieve the label
+  expect_equal(m$label, NULL)
 
-  # Try to set the diseasystore_label
-  expect_equal(tryCatch(m$diseasystore_label <- "test", error = \(e) e),
-               simpleError("`$diseasystore_label` is read only"))
-  expect_equal(m$diseasystore_label, NULL)
+  # Try to set the label
+  expect_equal(tryCatch(m$label <- "test", error = \(e) e),
+               simpleError("`$label` is read only"))
+  expect_equal(m$label, NULL)
   rm(m)
 })

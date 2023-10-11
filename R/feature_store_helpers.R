@@ -1,11 +1,11 @@
 #' Transform case definition to PascalCase
-#' @param diseasystore_label `r rd_diseasystore_label()`
-#' @return The given diseasystore_label formatted to match a Diseasystore
+#' @param label `r rd_diseasystore_label()`
+#' @return The given label formatted to match a Diseasystore
 #' @noRd
-to_diseasystore_case <- function(diseasystore_label) {
+to_diseasystore_case <- function(label) {
 
   # First convert to diseasystore case
-  diseasystore_case <- diseasystore_label |>
+  diseasystore_case <- label |>
     stringr::str_replace_all("_", " ") |>
     stringr::str_replace_all("(?<=[a-z])([A-Z])", " \\1") |>
     stringr::str_to_title() |>
@@ -41,32 +41,32 @@ available_diseasystores <- function() {
 
 
 #' Check for the existence of a `diseasystore` for the case definition
-#' @param diseasystore_label `r rd_diseasystore_label()`
+#' @param label `r rd_diseasystore_label()`
 #' @return TRUE if the given diseasystore can be matched to a diseasystore on the search path. FALSE otherwise.
 #' @examples
 #'   diseasystore_exists("Google COVID-19")  # TRUE
 #'   diseasystore_exists("Non existent diseasystore")  # FALSE
 #' @export
-diseasystore_exists <- function(diseasystore_label) {
+diseasystore_exists <- function(label) {
 
-  checkmate::assert_character(diseasystore_label)
+  checkmate::assert_character(label)
 
-  # Convert diseasystore_label to DiseasystorePascalCase and check existence
-  return(to_diseasystore_case(diseasystore_label) %in% available_diseasystores())
+  # Convert label to DiseasystorePascalCase and check existence
+  return(to_diseasystore_case(label) %in% available_diseasystores())
 }
 
 
 #' Get the `diseasystore` for the case definition
-#' @param diseasystore_label `r rd_diseasystore_label()`
-#' @return The diseasystore generator for the diseasystore matching the given diseasystore_label
+#' @param label `r rd_diseasystore_label()`
+#' @return The diseasystore generator for the diseasystore matching the given label
 #' @examples
 #'   ds <- get_diseasystore("Google COVID-19")  # Returns the DiseasystoreGoogleCovid19 generator
 #' @export
-get_diseasystore <- function(diseasystore_label) {
+get_diseasystore <- function(label) {
 
-  checkmate::assert_true(diseasystore_exists(diseasystore_label))
+  checkmate::assert_true(diseasystore_exists(label))
 
-  return(get(to_diseasystore_case(diseasystore_label)))
+  return(get(to_diseasystore_case(label)))
 }
 
 

@@ -4,13 +4,13 @@
 \alias{get_diseasystore}
 \title{Get the \code{diseasystore} for the case definition}
 \usage{
-get_diseasystore(diseasystore_label)
+get_diseasystore(label)
 }
 \arguments{
-\item{diseasystore_label}{(\code{character})\cr A character string that controls which feature store to get data from.}
+\item{label}{(\code{character})\cr A character string that controls which feature store to get data from.}
 }
 \value{
-The diseasystore generator for the diseasystore matching the given diseasystore_label
+The diseasystore generator for the diseasystore matching the given label
 }
 \description{
 Get the \code{diseasystore} for the case definition

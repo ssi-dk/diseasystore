@@ -42,7 +42,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
-  expect_equal(fs %.% diseasystore_label, "Google COVID-19")
+  expect_equal(fs %.% label, "Google COVID-19")
 
 
   # SCDB v0.1 gives a warning if database has no tables when used. We suppress this warning here

@@ -79,7 +79,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
                        "ventilator"      = "n_ventilator",
                        "min_temperature" = "min_temperature",
                        "max_temperature" = "max_temperature"),
-    .diseasystore_label = "Google COVID-19",
+    .label = "Google COVID-19",
 
     google_covid_19_population       = NULL,
     google_covid_19_index            = NULL,
