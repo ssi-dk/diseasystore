@@ -40,13 +40,13 @@ See the vignette("google_covid_19_data") for details on how to configure the fea
 \if{html}{\out{<a id="method-DiseasystoreGoogleCovid19-key_join_filter"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreGoogleCovid19-key_join_filter}{}}}
 \subsection{Method \code{key_join_filter()}}{
-This function implements an intermediate filtering in the aggregation pipeline.
+This function implements an intermediate filtering in the stratification pipeline.
 For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-The \code{key_join_filter} is inserted into the aggregation pipeline to remove this double counting.
+The \code{key_join_filter} is inserted into the stratification pipeline to remove this double counting.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(
   .data,
-  aggregation_features,
+  stratification_features,
   start_date = private \%.\% start_date,
   end_date = private \%.\% end_date
 )}\if{html}{\out{</div>}}
@@ -57,8 +57,8 @@ The \code{key_join_filter} is inserted into the aggregation pipeline to remove t
 \describe{
 \item{\code{.data}}{.data\cr The data object to perform the operation on}
 
-\item{\code{aggregation_features}}{(\code{character})\cr
-A list of the features included in the aggregation process.}
+\item{\code{stratification_features}}{(\code{character})\cr
+A list of the features included in the stratification process.}
 
 \item{\code{start_date}}{start_date (\code{Date})\cr Study period start.}
 
