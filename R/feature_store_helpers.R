@@ -1,7 +1,9 @@
 #' Transform case definition to PascalCase
 #' @param label `r rd_diseasystore_label()`
 #' @return The given label formatted to match a Diseasystore
-#' @noRd
+#' @examples
+#'   to_diseasystore_case("Google COVID-19")  # DiseasystoreGoogleCovid19
+#' @export
 to_diseasystore_case <- function(label) {
 
   # First convert to diseasystore case
