@@ -28,8 +28,8 @@ that compute the features. Read only.}
 \item{\code{available_features}}{(\code{character})\cr
 A list of available features in the feature store. Read only.}
 
-\item{\code{case_definition}}{(\code{character})\cr
-A human readable case_definition of the feature store. Read only.}
+\item{\code{diseasystore_label}}{(\code{character})\cr
+A human readable diseasystore_label of the feature store. Read only.}
 
 \item{\code{source_conn}}{source_conn\cr Used to specify where data is located.  Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 

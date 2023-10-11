@@ -431,7 +431,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (!is.null(fs_specific)) {
 
           # We need to transform case definition to snake case
-          fs_case_definition <- self$case_definition |>
+          diseasystore <- self$diseasystore_label |>
             stringr::str_to_lower() |>
             stringr::str_replace_all(" ", "_") |>
             stringr::str_replace_all("-", "_")
@@ -440,7 +440,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           # Then we can paste it together
           names(fs_specific) <- names(fs_specific) |>
             purrr::map_chr(~ glue::glue_collapse(sep = "_",
-                                                 x = c(fs_case_definition, .x)))
+                                                 x = c(diseasystore, .x)))
         }
 
         return(c(fs_generic, fs_specific))
@@ -455,12 +455,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       expr = return(unlist(self$fs_map, use.names = FALSE))),
 
 
-    #' @field case_definition (`character`)\cr
-    #'   A human readable case_definition of the feature store. Read only.
-    case_definition = purrr::partial(
+    #' @field diseasystore_label (`character`)\cr
+    #'   A human readable diseasystore_label of the feature store. Read only.
+    diseasystore_label = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
-      name = "case_definition",
-      expr = return(private$.case_definition)),
+      name = "diseasystore_label",
+      expr = return(private$.diseasystore_label)),
 
 
     #' @field source_conn `r rd_source_conn("field")`
@@ -513,10 +513,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
   private = list(
 
-    .case_definition = NULL,
-    .source_conn     = NULL,
-    .target_conn     = NULL,
-    .target_schema   = NULL,
+    .diseasystore_label = NULL,
+    .source_conn        = NULL,
+    .target_conn        = NULL,
+    .target_schema      = NULL,
 
     .start_date = NULL,
     .end_date   = NULL,

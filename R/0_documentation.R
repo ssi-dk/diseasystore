@@ -7,7 +7,7 @@ rd_aggregation <- function(type = "param") {
 }
 
 
-rd_case_definition <- function(type = "param") {
+rd_diseasystore_label <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",

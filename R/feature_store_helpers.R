@@ -1,12 +1,11 @@
 #' Transform case definition to PascalCase
-#' @param case_definition `r rd_case_definition()`
-#' @return The given case_definition formatted to match a Diseasystore
-#' @examples
-#'   diseasystore_case_definition("Google COVID-19")  # DiseasystoreGoogleCovid19
-#' @export
-diseasystore_case_definition <- function(case_definition) {
+#' @param diseasystore_label `r rd_diseasystore_label()`
+#' @return The given diseasystore_label formatted to match a Diseasystore
+#' @noRd
+to_diseasystore_case <- function(diseasystore_label) {
 
-  case_definition |>
+  # First convert to diseasystore case
+  diseasystore_case <- diseasystore_label |>
     stringr::str_replace_all("_", " ") |>
     stringr::str_replace_all("(?<=[a-z])([A-Z])", " \\1") |>
     stringr::str_to_title() |>
@@ -14,8 +13,8 @@ diseasystore_case_definition <- function(case_definition) {
     stringr::str_replace_all("-", "") |>
     (\(.) paste0("Diseasystore", .))()
 
+  return(diseasystore_case)
 }
-
 
 #' Detect available diseasystores
 #' @return The installed diseasystores on the search path
@@ -23,6 +22,7 @@ diseasystore_case_definition <- function(case_definition) {
 #'   available_diseasystores()  # DiseasystoreGoogleCovid19 + more from other packages
 #' @export
 available_diseasystores <- function() {
+
   # Get all installed packages that has the ^diseasystore.* pattern
   available_diseasystores <- purrr::keep(search(), ~ stringr::str_detect(., ":diseasystore\\.*"))
 
@@ -30,42 +30,43 @@ available_diseasystores <- function() {
   if (length(available_diseasystores) == 0) stop("No diseasystores found. Have you attached the libraries?")
 
   # Show available feature stores
-  available_diseasystores |>
+  available_diseasystores <- available_diseasystores |>
     purrr::map(ls) |>
     purrr::reduce(c) |>
     purrr::keep(~ startsWith(., "Diseasystore")) |>
     purrr::discard(~ . %in% c("DiseasystoreBase", "DiseasystoreGeneric"))
+
+  return(available_diseasystores)
 }
 
 
 #' Check for the existence of a `diseasystore` for the case definition
-#' @param case_definition `r rd_case_definition()`
-#' @return TRUE if the given case_definition can be matched to a diseasystore on the search path. FALSE otherwise.
+#' @param diseasystore_label `r rd_diseasystore_label()`
+#' @return TRUE if the given diseasystore can be matched to a diseasystore on the search path. FALSE otherwise.
 #' @examples
 #'   diseasystore_exists("Google COVID-19")  # TRUE
 #'   diseasystore_exists("Non existent diseasystore")  # FALSE
 #' @export
-diseasystore_exists <- function(case_definition) {
+diseasystore_exists <- function(diseasystore_label) {
 
-  checkmate::assert_character(case_definition)
+  checkmate::assert_character(diseasystore_label)
 
-  # Convert case_definition to DiseasystorePascalCase and check existence
-  return(diseasystore_case_definition(case_definition) %in% available_diseasystores())
-
+  # Convert diseasystore_label to DiseasystorePascalCase and check existence
+  return(to_diseasystore_case(diseasystore_label) %in% available_diseasystores())
 }
 
 
 #' Get the `diseasystore` for the case definition
-#' @param case_definition `r rd_case_definition()`
-#' @return The diseasystore generator for the diseasystore matching the given case_definition
+#' @param diseasystore_label `r rd_diseasystore_label()`
+#' @return The diseasystore generator for the diseasystore matching the given diseasystore_label
 #' @examples
 #'   ds <- get_diseasystore("Google COVID-19")  # Returns the DiseasystoreGoogleCovid19 generator
 #' @export
-get_diseasystore <- function(case_definition) {
+get_diseasystore <- function(diseasystore_label) {
 
-  checkmate::assert_true(diseasystore_exists(case_definition))
+  checkmate::assert_true(diseasystore_exists(diseasystore_label))
 
-  return(get(diseasystore_case_definition(case_definition)))
+  return(get(to_diseasystore_case(diseasystore_label)))
 }
 
 
@@ -80,9 +81,14 @@ age_labels <- function(age_cuts) {
 
   age_cuts <- age_cuts[age_cuts > 0 & is.finite(age_cuts)]
   width <- nchar(as.character(max(c(0, age_cuts))))
-  stringr::str_c(stringr::str_pad(c(0, age_cuts), width, pad = "0"),
-                 c(rep("-", length(age_cuts)), "+"),
-                 c(stringr::str_pad(age_cuts - 1, width, pad = "0"), ""))
+
+  age_labels <- stringr::str_c(
+    stringr::str_pad(c(0, age_cuts), width, pad = "0"),
+    c(rep("-", length(age_cuts)), "+"),
+    c(stringr::str_pad(age_cuts - 1, width, pad = "0"), "")
+  )
+
+  return(age_labels)
 }
 
 
