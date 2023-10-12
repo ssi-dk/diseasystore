@@ -140,7 +140,8 @@ google_covid_19_metric <- function(google_pattern, out_name) {
         checkmate::check_directory_exists(source_conn),
         checkmate::check_character(
           source_conn,
-          pattern = r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"),
+          pattern = r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
+        ),
         add = coll
       )
       checkmate::reportAssertions(coll)

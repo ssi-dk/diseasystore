@@ -6,8 +6,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = as.Date("2020-03-01"),
       end_date = as.Date("2020-03-01"),
-      verbose = FALSE)
-    )
+      verbose = FALSE
+    ))
 
     expect_no_error(ds$get_feature("n_hospital"))
   }
