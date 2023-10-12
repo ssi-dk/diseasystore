@@ -136,22 +136,23 @@ google_covid_19_metric <- function(google_pattern, out_name) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+
+      url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
       checkmate::assert(
         checkmate::check_directory_exists(source_conn),
-        checkmate::check_character(
-          source_conn,
-          pattern = r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
-        ),
+        checkmate::check_character(source_conn, pattern = url_regex),
         add = coll
       )
       checkmate::reportAssertions(coll)
 
 
       # Determine the location of the by-age file
-      if (dir.exists(source_conn)) { # Source is a directory
+      if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
         by_age_location <- file.path(source_conn, "by-age.csv")
-      } else { # Source is a URL
+      } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
         by_age_location <- paste0(source_conn, "by-age.csv")
+      } else {
+        stop("source_conn could not be parsed to valid directory or URL")
       }
 
       # Load and parse
