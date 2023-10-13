@@ -69,7 +69,7 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
   source_conn = NULL,
   target_conn = NULL,
   target_schema = NULL,
-  verbose = TRUE
+  verbose = diseasyoption("verbose", self)
 )}\if{html}{\out{</div>}}
 }
 
