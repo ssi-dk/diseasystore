@@ -1,59 +1,105 @@
-test_that("DiseasystoreGoogleCovid19 works", {
+# Store the current options
+remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
+source_conn <- diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
+target_conn <- diseasyoption("target_conn", "DiseasystoreGoogleCovid19")
 
-  # We assume the data is made available to us in a "testdata" folder
-  # If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
-  google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-  local_conn <- "testdata"
+# We assume the data is made available to us in a "testdata" folder
+# If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
+google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
+local_conn <- "testdata"
 
-  # Check that the files are available
-  test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
+# Check that the files are available
+test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
 
-  if (test_data_missing && curl::has_internet()) {
+if (test_data_missing && curl::has_internet()) {
 
-    # Ensure download folder exists
-    if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
+  # Ensure download folder exists
+  if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
 
-    # Then we download the first n rows of each data set of interest
-    remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
-    purrr::walk(google_files, \(file) {
-      paste0(remote_conn, file) |>
-        readr::read_csv(n_max = 100, show_col_types = FALSE, progress = FALSE) |>
-        readr::write_csv(file.path(local_conn, file))
-    })
+  # Then we download the first n rows of each data set of interest
+  purrr::walk(google_files, \(file) {
+    paste0(remote_conn, file) |>
+      readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+      readr::write_csv(file.path(local_conn, file))
+  })
+}
+
+# Check that the files are available after attempting to download
+if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
+  stop("DiseasystoreGoogleCovid19: test data not available and could not be downloaded")
+}
+
+
+test_that("DiseasystoreGoogleCovid19 initializes correctly", {
+
+  # Initialize without start_date and end_date
+  expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
+    verbose = FALSE,
+    target_conn = DBI::dbConnect(RSQLite::SQLite())
+  ))
+
+  # Check that class and label are as expected
+  checkmate::expect_class(ds, "DiseasystoreGoogleCovid19")
+  expect_equal(ds %.% case_definition, "Google COVID-19")
+
+  # Check all FeatureHandlers have been initialized
+  private <- ds$.__enclos_env__$private
+  feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
+    purrr::map(~ purrr::pluck(private, .))
+
+  purrr::walk(feature_handlers, ~ {
+    checkmate::expect_class(.x, "FeatureHandler")
+    checkmate::expect_function(.x %.% compute)
+    checkmate::expect_function(.x %.% get)
+    checkmate::expect_function(.x %.% key_join)
+  })
+})
+
+
+test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
+
+  if (curl::has_internet()) {
+
+    # Ensure source is set as the remote
+    options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = remote_conn)
+
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
+      target_conn = DBI::dbConnect(RSQLite::SQLite()),
+      start_date = as.Date("2020-03-01"),
+      end_date = as.Date("2020-03-01"),
+      verbose = FALSE
+    ))
+
+    expect_no_error(ds$get_feature("n_hospital"))
   }
 
-  # Check that the files are available after attempting to download
-  if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
-    stop("DiseasystoreGoogleCovid19: test data not available and could not be downloaded")
-  }
+  rm(ds)
+})
 
-  # Configure the location of the data
-  options(diseasystore.DiseasystoreGoogleCovid19.source_conn = local_conn)
 
-  # Test the diseasystore on the available backends
+test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
+
+  # Ensure source is set as the local directory
+  options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
+
+  expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
+    target_conn = DBI::dbConnect(RSQLite::SQLite()),
+    start_date = as.Date("2020-03-01"),
+    end_date = as.Date("2020-03-01"),
+    verbose = FALSE
+  ))
+
+  expect_no_error(ds$get_feature("n_hospital"))
+
+  rm(ds)
+})
+
+
+test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", {
   for (conn in get_test_conns()) {
 
-    # Set the current conn to be used
-    options(diseasystore.DiseasystoreGoogleCovid19.target_conn = conn)
-
     # Initialize without start_date and end_date
-    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE))
-
-    # Check feature store has been created
-    checkmate::expect_class(ds, "DiseasystoreGoogleCovid19")
-    expect_equal(ds %.% case_definition, "Google COVID-19")
-
-    # Check all FeatureHandlers have been initialized
-    private <- ds$.__enclos_env__$private
-    feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
-      purrr::map(~ purrr::pluck(private, .))
-
-    purrr::walk(feature_handlers, ~ {
-      checkmate::expect_class(.x, "FeatureHandler")
-      checkmate::expect_function(.x %.% compute)
-      checkmate::expect_function(.x %.% get)
-      checkmate::expect_function(.x %.% key_join)
-    })
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
 
     # Attempt to get features from the feature store
     # then check that they match the expected value from the generators
@@ -86,6 +132,16 @@ test_that("DiseasystoreGoogleCovid19 works", {
       expect_identical(feature_checksum, reference_checksum)
     })
 
+    rm(ds)
+  }
+})
+
+
+test_that("DiseasystoreGoogleCovid19 can extend existing features", {
+  for (conn in get_test_conns()) {
+
+    # Initialize without start_date and end_date
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
 
     # Attempt to get features from the feature store (using different dates)
     # then check that they match the expected value from the generators
@@ -114,27 +170,42 @@ test_that("DiseasystoreGoogleCovid19 works", {
       expect_identical(feature, reference)
     })
 
+    rm(ds)
+  }
+})
+
+
+# Helper function that checks the output of key_joins
+key_join_features_tester <- function(output, start_date, end_date) {
+  # The output dates should match start and end date
+  testthat::expect_true(min(output$date) == start_date)
+  testthat::expect_true(max(output$date) == end_date)
+}
+
+# Set start and end dates for the rest of the tests
+start_date <- as.Date("2020-03-01")
+end_date   <- as.Date("2020-04-30")
+
+test_that("DiseasystoreGoogleCovid19 can key_join features", {
+  for (conn in get_test_conns()) {
+
+    # Initialize without start_date and end_date
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
+
+
     # Attempt to perform the possible key_joins
     available_observables  <- ds$available_features |>
       purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
     available_aggregations <- ds$available_features |>
       purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
-    key_join_features_tester <- function(output, start_date, end_date) {
-      # The output dates should match start and end date
-      testthat::expect_true(min(output$date) == start_date)
-      testthat::expect_true(max(output$date) == end_date)
-    }
-
-    # Set start and end dates for the rest of the tests
-    start_date <- as.Date("2020-03-01")
-    end_date   <- as.Date("2020-04-30")
 
     # First check we can aggregate without an aggregation
     purrr::walk(available_observables,
                 ~ expect_no_error(ds$key_join_features(observable = as.character(.),
                                                        aggregation = NULL,
                                                        start_date, end_date)))
+
 
     # Then test combinations with non-NULL aggregations
     expand.grid(observable  = available_observables,
@@ -145,9 +216,13 @@ test_that("DiseasystoreGoogleCovid19 works", {
           ds$key_join_features(observable = as.character(..1),
                                aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
                                start_date, end_date)
-        }, error = function(e) {
-          expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
-                                        "Not implemented yet."))
+        },
+        warning = function(w) {
+          checkmate::expect_character(w$message, pattern = "observable already stratified by")
+          return(NULL)
+        },
+        error = function(e) {
+          checkmate::expect_character(e$message, pattern = "does not match observable aggregator")
           return(NULL)
         })
 
@@ -156,6 +231,24 @@ test_that("DiseasystoreGoogleCovid19 works", {
           key_join_features_tester(dplyr::collect(output), start_date, end_date)
         }
       })
+
+    rm(ds)
+  }
+})
+
+
+test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
+  for (conn in get_test_conns()) {
+
+    # Initialize without start_date and end_date
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
+
+
+    # Attempt to perform the possible key_joins
+    available_observables  <- ds$available_features |>
+      purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
+    available_aggregations <- ds$available_features |>
+      purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
 
     # Test key_join with malformed inputs
@@ -206,3 +299,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
     rm(ds)
   }
 })
+
+
+# Reset the options
+options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn)
+options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)

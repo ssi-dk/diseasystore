@@ -1,5 +1,6 @@
 # Configure diseasystore for testing
-options("diseasystore.target_schema" = "test_ds")
+target_schema <- "test_ds"
+options("diseasystore.target_schema" = target_schema)
 
 # Define list of connections to check
 conn_list <- list(
