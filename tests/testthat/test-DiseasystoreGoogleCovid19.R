@@ -1,6 +1,19 @@
 test_that("DiseasystoreGoogleCovid19 works", {
 
-  # First we create a temporary directory for the Google COVID-19 data
+  # Check we can use the Google API directly
+  if (curl::has_internet()) {
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
+      target_conn = DBI::dbConnect(RSQLite::SQLite()),
+      start_date = as.Date("2020-03-01"),
+      end_date = as.Date("2020-03-01"),
+      verbose = FALSE
+    ))
+
+    expect_no_error(ds$get_feature("n_hospital"))
+  }
+
+
+  # Then we create a temporary directory for the Google COVID-19 data
   remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 
   tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
