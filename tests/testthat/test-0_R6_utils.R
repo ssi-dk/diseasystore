@@ -1,12 +1,10 @@
 test_that("diseasyoption works", {
 
   # Store the current options
-  opt1 <- getOption("diseasystore.target_schema") |> unname()
-  opt2 <- getOption("diseasystore.DiseasystoreGoogleCovid19.target_schema") |> unname()
-
-  # Set them to default (empty)
-  options("diseasystore.target_schema" = "")
-  options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = "")
+  opts <- options(
+    "diseasystore.target_schema" = "",
+    "diseasystore.DiseasystoreGoogleCovid19.target_schema" = ""
+  )
 
   # Check that diseasyoption works for default values
   expect_equal(diseasyoption("target_schema"), NULL)
@@ -24,8 +22,8 @@ test_that("diseasyoption works", {
   expect_equal(diseasyoption("target_schema", ds), "target_schema_2")
 
   # Reset options
-  options("diseasystore.target_schema" = opt1)
-  options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = opt2)
+  options(opts)
+  rm(opts)
 })
 
 
