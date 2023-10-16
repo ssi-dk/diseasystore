@@ -32,7 +32,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #'   A new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
     initialize = function(start_date = NULL, end_date = NULL, slice_ts = NULL,
                           source_conn = NULL, target_conn = NULL, target_schema = NULL,
-                          verbose = TRUE) {
+                          verbose = diseasyoption("verbose", self)) {
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
@@ -620,7 +620,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 # Set default options for the package related to the Google COVID-19 store
 rlang::on_load({
-  options(diseasystore.source_conn = "")
-  options(diseasystore.target_conn = "")
-  options(diseasystore.target_schema = "")
+  options("diseasystore.source_conn" = "")
+  options("diseasystore.target_conn" = "")
+  options("diseasystore.target_schema" = "")
+  options("diseasystore.verbose" = TRUE)
 })
