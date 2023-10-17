@@ -103,9 +103,17 @@ source_conn_path <- function(source_conn, file) {
 
   # Determine the type of location
   if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
-    file_location <- file.path(source_conn, file)
+    # If source_conn is a dirctory, look for files in the folder and keep the ones that match the requested file
+    # This way, if the file exists in a zipped form, it is still retrieved
+    matching_file <- purrr::keep(dir(source_conn), ~ startsWith(., file)) |>
+      purrr::pluck(1) # Ensure we only have one match
+
+    if (is.null(matching_file)) stop(file, " could not be found in ", source_conn)
+
+    file_location <- file.path(source_conn, matching_file)
+
   } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
-    file_location <- paste0(source_conn, file)
+    file_location <- paste0(stringr::str_remove(source_conn, "/$"), "/", file)
   } else {
     stop("source_conn could not be parsed to valid directory or URL\n")
   }
