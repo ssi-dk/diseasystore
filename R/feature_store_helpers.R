@@ -84,3 +84,31 @@ age_labels <- function(age_cuts) {
                  c(rep("-", length(age_cuts)), "+"),
                  c(stringr::str_pad(age_cuts - 1, width, pad = "0"), ""))
 }
+
+
+#' File path helper for source_conn
+#'
+#' @description
+#'   This helper determines whether source_conn is a file path or URL and creates the full path to the
+#'   the file as needed based on the type of source_conn
+#' @param source_conn File location (path or URL)
+#' @param file Name of the file at the location
+#' @noRd
+source_conn_path <- function(source_conn, file) {
+  url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
+  checkmate::assert(
+    checkmate::check_directory_exists(source_conn),
+    checkmate::check_character(source_conn, pattern = url_regex)
+  )
+
+  # Determine the type of location
+  if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
+    file_location <- file.path(source_conn, file)
+  } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
+    file_location <- paste0(source_conn, file)
+  } else {
+    stop("source_conn could not be parsed to valid directory or URL\n")
+  }
+
+  return(file_location)
+}
