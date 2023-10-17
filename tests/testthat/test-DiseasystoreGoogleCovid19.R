@@ -9,7 +9,8 @@ test_that("DiseasystoreGoogleCovid19 works", {
       verbose = FALSE
     ))
 
-    expect_no_error(ds$get_feature("n_hospital"))
+    ds$available_features |>
+      purrr::walk(~ expect_no_error(ds$get_feature(.)))
   }
 
 
