@@ -113,10 +113,6 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 )
 
 
-
-
-
-
 #' `FeatureHandler` factory for Google COIVD-19 epidemic metrics
 #'
 #' @description
@@ -136,29 +132,11 @@ google_covid_19_metric <- function(google_pattern, out_name) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
-
-      url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
-      checkmate::assert(
-        checkmate::check_directory_exists(source_conn),
-        checkmate::check_character(source_conn, pattern = url_regex),
-        add = coll
-      )
       checkmate::reportAssertions(coll)
 
-
-      # Determine the location of the by-age file
-      if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
-        by_age_location <- file.path(source_conn, "by-age.csv")
-      } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
-        by_age_location <- paste0(source_conn, "by-age.csv")
-      } else {
-        stop("source_conn could not be parsed to valid directory or URL")
-      }
-
       # Load and parse
-      data <- readr::read_csv(by_age_location,
-                              n_max = ifelse(testthat::is_testing(), 1000, Inf),
-                              show_col_types = FALSE) |>
+      data <- source_conn_path(source_conn, "by-age.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
@@ -197,8 +175,9 @@ google_covid_19_population_ <- function() {
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "demographics.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "demographics.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::select("location_key", tidyselect::starts_with("population_age_")) |>
         tidyr::pivot_longer(!"location_key",
                             names_to = c("tmp", "age_group"),
@@ -227,16 +206,17 @@ google_covid_19_age_group_ <- function() {
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
       checkmate::reportAssertions(coll)
 
-      by_age <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))()
+      # Load and parse
+      out <- source_conn_path(source_conn, "by-age.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE)
 
       # We need a map between age_bin and age_group
-      age_bin_map <- by_age |>
+      age_bin_map <- out |>
         dplyr::group_by(.data$location_key) |>
         dplyr::select("location_key", tidyselect::starts_with("age_bin")) |>
         dplyr::distinct() |>
-        dplyr::left_join(dplyr::select(by_age, "location_key", "date", tidyselect::starts_with("age_bin")),
-                         by = colnames(dplyr::select(by_age, "location_key", tidyselect::starts_with("age_bin"))),
+        dplyr::left_join(dplyr::select(out, "location_key", "date", tidyselect::starts_with("age_bin")),
+                         by = colnames(dplyr::select(out, "location_key", tidyselect::starts_with("age_bin"))),
                          multiple = "first")
 
       # Some regions changes age aggregation. Discard for now
@@ -278,8 +258,9 @@ google_covid_19_index_ <- function() {
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "index.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "index.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::transmute("key_location" = .data$location_key,
                          "country_id"   = .data$country_code,
                          "country"      = .data$country_name,
@@ -310,8 +291,9 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "weather.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
@@ -333,8 +315,9 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "weather.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
