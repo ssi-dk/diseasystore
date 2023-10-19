@@ -4,10 +4,10 @@ on:
   push:
     branches: main
     paths: |
-      - 'R/**'
-      - 'tests/**'
-      - 'man/**'
-      - 'vignettes/**'
+      - R/**
+      - tests/**
+      - man/**
+      - vignettes/**
   pull_request:
     branches: main
 
