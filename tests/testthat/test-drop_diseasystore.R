@@ -3,12 +3,12 @@ test_that("drop_diseasystore can delete entire default schema", { for (conn in g
   # Create logs table in "test_ds" schema and add mtcars to the schema
   # to simulate a diseasystore on the connection
   SCDB::create_logs_if_missing("test_ds.logs", conn)
-  SCDB::create_table(mtcars, conn, "test_ds.mtcars_1")
-  SCDB::create_table(mtcars, conn, "test_ds.mtcars_2")
+  SCDB::create_table(mtcars, conn, "test_ds.mtcars_1", temporary = FALSE)
+  SCDB::create_table(mtcars, conn, "test_ds.mtcars_2", temporary = FALSE)
 
   # Add some other tables to simulate data that should not be touched
-  SCDB::create_table(mtcars, conn, "mtcars_1")
-  SCDB::create_table(mtcars, conn, "not_test_ds.mtcars_1")
+  SCDB::create_table(mtcars, conn, "mtcars_1",             temporary = FALSE)
+  SCDB::create_table(mtcars, conn, "not_test_ds.mtcars_1", temporary = FALSE)
 
   # Try to delete the entire test_ds store
   expect_equal(diseasyoption("target_schema"), "test_ds")      # Verify, that the testing target_schema has been set
@@ -38,12 +38,12 @@ test_that("drop_diseasystore can delete single table in default schema", { for (
   # Create logs table in "test_ds" schema and add mtcars to the schema
   # to simulate a diseasystore on the connection
   SCDB::create_logs_if_missing("test_ds.logs", conn)
-  SCDB::create_table(mtcars, conn, "test_ds.mtcars_1")
-  SCDB::create_table(mtcars, conn, "test_ds.mtcars_2")
+  SCDB::create_table(mtcars, conn, "test_ds.mtcars_1", temporary = FALSE)
+  SCDB::create_table(mtcars, conn, "test_ds.mtcars_2", temporary = FALSE)
 
   # Add some other tables to simulate data that should not be touched
-  SCDB::create_table(mtcars, conn, "mtcars_1")
-  SCDB::create_table(mtcars, conn, "not_test_ds.mtcars_1")
+  SCDB::create_table(mtcars, conn, "mtcars_1",             temporary = FALSE)
+  SCDB::create_table(mtcars, conn, "not_test_ds.mtcars_1", temporary = FALSE)
 
   # Try to delete only mtcars_1 within the diseasystore
   expect_equal(diseasyoption("target_schema"), "test_ds")      # Verify, that the testing target_schema has been set
