@@ -68,6 +68,7 @@ for (conn in conns) {
 
   # Delete the existing data in the schema
   drop_diseasystore(schema = target_schema, conn = conn)
+  drop_diseasystore(schema = paste0("not_", target_schema), conn = conn)
 }
 
 
