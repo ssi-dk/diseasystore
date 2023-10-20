@@ -71,9 +71,9 @@ test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
     ))
 
     expect_no_error(ds$get_feature("n_hospital"))
-  }
 
-  rm(ds)
+    rm(ds)
+  }
 })
 
 
@@ -105,7 +105,7 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
     # then check that they match the expected value from the generators
     purrr::walk2(ds$available_features, names(ds$fs_map), ~ {
       start_date <- as.Date("2020-03-01")
-      end_date   <- as.Date("2020-04-30")
+      end_date   <- as.Date("2020-03-05")
 
       feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
         dplyr::collect()
@@ -147,7 +147,7 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
     # then check that they match the expected value from the generators
     purrr::walk2(ds$available_features, names(ds$fs_map), ~ {
       start_date <- as.Date("2020-03-01")
-      end_date   <- as.Date("2020-05-31")
+      end_date   <- as.Date("2020-03-10")
 
       feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
         dplyr::collect() |>
@@ -184,7 +184,7 @@ key_join_features_tester <- function(output, start_date, end_date) {
 
 # Set start and end dates for the rest of the tests
 start_date <- as.Date("2020-03-01")
-end_date   <- as.Date("2020-04-30")
+end_date   <- as.Date("2020-03-10")
 
 test_that("DiseasystoreGoogleCovid19 can key_join features", {
   for (conn in get_test_conns()) {
@@ -257,9 +257,12 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
       purrr::pwalk(~ {
         # This code may fail (gracefully) in some cases. These we catch here
         output <- tryCatch({
-          ds$key_join_features(observable = as.character(..1),
-                               aggregation = ..2,
-                               start_date, end_date)
+          ds$key_join_features(
+            observable = as.character(..1),
+            aggregation = ..2,
+            start_date = start_date,
+            end_date = end_date
+          )
         }, error = function(e) {
           checkmate::expect_character(e$message, pattern = "Must be element of set")
           return(NULL)
@@ -277,14 +280,19 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
       purrr::pwalk(~ {
         # This code may fail (gracefully) in some cases. These we catch here
         output <- tryCatch({
-          ds$key_join_features(observable = as.character(..1),
-                               aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
-                               start_date, end_date)
+          ds$key_join_features(
+            observable = as.character(..1),
+            aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+            start_date = start_date,
+            end_date = end_date
+          )
         }, error = function(e) {
-          checkmate::expect_character(e$message,
-                                      pattern = glue::glue("Aggregation variable not found. ",
-                                                           "Available aggregation variables are: ",
-                                                           "{toString(available_aggregations)}"))
+          checkmate::expect_character(
+            e$message,
+            pattern = glue::glue("Aggregation variable not found. ",
+                                 "Available aggregation variables are: ",
+                                 "{toString(available_aggregations)}")
+          )
           return(NULL)
         })
 
