@@ -9,6 +9,12 @@ conn_list <- list(
   "PostgreSQL" = "RPostgres::Postgres"
 )
 
+# Define list of args to conns
+conn_args <- list(
+  # Backend string = list(named args)
+  "SQLite" = list(dbname = tempfile())
+)
+
 get_driver <- function(x = character(), ...) {
   if (!grepl(".*::.*", x)) stop("Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
                                 "Received: ", x)
@@ -28,7 +34,19 @@ get_driver <- function(x = character(), ...) {
 }
 
 # Create connection generator
-get_test_conns <- \() unlist(lapply(conn_list, get_driver))
+conn_configuration <- dplyr::left_join(
+  tibble::tibble(backend = names(conn_list), conn_list = unname(unlist(conn_list))),
+  tibble::tibble(backend = names(conn_args), conn_args),
+  by = "backend"
+)
+
+# Send configuration to get_driver when getting test cons
+get_test_conns <- function() {
+  test_conns <- purrr::pmap(conn_configuration, ~ purrr::partial(get_driver, x = !!..2, !!!..3)())
+  names(test_conns) <- conn_configuration$backend
+  test_conns <- purrr::discard(test_conns, is.null)
+  return(test_conns)
+}
 conns <- get_test_conns()
 
 # Ensure the target conns are empty and configured correctly
