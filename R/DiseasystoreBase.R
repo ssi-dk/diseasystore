@@ -573,7 +573,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Determine the dates covered on this slice_ts
-      if (SCDB::nrow(logs) > 0) {
+      if (nrow(logs) > 0) {
         fs_dates <- logs |>
           dplyr::select(fs_start_date, fs_end_date) |>
           purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = as.Date(fs_start_date),
@@ -601,10 +601,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Reduce to single intervals
       new_ranges <- tibble::tibble(date = new_dates) |>
-        dplyr::mutate(next_date_diff = as.numeric(difftime(dplyr::lead(.data$date), .data$date, units = "days")),
-                      prev_date_diff = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
-                      first_in_segment = dplyr::if_else(is.na(next_date_diff) | next_date_diff > 1, FALSE, TRUE) |
-                                           dplyr::if_else(is.na(prev_date_diff) | prev_date_diff > 1, TRUE, FALSE)) |> # nolint: indentation_linter
+        dplyr::mutate(prev_date_diff = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
+                      first_in_segment = dplyr::case_when(
+                        is.na(prev_date_diff) ~ TRUE,   # Nothing before, must be a new segment
+                        prev_date_diff > 1 ~ TRUE,      # Previous segment is long before, must be a new segment
+                        TRUE ~ FALSE                    # All other cases are not the first in segment
+                      )) |>
         dplyr::group_by(cumsum(.data$first_in_segment)) |>
         dplyr::summarise(start_date = min(.data$date, na.rm = TRUE),
                          end_date   = max(.data$date, na.rm = TRUE),

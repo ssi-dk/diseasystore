@@ -80,7 +80,7 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = "test_ds")
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = "test_ds")
   logs <- SCDB::create_logs_if_missing("test_ds.logs", conn)
   rows_append(logs, data.frame(date = slice_ts,
                                table = "test",
@@ -88,30 +88,31 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
                                log_file = "1"),
               copy = TRUE, in_place = TRUE)
 
-  determine_new_ranges <- fs$.__enclos_env__$private$determine_new_ranges
+  determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 
   expect_equal(determine_new_ranges("test", start_date, end_date, slice_ts),
-               tibble::tibble(start_date = as.Date(character(0)), end_date = as.Date(character(0))))
+               tibble::tibble(start_date = as.Date(character(0)),
+                              end_date   = as.Date(character(0))))
 
   expect_equal(determine_new_ranges("testing", start_date, end_date, slice_ts),
                tibble::tibble(start_date = !!start_date,
                               end_date   = !!end_date))
 
-  expect_equal(determine_new_ranges("test", start_date, end_date + lubridate::days(1), slice_ts),
+  expect_equal(determine_new_ranges("test", start_date, end_date + lubridate::days(5), slice_ts),
                tibble::tibble(start_date = !!end_date + lubridate::days(1),
-                              end_date   = !!end_date + lubridate::days(1)))
+                              end_date   = !!end_date + lubridate::days(5)))
 
-  expect_equal(determine_new_ranges("test", start_date - lubridate::days(1), end_date, slice_ts),
-               tibble::tibble(start_date = !!start_date - lubridate::days(1),
+  expect_equal(determine_new_ranges("test", start_date - lubridate::days(5), end_date, slice_ts),
+               tibble::tibble(start_date = !!start_date - lubridate::days(5),
                               end_date   = !!start_date - lubridate::days(1)))
 
-  expect_equal(determine_new_ranges("test", start_date - lubridate::days(1), end_date + lubridate::days(1), slice_ts),
-               tibble::tibble(start_date = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(1)),
-                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(1))))
+  expect_equal(determine_new_ranges("test", start_date - lubridate::days(5), end_date + lubridate::days(5), slice_ts),
+               tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5))))
 
-  expect_equal(determine_new_ranges("test", start_date - lubridate::days(2), end_date + lubridate::days(2), slice_ts),
-               tibble::tibble(start_date = c(!!start_date - lubridate::days(2), !!end_date + lubridate::days(1)),
-                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(2))))
+  expect_equal(determine_new_ranges("test", start_date - lubridate::days(5), end_date + lubridate::days(3), slice_ts),
+               tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3))))
 })
 
 
