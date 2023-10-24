@@ -132,9 +132,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
 
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
-                                                        start_date = start_date,
-                                                        end_date   = end_date,
-                                                        slice_ts   = slice_ts)
+                                                        start_date   = start_date,
+                                                        end_date     = end_date,
+                                                        slice_ts     = slice_ts)
 
       # Inform that we are computing features
       tic <- Sys.time()
@@ -168,7 +168,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
             fs_existing <- fs_existing |>
               dplyr::filter(.data$from_ts == slice_ts) |>
               dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
-              dplyr::filter(.data$valid_until < start_date, .data$valid_from < end_date)
+              dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
           }
 
           fs_updated_feature <- dplyr::union_all(fs_existing, fs_feature) |> dplyr::compute()
