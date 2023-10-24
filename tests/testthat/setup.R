@@ -52,6 +52,16 @@ conns <- get_test_conns()
 # Ensure the target conns are empty and configured correctly
 for (conn in conns) {
 
+  # SQLite back-ends gives an error in SCDB if there are no tables (it assumes a bad configuration)
+  # We create a table to suppress this warning
+  tryCatch(
+    SCDB::get_tables(conn),
+    warning = function(w) {
+      checkmate::assert_character(w$message, pattern = "No tables found")
+      DBI::dbWriteTable(conn, "mtcars", mtcars)
+    }
+  )
+
   # Try to write to the target schema
   test_id <- SCDB::id(paste(target_schema, "mtcars", sep = "."), conn)
 
@@ -69,6 +79,7 @@ for (conn in conns) {
   # Delete the existing data in the schema
   drop_diseasystore(schema = target_schema, conn = conn)
   drop_diseasystore(schema = paste0("not_", target_schema), conn = conn)
+
 }
 
 
