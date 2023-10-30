@@ -205,14 +205,15 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
-      dplyr::inner_join(out,
-                        data.frame(valid_from = start_date, valid_until = end_date) %>%
-                          dplyr::copy_to(self %.% target_conn, ., "fs_tmp", overwrite = TRUE),
-                        sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
-                                  ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
-                        suffix = c("", ".p")) |>
+      out <- dplyr::inner_join(out,
+                               data.frame(valid_from = start_date, valid_until = end_date) %>%
+                                 dplyr::copy_to(self %.% target_conn, ., "fs_tmp", overwrite = TRUE),
+                               sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
+                                         ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
+                               suffix = c("", ".p")) |>
         dplyr::select(!c("valid_from.p", "valid_until.p"))
 
+      return(out)
     },
 
     #' @description
