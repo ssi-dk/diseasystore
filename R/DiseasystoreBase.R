@@ -583,24 +583,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(fs_start_date < end_date, start_date <= fs_end_date)
-
-      # Looks for updates that (potentially) are ongoing
-      potentially_ongoing <- logs |>
-        dplyr::mutate(duration = as.numeric(difftime(Sys.time(), start_time, unit = "mins"))) |>
-        dplyr::filter(is.na(success) & duration < 30) |>
-        dplyr::select(message, duration)
-
-      if (nrow(potentially_ongoing) > 0) {
-        err <- glue::glue("db: {target_table} is potentially being updated on the specified date interval. ",
-                          "Aborting...")
-        cat(err)
-
-        potentially_ongoing |>
-          purrr::pmap(~ printr(glue::glue("{..1} started updating {round(..2)} minutes ago. ",
-                                          "Releasing lock after 30 minutes")))
-        stop(err)
-      }
+        dplyr::filter(fs_start_date < end_date, start_date <= fs_end_date, success == TRUE)
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
