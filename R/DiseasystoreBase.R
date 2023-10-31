@@ -530,6 +530,18 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
     verbose = TRUE,
 
+    # Determine which dates are not already computed
+    # @description
+    #   This method parses the `message` fields of the logs related to `target_table` on the date given by `slice_ts`.
+    #   These messages contains information on the date-ranges that are already computed.
+    #   Once parsed, the method compares the computed date-ranges with the requested date-range.
+    # @param target_table (`character` or `Id`)\cr
+    #   The feature table to investigate
+    # @param start_date `r rd_start_date()`
+    # @param end_date `r rd_end_date()`
+    # @param slice_ts `r rd_slice_ts()`
+    # @return (`tibble`)\cr
+    #   A data frame containing continuous un-computed date-ranges
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Get a list of the logs for the target_table on the slice_ts
@@ -537,7 +549,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                          SCDB::id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(target_table == !!target_table, date == !!slice_ts)
+        dplyr::filter(.data$target_table == !!target_table, .data$date == !!slice_ts)
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
@@ -546,13 +558,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Determine the date ranges used
       logs <- logs |>
-        dplyr::mutate(fs_start_date = stringr::str_extract(message, "(?<=fs-range: )([0-9]{4}-[0-9]{2}-[0-9]{2})"),
-                      fs_end_date   = stringr::str_extract(message, "([0-9]{4}-[0-9]{2}-[0-9]{2})$")) |>
+        dplyr::mutate(fs_start_date = stringr::str_extract(.data$message, r"{(?<=fs-range: )(\d{4}-\d{2}-\d{2})}"),
+                      fs_end_date   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")) |>
         dplyr::mutate(across(.cols = c("fs_start_date", "fs_end_date"), .fns = as.Date))
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(fs_start_date < end_date, start_date <= fs_end_date)
+        dplyr::filter(.data$fs_start_date < end_date, start_date <= .data$fs_end_date)
 
       # Looks for updates that (potentially) are ongoing
       potentially_ongoing <- logs |>
@@ -574,7 +586,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
         fs_dates <- logs |>
-          dplyr::select(fs_start_date, fs_end_date) |>
+          dplyr::select("fs_start_date", "fs_end_date") |>
           purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = as.Date(fs_start_date),
                                                              to = as.Date(fs_end_date),
                                                              by = "1 day")) |>
@@ -600,17 +612,17 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Reduce to single intervals
       new_ranges <- tibble::tibble(date = new_dates) |>
-        dplyr::mutate(prev_date_diff = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
-                      first_in_segment = dplyr::case_when(
-                        is.na(prev_date_diff) ~ TRUE,   # Nothing before, must be a new segment
-                        prev_date_diff > 1 ~ TRUE,      # Previous segment is long before, must be a new segment
-                        TRUE ~ FALSE                    # All other cases are not the first in segment
+        dplyr::mutate("prev_date_diff" = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
+                      "first_in_segment" = dplyr::case_when(
+                        is.na(.data$prev_date_diff) ~ TRUE,   # Nothing before, must be a new segment
+                        .data$prev_date_diff > 1 ~ TRUE,      # Previous segment is long before, must be a new segment
+                        TRUE ~ FALSE                          # All other cases are not the first in segment
                       )) |>
         dplyr::group_by(cumsum(.data$first_in_segment)) |>
         dplyr::summarise(start_date = min(.data$date, na.rm = TRUE),
                          end_date   = max(.data$date, na.rm = TRUE),
                          .groups = "drop") |>
-        dplyr::select(start_date, end_date)
+        dplyr::select("start_date", "end_date")
 
       return(new_ranges)
     },
