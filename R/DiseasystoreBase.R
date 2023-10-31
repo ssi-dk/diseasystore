@@ -131,6 +131,23 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine which dates need to be computed
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
 
+
+      # Add a LOCK to the diseasystore
+      add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+
+      # Check if we have ownership of the update of the target_table
+      # If not, keep retrying and wait for up to 30 minutes before giving up
+      wait_time <- 0 # seconds
+      while (!identical(Sys.getpid(), get_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
+        Sys.sleep(15)
+        add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        wait_time <- wait_time + 15
+        if (wait_time > 30 * 60) {
+          rlang::abort("Lock not released within 30 minutes. Giving up.")
+        }
+      }
+
+      # Determine dates that need computation
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date   = start_date,
                                                         end_date     = end_date,
@@ -189,6 +206,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           enforce_chronological_order = FALSE
         )
       })
+
+      # Release the lock on the table
+      remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
 
       # Inform how long has elapsed for updating data
       if (private$verbose && nrow(fs_missing_ranges) > 0) {
