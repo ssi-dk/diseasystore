@@ -141,14 +141,14 @@ google_covid_19_metric <- function(google_pattern, out_name) {
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("location_key", "date", tidyselect::starts_with(glue::glue("new_{google_pattern}"))) |>
-        tidyr::pivot_longer(-c("location_key", "date"),
+        tidyr::pivot_longer(!c("location_key", "date"),
                             names_to = c("tmp", "key_age_bin"),
                             names_sep = "_age_",
                             values_to = out_name,
                             values_transform = as.numeric) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(data)
     },
@@ -299,7 +299,7 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::select("key_location" = "location_key",
                       "date",
                       "min_temperature" = "minimum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(out)
     },
@@ -323,7 +323,7 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::select("key_location" = "location_key",
                       "date",
                       "max_temperature" = "maximum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(out)
     },
