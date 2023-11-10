@@ -4,7 +4,7 @@
 \alias{db_locks}
 \alias{add_table_lock}
 \alias{remove_table_lock}
-\alias{get_lock_owner}
+\alias{is_lock_owner}
 \alias{cleanup_locks}
 \title{Sets, queries and removes locks for db tables}
 \usage{
@@ -12,7 +12,7 @@ add_table_lock(conn, db_table, schema = NULL)
 
 remove_table_lock(conn, db_table, schema = NULL)
 
-get_lock_owner(conn, db_table, schema = NULL)
+is_lock_owner(conn, db_table, schema = NULL)
 
 cleanup_locks(conn, schema = NULL)
 }
@@ -24,7 +24,7 @@ cleanup_locks(conn, schema = NULL)
 \item{schema}{DB schema where lock table is / should be placed}
 }
 \value{
-Most are called for side effects. \code{get_lock_owner} returns the pid of the process that can modify the table.
+Most are called for side effects. \code{is_lock_owner} returns the TRUE if the process can modify the table.
 }
 \description{
 This set of function adds a simple locking system to db tables.
@@ -32,20 +32,21 @@ This set of function adds a simple locking system to db tables.
 \item \code{add_table_lock} adds a record in the target_schema.lock table with the current time and R-session process id.
 \item \code{remove_table_lock} removes records in the target_schema.lock table with the target table and the
 R-session process id.
-\item \code{get_lock_owner} returns the process id (pid) associated with the lock on db_table in target_schema.lock
+\item \code{is_lock_owner} returns TRUE if the current process id (pid) matches the pid associated with the lock on db_table
+in target_schema.lock. If no lock is found, NULL is returned.
 \item \code{cleanup_locks} removes locks that are timed out
 }
 }
 \examples{
 conn <- DBI::dbConnect(RSQLite::SQLite())
 
-get_lock_owner(conn, "test_table") # NULL
+is_lock_owner(conn, "test_table") # NULL
 
 add_table_lock(conn, "test_table")
-get_lock_owner(conn, "test_table") == Sys.getpid() # TRUE
+is_lock_owner(conn, "test_table") # TRUE
 
 remove_table_lock(conn, "test_table")
-get_lock_owner(conn, "test_table") # NULL
+is_lock_owner(conn, "test_table") # NULL
 
 DBI::dbDisconnect(conn)
 }

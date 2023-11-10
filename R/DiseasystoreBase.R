@@ -147,7 +147,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         # Check if we have ownership of the update of the target_table
         # If not, keep retrying and wait for up to 30 minutes before giving up
         wait_time <- 0 # seconds
-        while (!identical(Sys.getpid(), get_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
+        while (!is_lock_owner(self %.% target_conn, target_table, self %.% target_schema)) {
           Sys.sleep(15)
           add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
           wait_time <- wait_time + 15
