@@ -586,10 +586,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
         fs_dates <- logs |>
-          dplyr::select("fs_start_date", "fs_end_date") |>
-          purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = as.Date(fs_start_date),
-                                                             to = as.Date(fs_end_date),
-                                                             by = "1 day")) |>
+          dplyr::transmute("fs_start_date" = as.Date(fs_start_date), "fs_end_date" = as.Date(fs_end_date)) |>
+          purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = fs_start_date, to = fs_end_date, by = "1 day")) |>
           purrr::reduce(dplyr::union_all) |> # union does not preserve type (converts from Date to numeric)
           unique() # so we have to use union_all (preserves type) followed by unique (preserves type)
       } else {
