@@ -53,7 +53,8 @@ rd_scale <- function(type = "param") {
 
 rd_source_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("Used to specify where data is located.",
+  paste("(`DBIConnection` or `file path`)\\cr",
+        "Used to specify where data is located.",
         ifelse(type == "field", " Read only.", ""),
         "Can be `DBIConnection` or file path depending on the `diseasystore`.")
 }
