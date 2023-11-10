@@ -52,9 +52,6 @@
     <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore-package.html</loc>
   </url>
   <url>
-    <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore_case_definition.html</loc>
-  </url>
-  <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/diseasystore_exists.html</loc>
   </url>
   <url>
@@ -68,5 +65,8 @@
   </url>
   <url>
     <loc>https://rasmusskytte.github.io/diseasystore/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://rasmusskytte.github.io/diseasystore/reference/to_diseasystore_case.html</loc>
   </url>
 </urlset>
