@@ -431,7 +431,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         if (!is.null(fs_specific)) {
 
           # We need to transform case definition to snake case
-          fs_case_definition <- self$case_definition |>
+          diseasystore <- self$label |>
             stringr::str_to_lower() |>
             stringr::str_replace_all(" ", "_") |>
             stringr::str_replace_all("-", "_")
@@ -440,7 +440,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           # Then we can paste it together
           names(fs_specific) <- names(fs_specific) |>
             purrr::map_chr(~ glue::glue_collapse(sep = "_",
-                                                 x = c(fs_case_definition, .x)))
+                                                 x = c(diseasystore, .x)))
         }
 
         return(c(fs_generic, fs_specific))
@@ -455,12 +455,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       expr = return(unlist(self$fs_map, use.names = FALSE))),
 
 
-    #' @field case_definition (`character`)\cr
-    #'   A human readable case_definition of the feature store. Read only.
-    case_definition = purrr::partial(
+    #' @field label (`character`)\cr
+    #'   A human readable label of the feature store. Read only.
+    label = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
-      name = "case_definition",
-      expr = return(private$.case_definition)),
+      name = "label",
+      expr = return(private$.label)),
 
 
     #' @field source_conn `r rd_source_conn("field")`
@@ -513,10 +513,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
   private = list(
 
-    .case_definition = NULL,
-    .source_conn     = NULL,
-    .target_conn     = NULL,
-    .target_schema   = NULL,
+    .label         = NULL,
+    .source_conn   = NULL,
+    .target_conn   = NULL,
+    .target_schema = NULL,
 
     .start_date = NULL,
     .end_date   = NULL,
@@ -586,10 +586,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
         fs_dates <- logs |>
-          dplyr::select("fs_start_date", "fs_end_date") |>
-          purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = as.Date(fs_start_date),
-                                                             to = as.Date(fs_end_date),
-                                                             by = "1 day")) |>
+          dplyr::transmute("fs_start_date" = as.Date(fs_start_date), "fs_end_date" = as.Date(fs_end_date)) |>
+          purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = fs_start_date, to = fs_end_date, by = "1 day")) |>
           purrr::reduce(dplyr::union_all) |> # union does not preserve type (converts from Date to numeric)
           unique() # so we have to use union_all (preserves type) followed by unique (preserves type)
       } else {
