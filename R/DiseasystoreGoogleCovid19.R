@@ -40,8 +40,9 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
       # Manually perform filtering
       if (is.null(aggregation_features) ||
-            (!is.null(aggregation_features) && !(aggregation_features %in% c("country_id", "country", "region_id",
-                                                                             "region", "subregion_id", "subregion")))) {
+            (!is.null(aggregation_features) && purrr::none(aggregation_features,
+                                                           ~ . %in% c("country_id", "country", "region_id",
+                                                                      "region", "subregion_id", "subregion")))) {
 
         # If no spatial aggregation is requested, use the largest available per country
         filter_level <- self$get_feature("country_id", start_date, end_date) |>
