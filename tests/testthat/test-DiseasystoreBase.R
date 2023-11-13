@@ -85,6 +85,7 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   rows_append(logs, data.frame(date = slice_ts,
                                table = "test",
                                message = glue::glue("fs-range: {start_date} - {end_date}"),
+                               success = TRUE,
                                log_file = "1"),
               copy = TRUE, in_place = TRUE)
 

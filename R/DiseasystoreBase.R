@@ -124,76 +124,107 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine which feature_loader should be called
       feature_loader <- names(fs_map[fs_map == feature])
 
+      # Determine where these features are stored
+      target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
+
+
       # Create log table
       SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
                                    conn = self %.% target_conn)
 
-      # Determine which dates need to be computed
-      target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
-
+      # Determine dates that need computation
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date   = start_date,
                                                         end_date     = end_date,
                                                         slice_ts     = slice_ts)
 
-      # Inform that we are computing features
-      tic <- Sys.time()
-      if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
-        message(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
-                           "please wait..."))
-      }
+      # If there are any missing ranges, put a lock on the data base
+      if (nrow(fs_missing_ranges) > 0) {
 
-      # Call the feature loader on the dates
-      purrr::pwalk(fs_missing_ranges, ~ {
+        # Add a LOCK to the diseasystore
+        add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
 
-        start_date <- ..1
-        end_date   <- ..2
-
-        # Compute the feature for the date range
-        fs_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
-                              args = list(start_date = start_date, end_date = end_date,
-                                          slice_ts = slice_ts, source_conn = self %.% source_conn))
-
-        # Check it table is copied to target DB
-        if (!inherits(fs_feature, "tbl_dbi") ||
-              !identical(self %.% source_conn, self %.% target_conn)) {
-          fs_feature <- dplyr::copy_to(self %.% target_conn, fs_feature, "fs_tmp", overwrite = TRUE)
+        # Check if we have ownership of the update of the target_table
+        # If not, keep retrying and wait for up to 30 minutes before giving up
+        wait_time <- 0 # seconds
+        while (!is_lock_owner(self %.% target_conn, target_table, self %.% target_schema)) {
+          Sys.sleep(diseasyoption("lock_wait_increment"))
+          add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+          wait_time <- wait_time + diseasyoption("lock_wait_increment")
+          if (wait_time > diseasyoption("lock_wait_max")) {
+            rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+          }
         }
 
-        # Add the existing computed data for given slice_ts
-        if (SCDB::table_exists(self %.% target_conn, target_table)) {
-          fs_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn))
+        # Once the locks are release
+        # Re-determine dates that need computation
+        fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
+                                                          start_date   = start_date,
+                                                          end_date     = end_date,
+                                                          slice_ts     = slice_ts)
 
-          if (SCDB::is.historical(fs_existing)) {
-            fs_existing <- fs_existing |>
-              dplyr::filter(.data$from_ts == slice_ts) |>
-              dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
-              dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
+        # Inform that we are computing features
+        tic <- Sys.time()
+        if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
+          message(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
+                             "please wait..."))
+        }
+
+        # Call the feature loader on the dates
+        purrr::pwalk(fs_missing_ranges, ~ {
+
+          start_date <- ..1
+          end_date   <- ..2
+
+          # Compute the feature for the date range
+          fs_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
+                                args = list(start_date = start_date, end_date = end_date,
+                                            slice_ts = slice_ts, source_conn = self %.% source_conn))
+
+          # Check it table is copied to target DB
+          if (!inherits(fs_feature, "tbl_dbi") ||
+                !identical(self %.% source_conn, self %.% target_conn)) {
+            fs_feature <- dplyr::copy_to(self %.% target_conn, fs_feature, "fs_tmp", overwrite = TRUE)
           }
 
-          fs_updated_feature <- dplyr::union_all(fs_existing, fs_feature) |> dplyr::compute()
-        } else {
-          fs_updated_feature <- fs_feature
+          # Add the existing computed data for given slice_ts
+          if (SCDB::table_exists(self %.% target_conn, target_table)) {
+            fs_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn))
+
+            if (SCDB::is.historical(fs_existing)) {
+              fs_existing <- fs_existing |>
+                dplyr::filter(.data$from_ts == slice_ts) |>
+                dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
+                dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
+            }
+
+            fs_updated_feature <- dplyr::union_all(fs_existing, fs_feature) |> dplyr::compute()
+          } else {
+            fs_updated_feature <- fs_feature
+          }
+
+          # Commit to DB
+          SCDB::update_snapshot(
+            .data = fs_updated_feature,
+            conn = self %.% target_conn,
+            db_table = target_table,
+            timestamp = slice_ts,
+            message = glue::glue("ds-range: {start_date} - {end_date}"),
+            logger = SCDB::Logger$new(output_to_console = FALSE,
+                                      log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
+                                      log_conn = self %.% target_conn),
+            enforce_chronological_order = FALSE
+          )
+        })
+
+        # Release the lock on the table
+        remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+
+        # Inform how long has elapsed for updating data
+        if (private$verbose && nrow(fs_missing_ranges) > 0) {
+          message(glue::glue("feature: {feature} updated ",
+                             "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
         }
-
-        # Commit to DB
-        SCDB::update_snapshot(
-          .data = fs_updated_feature,
-          conn = self %.% target_conn,
-          db_table = target_table,
-          timestamp = slice_ts,
-          message = glue::glue("fs-range: {start_date} - {end_date}"),
-          logger = SCDB::Logger$new(output_to_console = FALSE,
-                                    log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
-                                    log_conn = self %.% target_conn),
-          enforce_chronological_order = FALSE
-        )
-      })
-
-      # Inform how long has elapsed for updating data
-      if (private$verbose && nrow(fs_missing_ranges) > 0) {
-        message(glue::glue("feature: {feature} updated ",
-                           "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
       }
 
       # Finally, return the data to the user
@@ -564,24 +595,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(.data$fs_start_date < end_date, start_date <= .data$fs_end_date)
-
-      # Looks for updates that (potentially) are ongoing
-      potentially_ongoing <- logs |>
-        dplyr::mutate(duration = as.numeric(difftime(Sys.time(), start_time, unit = "mins"))) |>
-        dplyr::filter(is.na(success) & duration < 30) |>
-        dplyr::select(message, duration)
-
-      if (nrow(potentially_ongoing) > 0) {
-        err <- glue::glue("db: {target_table} is potentially being updated on the specified date interval. ",
-                          "Aborting...")
-        cat(err)
-
-        potentially_ongoing |>
-          purrr::pmap(~ printr(glue::glue("{..1} started updating {round(..2)} minutes ago. ",
-                                          "Releasing lock after 30 minutes")))
-        stop(err)
-      }
+        dplyr::filter(fs_start_date < end_date, start_date <= fs_end_date, success == TRUE)
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
@@ -635,4 +649,6 @@ rlang::on_load({
   options("diseasystore.target_conn" = "")
   options("diseasystore.target_schema" = "")
   options("diseasystore.verbose" = TRUE)
+  options("diseasystore.lock_max_wait" = 30 * 60) # 30 minutes
+  options("diseasystore.lock_wait_increment" = 15) # 15 seconds
 })
