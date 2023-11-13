@@ -7,7 +7,7 @@ rd_aggregation <- function(type = "param") {
 }
 
 
-rd_case_definition <- function(type = "param") {
+rd_diseasystore_label <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
@@ -53,7 +53,7 @@ rd_scale <- function(type = "param") {
 
 rd_source_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("source_conn\\cr",
+  paste("(`DBIConnection` or `file path`)\\cr",
         "Used to specify where data is located.",
         ifelse(type == "field", " Read only.", ""),
         "Can be `DBIConnection` or file path depending on the `diseasystore`.")
@@ -111,7 +111,7 @@ rd_end_date <- function(type = "param") {
 
 rd_.data <- function(type = "param") {                                                                                  # nolint: object_name_linter
   checkmate::assert_choice(type, c("param", "field"))
-  paste(".data\\cr",
+  paste("(`any`)\\cr",
         "The data object to perform the operation on.",
         ifelse(type == "field", " Read only.", ""))
 }

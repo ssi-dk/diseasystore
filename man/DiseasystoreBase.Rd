@@ -28,10 +28,10 @@ that compute the features. Read only.}
 \item{\code{available_features}}{(\code{character})\cr
 A list of available features in the feature store. Read only.}
 
-\item{\code{case_definition}}{(\code{character})\cr
-A human readable case_definition of the feature store. Read only.}
+\item{\code{label}}{(\code{character})\cr
+A human readable label of the feature store. Read only.}
 
-\item{\code{source_conn}}{source_conn\cr Used to specify where data is located.  Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
+\item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
 \item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.  Read only.}
 
@@ -82,7 +82,7 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date to slice the database on (used if source_conn is a database).}
 
-\item{\code{source_conn}}{source_conn\cr Used to specify where data is located.  Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
+\item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
 \item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.}
 
@@ -193,7 +193,7 @@ The \code{key_join_filter} is inserted into the aggregation pipeline to remove t
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{.data}}{.data\cr The data object to perform the operation on.}
+\item{\code{.data}}{(\code{any})\cr The data object to perform the operation on.}
 
 \item{\code{aggregation_features}}{(\code{character})\cr
 A list of the features included in the aggregation process.}

@@ -146,15 +146,15 @@ test_that("active binding: available_features works", {
 })
 
 
-test_that("active binding: case_definition works", {
+test_that("active binding: label works", {
   m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
-  # Retrieve the case_definition
-  expect_equal(m$case_definition, NULL)
+  # Retrieve the label
+  expect_equal(m$label, NULL)
 
-  # Try to set the case_definition
-  expect_equal(tryCatch(m$case_definition <- "test", error = \(e) e),
-               simpleError("`$case_definition` is read only"))
-  expect_equal(m$case_definition, NULL)
+  # Try to set the label
+  expect_equal(tryCatch(m$label <- "test", error = \(e) e),
+               simpleError("`$label` is read only"))
+  expect_equal(m$label, NULL)
   rm(m)
 })

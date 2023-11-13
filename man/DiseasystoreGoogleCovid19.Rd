@@ -55,7 +55,7 @@ The \code{key_join_filter} is inserted into the aggregation pipeline to remove t
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{.data}}{.data\cr The data object to perform the operation on.}
+\item{\code{.data}}{(\code{any})\cr The data object to perform the operation on.}
 
 \item{\code{aggregation_features}}{(\code{character})\cr
 A list of the features included in the aggregation process.}
