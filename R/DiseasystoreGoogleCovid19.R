@@ -133,6 +133,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Load and parse
@@ -174,6 +175,7 @@ google_covid_19_population_ <- function() {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Load and parse
@@ -205,6 +207,7 @@ google_covid_19_age_group_ <- function() {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Load and parse
@@ -257,6 +260,7 @@ google_covid_19_index_ <- function() {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Load and parse
@@ -290,6 +294,7 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Load and parse
@@ -314,6 +319,7 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
       # Load and parse
