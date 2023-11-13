@@ -246,32 +246,32 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
     #' @description
     #'   Joins various features from feature store assuming a primary feature (observable)
-    #'   that contains keys to witch the secondary features (defined by aggregation) can be joined.
+    #'   that contains keys to witch the secondary features (defined by `stratification`) can be joined.
     #' @param observable (`character`)\cr
     #'   The name of a feature defined in the feature store
-    #' @param aggregation (`list`(`quosures`))\cr
-    #'   Expressions in aggregation evaluated to find appropriate features.
-    #'   These are then joined to the observable feature before aggregation is performed.
+    #' @param stratification (`list`(`quosures`))\cr
+    #'   Expressions in `stratification` are evaluated to find appropriate features.
+    #'   These are then joined to the observable feature before `stratification` is performed.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
-    key_join_features = function(observable, aggregation,
+    key_join_features = function(observable, stratification,
                                  start_date = self %.% start_date,
                                  end_date   = self %.% end_date) {
 
       # Validate input
       available_observables  <- self$available_features |>
         purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-      available_aggregations <- self$available_features |>
+      available_stratifications <- self$available_features |>
         purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(observable, available_observables, add = coll)
       checkmate::assert(
-        checkmate::check_choice(aggregation, available_aggregations, null.ok = TRUE),
-        checkmate::check_class(aggregation, "quosure", null.ok = TRUE),
-        checkmate::check_class(aggregation, "quosures", null.ok = TRUE),
+        checkmate::check_choice(stratification, available_stratifications, null.ok = TRUE),
+        checkmate::check_class(stratification, "quosure", null.ok = TRUE),
+        checkmate::check_class(stratification, "quosures", null.ok = TRUE),
         add = coll
       )
       checkmate::assert_date(start_date, add = coll)
@@ -285,41 +285,41 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) %>%
         dplyr::copy_to(self %.% target_conn, ., overwrite = TRUE)
 
-      # Determine which features are affected by an aggregation
-      if (!is.null(aggregation)) {
+      # Determine which features are affected by a stratification
+      if (!is.null(stratification)) {
 
         # Create regex detection for features
         fs_map_regex <- paste0(r"{(?<=^|\W)}", fs_map, r"{(?=$|\W)}")
 
-        # Perform detection of features in the aggregation
-        aggregation_features <- purrr::map(aggregation, rlang::as_label) |>
+        # Perform detection of features in the stratification
+        stratification_features <- purrr::map(stratification, rlang::as_label) |>
           purrr::map(\(e) unlist(fs_map[purrr::map_lgl(fs_map_regex, ~ stringr::str_detect(e, .x))])) |>
           unlist() |>
           unique()
 
-        # Report if aggregation not found
-        if (is.null(aggregation_features)) {
-          err <- glue::glue("Aggregation variable not found. ",
-                            "Available aggregation variables are: ",
-                            "{toString(available_aggregations)}")
+        # Report if stratification not found
+        if (is.null(stratification_features)) {
+          err <- glue::glue("Stratification variable not found. ",
+                            "Available stratification variables are: ",
+                            "{toString(available_stratifications)}")
           stop(err)
         }
 
-        aggregation_names <- purrr::map(aggregation, rlang::as_label)
-        aggregation_names <- purrr::map2_chr(aggregation_names,
-                                             names(aggregation_names),
-                                             ~ ifelse(.y == "", .x, .y)) |>
+        stratification_names <- purrr::map(stratification, rlang::as_label)
+        stratification_names <- purrr::map2_chr(stratification_names,
+                                                names(stratification_names),
+                                                ~ ifelse(.y == "", .x, .y)) |>
           unname()
 
-        # Check aggregation features are not observables
-        stopifnot("Aggregation features cannot be observables" =
-                    purrr::none(aggregation_names, ~ . %in% available_observables))
+        # Check stratification features are not observables
+        stopifnot("Stratification features cannot be observables" =
+                    purrr::none(stratification_names, ~ . %in% available_observables))
 
-        # Fetch requested aggregation features from the feature store
-        aggregation_data <- aggregation_features |>
+        # Fetch requested stratification features from the feature store
+        stratification_data <- stratification_features |>
           unique() |>
           purrr::map(~ {
-            # Fetch the requested aggregation feature from the feature store and truncate to the start
+            # Fetch the requested stratification feature from the feature store and truncate to the start
             #  and end dates to simplify the interlaced output
             self$get_feature(.x, start_date, end_date) |>
               dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
@@ -330,9 +330,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
               dplyr::select(!ends_with(".d"))
           })
       } else {
-        aggregation_features <- NULL
-        aggregation_names <- NULL
-        aggregation_data <- NULL
+        stratification_features <- NULL
+        stratification_names <- NULL
+        stratification_data <- NULL
       }
 
       # Fetch the requested observable from the feature store and truncate to the start and end dates
@@ -348,35 +348,36 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine the keys
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
 
-      # Give warning if aggregation features are already in the observables data
-      existing_stratification <- intersect(names(observable_data), aggregation_features)
+      # Give warning if stratification features are already in the observables data
+      existing_stratification <- intersect(names(observable_data), stratification_features)
       if (length(existing_stratification) > 0) {
         warning("observable already stratified by: ", toString(existing_stratification), ". ",
-                "Output might be inconsistent.")
+                "Output might be inconsistent with expectation.")
       }
 
-      # Map aggregation_data to observable_keys (if not already)
-      if (!is.null(aggregation_data)) {
-        aggregation_keys <- purrr::map(aggregation_data, ~ colnames(dplyr::select(., tidyselect::starts_with("key_"))))
+      # Map stratification_data to observable_keys (if not already)
+      if (!is.null(stratification_data)) {
+        stratification_keys <- purrr::map(stratification_data,
+                                          ~ colnames(dplyr::select(., tidyselect::starts_with("key_"))))
 
-        aggregation_data <- aggregation_data |>
-          purrr::map_if(!purrr::map_lgl(aggregation_keys, ~ any(observable_keys %in% .)),
+        stratification_data <- stratification_data |>
+          purrr::map_if(!purrr::map_lgl(stratification_keys, ~ any(observable_keys %in% .)),
                         ~ .) # TODO: create the mapping
       }
 
       # Merge and prepare for counting
-      out <- truncate_interlace(observable_data, aggregation_data) |>
-        self$key_join_filter(aggregation_features, start_date, end_date) |>
+      out <- truncate_interlace(observable_data, stratification_data) |>
+        self$key_join_filter(stratification_features, start_date, end_date) |>
         dplyr::compute() |>
-        dplyr::group_by(!!!aggregation)
+        dplyr::group_by(!!!stratification)
 
       # Retrieve the aggregators (and ensure they work together)
       key_join_aggregators <- c(purrr::pluck(private, names(fs_map[fs_map == observable])) %.% key_join,
-                                purrr::map(aggregation_features,
+                                purrr::map(stratification_features,
                                            ~ purrr::pluck(private, names(fs_map)[fs_map == .x]) %.% key_join))
 
       if (length(unique(key_join_aggregators)) > 1) {
-        stop("(At least one) aggregation feature does not match observable aggregator. Not implemented yet.")
+        stop("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
       }
 
       key_join_aggregator <- purrr::pluck(key_join_aggregators, 1)
@@ -398,10 +399,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Get all combinations to merge onto
       all_dates <- tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1))
 
-      if (!is.null(aggregation)) {
+      if (!is.null(stratification)) {
         all_combi <- out |>
           dplyr::ungroup() |>
-          dplyr::distinct(!!!aggregation) |>
+          dplyr::distinct(!!!stratification) |>
           dplyr::cross_join(all_dates, copy = TRUE) |>
           dplyr::compute()
       } else {
@@ -410,15 +411,15 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Aggregate across dates
       data <- t_add |>
-        dplyr::right_join(all_combi, by = c("date", aggregation_names), na_matches = "na",
-                          copy = is.null(aggregation)) |>
-        dplyr::left_join(t_remove,  by = c("date", aggregation_names), na_matches = "na") |>
+        dplyr::right_join(all_combi, by = c("date", stratification_names), na_matches = "na",
+                          copy = is.null(stratification)) |>
+        dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
-        dplyr::group_by(tidyselect::across(tidyselect::all_of(aggregation_names))) |>
+        dplyr::group_by(tidyselect::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
         dplyr::mutate(date, !!observable := cumsum(n_add) - cumsum(n_remove)) |>
         dplyr::ungroup() |>
-        dplyr::select(date, all_of(aggregation_names), !!observable) |>
+        dplyr::select(date, all_of(stratification_names), !!observable) |>
         dplyr::collect()
 
       return(data)
@@ -426,17 +427,17 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 
     #' @description
-    #'   This function implements an intermediate filtering in the aggregation pipeline.
+    #'   This function implements an intermediate filtering in the stratification pipeline.
     #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-    #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
+    #'   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
     #' @param .data `r rd_.data()`
-    #' @param aggregation_features (`character`)\cr
-    #'   A list of the features included in the aggregation process.
+    #' @param stratification_features (`character`)\cr
+    #'   A list of the features included in the stratification process.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, aggregation_features,
+    key_join_filter = function(.data, stratification_features,
                                start_date = self %.% start_date,
                                end_date   = self %.% end_date) {
       return(.data) # By default, no filtering is performed
