@@ -53,13 +53,13 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       if (is.null(source_conn)) {
         source_conn <- diseasyoption("source_conn", self)
       }
-      private$.source_conn <- parse_diseasyconn(source_conn)
+      private$.source_conn <- parse_diseasyconn(source_conn, "source_conn")
 
 
       if (is.null(target_conn)) {
         target_conn <- diseasyoption("target_conn", self)
       }
-      private$.target_conn <- parse_diseasyconn(target_conn)
+      private$.target_conn <- parse_diseasyconn(target_conn, "target_conn")
 
 
       # Check source and target conn has been set correctly
