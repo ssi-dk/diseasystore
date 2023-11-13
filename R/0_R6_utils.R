@@ -62,7 +62,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
     purrr::map(getOption) |>
     purrr::map(unlist) |>
     purrr::keep(purrr::negate(is.null)) |>
-    purrr::discard(~ is.character(.) && . == "") |>
+    purrr::discard(~ identical(., "")) |>
     purrr::pluck(1)
 }
 
