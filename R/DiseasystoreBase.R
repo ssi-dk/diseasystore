@@ -299,7 +299,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
         # Report if stratification not found
         if (is.null(stratification_features)) {
-          err <- glue::glue("stratification variable not found. ",
+          err <- glue::glue("Stratification variable not found. ",
                             "Available stratification variables are: ",
                             "{toString(available_stratifications)}")
           stop(err)

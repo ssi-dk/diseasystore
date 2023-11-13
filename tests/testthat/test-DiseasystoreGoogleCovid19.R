@@ -199,7 +199,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
                              start_date, end_date)
       }, error = function(e) {
         checkmate::expect_character(e$message,
-                                    pattern = glue::glue("stratification variable not found. ",
+                                    pattern = glue::glue("Stratification variable not found. ",
                                                          "Available stratification variables are: ",
                                                          "{toString(available_stratifications)}"))
         return(NULL)
