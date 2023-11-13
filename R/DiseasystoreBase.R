@@ -148,11 +148,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         # If not, keep retrying and wait for up to 30 minutes before giving up
         wait_time <- 0 # seconds
         while (!is_lock_owner(self %.% target_conn, target_table, self %.% target_schema)) {
-          Sys.sleep(15)
+          Sys.sleep(diseasyoption("lock_wait_increment"))
           add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-          wait_time <- wait_time + 15
-          if (wait_time > 30 * 60) {
-            rlang::abort("Lock not released within 30 minutes. Giving up.")
+          wait_time <- wait_time + diseasyoption("lock_wait_increment")
+          if (wait_time > diseasyoption("lock_wait_max")) {
+            rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
           }
         }
 
@@ -639,4 +639,6 @@ rlang::on_load({
   options("diseasystore.target_conn" = "")
   options("diseasystore.target_schema" = "")
   options("diseasystore.verbose" = TRUE)
+  options("diseasystore.lock_max_wait" = 30 * 60) # 30 minutes
+  options("diseasystore.lock_wait_increment" = 15) # 15 seconds
 })
