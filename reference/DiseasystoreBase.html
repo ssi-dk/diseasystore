@@ -220,11 +220,11 @@ The name of a feature defined in the feature store.</p></dd>
 </div><p></p><hr><a id="method-DiseasystoreBase-key_join_features"></a><div class="section">
 <h3 id="method-key-join-features-">Method <code>key_join_features()</code><a class="anchor" aria-label="anchor" href="#method-key-join-features-"></a></h3>
 <p>Joins various features from feature store assuming a primary feature (observable)
-that contains keys to witch the secondary features (defined by aggregation) can be joined.</p><div class="section">
+that contains keys to witch the secondary features (defined by <code>stratification</code>) can be joined.</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span></span>
 <span>  <span class="va">observable</span>,</span>
-<span>  <span class="va">aggregation</span>,</span>
+<span>  <span class="va">stratification</span>,</span>
 <span>  start_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
 <span>  end_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -237,10 +237,10 @@ that contains keys to witch the secondary features (defined by aggregation) can 
 The name of a feature defined in the feature store</p></dd>
 
 
-<dt><code>aggregation</code></dt>
+<dt><code>stratification</code></dt>
 <dd><p>(<code>list</code>(<code>quosures</code>))<br>
-Expressions in aggregation evaluated to find appropriate features.
-These are then joined to the observable feature before aggregation is performed.</p></dd>
+Expressions in <code>stratification</code> are evaluated to find appropriate features.
+These are then joined to the observable feature before <code>stratification</code> is performed.</p></dd>
 
 
 <dt><code>start_date</code></dt>
@@ -260,13 +260,13 @@ These are then joined to the observable feature before aggregation is performed.
 
 </div><p></p><hr><a id="method-DiseasystoreBase-key_join_filter"></a><div class="section">
 <h3 id="method-key-join-filter-">Method <code>key_join_filter()</code><a class="anchor" aria-label="anchor" href="#method-key-join-filter-"></a></h3>
-<p>This function implements an intermediate filtering in the aggregation pipeline.
+<p>This function implements an intermediate filtering in the stratification pipeline.
 For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-The <code>key_join_filter</code> is inserted into the aggregation pipeline to remove this double counting.</p><div class="section">
+The <code>key_join_filter</code> is inserted into the stratification pipeline to remove this double counting.</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_filter</span><span class="op">(</span></span>
 <span>  <span class="va">.data</span>,</span>
-<span>  <span class="va">aggregation_features</span>,</span>
+<span>  <span class="va">stratification_features</span>,</span>
 <span>  start_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
 <span>  end_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
@@ -278,9 +278,9 @@ The <code>key_join_filter</code> is inserted into the aggregation pipeline to re
 <dd><p>(<code>any</code>)<br> The data object to perform the operation on.</p></dd>
 
 
-<dt><code>aggregation_features</code></dt>
+<dt><code>stratification_features</code></dt>
 <dd><p>(<code>character</code>)<br>
-A list of the features included in the aggregation process.</p></dd>
+A list of the features included in the stratification process.</p></dd>
 
 
 <dt><code>start_date</code></dt>
