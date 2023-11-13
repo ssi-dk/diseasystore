@@ -42,9 +42,9 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
       if (is.null(stratification_features) ||
             (!is.null(stratification_features) &&
                purrr::none(stratification_features,
-                           ~ %in% c("country_id", "country",
-                                    "region_id", "region",
-                                    "subregion_id", "subregion")))) {
+                           ~ . %in% c("country_id", "country",
+                                      "region_id", "region",
+                                      "subregion_id", "subregion")))) {
 
         # If no spatial stratification is requested, use the largest available per country
         filter_level <- self$get_feature("country_id", start_date, end_date) |>
