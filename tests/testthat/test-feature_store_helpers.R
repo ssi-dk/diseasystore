@@ -1,35 +1,35 @@
-test_that("diseasystore_case_definition works", {
+test_that("to_diseasystore_case works", {
 
   # Initial tests
-  expect_identical(diseasystore_case_definition("This is a test"),
+  expect_identical(to_diseasystore_case("This is a test"),
                    "DiseasystoreThisIsATest")
 
-  expect_identical(diseasystore_case_definition("This is a test with numb3r5"),
+  expect_identical(to_diseasystore_case("This is a test with numb3r5"),
                    "DiseasystoreThisIsATestWithNumb3r5")
 
-  expect_identical(diseasystore_case_definition("This is a test with numb3r5 and dashes--3"),
+  expect_identical(to_diseasystore_case("This is a test with numb3r5 and dashes--3"),
                    "DiseasystoreThisIsATestWithNumb3r5AndDashes3")
 
 
   # Generic case conversions
-  expect_identical(diseasystore_case_definition("snake_case"),
+  expect_identical(to_diseasystore_case("snake_case"),
                    "DiseasystoreSnakeCase")
 
-  expect_identical(diseasystore_case_definition("camelCase"),
+  expect_identical(to_diseasystore_case("camelCase"),
                    "DiseasystoreCamelCase")
 
-  expect_identical(diseasystore_case_definition("PascalCase"),
+  expect_identical(to_diseasystore_case("PascalCase"),
                    "DiseasystorePascalCase")
 
 
   # Specific tests, for Google COVID 19 diseasystore
-  expect_identical(diseasystore_case_definition("Google covid-19"),
+  expect_identical(to_diseasystore_case("Google covid-19"),
                    "DiseasystoreGoogleCovid19")
 
-  expect_identical(diseasystore_case_definition("Google COVID-19"),
+  expect_identical(to_diseasystore_case("Google COVID-19"),
                    "DiseasystoreGoogleCovid19")
 
-  expect_identical(diseasystore_case_definition("google covid 19"),
+  expect_identical(to_diseasystore_case("google covid 19"),
                    "DiseasystoreGoogleCovid19")
 })
 

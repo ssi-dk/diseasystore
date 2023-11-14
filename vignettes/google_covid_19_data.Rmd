@@ -61,8 +61,9 @@ NOTE: a global DB can also be configured using `options(diseasystore.target_conn
 ```{r configure_diseasystore, eval=FALSE}
 
 # We will store the target_conn as a function that opens a DBIconnection to the DB
-target_conn <- \() DBI::dbConnect(RSQLite::SQLite(),
-                                  "/local/file/path/diseasystore_google_covid_19.sqlite")
+target_conn <- \() {
+  DBI::dbConnect(RSQLite::SQLite(), "/local/file/path/diseasystore_google_covid_19.sqlite")
+}
 
 options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 ```

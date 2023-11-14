@@ -18,32 +18,35 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
   public = list(
 
     #' @description
-    #'   This function implements an intermediate filtering in the aggregation pipeline.
+    #'   This function implements an intermediate filtering in the stratification pipeline.
     #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-    #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
+    #'   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
     #' @param .data `r rd_.data()`
-    #' @param aggregation_features (`character`)\cr
-    #'   A list of the features included in the aggregation process.
+    #' @param stratification_features (`character`)\cr
+    #'   A list of the features included in the stratification process.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, aggregation_features,
+    key_join_filter = function(.data, stratification_features,
                                start_date = private %.% start_date,
                                end_date = private %.% end_date) {
 
-      # The Google data contains surplus data depending on the aggregation.
+      # The Google data contains surplus data depending on the stratification.
       # Ie. some individuals are counted more than once.
       # Eg. once at the country level, and then again at the region level etc.
-      # We need to filter at the appropriate aggregation level when these doubly counted
+      # We need to filter at the appropriate stratification level when these doubly counted
       # features are requested.
 
       # Manually perform filtering
-      if (is.null(aggregation_features) ||
-            (!is.null(aggregation_features) && !(aggregation_features %in% c("country_id", "country", "region_id",
-                                                                             "region", "subregion_id", "subregion")))) {
+      if (is.null(stratification_features) ||
+            (!is.null(stratification_features) &&
+               purrr::none(stratification_features,
+                           ~ . %in% c("country_id", "country",
+                                      "region_id", "region",
+                                      "subregion_id", "subregion")))) {
 
-        # If no spatial aggregation is requested, use the largest available per country
+        # If no spatial stratification is requested, use the largest available per country
         filter_level <- self$get_feature("country_id", start_date, end_date) |>
           dplyr::group_by(country_id) |>
           dplyr::slice_min(aggregation_level) |>
@@ -52,11 +55,11 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
 
-      } else if (aggregation_features %in% c("country_id", "country")) {
+      } else if (stratification_features %in% c("country_id", "country")) {
         return(.data |> dplyr::filter(key_location == country_id))
-      } else if (aggregation_features %in% c("region_id", "region")) {
+      } else if (stratification_features %in% c("region_id", "region")) {
         return(.data |> dplyr::filter(key_location == region_id))
-      } else if (aggregation_features %in% c("subregion_id", "subregion")) {
+      } else if (stratification_features %in% c("subregion_id", "subregion")) {
         return(.data |> dplyr::filter(key_location == subregion_id))
       }
     }
@@ -79,7 +82,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
                        "ventilator"      = "n_ventilator",
                        "min_temperature" = "min_temperature",
                        "max_temperature" = "max_temperature"),
-    .case_definition = "Google COVID-19",
+    .label = "Google COVID-19",
 
     google_covid_19_population       = NULL,
     google_covid_19_index            = NULL,
@@ -141,14 +144,14 @@ google_covid_19_metric <- function(google_pattern, out_name) {
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("location_key", "date", tidyselect::starts_with(glue::glue("new_{google_pattern}"))) |>
-        tidyr::pivot_longer(-c("location_key", "date"),
+        tidyr::pivot_longer(!c("location_key", "date"),
                             names_to = c("tmp", "key_age_bin"),
                             names_sep = "_age_",
                             values_to = out_name,
                             values_transform = as.numeric) |>
         dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
         dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(data)
     },
@@ -219,7 +222,7 @@ google_covid_19_age_group_ <- function() {
                          by = colnames(dplyr::select(out, "location_key", tidyselect::starts_with("age_bin"))),
                          multiple = "first")
 
-      # Some regions changes age aggregation. Discard for now
+      # Some regions changes age stratification. Discard for now
       age_bin_map <- age_bin_map |>
         dplyr::select("location_key") |>
         dplyr::filter(dplyr::n() == 1) |>
@@ -299,7 +302,7 @@ google_covid_19_min_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::select("key_location" = "location_key",
                       "date",
                       "min_temperature" = "minimum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(out)
     },
@@ -323,7 +326,7 @@ google_covid_19_max_temperature_ <- function() { # nolint: object_length_linter.
         dplyr::select("key_location" = "location_key",
                       "date",
                       "max_temperature" = "maximum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(out)
     },
