@@ -1,6 +1,20 @@
 test_that("DiseasystoreGoogleCovid19 works", {
 
-  # First we create a temporary directory for the Google COVID-19 data
+  # Check we can use the Google API directly
+  if (curl::has_internet()) {
+    expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
+      target_conn = DBI::dbConnect(RSQLite::SQLite()),
+      start_date = as.Date("2020-03-01"),
+      end_date = as.Date("2020-03-01"),
+      verbose = FALSE
+    ))
+
+    ds$available_features |>
+      purrr::walk(~ expect_no_error(ds$get_feature(.)))
+  }
+
+
+  # Then we create a temporary directory for the Google COVID-19 data
   remote_conn <- options() %.% diseasystore.DiseasystoreGoogleCovid19.remote_conn
 
   tmp_dir <- stringr::str_replace_all(tempdir(), r"{\\}", .Platform$file.sep)
@@ -28,7 +42,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Check feature store has been created
   checkmate::expect_class(fs, "DiseasystoreGoogleCovid19")
-  expect_equal(fs %.% case_definition, "Google COVID-19")
+  expect_equal(fs %.% label, "Google COVID-19")
 
 
   # SCDB v0.1 gives a warning if database has no tables when used. We suppress this warning here
@@ -113,7 +127,7 @@ test_that("DiseasystoreGoogleCovid19 works", {
   # Attempt to perform the possible key_joins
   available_observables  <- fs$available_features |>
     purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-  available_aggregations <- fs$available_features |>
+  available_stratifications <- fs$available_features |>
     purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
 
   key_join_features_tester <- function(output, start_date, end_date) {
@@ -126,23 +140,23 @@ test_that("DiseasystoreGoogleCovid19 works", {
   start_date <- as.Date("2020-03-01")
   end_date   <- as.Date("2020-04-30")
 
-  # First check we can aggregate without an aggregation
+  # First check we can aggregate without a stratification
   purrr::walk(available_observables,
               ~ expect_no_error(fs$key_join_features(observable = as.character(.),
-                                                     aggregation = NULL,
+                                                     stratification = NULL,
                                                      start_date, end_date)))
 
-  # Then test combinations with non-NULL aggregations
+  # Then test combinations with non-NULL stratifications
   expand.grid(observable  = available_observables,
-              aggregation = available_aggregations) |>
+              stratification = available_stratifications) |>
     purrr::pwalk(~ {
       # This code may fail (gracefully) in some cases. These we catch here
       output <- tryCatch({
         fs$key_join_features(observable = as.character(..1),
-                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                             stratification = eval(parse(text = glue::glue("rlang::quos({..2})"))),
                              start_date, end_date)
       }, error = function(e) {
-        expect_equal(e$message, paste("(At least one) aggregation feature does not match observable aggregator.",
+        expect_equal(e$message, paste("(At least one) stratification feature does not match observable aggregator.",
                                       "Not implemented yet."))
         return(NULL)
       })
@@ -156,12 +170,12 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
   # Test key_join with malformed inputs
   expand.grid(observable  = available_observables,
-              aggregation = "non_existent_aggregation") |>
+              stratification = "non_existent_stratification") |>
     purrr::pwalk(~ {
       # This code may fail (gracefully) in some cases. These we catch here
       output <- tryCatch({
         fs$key_join_features(observable = as.character(..1),
-                             aggregation = ..2,
+                             stratification = ..2,
                              start_date, end_date)
       }, error = function(e) {
         checkmate::expect_character(e$message, pattern = "Must be element of set")
@@ -176,18 +190,18 @@ test_that("DiseasystoreGoogleCovid19 works", {
 
 
   expand.grid(observable  = available_observables,
-              aggregation = "test = non_existent_aggregation") |>
+              stratification = "test = non_existent_stratification") |>
     purrr::pwalk(~ {
       # This code may fail (gracefully) in some cases. These we catch here
       output <- tryCatch({
         fs$key_join_features(observable = as.character(..1),
-                             aggregation = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+                             stratification = eval(parse(text = glue::glue("rlang::quos({..2})"))),
                              start_date, end_date)
       }, error = function(e) {
         checkmate::expect_character(e$message,
-                                    pattern = glue::glue("Aggregation variable not found. ",
-                                                         "Available aggregation variables are: ",
-                                                         "{toString(available_aggregations)}"))
+                                    pattern = glue::glue("Stratification variable not found. ",
+                                                         "Available stratification variables are: ",
+                                                         "{toString(available_stratifications)}"))
         return(NULL)
       })
 
