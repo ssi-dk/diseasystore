@@ -79,7 +79,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   checkmate::assert(
     checkmate::check_function(conn, null.ok = TRUE),
     checkmate::check_class(conn, "DBIConnection", null.ok = TRUE),
-    checkmate::check_character(conn, len = 1, null.ok = TRUE),
+    checkmate::check_character(conn, null.ok = TRUE),
     add = coll
   )
   checkmate::assert_choice(type, c("source_conn", "target_conn"), add = coll)
