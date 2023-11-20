@@ -32,11 +32,13 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    suppressMessages(dplyr::copy_to(conn,
-                   data.frame("db_table" = character(0),
-                              "lock_start" = numeric(0),
-                              "pid" = numeric(0)),
-                   lock_table_id, temporary = FALSE, unique_indexes = "db_table"))
+    suppressMessages(
+      dplyr::copy_to(conn,
+                     data.frame("db_table" = character(0),
+                                "lock_start" = numeric(0),
+                                "pid" = numeric(0)),
+                     lock_table_id, temporary = FALSE, unique_indexes = "db_table")
+    )
   }
 
   # Get a reference to the table
