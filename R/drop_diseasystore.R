@@ -36,12 +36,12 @@ drop_diseasystore <- function(pattern = ".*", schema = "ds", conn = SCDB::get_co
 
   # Delete from logs
   if (SCDB::table_exists(conn, glue::glue("{schema}.logs"))) {
-    log_records_to_delete <- SCDB::get_table(conn, glue::glue("{schema}.logs")) |>
+    log_records_to_delete <- suppressMessages(SCDB::get_table(conn, glue::glue("{schema}.logs"))) |>
       tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE) |>
       dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
       dplyr::select("log_file")
 
-    dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(glue::glue("{schema}.logs"), conn)),
+    dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(glue::glue("{schema}.logs"), conn), check_from = FALSE),
                        log_records_to_delete,
                        by = "log_file",
                        in_place = TRUE,

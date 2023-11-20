@@ -4,7 +4,7 @@ test_that("drop_diseasystore can delete entire default schema", {
 
   # Create logs table in "ds" schema and add mtcars to the schema
   # to simulate a diseasystore on the connection
-  SCDB::create_logs_if_missing("ds.logs", conn)
+  suppressMessages(SCDB::create_logs_if_missing("ds.logs", conn))
   SCDB::create_table(mtcars, conn, "ds.mtcars_1")
   SCDB::create_table(mtcars, conn, "ds.mtcars_2")
 
@@ -33,7 +33,7 @@ test_that("drop_diseasystore can delete single table in default schema", {
 
   # Create logs table in "ds" schema and add mtcars to the schema
   # to simulate a diseasystore on the connection
-  SCDB::create_logs_if_missing("ds.logs", conn)
+  suppressMessages(SCDB::create_logs_if_missing("ds.logs", conn))
   SCDB::create_table(mtcars, conn, "ds.mtcars_1")
   SCDB::create_table(mtcars, conn, "ds.mtcars_2")
 
@@ -72,7 +72,7 @@ test_that("drop_diseasystore can delete entire non-default schema", {
 
   # Create logs table in "ds" schema and add mtcars to the schema
   # to simulate a diseasystore on the connection
-  SCDB::create_logs_if_missing("fs.logs", conn)
+  suppressMessages(SCDB::create_logs_if_missing("fs.logs", conn))
   SCDB::create_table(mtcars, conn, "fs.mtcars_1")
   SCDB::create_table(mtcars, conn, "fs.mtcars_2")
 
@@ -101,7 +101,7 @@ test_that("drop_diseasystore can delete single table in non-default schema", {
 
   # Create logs table in "fs" schema and add mtcars to the schema
   # to simulate a diseasystore on the connection
-  SCDB::create_logs_if_missing("fs.logs", conn)
+  suppressMessages(SCDB::create_logs_if_missing("fs.logs", conn))
   SCDB::create_table(mtcars, conn, "fs.mtcars_1")
   SCDB::create_table(mtcars, conn, "fs.mtcars_2")
 
