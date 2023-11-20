@@ -349,9 +349,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
 
       # Give warning if stratification features are already in the observables data
-      existing_stratification <- intersect(names(observable_data), stratification_features)
+      existing_stratification <- intersect(colnames(observable_data), stratification_features)
       if (length(existing_stratification) > 0) {
-        warning("observable already stratified by: ", toString(existing_stratification), ". ",
+        warning("Observable already stratified by: ", toString(existing_stratification), ". ",
                 "Output might be inconsistent with expectation.")
       }
 
