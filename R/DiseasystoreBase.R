@@ -649,6 +649,6 @@ rlang::on_load({
   options("diseasystore.target_conn" = "")
   options("diseasystore.target_schema" = "")
   options("diseasystore.verbose" = TRUE)
-  options("diseasystore.lock_max_wait" = 30 * 60) # 30 minutes
+  options("diseasystore.lock_wait_max" = 30 * 60) # 30 minutes
   options("diseasystore.lock_wait_increment" = 15) # 15 seconds
 })
