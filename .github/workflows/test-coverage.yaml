@@ -2,15 +2,40 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: main
+    paths: |
+      - R/**
+      - tests/**
+      - man/**
+      - vignettes/**
   pull_request:
-    branches: [main, master]
+    branches: main
 
 name: test-coverage
+
+env:
+  PGHOST: localhost
+  PGPORT: 5432
+  PGDATABASE: diseasystore_test
+  PGUSER: postgres
+  PGPASSWORD: postgres
+
 
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: diseasystore_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -25,6 +50,10 @@ jobs:
         with:
           extra-packages: any::covr, github::r-dbi/RSQLite
           needs: coverage
+
+      - name: Setup testing schemata in PostgreSQL
+        run: |
+          psql diseasystore_test -c "CREATE SCHEMA test_ds; CREATE SCHEMA not_test_ds;"
 
       - name: Test coverage
         run: |

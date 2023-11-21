@@ -7,7 +7,7 @@ test_that("diseasyoption works", {
   )
 
   # Check that diseasyoption works for default values
-  expect_equal(diseasyoption("target_schema"), NULL)
+  expect_equal(diseasyoption("non_existant_option"), NULL)
 
   options("diseasystore.target_schema" = "target_schema_1")
   expect_equal(diseasyoption("target_schema"), "target_schema_1")
