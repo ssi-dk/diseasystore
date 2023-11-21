@@ -52,7 +52,11 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drop_diseasystore</span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">".*"</span>, schema <span class="op">=</span> <span class="st">"ds"</span>, conn <span class="op">=</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_connection.html" class="external-link">get_connection</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">drop_diseasystore</span><span class="op">(</span></span>
+<span>  pattern <span class="op">=</span> <span class="st">".*"</span>,</span>
+<span>  schema <span class="op">=</span> <span class="fu"><a href="diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"target_schema"</span><span class="op">)</span>,</span>
+<span>  conn <span class="op">=</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_connection.html" class="external-link">get_connection</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
