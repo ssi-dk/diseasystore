@@ -589,7 +589,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Determine the date ranges used
       logs <- logs |>
-        dplyr::mutate("fs_start_date" = stringr::str_extract(.data$message, r"{(?<=fs-range: )(\d{4}-\d{2}-\d{2})}"),
+        dplyr::mutate("fs_start_date" = stringr::str_extract(.data$message, r"{(?<=ds-range: )(\d{4}-\d{2}-\d{2})}"),
                       "fs_end_date"   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")) |>
         dplyr::mutate(across(.cols = c("fs_start_date", "fs_end_date"), .fns = as.Date))
 
@@ -647,7 +647,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 rlang::on_load({
   options("diseasystore.source_conn" = "")
   options("diseasystore.target_conn" = "")
-  options("diseasystore.target_schema" = "")
+  options("diseasystore.target_schema" = "ds")
   options("diseasystore.verbose" = TRUE)
   options("diseasystore.lock_max_wait" = 30 * 60) # 30 minutes
   options("diseasystore.lock_wait_increment" = 15) # 15 seconds
