@@ -118,12 +118,14 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
 
       reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
 
-      suppressMessages(reference <- reference_generator(start_date  = start_date,
-                                       end_date    = end_date,
-                                       slice_ts    = ds %.% slice_ts,
-                                       source_conn = ds %.% source_conn) %>%
-        dplyr::copy_to(ds %.% target_conn, ., overwrite = TRUE) |>
-        dplyr::collect())
+      suppressMessages(
+        reference <- reference_generator(start_date  = start_date,
+                                         end_date    = end_date,
+                                         slice_ts    = ds %.% slice_ts,
+                                         source_conn = ds %.% source_conn) %>%
+          dplyr::copy_to(ds %.% target_conn, ., overwrite = TRUE) |>
+          dplyr::collect()
+      )
 
       reference_checksum <- reference |>
         SCDB::digest_to_checksum() |>
@@ -158,15 +160,17 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
 
       reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
 
-      suppressMessages(reference <- reference_generator(start_date  = start_date,
-                                       end_date    = end_date,
-                                       slice_ts    = ds %.% slice_ts,
-                                       source_conn = ds %.% source_conn) %>%
-        dplyr::copy_to(ds %.% target_conn, ., name = "ds_tmp", overwrite = TRUE) |>
-        dplyr::collect() |>
-        SCDB::digest_to_checksum() |>
-        dplyr::pull("checksum") |>
-        sort())
+      suppressMessages(
+        reference <- reference_generator(start_date  = start_date,
+                                         end_date    = end_date,
+                                         slice_ts    = ds %.% slice_ts,
+                                         source_conn = ds %.% source_conn) %>%
+          dplyr::copy_to(ds %.% target_conn, ., name = "ds_tmp", overwrite = TRUE) |>
+          dplyr::collect() |>
+          SCDB::digest_to_checksum() |>
+          dplyr::pull("checksum") |>
+          sort()
+      )
 
       expect_identical(feature, reference)
     })
