@@ -20,6 +20,7 @@ Imports:
     checkmate,
     DBI,
     dbplyr,
+    devtools,
     dplyr,
     glue,
     lubridate,
@@ -35,7 +36,6 @@ Imports:
     zoo
 Suggests:
     curl,
-    devtools,
     knitr,
     rmarkdown,
     RSQLite,
