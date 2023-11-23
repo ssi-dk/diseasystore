@@ -36,6 +36,11 @@ test_that("SCDB gives too many messages", {
   # SCDB::is_historical
   expect_message(SCDB::is.historical(dplyr::tbl(conn, test_id)), "If you want to specify a schema use")
 
+
+  # As well as calls to dplyr::tbl if a SCDB::id is supplied
+  expect_message(dplyr::tbl(conn, test_id), "If you want to specify a schema use")
+
+
   # If any of these message disappears, we need to remove some "suppressMessages" in the code
 
   DBI::dbDisconnect(conn)
