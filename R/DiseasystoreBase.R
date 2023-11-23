@@ -237,8 +237,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       out <- dplyr::inner_join(out,
-                               data.frame(valid_from = start_date, valid_until = end_date) %>%
-                                 dplyr::copy_to(self %.% target_conn, ., "fs_tmp", overwrite = TRUE),
+                               data.frame(valid_from = start_date, valid_until = end_date) |>
+                                 dplyr::copy_to(self %.% target_conn, df = _, "fs_tmp", overwrite = TRUE),
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
@@ -285,8 +285,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       fs_map <- self %.% fs_map
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
-      study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) %>%
-        dplyr::copy_to(self %.% target_conn, ., overwrite = TRUE)
+      study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) |>
+        dplyr::copy_to(self %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
