@@ -6,7 +6,7 @@ target_conn <- diseasyoption("target_conn", "DiseasystoreGoogleCovid19")
 # We assume the data is made available to us in a "testdata" folder
 # If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-local_conn <- file.path(system.file("tests", package = "diseasystore"), "testthat", "testdata")
+local_conn <- devtools::package_file("tests", "testthat", "testdata")
 
 # Check that the files are available
 test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
