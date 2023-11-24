@@ -32,15 +32,17 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    dplyr::copy_to(conn,
-                   data.frame("db_table" = character(0),
-                              "lock_start" = numeric(0),
-                              "pid" = numeric(0)),
-                   lock_table_id, temporary = FALSE, unique_indexes = "db_table")
+    suppressMessages(
+      dplyr::copy_to(conn,
+                     data.frame("db_table" = character(0),
+                                "lock_start" = numeric(0),
+                                "pid" = numeric(0)),
+                     lock_table_id, temporary = FALSE, unique_indexes = "db_table")
+    )
   }
 
   # Get a reference to the table
-  lock_table <- dplyr::tbl(conn, lock_table_id)
+  lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
 
   # We first delete old locks.
   cleanup_locks(conn, schema)
@@ -78,7 +80,7 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_table <- dplyr::tbl(conn, lock_table_id)
+  lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
 
   # Delete locks matching  our process ID (pid) and the given db_table
   dplyr::rows_delete(lock_table,
@@ -103,7 +105,7 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_owner <- dplyr::tbl(conn, lock_table_id) |>
+  lock_owner <- dplyr::tbl(conn, lock_table_id, check_from = FALSE) |>
     dplyr::filter(.data$db_table == !!db_table) |>
     dplyr::pull("pid") |>
     as.integer()
@@ -125,7 +127,7 @@ cleanup_locks <- function(conn, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_table <- dplyr::tbl(conn, lock_table_id)
+  lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
 
   # Detect and delete old locks
   old_locks <- lock_table |>

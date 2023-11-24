@@ -128,8 +128,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
 
       # Create log table
-      SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
-                                   conn = self %.% target_conn)
+      suppressMessages(
+        SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
+                                     conn = self %.% target_conn)
+      )
 
       # Determine dates that need computation
       fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
@@ -188,9 +190,10 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
           # Add the existing computed data for given slice_ts
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
-            fs_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn))
+            fs_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
+                                      check_from = FALSE)
 
-            if (SCDB::is.historical(fs_existing)) {
+            if (suppressMessages(SCDB::is.historical(fs_existing))) {
               fs_existing <- fs_existing |>
                 dplyr::filter(.data$from_ts == slice_ts) |>
                 dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
@@ -203,7 +206,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
           }
 
           # Commit to DB
-          SCDB::update_snapshot(
+          suppressMessages(SCDB::update_snapshot(
             .data = fs_updated_feature,
             conn = self %.% target_conn,
             db_table = target_table,
@@ -213,7 +216,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                                       log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
                                       log_conn = self %.% target_conn),
             enforce_chronological_order = FALSE
-          )
+          ))
         })
 
         # Release the lock on the table
@@ -234,8 +237,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       out <- dplyr::inner_join(out,
-                               data.frame(valid_from = start_date, valid_until = end_date) %>%
-                                 dplyr::copy_to(self %.% target_conn, ., "fs_tmp", overwrite = TRUE),
+                               data.frame(valid_from = start_date, valid_until = end_date) |>
+                                 dplyr::copy_to(self %.% target_conn, df = _, "fs_tmp", overwrite = TRUE),
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
@@ -282,8 +285,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       fs_map <- self %.% fs_map
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
-      study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) %>%
-        dplyr::copy_to(self %.% target_conn, ., overwrite = TRUE)
+      study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) |>
+        dplyr::copy_to(self %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
@@ -577,7 +580,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,
-                         SCDB::id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn)) |>
+                         SCDB::id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn),
+                         check_from = FALSE) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
         dplyr::filter(.data$target_table == !!target_table, .data$date == !!slice_ts)

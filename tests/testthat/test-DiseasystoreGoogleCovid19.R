@@ -6,7 +6,7 @@ target_conn <- diseasyoption("target_conn", "DiseasystoreGoogleCovid19")
 # We assume the data is made available to us in a "testdata" folder
 # If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-local_conn <- "testdata"
+local_conn <- devtools::package_file("tests", "testthat", "testdata")
 
 # Check that the files are available
 test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
@@ -121,8 +121,8 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
       reference <- reference_generator(start_date  = start_date,
                                        end_date    = end_date,
                                        slice_ts    = ds %.% slice_ts,
-                                       source_conn = ds %.% source_conn) %>%
-        dplyr::copy_to(ds %.% target_conn, ., overwrite = TRUE) |>
+                                       source_conn = ds %.% source_conn) |>
+        dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
         dplyr::collect()
 
       reference_checksum <- reference |>
@@ -161,8 +161,8 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
       reference <- reference_generator(start_date  = start_date,
                                        end_date    = end_date,
                                        slice_ts    = ds %.% slice_ts,
-                                       source_conn = ds %.% source_conn) %>%
-        dplyr::copy_to(ds %.% target_conn, ., name = "ds_tmp", overwrite = TRUE) |>
+                                       source_conn = ds %.% source_conn) |>
+        dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
         dplyr::collect() |>
         SCDB::digest_to_checksum() |>
         dplyr::pull("checksum") |>
@@ -224,7 +224,7 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
           )
         },
         warning = function(w) {
-          checkmate::expect_character(w$message, pattern = "observable already stratified by")
+          checkmate::expect_character(w$message, pattern = "Observable already stratified by")
           return(NULL)
         },
         error = function(e) {
