@@ -9,9 +9,9 @@ test_that("DiseasystoreBase works", {
   expect_error(DiseasystoreBase$new(source_conn = "/some/path"), regexp = "target_conn option not defined")
 
   # 3)
-  options("diseasystore.source_conn" = "/some/path")
+  withr::local_options("diseasystore.source_conn" = "/some/path")
   expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
-  options("diseasystore.source_conn" = NULL)
+  withr::local_options("diseasystore.source_conn" = NULL)
 
   # 4)
   ds <- DiseasystoreBase$new(
@@ -74,7 +74,7 @@ test_that("DiseasystoreBase works", {
   rm(ds)
 
   # 10)
-  options(diseasystore.target_schema = "test_ds")
+  withr::local_options("diseasystore.target_schema" = "test_ds")
   ds <- DiseasystoreBase$new(
     source_conn = "/some/path",
     target_conn = dbplyr::simulate_dbi()
@@ -106,8 +106,8 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
-  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = "test_ds")
-  logs <- suppressMessages(SCDB::create_logs_if_missing("test_ds.logs", conn))
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = target_schema_1)
+  logs <- suppressMessages(SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn))
   rows_append(logs, data.frame(date = slice_ts,
                                table = "table1",
                                message = glue::glue("ds-range: {start_date} - {end_date}"),

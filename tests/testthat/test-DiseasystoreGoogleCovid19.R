@@ -1,12 +1,14 @@
+withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = target_schema_1)
+
 # Store the current options
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 source_conn <- diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 target_conn <- diseasyoption("target_conn", "DiseasystoreGoogleCovid19")
 
-# We assume the data is made available to us in a "testdata" folder
+# We assume the data is made available to us in a "test_data" folder
 # If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-local_conn <- devtools::package_file("tests", "testthat", "testdata")
+local_conn <- testthat::test_path("test_data")
 
 # Check that the files are available
 test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
@@ -62,7 +64,7 @@ test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
   if (curl::has_internet()) {
 
     # Ensure source is set as the remote
-    options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = remote_conn)
+    withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = remote_conn)
 
     expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -81,7 +83,7 @@ test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
 test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
 
   # Ensure source is set as the local directory
-  options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
 
   expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
     target_conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -316,8 +318,3 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
     rm(ds)
   }
 })
-
-
-# Reset the options
-options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn)
-options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)

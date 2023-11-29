@@ -1,29 +1,20 @@
 test_that("diseasyoption works", {
 
-  # Store the current options
-  opts <- options(
-    "diseasystore.target_schema" = "",
-    "diseasystore.DiseasystoreGoogleCovid19.target_schema" = ""
-  )
-
   # Check that diseasyoption works for default values
-  expect_equal(diseasyoption("non_existant_option"), NULL)
+  expect_equal(diseasyoption("non_existent_option"), NULL)
 
-  options("diseasystore.target_schema" = "target_schema_1")
-  expect_equal(diseasyoption("target_schema"), "target_schema_1")
+  withr::local_options("diseasystore.target_schema" = target_schema_1)
+  expect_equal(diseasyoption("target_schema"), target_schema_1)
 
   # Check that it works for child classes
   ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite()))
-  expect_equal(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), "target_schema_1")
-  expect_equal(diseasyoption("target_schema", ds), "target_schema_1")
+  expect_equal(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_1)
+  expect_equal(diseasyoption("target_schema", ds), target_schema_1)
 
-  options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = "target_schema_2")
-  expect_equal(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), "target_schema_2")
-  expect_equal(diseasyoption("target_schema", ds), "target_schema_2")
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = target_schema_2)
+  expect_equal(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_2)
+  expect_equal(diseasyoption("target_schema", ds), target_schema_2)
 
-  # Reset options
-  options(opts)
-  rm(opts)
 })
 
 
