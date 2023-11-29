@@ -1,11 +1,13 @@
 test_that("diseasyoption works", {
 
-  # Store current values
-  opt1 <- options() %.% "diseasystore.target_schema"
-  opt2 <- options() %.% "diseasystore.DiseasystoreGoogleCovid19.target_schema"
+  # Store the current options
+  opts <- options(
+    "diseasystore.target_schema" = "",
+    "diseasystore.DiseasystoreGoogleCovid19.target_schema" = ""
+  )
 
   # Check that diseasyoption works for default values
-  expect_equal(diseasyoption("target_schema"), NULL)
+  expect_equal(diseasyoption("non_existant_option"), NULL)
 
   options("diseasystore.target_schema" = "target_schema_1")
   expect_equal(diseasyoption("target_schema"), "target_schema_1")
@@ -15,14 +17,13 @@ test_that("diseasyoption works", {
   expect_equal(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), "target_schema_1")
   expect_equal(diseasyoption("target_schema", ds), "target_schema_1")
 
-
   options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = "target_schema_2")
   expect_equal(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), "target_schema_2")
   expect_equal(diseasyoption("target_schema", ds), "target_schema_2")
 
   # Reset options
-  options("diseasystore.target_schema" = opt1)
-  options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = opt2)
+  options(opts)
+  rm(opts)
 })
 
 

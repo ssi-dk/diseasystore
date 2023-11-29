@@ -68,7 +68,7 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
       # Set defaults for missing functions
       if (is.null(get)) {
         args <- append(args, c("get" = function(target_table, slice_ts, target_conn) {
-          SCDB::get_table(target_conn, target_table, slice_ts = slice_ts)
+          suppressMessages(SCDB::get_table(target_conn, target_table, slice_ts = slice_ts))
         }))
       }
       if (is.null(compute)) {

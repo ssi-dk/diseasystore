@@ -61,8 +61,9 @@ NOTE: a global DB can also be configured using `options(diseasystore.target_conn
 ```{r configure_diseasystore, eval=FALSE}
 
 # We will store the target_conn as a function that opens a DBIconnection to the DB
-target_conn <- \() DBI::dbConnect(RSQLite::SQLite(),
-                                  "/local/file/path/diseasystore_google_covid_19.sqlite")
+target_conn <- \() {
+  DBI::dbConnect(RSQLite::SQLite(), "/local/file/path/diseasystore_google_covid_19.sqlite")
+}
 
 options(diseasystore.DiseasystoreGoogleCovid19.target_conn = target_conn)
 ```
@@ -76,7 +77,7 @@ Once the files are downloaded and the target DB is configured, we can run the `d
 start_date <- as.Date("2020-01-01")
 end_date   <- as.Date("2020-06-01")
 
-fs <- DiseasystoreGoogleCovid19$new(start_date, end_date)
+ds <- DiseasystoreGoogleCovid19$new(start_date, end_date)
 ```
 
 The feature store is designed to work with the `diseasy` package, which utilizes it to couple data as requested.
@@ -85,10 +86,10 @@ However, we can also use the feature store directly to get data.
 ```{r using_diseasystore, eval=FALSE}
 
 # We can see all the available features in the feature store
-print(fs$available_features)
+print(ds$available_features)
 
 # And then retrieve each feature from the feature store
 #' \dontrun{
-fs$get_feature("n_hospital")
+ds$get_feature("n_hospital")
 #' }
 ```

@@ -20,6 +20,7 @@ Imports:
     checkmate,
     DBI,
     dbplyr,
+    devtools,
     dplyr,
     glue,
     lubridate,
@@ -29,17 +30,17 @@ Imports:
     R6,
     SCDB,
     stringr,
+    testthat (>= 3.0.0),
     tidyr,
     tidyselect,
     zoo
 Suggests:
-    devtools,
+    curl,
     knitr,
     rmarkdown,
     RSQLite,
     RPostgres,
     tibble,
-    testthat (>= 3.0.0),
     spelling
 VignetteBuilder: knitr
 Config/testthat/edition: 3
