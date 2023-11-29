@@ -1,6 +1,9 @@
+# Store the current options
+diseasy_opts <- options(purrr::keep(names(options()), ~ startsWith(., "diseasy")))
+
 # Configure diseasystore for testing
-target_schema <- "test_ds"
-options("diseasystore.target_schema" = target_schema)
+target_schema_1 <- "test_ds"
+target_schema_2 <- "not_test_ds"
 
 # Define list of connections to check
 conn_list <- list(
@@ -63,7 +66,7 @@ for (conn in conns) {
   )
 
   # Try to write to the target schema
-  test_id <- SCDB::id(paste(target_schema, "mtcars", sep = "."), conn)
+  test_id <- SCDB::id(paste(target_schema_1, "mtcars", sep = "."), conn)
 
   # Delete existing
   if (DBI::dbExistsTable(conn, test_id)) {
@@ -73,12 +76,12 @@ for (conn in conns) {
   # Check write permissions
   DBI::dbWriteTable(conn, test_id, mtcars)
   if (!DBI::dbExistsTable(conn, test_id)) {
-    stop("Cannot write to test schema (", target_schema, "). Check DB permissions.")
+    rlang::abort("Cannot write to test schema (", target_schema_1, "). Check DB permissions.")
   }
 
   # Delete the existing data in the schema
-  drop_diseasystore(schema = target_schema, conn = conn)
-  drop_diseasystore(schema = paste0("not_", target_schema), conn = conn)
+  drop_diseasystore(schema = target_schema_1, conn = conn)
+  drop_diseasystore(schema = target_schema_2, conn = conn)
 
 }
 
