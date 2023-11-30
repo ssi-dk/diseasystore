@@ -131,7 +131,7 @@ remove_expired_locks <- function(conn, schema = NULL) {
 
   # Detect and delete old locks
   old_locks <- lock_table |>
-    dplyr::filter(.data$lock_start < !!as.numeric(Sys.time()) - 60 * 30) |>
+    dplyr::filter(.data$lock_start < !!as.numeric(Sys.time()) - !!diseasyoption("lock_wait_max")) |>
     dplyr::select("db_table")
   dplyr::rows_delete(lock_table, old_locks, by = "db_table", unmatched = "ignore", in_place = TRUE)
 
