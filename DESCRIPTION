@@ -22,6 +22,7 @@ Imports:
     dbplyr,
     dplyr,
     glue,
+    lintr,
     lubridate,
     purrr,
     readr,

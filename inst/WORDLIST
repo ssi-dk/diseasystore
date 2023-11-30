@@ -31,6 +31,9 @@ FeatureHandler
 FeatureHandlers
 
 Lasse
+linter
+linters
+lintr
 
 tbl
 tibble
@@ -40,6 +43,7 @@ ts
 
 md
 
+nolint
 nrow
 
 OO
