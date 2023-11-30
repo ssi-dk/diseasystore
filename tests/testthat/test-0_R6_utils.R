@@ -1,3 +1,41 @@
+test_that("printr works", {
+
+  # Check that printr works without file printing
+  # 1)
+  checkmate::expect_character(capture.output(printr("test string")),               pattern = r"{test string}")
+  # 2)
+  checkmate::expect_character(capture.output(printr("test1", "test2")),            pattern = r"{test1test2}")
+  # 3)
+  checkmate::expect_character(capture.output(printr("test1", "test2", sep = " ")), pattern = r"{test1 test2}")
+
+  # Check that printr works with file printing
+  test_file <- tempfile()
+
+  # 1)
+  checkmate::expect_character(capture.output(printr("test string",    file = test_file)),
+                              pattern = r"{test string}")
+  checkmate::expect_character(readLines(test_file),
+                              pattern = r"{test string}")
+  file.remove(test_file)
+
+
+  # 2)
+  checkmate::expect_character(capture.output(printr("test1", "test2", file = test_file)),
+                              pattern = r"{test1test2}")
+  checkmate::expect_character(readLines(test_file),
+                              pattern = r"{test1test2}")
+  file.remove(test_file)
+
+
+  # 3)
+  checkmate::expect_character(capture.output(printr("test1", "test2", file = test_file, sep = " ")),
+                              pattern = r"{test1 test2}")
+  checkmate::expect_character(readLines(test_file),
+                              pattern = r"{test1 test2}")
+  file.remove(test_file)
+})
+
+
 test_that("diseasyoption works", {
 
   # Check that diseasyoption works for default values
