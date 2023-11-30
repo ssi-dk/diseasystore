@@ -7,13 +7,13 @@
 #' @examples
 #' # will produce lints
 #' lint(
-#'   text = paste(strrep("x", 15L), "# nolint: object_name_linter",
+#'   text = paste(strrep("x", 15L), "# nolint: nolint_linter",
 #'   linters = nolint_linter(length = 20L)
 #' )
 #'
 #' # okay
 #' lint(
-#'   text = paste(strrep("x", 19L), "# nolint: object_name_linter",
+#'   text = paste(strrep("x", 19L), "# nolint: nolint_linter",
 #'   linters = nolint_linter(length = 20L)
 #' )
 #'
@@ -22,7 +22,7 @@
 #' - <https://style.tidyverse.org/syntax.html#long-lines>
 #' @export
 nolint_linter <- function(length = 80L) {
-  general_msg <- paste("`# nolint:` statements start at", length, "characters.")
+  general_msg <- paste("`nolint:` statements start at", length, "characters.")
 
   lintr::Linter(
     function(source_expression) {
@@ -32,11 +32,15 @@ nolint_linter <- function(length = 80L) {
         return(list())
       }
 
-      nolint_info <- source_expression$file_lines |>
-        stringr::str_locate_all(r"{# ?nolint:}") |>
-        purrr::map(as.data.frame) |>
-        purrr::reduce(rbind) |>
+      nolint_info <- tibble::tibble(lines = source_expression$file_lines) |>
         dplyr::mutate(line_number = dplyr::row_number()) |>
+        dplyr::filter(stringr::str_detect(.data$lines, r"{# ?nolint:}")) |>
+        dplyr::group_by(.data$line_number) |>
+        dplyr::group_modify(~ {
+          stringr::str_locate_all(.$lines, r"{# ?nolint:}") |>
+            purrr::map(as.data.frame) |>
+            purrr::reduce(union)
+        }) |>
         dplyr::filter(start != length + 1)
 
       purrr::pmap(
@@ -47,7 +51,7 @@ nolint_linter <- function(length = 80L) {
             line_number = line_number,
             column_number = start,
             type = "style",
-            message = paste(general_msg, "This `# nolint:` statements starts at ", start, "characters."),
+            message = paste(general_msg, "This `nolint:` statements starts at ", start, "characters."),
             line = source_expression$file_lines[line_number],
             ranges = list(c(start, end))
           )
