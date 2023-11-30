@@ -406,18 +406,18 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       all_dates <- tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1))
 
       if (!is.null(stratification)) {
-        all_combi <- out |>
+        all_combinations <- out |>
           dplyr::ungroup() |>
           dplyr::distinct(!!!stratification) |>
           dplyr::cross_join(all_dates, copy = TRUE) |>
           dplyr::compute()
       } else {
-        all_combi <- all_dates
+        all_combinations <- all_dates
       }
 
       # Aggregate across dates
       data <- t_add |>
-        dplyr::right_join(all_combi, by = c("date", stratification_names), na_matches = "na",
+        dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na",
                           copy = is.null(stratification)) |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>

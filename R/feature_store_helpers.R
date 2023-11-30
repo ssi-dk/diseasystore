@@ -111,7 +111,7 @@ source_conn_path <- function(source_conn, file) {
 
   # Determine the type of location
   if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
-    # If source_conn is a dirctory, look for files in the folder and keep the ones that match the requested file
+    # If source_conn is a directory, look for files in the folder and keep the ones that match the requested file
     # This way, if the file exists in a zipped form, it is still retrieved
     matching_file <- purrr::keep(dir(source_conn), ~ startsWith(., file)) |>
       purrr::pluck(1) # Ensure we only have one match

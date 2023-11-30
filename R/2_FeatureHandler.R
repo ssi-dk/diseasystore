@@ -5,7 +5,7 @@
 #'   They define the three methods associated with features (`compute`, `get` and `key_join`).
 #' @examples
 #'   # The FeatureHandler is typically configured as part of making a new Diseasystore.
-#'   # Most often, we need only specifiy `compute` and `key_join` to get a functioning FeatureHandler
+#'   # Most often, we need only specify `compute` and `key_join` to get a functioning FeatureHandler
 #'
 #'   # In this example we use mtcars as the basis for our features
 #'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
@@ -20,11 +20,11 @@
 #'
 #'   dplyr::copy_to(conn, data, "mtcars")
 #'
-#'   # In this example, the feature we want is the "maximum miles per galon"
-#'   # The feature in question in the mtcars dataset is then "mpg" and when we need to reduce
+#'   # In this example, the feature we want is the "maximum miles per gallon"
+#'   # The feature in question in the mtcars data set is then "mpg" and when we need to reduce
 #'   # our data set, we want to use the "max()" function.
 #'
-#'   # We first write a compute function for the mpg in our modified mtcars dataset
+#'   # We first write a compute function for the mpg in our modified mtcars data set
 #'   # Our goal is to get the mpg of all cars that were in production at the between start/end_date
 #'   compute_mpg <- function(start_date, end_date, slice_ts, source_conn) {
 #'     out <- SCDB::get_table(source_conn, "mtcars", slice_ts = slice_ts) |>
@@ -53,12 +53,24 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
     #'   Creates a new instance of the `FeatureHandler` [R6][R6::R6Class] class.
     #' @param compute (`function`)\cr
     #'   A function of the form "function(start_date, end_date, slice_ts, source_conn)".
-    #'   This function should compute the feature from the source connection.
+    #'   This function should return a `data.frame` with the computed feature (computed from the source connection).
+    #'   The `data.frame` should contain the following columns:
+    #'    * key_\*: One (or more) columns containing keys to link this feature with other features
+    #'    * \*: One (or more) columns containing the features that are computed
+    #'    * valid_from/until: A set of columns containing the time period for which this feature information is valid.
+    #'    \cr
     #' @param get (`function`)\cr
-    #'   A function of the form "function(target_table, slice_ts, target_conn)".
-    #'   This function should retrieve the computed feature from the target connection.
+    #'   (Optional). A function of the form "function(target_table, slice_ts, target_conn)".
+    #'   This function should retrieve the computed feature from the target connection.\cr
     #' @param key_join (`function`)\cr
-    #'   One of the aggregators from [aggregators()].
+    #'   A function like one of the aggregators from [aggregators()].
+    #'
+    #'   The function should return an expression on the form:
+    #'   dplyr::summarise(.data,
+    #'     dplyr::across(.cols = tidyselect::all_of(feature),
+    #'                   .fns = list(n = ~ <aggregation function>),
+    #'                   .names = "{.fn}"),
+    #'     .groups = "drop")
     #' @return
     #'   A new instance of the `FeatureHandler` [R6][R6::R6Class] class.
     initialize = function(compute = NULL, get = NULL, key_join = NULL) {
@@ -67,16 +79,24 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
       args <- as.list(c(compute = compute, get = get, key_join = key_join))
 
       # Set defaults for missing functions
+      if (is.null(compute)) {
+        args <- append(args, c("compute" = \(...) stop("compute not configured!")))
+      } else {
+        checkmate::assert_function(compute, args = c("start_date", "end_date", "slice_ts", "source_conn"))
+      }
+
       if (is.null(get)) {
         args <- append(args, c("get" = function(target_table, slice_ts, target_conn) {
           suppressMessages(SCDB::get_table(target_conn, target_table, slice_ts = slice_ts))
         }))
+      } else {
+        checkmate::assert_function(get, args = c("target_table", "slice_ts", "target_conn"))
       }
-      if (is.null(compute)) {
-        args <- append(args, c("compute" = \(...) stop("compute not configured!")))
-      }
+
       if (is.null(key_join)) {
         args  <- append(args, c("key_join" = \(...) stop("key_join not configured!")))
+      } else {
+        checkmate::assert_function(key_join, args = c(".data", "feature"))
       }
 
       # Set the functions of the FeatureHandler

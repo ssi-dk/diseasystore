@@ -25,7 +25,7 @@ read_only_error <- function(field) {
 #' @param file Path of an output file to append the output to
 #' @param sep The separator given to cat
 #' @noRd
-printr <- function(..., file = "/dev/null", sep = "") {
+printr <- function(..., file = nullfile(), sep = "") {
   sink(file = file, split = TRUE, append = TRUE, type = "output")
   cat(..., "\n", sep = sep)
   sink()
@@ -45,7 +45,7 @@ printr <- function(..., file = "/dev/null", sep = "") {
 #'   # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
 #'   diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 #'
-#'   # Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore
+#'   # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
 #'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 #' @export
 diseasyoption <- function(option, class = "DiseasystoreBase") {

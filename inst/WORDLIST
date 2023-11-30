@@ -25,6 +25,8 @@ dtplyr
 
 Engbo
 
+fn
+fns
 FeatureHandler
 FeatureHandlers
 
@@ -32,6 +34,7 @@ Lasse
 
 tbl
 tibble
+tidyselect
 TODOs
 ts
 

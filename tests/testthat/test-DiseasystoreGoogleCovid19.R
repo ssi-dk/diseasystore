@@ -314,7 +314,7 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
       })
 
 
-    # Cleanup
+    # Clean up
     rm(ds)
   }
 })
