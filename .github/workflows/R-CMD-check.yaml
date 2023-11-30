@@ -45,7 +45,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, github::r-dbi/RSQLite
+          extra-packages: any::rcmdcheck
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
@@ -79,7 +79,6 @@ jobs:
             any::testthat
             any::knitr
             any::rmarkdown
-            github::r-dbi/RSQLite
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
