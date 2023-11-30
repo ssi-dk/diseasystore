@@ -9,66 +9,92 @@ test_that("DiseasystoreBase works", {
   expect_error(DiseasystoreBase$new(source_conn = "/some/path"), regexp = "target_conn option not defined")
 
   # 3)
-  options(diseasystore.source_conn = "/some/path")
+  withr::local_options("diseasystore.source_conn" = "/some/path")
   expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
-  options(diseasystore.source_conn = NULL)
+  withr::local_options("diseasystore.source_conn" = NULL)
 
   # 4)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
-  expect_null(fs %.% start_date)
-  expect_null(fs %.% end_date)
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi()
+  )
+  expect_null(ds %.% start_date)
+  expect_null(ds %.% end_date)
+  rm(ds)
 
   # 5)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(),
-                             start_date = as.Date("2020-03-01"))
-  expect_identical(fs %.% start_date, as.Date("2020-03-01"))
-  expect_null(fs %.% end_date)
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi(),
+    start_date = as.Date("2020-03-01")
+  )
+  expect_identical(ds %.% start_date, as.Date("2020-03-01"))
+  expect_null(ds %.% end_date)
+  rm(ds)
 
   # 6)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(),
-                             start_date = as.Date("2020-03-01"),
-                             end_date   = as.Date("2020-06-01"))
-  expect_identical(fs %.% start_date, as.Date("2020-03-01"))
-  expect_identical(fs %.% end_date,   as.Date("2020-06-01"))
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi(),
+    start_date = as.Date("2020-03-01"),
+    end_date   = as.Date("2020-06-01")
+  )
+  expect_identical(ds %.% start_date, as.Date("2020-03-01"))
+  expect_identical(ds %.% end_date,   as.Date("2020-06-01"))
+  rm(ds)
 
   # 7)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(),
-                             start_date = as.Date("2020-03-01"),
-                             end_date   = as.Date("2020-06-01"),
-                             slice_ts   = "2021-01-01 09:00:00")
-  expect_identical(fs %.% start_date, as.Date("2020-03-01"))
-  expect_identical(fs %.% end_date,   as.Date("2020-06-01"))
-  expect_identical(fs %.% slice_ts,   "2021-01-01 09:00:00")
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi(),
+    start_date = as.Date("2020-03-01"),
+    end_date   = as.Date("2020-06-01"),
+    slice_ts   = "2021-01-01 09:00:00"
+  )
+  expect_identical(ds %.% start_date, as.Date("2020-03-01"))
+  expect_identical(ds %.% end_date,   as.Date("2020-06-01"))
+  expect_identical(ds %.% slice_ts,   "2021-01-01 09:00:00")
+  rm(ds)
 
   # 8)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
-  expect_identical(fs %.% target_schema, "ds")
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi()
+  )
+  expect_identical(ds %.% target_schema, options() %.% "diseasystore.target_schema")
+  rm(ds)
 
   # 9)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
-  expect_identical(fs %.% target_schema, "test")
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi(),
+    target_schema = "test_ds"
+  )
+  expect_identical(ds %.% target_schema, "test_ds")
+  rm(ds)
 
   # 10)
-  options(diseasystore.target_schema = "test")
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi())
-  expect_identical(fs %.% target_schema, "test")
-  rm(fs)
+  withr::local_options("diseasystore.target_schema" = "test_ds")
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi()
+  )
+  expect_identical(ds %.% target_schema, "test_ds")
+  rm(ds)
 
   # 11)
-  fs <- DiseasystoreBase$new(source_conn = "/some/path", target_conn = dbplyr::simulate_dbi(), target_schema = "test")
-  expect_identical(fs %.% target_schema, "test")
-  rm(fs)
+  ds <- DiseasystoreBase$new(
+    source_conn = "/some/path",
+    target_conn = dbplyr::simulate_dbi(),
+    target_schema = "test_ds"
+  )
+  expect_identical(ds %.% target_schema, "test_ds")
+  rm(ds)
 
   # 12)
-  fs <- DiseasystoreBase$new(target_conn = dbplyr::simulate_dbi())
-  expect_identical(fs %.% target_conn, fs %.% source_conn)
-  rm(fs)
+  ds <- DiseasystoreBase$new(target_conn = dbplyr::simulate_dbi())
+  expect_identical(ds %.% target_conn, ds %.% source_conn)
+  rm(ds)
 
 })
 
@@ -80,38 +106,40 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
-  fs <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = "test_ds")
-  logs <- SCDB::create_logs_if_missing("test_ds.logs", conn)
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = target_schema_1)
+  logs <- suppressMessages(SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn))
   rows_append(logs, data.frame(date = slice_ts,
-                               table = "test",
-                               message = glue::glue("fs-range: {start_date} - {end_date}"),
+                               table = "table1",
+                               message = glue::glue("ds-range: {start_date} - {end_date}"),
+                               success = TRUE,
                                log_file = "1"),
               copy = TRUE, in_place = TRUE)
 
-  determine_new_ranges <- fs$.__enclos_env__$private$determine_new_ranges
+  determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 
-  expect_equal(determine_new_ranges("test", start_date, end_date, slice_ts),
-               tibble::tibble(start_date = as.Date(character(0)), end_date = as.Date(character(0))))
+  expect_equal(determine_new_ranges("table1", start_date, end_date, slice_ts),
+               tibble::tibble(start_date = as.Date(character(0)),
+                              end_date   = as.Date(character(0))))
 
-  expect_equal(determine_new_ranges("testing", start_date, end_date, slice_ts),
+  expect_equal(determine_new_ranges("table2", start_date, end_date, slice_ts),
                tibble::tibble(start_date = !!start_date,
                               end_date   = !!end_date))
 
-  expect_equal(determine_new_ranges("test", start_date, end_date + lubridate::days(1), slice_ts),
+  expect_equal(determine_new_ranges("table1", start_date, end_date + lubridate::days(5), slice_ts),
                tibble::tibble(start_date = !!end_date + lubridate::days(1),
-                              end_date   = !!end_date + lubridate::days(1)))
+                              end_date   = !!end_date + lubridate::days(5)))
 
-  expect_equal(determine_new_ranges("test", start_date - lubridate::days(1), end_date, slice_ts),
-               tibble::tibble(start_date = !!start_date - lubridate::days(1),
+  expect_equal(determine_new_ranges("table1", start_date - lubridate::days(5), end_date, slice_ts),
+               tibble::tibble(start_date = !!start_date - lubridate::days(5),
                               end_date   = !!start_date - lubridate::days(1)))
 
-  expect_equal(determine_new_ranges("test", start_date - lubridate::days(1), end_date + lubridate::days(1), slice_ts),
-               tibble::tibble(start_date = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(1)),
-                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(1))))
+  expect_equal(determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), slice_ts),
+               tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5))))
 
-  expect_equal(determine_new_ranges("test", start_date - lubridate::days(2), end_date + lubridate::days(2), slice_ts),
-               tibble::tibble(start_date = c(!!start_date - lubridate::days(2), !!end_date + lubridate::days(1)),
-                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(2))))
+  expect_equal(determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), slice_ts),
+               tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3))))
 })
 
 
@@ -144,15 +172,15 @@ test_that("active binding: available_features works", {
 })
 
 
-test_that("active binding: case_definition works", {
+test_that("active binding: label works", {
   m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
-  # Retrieve the case_definition
-  expect_equal(m$case_definition, NULL)
+  # Retrieve the label
+  expect_equal(m$label, NULL)
 
-  # Try to set the case_definition
-  expect_equal(tryCatch(m$case_definition <- "test", error = \(e) e),
-               simpleError("`$case_definition` is read only"))
-  expect_equal(m$case_definition, NULL)
+  # Try to set the label
+  expect_equal(tryCatch(m$label <- "test", error = \(e) e),
+               simpleError("`$label` is read only"))
+  expect_equal(m$label, NULL)
   rm(m)
 })

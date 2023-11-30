@@ -18,32 +18,35 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
   public = list(
 
     #' @description
-    #'   This function implements an intermediate filtering in the aggregation pipeline.
+    #'   This function implements an intermediate filtering in the stratification pipeline.
     #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-    #'   The `key_join_filter` is inserted into the aggregation pipeline to remove this double counting.
+    #'   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
     #' @param .data `r rd_.data()`
-    #' @param aggregation_features (`character`)\cr
-    #'   A list of the features included in the aggregation process.
+    #' @param stratification_features (`character`)\cr
+    #'   A list of the features included in the stratification process.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, aggregation_features,
+    key_join_filter = function(.data, stratification_features,
                                start_date = private %.% start_date,
                                end_date = private %.% end_date) {
 
-      # The Google data contains surplus data depending on the aggregation.
+      # The Google data contains surplus data depending on the stratification.
       # Ie. some individuals are counted more than once.
       # Eg. once at the country level, and then again at the region level etc.
-      # We need to filter at the appropriate aggregation level when these doubly counted
+      # We need to filter at the appropriate stratification level when these doubly counted
       # features are requested.
 
       # Manually perform filtering
-      if (is.null(aggregation_features) ||
-            (!is.null(aggregation_features) && !(aggregation_features %in% c("country_id", "country", "region_id",
-                                                                             "region", "subregion_id", "subregion")))) {
+      if (is.null(stratification_features) ||
+            (!is.null(stratification_features) &&
+               purrr::none(stratification_features,
+                           ~ . %in% c("country_id", "country",
+                                      "region_id", "region",
+                                      "subregion_id", "subregion")))) {
 
-        # If no spatial aggregation is requested, use the largest available per country
+        # If no spatial stratification is requested, use the largest available per country
         filter_level <- self$get_feature("country_id", start_date, end_date) |>
           dplyr::group_by(country_id) |>
           dplyr::slice_min(aggregation_level) |>
@@ -52,11 +55,11 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
 
-      } else if (aggregation_features %in% c("country_id", "country")) {
+      } else if (stratification_features %in% c("country_id", "country")) {
         return(.data |> dplyr::filter(key_location == country_id))
-      } else if (aggregation_features %in% c("region_id", "region")) {
+      } else if (stratification_features %in% c("region_id", "region")) {
         return(.data |> dplyr::filter(key_location == region_id))
-      } else if (aggregation_features %in% c("subregion_id", "subregion")) {
+      } else if (stratification_features %in% c("subregion_id", "subregion")) {
         return(.data |> dplyr::filter(key_location == subregion_id))
       }
     }
@@ -79,7 +82,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
                        "ventilator"      = "n_ventilator",
                        "min_temperature" = "min_temperature",
                        "max_temperature" = "max_temperature"),
-    .case_definition = "Google COVID-19",
+    .label = "Google COVID-19",
 
     google_covid_19_population       = NULL,
     google_covid_19_index            = NULL,
@@ -113,10 +116,6 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 )
 
 
-
-
-
-
 #' `FeatureHandler` factory for Google COIVD-19 epidemic metrics
 #'
 #' @description
@@ -136,22 +135,22 @@ google_covid_19_metric <- function(google_pattern, out_name) {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
-      data <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      data <- source_conn_path(source_conn, "by-age.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("location_key", "date", tidyselect::starts_with(glue::glue("new_{google_pattern}"))) |>
-        tidyr::pivot_longer(-c("location_key", "date"),
-                            names_to = c("tmp", "key_age_bin"),
-                            names_sep = "_age_",
-                            values_to = out_name,
-                            values_transform = as.numeric) |>
-        dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", "date", out_name))) |>
-        dplyr::rename("key_location" = "location_key") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        tidyr::pivot_longer(!c("location_key", "date"),
+                            names_to = c("tmp", "key_age_bin"), names_sep = "_age_",
+                            values_to = out_name, values_transform = as.numeric) |>
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1))) |>
+        dplyr::select(tidyselect::all_of(c("location_key", "key_age_bin", out_name, "valid_from", "valid_until"))) |>
+        dplyr::rename("key_location" = "location_key")
 
       return(data)
     },
@@ -176,10 +175,12 @@ google_covid_19_population_ <- function() {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "demographics.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "demographics.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::select("location_key", tidyselect::starts_with("population_age_")) |>
         tidyr::pivot_longer(!"location_key",
                             names_to = c("tmp", "age_group"),
@@ -206,21 +207,23 @@ google_covid_19_age_group_ <- function() {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
-      by_age <- purrr::keep(dir(source_conn), ~ startsWith(., "by-age.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))()
+      # Load and parse
+      out <- source_conn_path(source_conn, "by-age.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE)
 
       # We need a map between age_bin and age_group
-      age_bin_map <- by_age |>
+      age_bin_map <- out |>
         dplyr::group_by(.data$location_key) |>
         dplyr::select("location_key", tidyselect::starts_with("age_bin")) |>
         dplyr::distinct() |>
-        dplyr::left_join(dplyr::select(by_age, "location_key", "date", tidyselect::starts_with("age_bin")),
-                         by = colnames(dplyr::select(by_age, "location_key", tidyselect::starts_with("age_bin"))),
+        dplyr::left_join(dplyr::select(out, "location_key", "date", tidyselect::starts_with("age_bin")),
+                         by = colnames(dplyr::select(out, "location_key", tidyselect::starts_with("age_bin"))),
                          multiple = "first")
 
-      # Some regions changes age aggregation. Discard for now
+      # Some regions changes age stratification. Discard for now
       age_bin_map <- age_bin_map |>
         dplyr::select("location_key") |>
         dplyr::filter(dplyr::n() == 1) |>
@@ -257,10 +260,12 @@ google_covid_19_index_ <- function() {
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "index.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "index.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::transmute("key_location" = .data$location_key,
                          "country_id"   = .data$country_code,
                          "country"      = .data$country_name,
@@ -289,16 +294,18 @@ google_covid_19_min_temperature_ <- function() {                                
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "weather.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
                       "min_temperature" = "minimum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(out)
     },
@@ -312,16 +319,18 @@ google_covid_19_max_temperature_ <- function() {                                
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
       checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
       checkmate::reportAssertions(coll)
 
-      out <- purrr::keep(dir(source_conn), ~ startsWith(., "weather.csv")) |>
-        (\(.) readr::read_csv(file.path(source_conn, .), show_col_types = FALSE))() |>
+      # Load and parse
+      out <- source_conn_path(source_conn, "weather.csv") |>
+        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("key_location" = "location_key",
                       "date",
                       "max_temperature" = "maximum_temperature_celsius") |>
-        dplyr::mutate("valid_from" = .data$date, "valid_until" = .data$date + lubridate::days(1))
+        dplyr::mutate("valid_from" = .data$date, "valid_until" = as.Date(.data$date + lubridate::days(1)))
 
       return(out)
     },
@@ -333,8 +342,8 @@ google_covid_19_max_temperature_ <- function() {                                
 
 # Set default options for the package related to the Google COVID-19 store
 rlang::on_load({
-  options(diseasystore.DiseasystoreGoogleCovid19.remote_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
-  options(diseasystore.DiseasystoreGoogleCovid19.source_conn = "https://storage.googleapis.com/covid19-open-data/v3/")
-  options(diseasystore.DiseasystoreGoogleCovid19.target_conn = "")
-  options(diseasystore.DiseasystoreGoogleCovid19.target_schema = "")
+  options("diseasystore.DiseasystoreGoogleCovid19.remote_conn" = "https://storage.googleapis.com/covid19-open-data/v3/")
+  options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = "https://storage.googleapis.com/covid19-open-data/v3/")
+  options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = "")
+  options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = "")
 })
