@@ -108,12 +108,14 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   conn <- DBI::dbConnect(RSQLite::SQLite())
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = target_schema_1)
   logs <- suppressMessages(SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn))
-  rows_append(logs, data.frame(date = slice_ts,
-                               table = "table1",
-                               message = glue::glue("ds-range: {start_date} - {end_date}"),
-                               success = TRUE,
-                               log_file = "1"),
-              copy = TRUE, in_place = TRUE)
+  dplyr::rows_append(
+    logs,
+    data.frame(date = slice_ts,
+               table = "table1",
+               message = glue::glue("ds-range: {start_date} - {end_date}"),
+               success = TRUE,
+               log_file = "1"),
+    copy = TRUE, in_place = TRUE)
 
   determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 

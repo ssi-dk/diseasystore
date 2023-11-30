@@ -59,7 +59,7 @@ test_that("parse_diseasyconn works", {
 
   # Test inputs for source_conn
   expect_no_condition(conn <- parse_diseasyconn(valid_function_conn, type = "source_conn"))
-  expect_class(conn, "DBIConnection")
+  checkmate::expect_class(conn, "DBIConnection")
   DBI::dbDisconnect(conn)
 
 
@@ -80,7 +80,7 @@ test_that("parse_diseasyconn works", {
 
   # Test inputs for target_conn
   expect_no_condition(conn <- parse_diseasyconn(valid_function_conn, type = "target_conn"))
-  expect_class(conn, "DBIConnection")
+  checkmate::expect_class(conn, "DBIConnection")
   DBI::dbDisconnect(conn)
 
 

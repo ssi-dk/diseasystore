@@ -13,6 +13,7 @@
 #' @return
 #'   A new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
 #' @export
+#' @importFrom R6 R6Class
 DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
   classname = "DiseasystoreBase",
 
@@ -257,6 +258,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
+    #' @importFrom dbplyr window_order
     key_join_features = function(observable, stratification,
                                  start_date = self %.% start_date,
                                  end_date   = self %.% end_date) {
@@ -283,7 +285,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       ds_map <- self %.% ds_map
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
-      study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) |>
+      study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
         dplyr::copy_to(self %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE)
 
       # Determine which features are affected by a stratification
@@ -543,6 +545,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     # @param slice_ts `r rd_slice_ts()`
     # @return (`tibble`)\cr
     #   A data frame containing continuous un-computed date-ranges
+    #' @importFrom zoo as.Date
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Get a list of the logs for the target_table on the slice_ts
@@ -562,7 +565,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       logs <- logs |>
         dplyr::mutate("fs_start_date" = stringr::str_extract(.data$message, r"{(?<=ds-range: )(\d{4}-\d{2}-\d{2})}"),
                       "fs_end_date"   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")) |>
-        dplyr::mutate(across(.cols = c("fs_start_date", "fs_end_date"), .fns = as.Date))
+        dplyr::mutate(across(.cols = c("fs_start_date", "fs_end_date"), .fns = base::as.Date))
 
       # Find updates that overlap with requested range
       logs <- logs |>
@@ -571,7 +574,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
         fs_dates <- logs |>
-          dplyr::transmute("fs_start_date" = as.Date(fs_start_date), "fs_end_date" = as.Date(fs_end_date)) |>
+          dplyr::transmute("fs_start_date" = base::as.Date(fs_start_date),
+                           "fs_end_date" = base::as.Date(fs_end_date)) |>
           purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = fs_start_date, to = fs_end_date, by = "1 day")) |>
           purrr::reduce(dplyr::union_all) |> # union does not preserve type (converts from Date to numeric)
           unique() # so we have to use union_all (preserves type) followed by unique (preserves type)
@@ -580,7 +584,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
 
       # Define the new dates to compute
-      new_interval <- seq.Date(from = as.Date(start_date), to = as.Date(end_date), by = "1 day")
+      new_interval <- seq.Date(from = base::as.Date(start_date), to = base::as.Date(end_date), by = "1 day")
 
       # Determine the dates that needs to be computed
       new_dates <- zoo::as.Date(setdiff(new_interval, fs_dates))
@@ -590,7 +594,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Early return, if no new dates are found
       if (length(new_dates) == 0) {
-        return(tibble::tibble(start_date = as.Date(character(0)), end_date = as.Date(character(0))))
+        return(tibble::tibble(start_date = base::as.Date(character(0)), end_date = base::as.Date(character(0))))
       }
 
       # Reduce to single intervals
