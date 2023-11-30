@@ -6,19 +6,19 @@
 #'
 #' @examples
 #' # will produce lints
-#' lint(
-#'   text = paste(strrep("x", 15L), "# nolint: nolint_linter",
+#' lintr::lint(
+#'   text = paste(strrep("x", 15L), "# nolint: object_name_linter"),
 #'   linters = nolint_linter(length = 20L)
 #' )
 #'
 #' # okay
-#' lint(
-#'   text = paste(strrep("x", 19L), "# nolint: nolint_linter",
+#' lintr::lint(
+#'   text = paste(strrep("x", 20L), "# nolint: object_name_linter"),
 #'   linters = nolint_linter(length = 20L)
 #' )
 #'
 #' @seealso
-#' - [linters] for a complete list of linters available in lintr.
+#' - [lintr::linters] for a complete list of linters available in lintr.
 #' - <https://style.tidyverse.org/syntax.html#long-lines>
 #' @export
 nolint_linter <- function(length = 80L) {
@@ -41,7 +41,7 @@ nolint_linter <- function(length = 80L) {
             purrr::map(as.data.frame) |>
             purrr::reduce(union, .init = data.frame(start = numeric(0), end = numeric(0)))
         }) |>
-        dplyr::filter(start != length + 1)
+        dplyr::filter(.data$start != length + 1)
 
       purrr::pmap(
         nolint_info,

@@ -14,21 +14,21 @@ Check that the \verb{nolint:} statements occur after the character limit
 }
 \examples{
 # will produce lints
-lint(
-  text = paste(strrep("x", 15L), "# nolint: nolint_linter",
+lintr::lint(
+  text = paste(strrep("x", 15L), "# nolint: object_name_linter"),
   linters = nolint_linter(length = 20L)
 )
 
 # okay
-lint(
-  text = paste(strrep("x", 19L), "# nolint: nolint_linter",
+lintr::lint(
+  text = paste(strrep("x", 19L), "# nolint: object_name_linter"),
   linters = nolint_linter(length = 20L)
 )
 
 }
 \seealso{
 \itemize{
-\item \link{linters} for a complete list of linters available in lintr.
+\item \link[lintr:linters]{lintr::linters} for a complete list of linters available in lintr.
 \item \url{https://style.tidyverse.org/syntax.html#long-lines}
 }
 }
