@@ -39,7 +39,7 @@ nolint_linter <- function(length = 80L) {
         dplyr::group_modify(~ {
           stringr::str_locate_all(.$lines, r"{# ?nolint:}") |>
             purrr::map(as.data.frame) |>
-            purrr::reduce(union)
+            purrr::reduce(union, .init = data.frame(start = numeric(0), end = numeric(0)))
         }) |>
         dplyr::filter(start != length + 1)
 
