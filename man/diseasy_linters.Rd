@@ -22,6 +22,7 @@ nolint_position_linter: Check that the \verb{nolint:} statements occur after the
 nolint_line_length_linter: Check that lines adhere to a given character limit, ignoring \code{nolint} statements
 }
 \examples{
+## nolint_position_linter
 # will produce lints
 lintr::lint(
   text = paste0(strrep("x", 15L), "# nolint: object_name_linter."),
@@ -34,6 +35,7 @@ lintr::lint(
   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
 )
 
+## nolint_line_length_linter
 # will produce lints
 lintr::lint(
   text = paste0(strrep("x", 25L), "# nolint: object_name_linter."),
@@ -45,14 +47,8 @@ lintr::lint(
   text = paste0(strrep("x", 20L), "# nolint: object_name_linter."),
   linters = c(nolint_line_length_linter(length = 20L), lintr::object_name_linter())
 )
-
 }
 \seealso{
-\itemize{
-\item \link[lintr:linters]{lintr::linters} for a complete list of linters available in lintr.
-\item \url{https://style.tidyverse.org/syntax.html#long-lines}
-}
-
 \itemize{
 \item \link[lintr:linters]{lintr::linters} for a complete list of linters available in lintr.
 \item \url{https://style.tidyverse.org/syntax.html#long-lines}
