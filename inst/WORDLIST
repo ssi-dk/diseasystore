@@ -1,4 +1,5 @@
 backends
+bitemporal
 
 classname
 cloneable
@@ -19,6 +20,7 @@ DiseasystoreBase
 DiseasystoreGoogleCovid
 diseasystores
 dplyr
+ds
 dtplyr
 
 Engbo
@@ -37,12 +39,14 @@ md
 
 nrow
 
+OO
 ORCID
 
 PascalCase
 POSIXct
 pid
 
+R's
 Rasmus
 regex
 rm
