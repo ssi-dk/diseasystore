@@ -456,28 +456,16 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       .f = active_binding, # nolint start: indentation_linter
       name = "ds_map",
       expr = {  # nolint: indentation_linter
-        # Generic features are named generic_ in the db
-        fs_generic <- private %.% fs_generic
-        if (!is.null(fs_generic)) names(fs_generic) <- paste("generic", names(fs_generic), sep = "_")
 
         # Specific features are named by the case definition of the feature store
-        fs_specific <- private %.% fs_specific
-        if (!is.null(fs_specific)) {
+        .ds_map <- private %.% .ds_map
 
-          # We need to transform case definition to snake case
-          diseasystore <- self$label |>
-            stringr::str_to_lower() |>
-            stringr::str_replace_all(" ", "_") |>
-            stringr::str_replace_all("-", "_")
-
-
-          # Then we can paste it together
-          names(fs_specific) <- names(fs_specific) |>
-            purrr::map_chr(~ glue::glue_collapse(sep = "_",
-                                                 x = c(diseasystore, .x)))
+        # If the class is "DiseasystoreBase", we break the iteration, otherwise we recursively iterate deeper
+        if (!exists("super")) {
+          return(.ds_map)
+        } else {
+          return(c(super$ds_map, .ds_map))
         }
-
-        return(c(fs_generic, fs_specific))
       }), # nolint end
 
 
