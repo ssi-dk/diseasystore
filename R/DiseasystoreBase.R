@@ -39,8 +39,11 @@ DiseasystoreBase <- R6::R6Class(                                                
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_date(start_date, null.ok = TRUE, add = coll)
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
-      checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}",
-                                  null.ok = TRUE, add = coll)
+      checkmate::assert(
+        checkmate::check_date(slice_ts),
+        checkmate::check_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", null.ok = TRUE),
+        add = coll
+      )
       checkmate::assert_logical(verbose, add = coll)
       checkmate::reportAssertions(coll)
 
@@ -114,7 +117,11 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_choice(feature, names(ds_map), add = coll)
       checkmate::assert_date(start_date, any.missing = FALSE, add = coll)
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
-      checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", add = coll)
+      checkmate::assert(
+        checkmate::check_date(slice_ts),
+        checkmate::check_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", null.ok = TRUE),
+        add = coll
+      )
       checkmate::assert(!is.null(self %.% source_conn), add = coll)
       checkmate::assert(!is.null(self %.% target_conn), add = coll)
       checkmate::reportAssertions(coll)
@@ -524,7 +531,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
     .start_date = NULL,
     .end_date   = NULL,
-    .slice_ts   = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
+    .slice_ts   = lubridate::today(),
 
     .ds_map     = NULL, # Must be implemented in child classes
     ds_key_map  = NULL, # Must be implemented in child classes
