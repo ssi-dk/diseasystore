@@ -371,7 +371,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, stratification_data) |>
-        self$key_join_filter(stratification_features, start_date, end_date) |>
+        private$key_join_filter(stratification_features, start_date, end_date) |>
         dplyr::compute() |>
         dplyr::group_by(!!!stratification)
 
@@ -427,24 +427,6 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::collect()
 
       return(data)
-    },
-
-
-    #' @description
-    #'   This function implements an intermediate filtering in the stratification pipeline.
-    #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-    #'   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
-    #' @param .data `r rd_.data()`
-    #' @param stratification_features (`character`)\cr
-    #'   A list of the features included in the stratification process.
-    #' @param start_date `r rd_start_date()`
-    #' @param end_date `r rd_end_date()`
-    #' @return
-    #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, stratification_features,
-                               start_date = self %.% start_date,
-                               end_date   = self %.% end_date) {
-      return(.data) # By default, no filtering is performed
     }
   ),
 
@@ -626,6 +608,24 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::select("start_date", "end_date")
 
       return(new_ranges)
+    },
+
+
+    # @description
+    #   This function implements an intermediate filtering in the stratification pipeline.
+    #   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+    #   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
+    # @param .data `r rd_.data()`
+    # @param stratification_features (`character`)\cr
+    #   A list of the features included in the stratification process.
+    # @param start_date `r rd_start_date()`
+    # @param end_date `r rd_end_date()`
+    # @return
+    #   A subset of `.data` filtered to remove double counting
+    key_join_filter = function(.data, stratification_features,
+                               start_date = self %.% start_date,
+                               end_date   = self %.% end_date) {
+      return(.data) # By default, no filtering is performed
     }
   )
 )
