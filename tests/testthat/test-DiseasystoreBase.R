@@ -143,16 +143,16 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
 })
 
 
-test_that("active binding: fs_map works", {
+test_that("active binding: ds_map works", {
   m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
-  # Retrieve the fs_map
-  expect_equal(m$fs_map, NULL)
+  # Retrieve the ds_map
+  expect_equal(m$ds_map, NULL)
 
-  # Try to set the fs_map
-  expect_equal(tryCatch(m$fs_map <- list("testing" = "n_positive"), error = \(e) e),
-               simpleError("`$fs_map` is read only"))
-  expect_equal(m$fs_map, NULL)
+  # Try to set the ds_map
+  expect_equal(tryCatch(m$ds_map <- list("testing" = "n_positive"), error = \(e) e),
+               simpleError("`$ds_map` is read only"))
+  expect_equal(m$ds_map, NULL)
   rm(m)
 })
 

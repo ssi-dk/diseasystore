@@ -108,11 +108,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
                            slice_ts   = self %.% slice_ts) {
 
       # Load the available features
-      fs_map <- self %.% fs_map
+      ds_map <- self %.% ds_map
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(feature, unlist(fs_map), add = coll)
+      checkmate::assert_choice(feature, unlist(ds_map), add = coll)
       checkmate::assert_date(start_date, any.missing = FALSE, add = coll)
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", add = coll)
@@ -121,7 +121,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       checkmate::reportAssertions(coll)
 
       # Determine which feature_loader should be called
-      feature_loader <- names(fs_map[fs_map == feature])
+      feature_loader <- names(ds_map[ds_map == feature])
 
       # Determine where these features are stored
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
@@ -281,8 +281,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       checkmate::assert_date(end_date, add = coll)
       checkmate::reportAssertions(coll)
 
-      # Store the fs_map
-      fs_map <- self %.% fs_map
+      # Store the ds_map
+      ds_map <- self %.% ds_map
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = as.Date(end_date + lubridate::days(1))) |>
@@ -292,11 +292,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       if (!is.null(stratification)) {
 
         # Create regex detection for features
-        fs_map_regex <- paste0(r"{(?<=^|\W)}", fs_map, r"{(?=$|\W)}")
+        fs_map_regex <- paste0(r"{(?<=^|\W)}", ds_map, r"{(?=$|\W)}")
 
         # Perform detection of features in the stratification
         stratification_features <- purrr::map(stratification, rlang::as_label) |>
-          purrr::map(\(e) unlist(fs_map[purrr::map_lgl(fs_map_regex, ~ stringr::str_detect(e, .x))])) |>
+          purrr::map(\(e) unlist(ds_map[purrr::map_lgl(fs_map_regex, ~ stringr::str_detect(e, .x))])) |>
           unlist() |>
           unique()
 
@@ -375,9 +375,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::group_by(!!!stratification)
 
       # Retrieve the aggregators (and ensure they work together)
-      key_join_aggregators <- c(purrr::pluck(private, names(fs_map[fs_map == observable])) %.% key_join,
+      key_join_aggregators <- c(purrr::pluck(private, names(ds_map[ds_map == observable])) %.% key_join,
                                 purrr::map(stratification_features,
-                                           ~ purrr::pluck(private, names(fs_map)[fs_map == .x]) %.% key_join))
+                                           ~ purrr::pluck(private, names(ds_map)[ds_map == .x]) %.% key_join))
 
       if (length(unique(key_join_aggregators)) > 1) {
         stop("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
@@ -449,12 +449,12 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
   active = list(
 
-    #' @field fs_map (`named list`(`character`))\cr
+    #' @field ds_map (`named list`(`character`))\cr
     #'   A list that maps features known by the feature store to the corresponding feature handlers
     #'   that compute the features. Read only.
-    fs_map = purrr::partial(
+    ds_map = purrr::partial(
       .f = active_binding, # nolint start: indentation_linter
-      name = "fs_map",
+      name = "ds_map",
       expr = {  # nolint: indentation_linter
         # Generic features are named generic_ in the db
         fs_generic <- private %.% fs_generic
@@ -486,7 +486,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     available_features = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "available_features",
-      expr = return(unlist(self$fs_map, use.names = FALSE))),
+      expr = return(unlist(self$ds_map, use.names = FALSE))),
 
 
     #' @field label (`character`)\cr
@@ -556,9 +556,8 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     .end_date   = NULL,
     .slice_ts   = glue::glue("{lubridate::today() - lubridate::days(1)} 09:00:00"),
 
-    fs_generic  = NULL, # Must be implemented in child classes
-    fs_specific = NULL, # Must be implemented in child classes
-    fs_key_map  = NULL, # Must be implemented in child classes
+    .ds_map     = NULL, # Must be implemented in child classes
+    ds_key_map  = NULL, # Must be implemented in child classes
 
 
 
