@@ -65,7 +65,6 @@ diseasystore_exists <- function(label) {
 #'   ds <- get_diseasystore("Google COVID-19")  # Returns the DiseasystoreGoogleCovid19 generator
 #' @export
 get_diseasystore <- function(label) {
-
   checkmate::assert_true(diseasystore_exists(label))
 
   return(get(to_diseasystore_case(label)))
