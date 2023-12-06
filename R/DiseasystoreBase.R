@@ -5,7 +5,7 @@
 #'   It defines the primary methods of each feature stores as well as all of the public methods.
 #' @examples
 #'   # DiseasystoreBase is mostly used as the basis of other, more specific, classes
-#'   # The DiseasystoreBase can be initialized individually if needed.
+#'   # The DiseasystoreBase can be initialised individually if needed.
 #'
 #'   ds <- DiseasystoreBase$new(source_conn = NULL,
 #'                              target_conn = DBI::dbConnect(RSQLite::SQLite()))
@@ -630,7 +630,10 @@ DiseasystoreBase <- R6::R6Class(                                                
                                start_date = self %.% start_date,
                                end_date   = self %.% end_date) {
       return(.data) # By default, no filtering is performed
-    }
+    },
+
+
+    initialise_feature_handlers = function() NULL
   )
 )
 

@@ -32,9 +32,9 @@ if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
 }
 
 
-test_that("DiseasystoreGoogleCovid19 initializes correctly", {
+test_that("DiseasystoreGoogleCovid19 initialises correctly", {
 
-  # Initialize without start_date and end_date
+  # Initialise without start_date and end_date
   expect_no_error(ds <- DiseasystoreGoogleCovid19$new(
     verbose = FALSE,
     target_conn = DBI::dbConnect(RSQLite::SQLite())
@@ -45,7 +45,7 @@ test_that("DiseasystoreGoogleCovid19 initializes correctly", {
   expect_equal(ds %.% label, "Google COVID-19")
 
 
-  # Check all FeatureHandlers have been initialized
+  # Check all FeatureHandlers have been initialised
   private <- ds$.__enclos_env__$private
   feature_handlers <- purrr::keep(ls(private), ~ startsWith(., "google_covid_19")) |>
     purrr::map(~ purrr::pluck(private, .))
@@ -101,7 +101,7 @@ test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
 test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", {
   for (conn in get_test_conns()) {
 
-    # Initialize without start_date and end_date
+    # Initialise without start_date and end_date
     expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
 
     # Attempt to get features from the feature store
@@ -143,7 +143,7 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
 test_that("DiseasystoreGoogleCovid19 can extend existing features", {
   for (conn in get_test_conns()) {
 
-    # Initialize without start_date and end_date
+    # Initialise without start_date and end_date
     expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
 
     # Attempt to get features from the feature store (using different dates)
@@ -195,7 +195,7 @@ end_date   <- as.Date("2020-03-10")
 test_that("DiseasystoreGoogleCovid19 can key_join features", {
   for (conn in get_test_conns()) {
 
-    # Initialize without start_date and end_date
+    # Initialise without start_date and end_date
     expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
 
     # Attempt to perform the possible key_joins
@@ -251,7 +251,7 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
 test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
   for (conn in get_test_conns()) {
 
-    # Initialize without start_date and end_date
+    # Initialise without start_date and end_date
     expect_no_error(ds <- DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
 
 
