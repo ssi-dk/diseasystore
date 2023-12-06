@@ -1,8 +1,0 @@
-linters <- linters_with_defaults(
-  cyclocomp_linter = NULL,
-  line_length_linter = NULL,
-  nolint_line_length_linter(120),
-  nolint_position_linter(120)
-)
-
-exclude_linter <- r"{^ *: *([\w, ]*).?$}"
