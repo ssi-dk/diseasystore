@@ -36,6 +36,7 @@ Imports:
 Suggests:
     curl,
     knitr,
+    R.utils,
     rmarkdown,
     RSQLite,
     RPostgres,
