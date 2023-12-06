@@ -22,7 +22,6 @@ See the vignette("google_covid_19_data") for details on how to configure the fea
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-DiseasystoreGoogleCovid19-key_join_filter}{\code{DiseasystoreGoogleCovid19$key_join_filter()}}
 \item \href{#method-DiseasystoreGoogleCovid19-clone}{\code{DiseasystoreGoogleCovid19$clone()}}
 }
 }
@@ -33,43 +32,10 @@ See the vignette("google_covid_19_data") for details on how to configure the fea
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_filter"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_filter'><code>diseasystore::DiseasystoreBase$key_join_filter()</code></a></span></li>
 </ul>
 </details>
 }}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreGoogleCovid19-key_join_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreGoogleCovid19-key_join_filter}{}}}
-\subsection{Method \code{key_join_filter()}}{
-This function implements an intermediate filtering in the stratification pipeline.
-For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-The \code{key_join_filter} is inserted into the stratification pipeline to remove this double counting.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$key_join_filter(
-  .data,
-  stratification_features,
-  start_date = private \%.\% start_date,
-  end_date = private \%.\% end_date
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{.data}}{(\code{any})\cr The data object to perform the operation on.}
-
-\item{\code{stratification_features}}{(\code{character})\cr
-A list of the features included in the stratification process.}
-
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A subset of \code{.data} filtered to remove double counting
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreGoogleCovid19-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreGoogleCovid19-clone}{}}}
