@@ -87,7 +87,7 @@ FeatureHandler <- R6::R6Class( # nolint: object_name_linter.
 
       if (is.null(get)) {
         args <- append(args, c("get" = function(target_table, slice_ts, target_conn) {
-          suppressMessages(SCDB::get_table(target_conn, target_table, slice_ts = slice_ts))
+          SCDB::get_table(target_conn, target_table, slice_ts = slice_ts)
         }))
       } else {
         checkmate::assert_function(get, args = c("target_table", "slice_ts", "target_conn"))

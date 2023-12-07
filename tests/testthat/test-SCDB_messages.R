@@ -1,3 +1,5 @@
+withr::local_options("diseasystore.target_schema" = target_schema_1)
+
 test_that("SCDB gives too many messages", {
 
   # The following SCDB functions have been giving unwanted messages
@@ -13,7 +15,7 @@ test_that("SCDB gives too many messages", {
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
 
-  target_schema <- diseasyoption("target_schema", "diseasystore")
+  target_schema <- diseasyoption("target_schema")
   test_id <- SCDB::id(paste(target_schema, "mtcars", sep = "."), conn)
 
   # SCDB::create_table
@@ -22,9 +24,6 @@ test_that("SCDB gives too many messages", {
   # SCDB::create_logs_if_missing
   log_id <- SCDB::id(paste(target_schema, "logs", sep = "."), conn)
   expect_message(SCDB::create_logs_if_missing(log_id, conn), "If you want to specify a schema use")
-
-  # SCDB::get_table
-  expect_message(SCDB::get_table(conn, test_id), "If you want to specify a schema use")
 
   # SCDB::update_snapshot
   mtcars_remote <- dplyr::copy_to(conn, mtcars)
