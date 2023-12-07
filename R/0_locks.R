@@ -1,4 +1,5 @@
 #' Sets, queries and removes locks for db tables
+#'
 #' @name db_locks
 #' @description
 #' This set of function adds a simple locking system to db tables.
@@ -24,7 +25,7 @@
 #' is_lock_owner(conn, "test_table") # NULL
 #'
 #' DBI::dbDisconnect(conn)
-#' @export
+#' @noRd
 add_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Determine lock table id
@@ -68,7 +69,7 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 
 
 #' @rdname db_locks
-#' @export
+#' @noRd
 remove_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Determine lock table id
@@ -93,7 +94,7 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 
 
 #' @rdname db_locks
-#' @export
+#' @noRd
 is_lock_owner <- function(conn, db_table, schema = NULL) {
 
   # Determine lock table id
@@ -116,6 +117,7 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
 
 #' @rdname db_locks
 #' @importFrom rlang .data
+#' @noRd
 remove_expired_locks <- function(conn, schema = NULL) {
 
   # Determine lock table id
