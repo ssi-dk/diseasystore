@@ -9,12 +9,12 @@
 #'
 #'   drop_diseasystore(conn = conn)
 #' @export
-drop_diseasystore <- function(pattern = ".*",
+drop_diseasystore <- function(pattern = NULL,
                               schema = diseasyoption("target_schema"),
                               conn = SCDB::get_connection()) {
 
   coll <- checkmate::makeAssertCollection()
-  checkmate::assert_character(pattern, add = coll)
+  checkmate::assert_character(pattern, null.ok = TRUE, add = coll)
   checkmate::assert_character(schema, add = coll)
   checkmate::assert_class(conn, "DBIConnection", add = coll)
   checkmate::reportAssertions(coll)
