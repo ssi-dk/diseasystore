@@ -38,7 +38,7 @@ options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = "/local/file/path
 source_conn <- diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 if (!dir.exists(source_conn)) {
   dir.create(source_conn, recursive = TRUE, showWarnings = FALSE)
-} 
+}
 
 # Define the Google files to download
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
@@ -73,7 +73,7 @@ if (curl::has_internet()) {
 
     destfile <-
       file.path(diseasyoption("source_conn", "DiseasystoreGoogleCovid19"), .)
-  
+
     if (!file.exists(paste0(destfile, ".gz"))) {
       readr::read_csv(url, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
         readr::write_csv(destfile)
