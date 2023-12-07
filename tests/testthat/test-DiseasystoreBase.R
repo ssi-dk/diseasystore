@@ -115,7 +115,8 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
                message = glue::glue("ds-range: {start_date} - {end_date}"),
                success = TRUE,
                log_file = "1"),
-    copy = TRUE, in_place = TRUE)
+    copy = TRUE, in_place = TRUE
+  )
 
   determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 
