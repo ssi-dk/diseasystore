@@ -6,7 +6,7 @@ test_that("rd_templates works", {
 
   for (type in c("field", "param")) {
     for (rd_fun in rd_functions) {
-      expect_no_condition(str <- do.call(rd_fun, args = list(type = type)))
+      str <- expect_no_condition(do.call(rd_fun, args = list(type = type)))
       checkmate::expect_character(str)
     }
   }

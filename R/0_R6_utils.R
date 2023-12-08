@@ -26,9 +26,8 @@ read_only_error <- function(field) {
 #' @param sep The separator given to cat
 #' @noRd
 printr <- function(..., file = nullfile(), sep = "") {
-  sink(file = file, split = TRUE, append = TRUE, type = "output")
+  withr::local_output_sink(new = file, split = TRUE, append = TRUE)
   cat(..., "\n", sep = sep)
-  sink()
 }
 
 
@@ -88,7 +87,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   if (is.null(conn)) {
     return(conn)
   } else if (is.function(conn)) {
-    tryCatch(conn <- conn(),
+    tryCatch(conn <- conn(),                                                                                            # nolint: implicit_assignment_linter
              error = \(e) stop("`conn` could not be parsed!"))
     return(conn)
   } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {

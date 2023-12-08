@@ -14,7 +14,8 @@ test_that("drop_diseasystore can delete entire default schema", {
     suppressMessages(SCDB::create_table(mtcars, conn, paste(target_schema_2, "mtcars_1", sep = "."), temporary = FALSE))
 
     # Try to delete the entire `target_schema_1` store
-    expect_equal(diseasyoption("target_schema"), target_schema_1) # Verify, that the testing target_schema has been set
+    # But first, verify that the testing target_schema has been set
+    expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(conn = conn)
 
     expect_false(SCDB::table_exists(conn, paste(target_schema_1, "logs",     sep = ".")))
@@ -56,7 +57,8 @@ test_that("drop_diseasystore can delete single table in default schema", {
     suppressMessages(SCDB::create_table(mtcars, conn, paste(target_schema_2, "mtcars_1", sep = "."), temporary = FALSE))
 
     # Try to delete only mtcars_1 within the diseasystore
-    expect_equal(diseasyoption("target_schema"), target_schema_1) # Verify, that the testing target_schema has been set
+    # But first, verify that the testing target_schema has been set
+    expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_1", conn = conn)
 
     expect_true(SCDB::table_exists(conn, paste(target_schema_1, "logs", sep = ".")))
@@ -67,7 +69,8 @@ test_that("drop_diseasystore can delete single table in default schema", {
     expect_true(SCDB::table_exists(conn, paste(target_schema_2, "mtcars_1", sep = ".")))
 
     # Try to delete only mtcars_2 within the diseasystore
-    expect_equal(diseasyoption("target_schema"), target_schema_1) # Verify, that the testing target_schema has been set
+    # But first, verify that the testing target_schema has been set
+    expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_2", conn = conn)
 
     expect_true(SCDB::table_exists(conn, paste(target_schema_1, "logs", sep = ".")))

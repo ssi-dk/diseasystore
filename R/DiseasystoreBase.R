@@ -428,7 +428,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                           copy = is.null(stratification)) |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
-        dplyr::group_by(tidyselect::across(tidyselect::all_of(stratification_names))) |>
+        dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
         dplyr::mutate(date, !!observable := cumsum(n_add) - cumsum(n_remove)) |>
         dplyr::ungroup() |>
@@ -576,7 +576,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(ds_start_date < end_date, start_date <= ds_end_date, success == TRUE)
+        dplyr::filter(ds_start_date < end_date, start_date <= ds_end_date, success == TRUE)                             # nolint: redundant_equals_linter. required for dbplyr translations
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {

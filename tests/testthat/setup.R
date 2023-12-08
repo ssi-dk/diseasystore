@@ -21,7 +21,7 @@ conn_args <- list(
 get_driver <- function(x = character(), ...) {
   if (!grepl(".*::.*", x)) stop("Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
                                 "Received: ", x)
-  parts <- strsplit(x, "::")[[1]]
+  parts <- strsplit(x, "::", fixed = TRUE)[[1]]
 
   # Skip unavailable packages
   if (!requireNamespace(parts[1], quietly = TRUE)) {

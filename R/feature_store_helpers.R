@@ -8,11 +8,11 @@ to_diseasystore_case <- function(label) {
 
   # First convert to diseasystore case
   diseasystore_case <- label |>
-    stringr::str_replace_all("_", " ") |>
+    stringr::str_replace_all(stringr::fixed("_"), " ") |>
     stringr::str_replace_all("(?<=[a-z])([A-Z])", " \\1") |>
     stringr::str_to_title() |>
-    stringr::str_replace_all(" ", "") |>
-    stringr::str_replace_all("-", "") |>
+    stringr::str_replace_all(stringr::fixed(" "), "") |>
+    stringr::str_replace_all(stringr::fixed("-"), "") |>
     (\(.) paste0("Diseasystore", .))()
 
   return(diseasystore_case)
@@ -120,7 +120,7 @@ source_conn_path <- function(source_conn, file) {
     file_location <- file.path(source_conn, matching_file)
 
   } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
-    file_location <- paste0(stringr::str_remove(source_conn, "/$"), "/", file)
+    file_location <- file.path(stringr::str_remove(source_conn, "/$"), file)
   } else {
     stop("source_conn could not be parsed to valid directory or URL\n")
   }

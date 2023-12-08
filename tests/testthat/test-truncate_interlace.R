@@ -78,8 +78,8 @@ test_that("truncate_interlace works", {
   }
 
   # No change when no secondary is given
-  expect_equal(truncate_interlace(p1), p1)
-  expect_equal(truncate_interlace(p1, NULL), p1)
+  expect_identical(truncate_interlace(p1), p1)
+  expect_identical(truncate_interlace(p1, NULL), p1)
 
 
   # Check that a few permutations work as expected
