@@ -133,13 +133,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       )
 
       # Determine dates that need computation
-      fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
+      ds_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                         start_date   = start_date,
                                                         end_date     = end_date,
                                                         slice_ts     = slice_ts)
 
       # If there are any missing ranges, put a lock on the data base
-      if (nrow(fs_missing_ranges) > 0) {
+      if (nrow(ds_missing_ranges) > 0) {
 
         # Add a LOCK to the diseasystore
         add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
@@ -158,55 +158,55 @@ DiseasystoreBase <- R6::R6Class(                                                
 
         # Once the locks are release
         # Re-determine dates that need computation
-        fs_missing_ranges <- private$determine_new_ranges(target_table = target_table,
+        ds_missing_ranges <- private$determine_new_ranges(target_table = target_table,
                                                           start_date   = start_date,
                                                           end_date     = end_date,
                                                           slice_ts     = slice_ts)
 
         # Inform that we are computing features
         tic <- Sys.time()
-        if (private %.% verbose && nrow(fs_missing_ranges) > 0) {
+        if (private %.% verbose && nrow(ds_missing_ranges) > 0) {
           message(glue::glue("feature: {feature} needs to be computed on the specified date interval. ",
                              "please wait..."))
         }
 
         # Call the feature loader on the dates
-        purrr::pwalk(fs_missing_ranges, ~ {
+        purrr::pwalk(ds_missing_ranges, ~ {
 
           start_date <- ..1
           end_date   <- ..2
 
           # Compute the feature for the date range
-          fs_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
+          ds_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
                                 args = list(start_date = start_date, end_date = end_date,
                                             slice_ts = slice_ts, source_conn = self %.% source_conn))
 
           # Check it table is copied to target DB
-          if (!inherits(fs_feature, "tbl_dbi") ||
+          if (!inherits(ds_feature, "tbl_dbi") ||
                 !identical(self %.% source_conn, self %.% target_conn)) {
-            fs_feature <- dplyr::copy_to(self %.% target_conn, fs_feature, "fs_tmp", overwrite = TRUE)
+            ds_feature <- dplyr::copy_to(self %.% target_conn, ds_feature, "ds_tmp", overwrite = TRUE)
           }
 
           # Add the existing computed data for given slice_ts
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
-            fs_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
+            ds_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
                                       check_from = FALSE)
 
-            if (suppressMessages(SCDB::is.historical(fs_existing))) {
-              fs_existing <- fs_existing |>
+            if (suppressMessages(SCDB::is.historical(ds_existing))) {
+              ds_existing <- ds_existing |>
                 dplyr::filter(.data$from_ts == slice_ts) |>
                 dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
                 dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
             }
 
-            fs_updated_feature <- dplyr::union_all(fs_existing, fs_feature) |> dplyr::compute()
+            ds_updated_feature <- dplyr::union_all(ds_existing, ds_feature) |> dplyr::compute()
           } else {
-            fs_updated_feature <- fs_feature
+            ds_updated_feature <- ds_feature
           }
 
           # Commit to DB
           suppressMessages(SCDB::update_snapshot(
-            .data = fs_updated_feature,
+            .data = ds_updated_feature,
             conn = self %.% target_conn,
             db_table = target_table,
             timestamp = slice_ts,
@@ -222,7 +222,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
 
         # Inform how long has elapsed for updating data
-        if (private$verbose && nrow(fs_missing_ranges) > 0) {
+        if (private$verbose && nrow(ds_missing_ranges) > 0) {
           message(glue::glue("feature: {feature} updated ",
                              "(elapsed time {format(round(difftime(Sys.time(), tic)),2)})."))
         }
@@ -237,7 +237,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       out <- dplyr::inner_join(out,
                                data.frame(valid_from = start_date, valid_until = end_date) |>
-                                 dplyr::copy_to(self %.% target_conn, df = _, "fs_tmp", overwrite = TRUE),
+                                 dplyr::copy_to(self %.% target_conn, df = _, "ds_tmp", overwrite = TRUE),
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
@@ -292,12 +292,12 @@ DiseasystoreBase <- R6::R6Class(                                                
       if (!is.null(stratification)) {
 
         # Create regex detection for features
-        fs_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
+        ds_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
 
         # Perform detection of features in the stratification
         stratification_features <- purrr::map(stratification, rlang::as_label) |>
           purrr::map(\(label) {
-            purrr::map(fs_map_regex, ~ stringr::str_extract(label, .x)) |>
+            purrr::map(ds_map_regex, ~ stringr::str_extract(label, .x)) |>
               purrr::discard(is.na)
           }) |>
           unlist() |>
@@ -563,31 +563,31 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Determine the date ranges used
       logs <- logs |>
-        dplyr::mutate("fs_start_date" = stringr::str_extract(.data$message, r"{(?<=ds-range: )(\d{4}-\d{2}-\d{2})}"),
-                      "fs_end_date"   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")) |>
-        dplyr::mutate(across(.cols = c("fs_start_date", "fs_end_date"), .fns = base::as.Date))
+        dplyr::mutate("ds_start_date" = stringr::str_extract(.data$message, r"{(?<=ds-range: )(\d{4}-\d{2}-\d{2})}"),
+                      "ds_end_date"   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")) |>
+        dplyr::mutate(across(.cols = c("ds_start_date", "ds_end_date"), .fns = base::as.Date))
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(fs_start_date < end_date, start_date <= fs_end_date, success == TRUE)
+        dplyr::filter(ds_start_date < end_date, start_date <= ds_end_date, success == TRUE)
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
-        fs_dates <- logs |>
-          dplyr::transmute("fs_start_date" = base::as.Date(fs_start_date),
-                           "fs_end_date" = base::as.Date(fs_end_date)) |>
-          purrr::pmap(\(fs_start_date, fs_end_date) seq.Date(from = fs_start_date, to = fs_end_date, by = "1 day")) |>
+        ds_dates <- logs |>
+          dplyr::transmute("ds_start_date" = base::as.Date(ds_start_date),
+                           "ds_end_date" = base::as.Date(ds_end_date)) |>
+          purrr::pmap(\(ds_start_date, ds_end_date) seq.Date(from = ds_start_date, to = ds_end_date, by = "1 day")) |>
           purrr::reduce(dplyr::union_all) |> # union does not preserve type (converts from Date to numeric)
           unique() # so we have to use union_all (preserves type) followed by unique (preserves type)
       } else {
-        fs_dates <- list()
+        ds_dates <- list()
       }
 
       # Define the new dates to compute
       new_interval <- seq.Date(from = base::as.Date(start_date), to = base::as.Date(end_date), by = "1 day")
 
       # Determine the dates that needs to be computed
-      new_dates <- zoo::as.Date(setdiff(new_interval, fs_dates))
+      new_dates <- zoo::as.Date(setdiff(new_interval, ds_dates))
       # setdiff does not preserve type (converts from Date to numeric)
       # it even breaks the type so hard, that we need to supply the origin also (which for some reason is not default)
       # so we use the zoo::as.Date, since this is reasonably configured...
