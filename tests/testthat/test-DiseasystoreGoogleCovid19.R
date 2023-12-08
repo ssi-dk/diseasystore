@@ -80,10 +80,11 @@ test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
 })
 
 
-test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
+# Ensure source is set as the local directory for remaining tests
+withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
 
-  # Ensure source is set as the local directory
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
+
+test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
 
   ds <- expect_no_error(DiseasystoreGoogleCovid19$new(
     target_conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -208,7 +209,7 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
 
     # First check we can aggregate without a stratification
     purrr::walk(available_observables,
-                ~ expect_no_error(ds$key_join_features(observable = as.character(.),
+                ~ expect_no_error(ds$key_join_features(observable = as.character(.x),
                                                        stratification = NULL,
                                                        start_date, end_date)))
 
