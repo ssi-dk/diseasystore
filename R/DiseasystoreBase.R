@@ -112,7 +112,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
 
       # Validate input
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(feature, unlist(ds_map), add = coll)
+      checkmate::assert_choice(feature, names(ds_map), add = coll)
       checkmate::assert_date(start_date, any.missing = FALSE, add = coll)
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", add = coll)
@@ -121,7 +121,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       checkmate::reportAssertions(coll)
 
       # Determine which feature_loader should be called
-      feature_loader <- names(ds_map[ds_map == feature])
+      feature_loader <- purrr::pluck(ds_map, feature)
 
       # Determine where these features are stored
       target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
@@ -292,11 +292,14 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       if (!is.null(stratification)) {
 
         # Create regex detection for features
-        fs_map_regex <- paste0(r"{(?<=^|\W)}", ds_map, r"{(?=$|\W)}")
+        fs_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
 
         # Perform detection of features in the stratification
         stratification_features <- purrr::map(stratification, rlang::as_label) |>
-          purrr::map(\(e) unlist(ds_map[purrr::map_lgl(fs_map_regex, ~ stringr::str_detect(e, .x))])) |>
+          purrr::map(\(label) {
+            purrr::map(fs_map_regex, ~ stringr::str_extract(label, .x)) |>
+              purrr::discard(is.na)
+          }) |>
           unlist() |>
           unique()
 
@@ -375,9 +378,9 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::group_by(!!!stratification)
 
       # Retrieve the aggregators (and ensure they work together)
-      key_join_aggregators <- c(purrr::pluck(private, names(ds_map[ds_map == observable])) %.% key_join,
+      key_join_aggregators <- c(purrr::pluck(private, purrr::pluck(ds_map, observable)) %.% key_join,
                                 purrr::map(stratification_features,
-                                           ~ purrr::pluck(private, names(ds_map)[ds_map == .x]) %.% key_join))
+                                           ~ purrr::pluck(private, purrr::pluck(ds_map, .x)) %.% key_join))
 
       if (length(unique(key_join_aggregators)) > 1) {
         stop("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
@@ -457,14 +460,11 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       name = "ds_map",
       expr = {  # nolint: indentation_linter
 
-        # Specific features are named by the case definition of the feature store
-        .ds_map <- private %.% .ds_map
-
         # If the class is "DiseasystoreBase", we break the iteration, otherwise we recursively iterate deeper
         if (!exists("super")) {
-          return(.ds_map)
+          return(private %.% .ds_map)
         } else {
-          return(c(super$ds_map, .ds_map))
+          return(c(super$.ds_map, private %.% .ds_map))
         }
       }), # nolint end
 
@@ -474,7 +474,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
     available_features = purrr::partial(
       .f = active_binding, # nolint: indentation_linter
       name = "available_features",
-      expr = return(unlist(self$ds_map, use.names = FALSE))),
+      expr = return(names(self$ds_map))),
 
 
     #' @field label (`character`)\cr
