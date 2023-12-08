@@ -1,5 +1,7 @@
 # Store the current options
-diseasy_opts <- options(purrr::keep(names(options()), ~ startsWith(., "diseasy")))
+diseasy_opts <- purrr::keep(names(options()), ~ startsWith(., "diseasy")) |>
+  purrr::map(options) |>
+  purrr::reduce(c)
 
 # Configure diseasystore for testing
 target_schema_1 <- "test_ds"
