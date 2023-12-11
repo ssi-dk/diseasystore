@@ -8,7 +8,15 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package handles the feature store data model for the diseasy framework.
+Simple feature stores and tools for creating personalised feature stores. `diseasystore` powers feature store which can automatically link and aggregate features to a given stratification level. These feature stores are automatically time-versioned (powered by the `SCDB` package) and allows you to easily and dynamically compute features as part of your continuous integration.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ssi-dk/diseasystore}
+  \item Report bugs at \url{https://github.com/ssi-dk/diseasystore/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Rasmus Skytte Randløv \email{rske@ssi.dk} (\href{https://orcid.org/0000-0002-5860-3838}{ORCID})
