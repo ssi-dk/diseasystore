@@ -32,7 +32,7 @@ First, it is a good idea to copy the relevant Google COVID-19 data files locally
 
 ```{r download_data, eval = FALSE}
 # First we set the path we want to use as an option
-options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = "/local/file/path")
+options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = file.path("local", "path"))
 
 # Ensure folder exists
 source_conn <- diseasyoption("source_conn", "DiseasystoreGoogleCovid19")

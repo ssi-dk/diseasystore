@@ -165,7 +165,7 @@ test_that("active binding: ds_map works", {
   expect_null(m$ds_map)
 
   # Try to set the ds_map
-  expect_identical(tryCatch(m$ds_map <- list("testing" = "n_positive"), error = \(e) e),
+  expect_identical(tryCatch(m$ds_map <- list("testing" = "n_positive"), error = \(e) e),                                # nolint: implicit_assignment_linter
                    simpleError("`$ds_map` is read only"))
   expect_null(m$ds_map)
   rm(m)
@@ -180,7 +180,7 @@ test_that("active binding: available_features works", {
 
   # Try to set the available_features
   # test_that cannot capture this error, so we have to hack it
-  expect_identical(tryCatch(m$available_features <- list("n_test", "n_positive"), error = \(e) e),
+  expect_identical(tryCatch(m$available_features <- list("n_test", "n_positive"), error = \(e) e),                      # nolint: implicit_assignment_linter
                    simpleError("`$available_features` is read only"))
   expect_null(m$available_features)
   rm(m)
@@ -194,7 +194,7 @@ test_that("active binding: label works", {
   expect_null(m$label)
 
   # Try to set the label
-  expect_identical(tryCatch(m$label <- "test", error = \(e) e),
+  expect_identical(tryCatch(m$label <- "test", error = \(e) e),                                                         # nolint: implicit_assignment_linter
                    simpleError("`$label` is read only"))
   expect_null(m$label)
   rm(m)

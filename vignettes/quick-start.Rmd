@@ -220,7 +220,7 @@ diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 
 If we change our general setting for `source_conn` and retry, we see that we get the fallback value.
 ```{r diseasyoption_example_3}
-options("diseasystore.source_conn" = "/local/file/path")
+options("diseasystore.source_conn" = file.path("local", "path"))
 diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 ```
 
