@@ -106,7 +106,7 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
 
     # Attempt to get features from the feature store
     # then check that they match the expected value from the generators
-    purrr::walk2(ds$available_features, names(ds$fs_map), ~ {
+    purrr::walk2(ds$available_features, ds$ds_map, ~ {
       start_date <- as.Date("2020-03-01")
       end_date   <- as.Date("2020-03-05")
 
@@ -118,7 +118,7 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
         dplyr::pull("checksum") |>
         sort()
 
-      reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+      reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
       reference <- reference_generator(start_date  = start_date,
                                        end_date    = end_date,
@@ -148,7 +148,7 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
 
     # Attempt to get features from the feature store (using different dates)
     # then check that they match the expected value from the generators
-    purrr::walk2(ds$available_features, names(ds$fs_map), ~ {
+    purrr::walk2(ds$available_features, ds$ds_map, ~ {
       start_date <- as.Date("2020-03-01")
       end_date   <- as.Date("2020-03-10")
 
@@ -158,7 +158,7 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
         dplyr::pull("checksum") |>
         sort()
 
-      reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+      reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
       reference <- reference_generator(start_date  = start_date,
                                        end_date    = end_date,
