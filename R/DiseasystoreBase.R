@@ -435,6 +435,10 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::select(date, all_of(stratification_names), !!observable) |>
         dplyr::collect()
 
+      # Ensure date is of type Date
+      data <- data |>
+        dplyr::mutate(date = as.Date(date))
+
       return(data)
     }
   ),
