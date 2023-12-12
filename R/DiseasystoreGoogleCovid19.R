@@ -271,7 +271,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
       # Manually perform filtering
       if (is.null(stratification_features) ||
             (!is.null(stratification_features) &&
-               purrr::some(stratification_features,
+               purrr::none(stratification_features,
                            ~ . %in% c("country_id", "country",
                                       "region_id", "region",
                                       "subregion_id", "subregion")))) {
@@ -285,12 +285,14 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
 
-      } else if (stratification_features %in% c("country_id", "country")) {
+      } else if (purrr::some(stratification_features, ~ . %in% c("country_id", "country"))) {
         return(.data |> dplyr::filter(key_location == country_id))
-      } else if (stratification_features %in% c("region_id", "region")) {
+      } else if (purrr::some(stratification_features, ~ . %in% c("region_id", "region"))) {
         return(.data |> dplyr::filter(key_location == region_id))
-      } else if (stratification_features %in% c("subregion_id", "subregion")) {
+      } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
         return(.data |> dplyr::filter(key_location == subregion_id))
+      } else {
+        rlang::abort("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
       }
     }
   )
