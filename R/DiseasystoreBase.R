@@ -78,8 +78,6 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
       }
       checkmate::assert_character(self %.% target_schema)
 
-      # Initialize the feature handlers
-      private$initialize_feature_handlers()
     },
 
 
@@ -628,9 +626,7 @@ DiseasystoreBase <- R6::R6Class( # nolint: object_name_linter.
         dplyr::select("start_date", "end_date")
 
       return(new_ranges)
-    },
-
-    initialize_feature_handlers = function() NULL
+    }
   )
 )
 

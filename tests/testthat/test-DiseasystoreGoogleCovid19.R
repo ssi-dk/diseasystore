@@ -118,7 +118,7 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
         dplyr::pull("checksum") |>
         sort()
 
-      reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+      reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
       reference <- reference_generator(start_date  = start_date,
                                        end_date    = end_date,
@@ -158,7 +158,7 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
         dplyr::pull("checksum") |>
         sort()
 
-      reference_generator <- eval(parse(text = paste0(.y, "_()"))) %.% compute
+      reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
       reference <- reference_generator(start_date  = start_date,
                                        end_date    = end_date,
