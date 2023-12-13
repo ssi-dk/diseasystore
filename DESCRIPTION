@@ -1,5 +1,5 @@
 Package: diseasystore
-Title: Feature Stores For The `diseasy` Framework
+Title: Feature Stores for the `diseasy` Framework
 Version: 0.1
 Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
