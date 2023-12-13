@@ -9,7 +9,8 @@ Authors@R:
       person("Kaare", "Gr\u00E6sb\u00F8ll", , "kagr@ssi.dk", role = c("ctb"),
              comment = c(ORCID = "0000-0002-6258-8212")),
       person("Kasper", "Schou Telkamp", ,"kasper.telkamp@gmail.com", role = c("ctb"),
-           comment = c(ORCID = "0009-0001-5126-0190")))
+           comment = c(ORCID = "0009-0001-5126-0190")),
+      person("Statens Serum Institut, SSI", role = c("cph", "fnd")))
 Description:
   Simple feature stores and tools for creating personalised feature stores.
   `diseasystore` powers feature store which can automatically link and aggregate features to a given stratification
