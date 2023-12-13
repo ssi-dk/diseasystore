@@ -201,6 +201,10 @@ accordingly after the features have been joined inside the `diseasystore`.
 
 For an example, you can consult [DiseasystoreGoogleCovid19: key_join_filter](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L75)
 
+## Testing your `diseasystore`
+The `diseasystore` package includes a large set of tests for `DiseasystoreGoogleCovid19` that you can adapt to your
+custom `diseasystore`. The latest version of these tests are available [here](https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R).
+
 [^1]: The `SCDB` package places `checksum`, `from_ts`, and `until_ts` as the last columns. But `valid_from` and
       `valid_until` should be the last columns in the output passed to `SCDB`.
 [^2]: In practice, this means that the names of features should be in `snake_case`.
