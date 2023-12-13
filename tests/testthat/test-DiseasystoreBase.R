@@ -99,6 +99,48 @@ test_that("DiseasystoreBase works", {
 })
 
 
+test_that("$get_feature verbosity works", {
+
+  # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
+  DummyDiseasystoreBase <- R6::R6Class(                                                                                 # nolint: object_name_linter
+    classname = "DummyDiseasystoreBase",
+    inherit = DiseasystoreBase,
+    private = list(
+      .ds_map = list("cyl" = "dummy_mtcars"),
+      dummy_mtcars = FeatureHandler$new(
+        compute = function(start_date, end_date, slice_ts, source_conn) {
+          return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
+        }
+      )
+    )
+  )
+
+  # Create an instance with verbose = TRUE
+  ds <- DummyDiseasystoreBase$new(
+    source_conn = file.path("some", "path"),
+    target_conn = DBI::dbConnect(RSQLite::SQLite()),
+    verbose = TRUE
+  )
+
+  # Capture the messages from a get_feature call and compare with expectation
+  messages <- capture.output(
+    invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
+    type = "message"
+  )
+  checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date inter.")
+  checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
+
+  # Second identical call should give no messages
+  messages <- capture.output(
+    invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
+    type = "message"
+  )
+  expect_equal(messages, character(0))
+
+  rm(ds)
+})
+
+
 test_that("DiseasystoreBase$determine_new_ranges works", {
 
   start_date <- as.Date("2020-01-01")
