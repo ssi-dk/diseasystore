@@ -25,13 +25,13 @@ nolint_line_length_linter: Check that lines adhere to a given character limit, i
 ## nolint_position_linter
 # will produce lints
 lintr::lint(
-  text = paste0(strrep("x", 15L), "# nolint: object_name_linter."),
+  text = paste0(strrep("x", 15L), "# nolint: object_name_linter"),
   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
 )
 
 # okay
 lintr::lint(
-  text = paste0(strrep("x", 20L), "# nolint: object_name_linter."),
+  text = paste0(strrep("x", 20L), "# nolint: object_name_linter"),
   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
 )
 
@@ -47,6 +47,7 @@ lintr::lint(
   text = paste0(strrep("x", 20L), "# nolint: object_name_linter."),
   linters = c(nolint_line_length_linter(length = 20L), lintr::object_name_linter())
 )
+
 }
 \seealso{
 \itemize{

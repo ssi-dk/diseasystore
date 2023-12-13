@@ -14,4 +14,9 @@ linters: c(
       expect_identical_linter = NULL      # Seems a little aggressive to require this.
     )
   )
-exclude_linter: r"{^ *: *([\w, ]*).?$}"
+exclude_linter: r"{^ *: *([\w, ]*)(.|$)}"
+exclusions: list(
+    "R/0_linters.R" = list(
+      "nolint_position_linter" = Inf
+    )
+  )

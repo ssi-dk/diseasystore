@@ -9,13 +9,13 @@
 #' ## nolint_position_linter
 #' # will produce lints
 #' lintr::lint(
-#'   text = paste0(strrep("x", 15L), "# nolint: object_name_linter."),
+#'   text = paste0(strrep("x", 15L), "# nolint: object_name_linter"),
 #'   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
 #' )
 #'
 #' # okay
 #' lintr::lint(
-#'   text = paste0(strrep("x", 20L), "# nolint: object_name_linter."),
+#'   text = paste0(strrep("x", 20L), "# nolint: object_name_linter"),
 #'   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
 #' )
 #'
@@ -84,6 +84,7 @@ nolint_position_linter <- function(length = 80L) {
 #'   text = paste0(strrep("x", 20L), "# nolint: object_name_linter."),
 #'   linters = c(nolint_line_length_linter(length = 20L), lintr::object_name_linter())
 #' )
+#'
 #' @export
 #' @importFrom rlang .data
 nolint_line_length_linter <- function(length = 80L) {
@@ -97,7 +98,7 @@ nolint_line_length_linter <- function(length = 80L) {
         return(list())
       }
 
-      nolint_regex <- r"{# ?nolint ?(start)?:? ?[\w, ]*\.?}"
+      nolint_regex <- r"{# ?nolint ?(start|end)?:?.*}"
 
       file_lines_nolint_excluded <- source_expression$file_lines |>
         purrr::map_chr(\(s) stringr::str_remove(s, nolint_regex))
