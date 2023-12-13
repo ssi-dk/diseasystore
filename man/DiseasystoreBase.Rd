@@ -52,7 +52,6 @@ A human readable label of the feature store. Read only.}
 \item \href{#method-DiseasystoreBase-finalize}{\code{DiseasystoreBase$finalize()}}
 \item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
 \item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
-\item \href{#method-DiseasystoreBase-key_join_filter}{\code{DiseasystoreBase$key_join_filter()}}
 \item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
 }
 }
@@ -172,40 +171,6 @@ These are then joined to the observable feature before \code{stratification} is 
 }
 \subsection{Returns}{
 A tbl_dbi with the requested joined features for the study period.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreBase-key_join_filter"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreBase-key_join_filter}{}}}
-\subsection{Method \code{key_join_filter()}}{
-This function implements an intermediate filtering in the stratification pipeline.
-For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-The \code{key_join_filter} is inserted into the stratification pipeline to remove this double counting.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_filter(
-  .data,
-  stratification_features,
-  start_date = self \%.\% start_date,
-  end_date = self \%.\% end_date
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{.data}}{(\code{any})\cr The data object to perform the operation on.}
-
-\item{\code{stratification_features}}{(\code{character})\cr
-A list of the features included in the stratification process.}
-
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A subset of \code{.data} filtered to remove double counting
 }
 }
 \if{html}{\out{<hr>}}

@@ -14,29 +14,34 @@ status](https://www.r-pkg.org/badges/version/diseasystore)](https://CRAN.R-proje
 
 ## Overview
 
-The `diseasystore` is a feature store implemented in R specifically
-designed for providing disease data for pandemic preparedness. The
-package forms the data-backbone of the `diseasy` package.
+The `diseasystore` package provides feature stores implemented in R
+specifically designed for serve disease data for epidemic preparedness.
 
-## A modular feature store
+What makes a `diseasystore` special, is that features can be
+automatically coupled and stratified within the `diseasystore` package.
+Consult the Quick start vignette to see it in action
+(`vignette("quick-start", package = "diseasystore")`).
 
-The `diseasystore` is modularly built using R6 classes. Different
-diseases are handled by individual feature stores that have access to
-all relevant disease data for the given disease.
+The package forms the data-backbone of the `{diseasy}` package.
 
 ## Handling of diverse data sources
 
+Different data sources are handled by individual `diseasystores` which
+each facilitate access to the relevant disease data for the given data
+source.
+
 Data for different diseases will typically be structured in different
-ways. The `diseasystore` currently implements the Google Health COVID-19
-Open Repository with more one the way.
+ways. The `diseasystore` package currently implements the Google Health
+COVID-19 Open Repository with more one `diseasystores` the way.
 
-The `diseasystore` is designed to handled both individual level data
-(examples to come) or semi-aggregated (typically public) data.
+The `diseasystore` package is designed to handled both individual-level
+data (examples to come) and semi-aggregated (typically publicly
+available) data.
 
-If the data is at the individual level, the feature store is fully
-dynamic and and can adapt to (virtually) any stratification that the
-user specifies. If the data conversely is semi-aggregated, the data can
-only be stratified at the levels of the semi-aggregation (or at higher
+If the data is at the individual-level, the feature store is fully
+dynamic and can adapt to (virtually) any stratification that the user
+specifies. If the data conversely is semi-aggregated, the data can only
+be stratified at the levels of the semi-aggregation (or at higher
 levels).
 
 ## Installation

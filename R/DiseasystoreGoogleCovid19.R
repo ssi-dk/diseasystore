@@ -59,56 +59,6 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
   classname = "DiseasystoreGoogleCovid19",
   inherit = DiseasystoreBase,
 
-  public = list(
-
-    #' @description
-    #'   This function implements an intermediate filtering in the stratification pipeline.
-    #'   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-    #'   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
-    #' @param .data `r rd_.data()`
-    #' @param stratification_features (`character`)\cr
-    #'   A list of the features included in the stratification process.
-    #' @param start_date `r rd_start_date()`
-    #' @param end_date `r rd_end_date()`
-    #' @return
-    #'   A subset of `.data` filtered to remove double counting
-    key_join_filter = function(.data, stratification_features,
-                               start_date = private %.% start_date,
-                               end_date = private %.% end_date) {
-
-      # The Google data contains surplus data depending on the stratification.
-      # Ie. some individuals are counted more than once.
-      # Eg. once at the country level, and then again at the region level etc.
-      # We need to filter at the appropriate stratification level when these doubly counted
-      # features are requested.
-
-      # Manually perform filtering
-      if (is.null(stratification_features) ||
-            (!is.null(stratification_features) &&
-               purrr::none(stratification_features,
-                           ~ . %in% c("country_id", "country",
-                                      "region_id", "region",
-                                      "subregion_id", "subregion")))) {
-
-        # If no spatial stratification is requested, use the largest available per country
-        filter_level <- self$get_feature("country_id", start_date, end_date) |>
-          dplyr::group_by(country_id) |>
-          dplyr::slice_min(aggregation_level) |>
-          dplyr::ungroup() |>
-          dplyr::select(key_location)
-
-        return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
-
-      } else if (stratification_features %in% c("country_id", "country")) {
-        return(.data |> dplyr::filter(key_location == country_id))
-      } else if (stratification_features %in% c("region_id", "region")) {
-        return(.data |> dplyr::filter(key_location == region_id))
-      } else if (stratification_features %in% c("subregion_id", "subregion")) {
-        return(.data |> dplyr::filter(key_location == subregion_id))
-      }
-    }
-  ),
-
   private = list(
     .ds_map = list(
       "n_population"    = "google_covid_19_population",
@@ -294,10 +244,59 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
         return(out)
       },
       key_join = key_join_max
-    )
+    ),
+
+
+    # @description
+    #   This function implements an intermediate filtering in the stratification pipeline.
+    #   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+    #   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
+    # @param .data `r rd_.data()`
+    # @param stratification_features (`character`)\cr
+    #   A list of the features included in the stratification process.
+    # @param start_date `r rd_start_date()`
+    # @param end_date `r rd_end_date()`
+    # @return
+    #   A subset of `.data` filtered to remove double counting
+    key_join_filter = function(.data, stratification_features,
+                               start_date = private %.% start_date,
+                               end_date = private %.% end_date) {
+
+      # The Google data contains surplus data depending on the stratification.
+      # Ie. some individuals are counted more than once.
+      # Eg. once at the country level, and then again at the region level etc.
+      # We need to filter at the appropriate stratification level when these doubly counted
+      # features are requested.
+
+      # Manually perform filtering
+      if (is.null(stratification_features) ||
+            (!is.null(stratification_features) &&
+               purrr::none(stratification_features,
+                           ~ . %in% c("country_id", "country",
+                                      "region_id", "region",
+                                      "subregion_id", "subregion")))) {
+
+        # If no spatial stratification is requested, use the largest available per country
+        filter_level <- self$get_feature("country_id", start_date, end_date) |>
+          dplyr::group_by(country_id) |>
+          dplyr::slice_min(aggregation_level) |>
+          dplyr::ungroup() |>
+          dplyr::select(key_location)
+
+        return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
+
+      } else if (purrr::some(stratification_features, ~ . %in% c("country_id", "country"))) {
+        return(.data |> dplyr::filter(key_location == country_id))
+      } else if (purrr::some(stratification_features, ~ . %in% c("region_id", "region"))) {
+        return(.data |> dplyr::filter(key_location == region_id))
+      } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
+        return(.data |> dplyr::filter(key_location == subregion_id))
+      } else {
+        rlang::abort("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
+      }
+    }
   )
 )
-
 
 
 # Set default options for the package related to the Google COVID-19 store
