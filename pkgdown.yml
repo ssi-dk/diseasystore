@@ -2,9 +2,10 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  google_covid_19_data: google_covid_19_data.html
-  quick_start: quick_start.html
-last_built: 2023-12-12T09:14Z
+  diseasystore-google-covid-19: diseasystore-google-covid-19.html
+  extending-diseasystore: extending-diseasystore.html
+  quick-start: quick-start.html
+last_built: 2023-12-13T13:16Z
 urls:
   reference: https://rasmusskytte.github.io/diseasystore/reference
   article: https://rasmusskytte.github.io/diseasystore/articles

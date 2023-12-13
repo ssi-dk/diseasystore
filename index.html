@@ -48,8 +48,9 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/google_covid_19_data.html">diseasystore: Google Health COVID-19 Open Data</a>
-    <a class="dropdown-item" href="articles/quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <a class="dropdown-item" href="articles/extending-diseasystore.html">Extending diseasystore</a>
+    <a class="dropdown-item" href="articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -79,19 +80,17 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The <code>diseasystore</code> is a feature store implemented in R specifically designed for providing disease data for pandemic preparedness. The package forms the data-backbone of the <code>diseasy</code> package.</p>
-</div>
-<div class="section level2">
-<h2 id="a-modular-feature-store">A modular feature store<a class="anchor" aria-label="anchor" href="#a-modular-feature-store"></a>
-</h2>
-<p>The <code>diseasystore</code> is modularly built using R6 classes. Different diseases are handled by individual feature stores that have access to all relevant disease data for the given disease.</p>
+<p>The <code>diseasystore</code> package provides feature stores implemented in R specifically designed for serve disease data for epidemic preparedness.</p>
+<p>What makes a <code>diseasystore</code> special, is that features can be automatically coupled and stratified within the <code>diseasystore</code> package. Consult the Quick start vignette to see it in action (<code><a href="articles/quick-start.html">vignette("quick-start", package = "diseasystore")</a></code>).</p>
+<p>The package forms the data-backbone of the <code>{diseasy}</code> package.</p>
 </div>
 <div class="section level2">
 <h2 id="handling-of-diverse-data-sources">Handling of diverse data sources<a class="anchor" aria-label="anchor" href="#handling-of-diverse-data-sources"></a>
 </h2>
-<p>Data for different diseases will typically be structured in different ways. The <code>diseasystore</code> currently implements the Google Health COVID-19 Open Repository with more one the way.</p>
-<p>The <code>diseasystore</code> is designed to handled both individual level data (examples to come) or semi-aggregated (typically public) data.</p>
-<p>If the data is at the individual level, the feature store is fully dynamic and and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
+<p>Different data sources are handled by individual <code>diseasystores</code> which each facilitate access to the relevant disease data for the given data source.</p>
+<p>Data for different diseases will typically be structured in different ways. The <code>diseasystore</code> package currently implements the Google Health COVID-19 Open Repository with more one <code>diseasystores</code> the way.</p>
+<p>The <code>diseasystore</code> package is designed to handled both individual-level data (examples to come) and semi-aggregated (typically publicly available) data.</p>
+<p>If the data is at the individual-level, the feature store is fully dynamic and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>

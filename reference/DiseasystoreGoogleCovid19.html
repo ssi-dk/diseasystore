@@ -28,8 +28,9 @@ See the vignette("google_covid_19_data") for details on how to configure the fea
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/google_covid_19_data.html">diseasystore: Google Health COVID-19 Open Data</a>
-    <a class="dropdown-item" href="../articles/quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
+    <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -75,61 +76,20 @@ See the vignette("google_covid_19_data") for details on how to configure the fea
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-DiseasystoreGoogleCovid19-key_join_filter"><code>DiseasystoreGoogleCovid19$key_join_filter()</code></a></p></li>
-<li><p><a href="#method-DiseasystoreGoogleCovid19-clone"><code>DiseasystoreGoogleCovid19$clone()</code></a></p></li>
+<ul><li><p><a href="#method-DiseasystoreGoogleCovid19-clone"><code>DiseasystoreGoogleCovid19$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="finalize"><a href="DiseasystoreBase.html#method-finalize"><code>diseasystore::DiseasystoreBase$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href="DiseasystoreBase.html#method-get_feature"><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href="DiseasystoreBase.html#method-initialize"><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href="DiseasystoreBase.html#method-key_join_features"><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
-</ul></details></p><hr><a id="method-DiseasystoreGoogleCovid19-key_join_filter"></a><div class="section">
-<h3 id="method-key-join-filter-">Method <code>key_join_filter()</code><a class="anchor" aria-label="anchor" href="#method-key-join-filter-"></a></h3>
-<p>This function implements an intermediate filtering in the stratification pipeline.
-For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
-The <code>key_join_filter</code> is inserted into the stratification pipeline to remove this double counting.</p><div class="section">
-<h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreGoogleCovid19</span><span class="op">$</span><span class="fu">key_join_filter</span><span class="op">(</span></span>
-<span>  <span class="va">.data</span>,</span>
-<span>  <span class="va">stratification_features</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="va">private</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">end_date</span></span>
-<span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>.data</code></dt>
-<dd><p>(<code>any</code>)<br> The data object to perform the operation on.</p></dd>
-
-
-<dt><code>stratification_features</code></dt>
-<dd><p>(<code>character</code>)<br>
-A list of the features included in the stratification process.</p></dd>
-
-
-<dt><code>start_date</code></dt>
-<dd><p>(<code>Date</code>)<br> Study period start.</p></dd>
-
-
-<dt><code>end_date</code></dt>
-<dd><p>(<code>Date</code>)<br> Study period end.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>A subset of <code>.data</code> filtered to remove double counting</p>
-</div>
-
-</div><p></p><hr><a id="method-DiseasystoreGoogleCovid19-clone"></a><div class="section">
+</ul></details></p><hr><a id="method-DiseasystoreGoogleCovid19-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreGoogleCovid19</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
