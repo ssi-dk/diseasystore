@@ -13,7 +13,20 @@ test_that("SCDB gives too many messages", {
 
   # Here we test whether these still give messages
 
+
+
+  # SCDB::get_table -- privileges warning (tempfile)
+  conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = tempfile())
+  expect_warning(SCDB::get_tables(conn), "Check user privileges / database configuration")
+  dplyr::copy_to(conn, iris, name = "iris")
+
+
+
   conn <- DBI::dbConnect(RSQLite::SQLite())
+
+  # SCDB::get_table -- privileges warning (memory)
+  expect_warning(SCDB::get_tables(conn), "Check user privileges / database configuration")
+  dplyr::copy_to(conn, iris, name = "iris")
 
   target_schema <- diseasyoption("target_schema")
   test_id <- SCDB::id(paste(target_schema, "mtcars", sep = "."), conn)
@@ -27,17 +40,33 @@ test_that("SCDB gives too many messages", {
 
   # SCDB::update_snapshot
   mtcars_remote <- dplyr::copy_to(conn, mtcars)
-  expect_message(SCDB::update_snapshot(mtcars_remote, conn, paste(target_schema, "mtcars", sep = "."),
-                                       timestamp = Sys.time(),
-                                       logger = SCDB::Logger$new(output_to_console = FALSE, warn = FALSE)),
-                 "If you want to specify a schema use")
+  message <- capture.output(
+    invisible(
+      SCDB::update_snapshot(mtcars_remote, conn, paste(target_schema, "mtcars", sep = "."),
+                            timestamp = Sys.time(),
+                            logger = SCDB::Logger$new(output_to_console = FALSE, warn = FALSE))
+    ),
+    type = "message"
+  ) |>
+    paste(collapse = " ")
+  checkmate::expect_character(message, pattern = "It looks like you tried to incorrectly use")
 
   # SCDB::is_historical
-  expect_message(SCDB::is.historical(dplyr::tbl(conn, test_id)), "If you want to specify a schema use")
+  message <- capture.output(
+    invisible(SCDB::is.historical(dplyr::tbl(conn, test_id))),
+    type = "message"
+  ) |>
+    paste(collapse = " ")
+  checkmate::expect_character(message, pattern = "It looks like you tried to incorrectly use")
 
 
   # As well as calls to dplyr::tbl if a SCDB::id is supplied
-  expect_message(dplyr::tbl(conn, test_id), "If you want to specify a schema use")
+  message <- capture.output(
+    invisible(dplyr::tbl(conn, test_id)),
+    type = "message"
+  ) |>
+    paste(collapse = " ")
+  checkmate::expect_character(message, pattern = "It looks like you tried to incorrectly use")
 
 
   # If any of these message disappears, we need to remove some "suppressMessages" in the code
