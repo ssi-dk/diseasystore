@@ -147,9 +147,9 @@ To see some `FeatureHandlers` in action, you can consult a few of those bundled 
 
 For example:
 
-* [DiseasystoreGoogleCovid19: index](https://github.com/ssi-dk/diseasystore/blob/1319eb93af/R/DiseasystoreGoogleCovid19.R#L111)
+* [DiseasystoreGoogleCovid19: index](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L161)
 
-* [DiseasystoreGoogleCovid19: min temperature](https://github.com/ssi-dk/diseasystore/blob/1319eb93af/R/DiseasystoreGoogleCovid19.R#L203)
+* [DiseasystoreGoogleCovid19: min temperature](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L253)
 
 
 # Creating a `diseasystore`
@@ -199,7 +199,7 @@ need to filter out the data aggregated at the region-level.
 This is the purpose of `$key_join_filter()`. It takes as input the requested stratifications and filters the data
 accordingly after the features have been joined inside the `diseasystore`.
 
-For an example, you can consult [DiseasystoreGoogleCovid19: key_join_filter](https://github.com/ssi-dk/diseasystore/blob/1319eb93af/R/DiseasystoreGoogleCovid19.R#L258)
+For an example, you can consult [DiseasystoreGoogleCovid19: key_join_filter](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L75)
 
 [^1]: The `SCDB` package places `checksum`, `from_ts`, and `until_ts` as the last columns. But `valid_from` and
       `valid_until` should be the last columns in the output passed to `SCDB`.
