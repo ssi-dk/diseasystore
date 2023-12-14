@@ -650,10 +650,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                                start_date = self %.% start_date,
                                end_date   = self %.% end_date) {
       return(.data) # By default, no filtering is performed
-    },
-
-
-    initialise_feature_handlers = function() NULL
+    }
   )
 )
 
