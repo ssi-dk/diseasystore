@@ -45,6 +45,7 @@ Suggests:
     R.utils,
     rmarkdown,
     RSQLite,
+    RPostgres,
     tibble,
     spelling,
     withr
