@@ -26,6 +26,7 @@ Other contributors:
   \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [contributor]
   \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID}) [contributor]
   \item Kasper Schou Telkamp \email{kasper.telkamp@gmail.com} (\href{https://orcid.org/0009-0001-5126-0190}{ORCID}) [contributor]
+  \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID}) [contributor]
   \item Statens Serum Institut, SSI [copyright holder, funder]
 }
 
