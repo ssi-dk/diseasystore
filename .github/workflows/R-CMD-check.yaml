@@ -48,6 +48,11 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: ${{ matrix.config.os == "ubuntu-latest" && matrix.config.r == "release" }
+        with:
+          extra-packages: github::r-dbi/RSQLite
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
@@ -80,6 +85,11 @@ jobs:
             any::knitr
             any::rmarkdown
           needs: check
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: ${{ matrix.config.os == "ubuntu-latest" && matrix.config.r == "release" }
+        with:
+          extra-packages: github::r-dbi/RSQLite
 
       - uses: r-lib/actions/check-r-package@v2
         with:
