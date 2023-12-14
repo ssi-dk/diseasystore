@@ -59,9 +59,8 @@ purrr::walk(google_files, ~ {
     .
   )
 
-  if (!file.exists(paste0(destfile, ".gz"))) {
+  if (!file.exists(destfile)) {
     download.file(url, destfile)
-    R.utils::gzip(destfile)
   }
 })
 ```
