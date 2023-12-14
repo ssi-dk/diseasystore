@@ -87,7 +87,7 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: ${{ matrix.config.os == "ubuntu-latest" && matrix.config.r == "release" }
+        if: ${{ matrix.config.os == "ubuntu-latest" && matrix.config.r == "release" }}
         with:
           extra-packages: github::r-dbi/RSQLite
 
