@@ -19,8 +19,15 @@ library(diseasystore)
 ```
 
 ```{r hidden_options, include = FALSE}
-withr::local_options("tibble.print_min" = 5)
-withr::local_options("diseasystore.verbose" = FALSE)
+if (rlang::is_installed("withr")) {
+  withr::local_options("tibble.print_min" = 5)
+  withr::local_options("diseasystore.verbose" = FALSE)
+} else {
+  opts <- options("tibble.print_min" = 5, "diseasystore.verbose" = FALSE)
+}
+
+# We have a "hard" dependency for RSQLite to render parts of this vignette
+suggests_available = rlang::is_installed("RSQLite")
 ```
 
 The Google COVID-19 data repository is a comprehensive open repository of COVID-19 data.
@@ -62,53 +69,73 @@ purrr::walk(google_files, ~ {
 ```{r download_data_hidden, include = FALSE}
 # First we set the path we want to use as an option
 source_conn <- "vignette_data"
-withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn)
+if (rlang::is_installed("withr")) {
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn) 
+} else {
+  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn))
+}
+
 if (!dir.exists(source_conn)) dir.create(source_conn, recursive = TRUE, showWarnings = FALSE)
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 files_to_download <- purrr::discard(google_files, ~ file.exists(file.path(source_conn, paste0(., ".gz"))))
 
-if (curl::has_internet()) {
-  purrr::walk(files_to_download, ~ {
-    url <- paste0(diseasyoption("remote_conn", "DiseasystoreGoogleCovid19"), .)
+purrr::walk(files_to_download, ~ {
+  url <- paste0(diseasyoption("remote_conn", "DiseasystoreGoogleCovid19"), .)
 
-    destfile <-
-      file.path(diseasyoption("source_conn", "DiseasystoreGoogleCovid19"), .)
+  destfile <-
+    file.path(diseasyoption("source_conn", "DiseasystoreGoogleCovid19"), .)
 
-    if (!file.exists(paste0(destfile, ".gz"))) {
-      readr::read_csv(url, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-        readr::write_csv(destfile)
+  if (!file.exists(paste0(destfile, ".gz"))) {
+    readr::read_csv(url, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+      readr::write_csv(destfile)
+
+    if (rlang::is_installed("R.utils")) {
       R.utils::gzip(destfile)
     }
-  })
-} else {
-  stop("Cannot download vignette files")
-}
+  }
+})
 ```
 
 
 The `diseasystores` require a data base to store its features in.
 These should be configured before use and can be stored in the packages options.
-```{r configure_diseasystore}
+```{r configure_diseasystore, eval = FALSE}
 # We will store the target_conn as a function that opens a DBIconnection to the DB
 target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
 options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
 ```
 
+```{r configure_diseasystore_hidden, include = FALSE, eval = suggests_available}
+target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
+if (rlang::is_installed("withr")) {
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
+} else {
+  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn))
+}
+```
+
 
 Once the files are downloaded and the target DB is configured, we can initialize the `diseasystore` that uses the Google COVID-19 data.
-```{r initializing_diseasystore}
+```{r initializing_diseasystore, eval = suggests_available}
 ds <- DiseasystoreGoogleCovid19$new()
 ```
 
 Once configured such, we can also use the feature store directly to get data.
-```{r using_diseasystore_example_1}
+```{r using_diseasystore_example_1, eval = suggests_available}
 # We can see all the available features in the feature store
 ds$available_features
 ```
 
-```{r using_diseasystore_example_2}
+```{r using_diseasystore_example_2, eval = suggests_available}
 # And then retrieve a feature from the feature store
 ds$get_feature(feature = "n_hospital",
                start_date = as.Date("2020-01-01"),
                end_date = as.Date("2020-06-01"))
+```
+
+
+```{r cleanup, include = FALSE}
+if (!rlang::is_installed("withr")) {
+  options(opts)
+}
 ```

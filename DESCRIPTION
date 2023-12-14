@@ -45,11 +45,10 @@ Suggests:
     R.utils,
     rmarkdown,
     RSQLite,
-    RPostgres,
     tibble,
     spelling,
     withr
+VignetteBuilder: knitr
 URL: https://github.com/ssi-dk/diseasystore
 BugReports: https://github.com/ssi-dk/diseasystore/issues
-VignetteBuilder: knitr
 Config/testthat/edition: 3
