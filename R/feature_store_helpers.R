@@ -36,7 +36,7 @@ available_diseasystores <- function() {
     purrr::map(ls) |>
     purrr::reduce(c) |>
     purrr::keep(~ startsWith(., "Diseasystore")) |>
-    purrr::discard(~ . %in% c("DiseasystoreBase", "DiseasystoreGeneric"))
+    purrr::discard(~ . %in% c("DiseasystoreBase"))
 
   return(available_diseasystores)
 }
