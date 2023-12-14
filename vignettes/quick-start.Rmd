@@ -64,7 +64,7 @@ local_conn <- "vignette_data"
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 
 # Check that the files are available
-vignette_data_missing <- purrr::some(paste0(google_files, ".gz"), ~ !file.exists(file.path(local_conn, .)))
+vignette_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
 
 if (vignette_data_missing) {
 
@@ -72,20 +72,16 @@ if (vignette_data_missing) {
   if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
 
   # Then we download the first n rows of each data set of interest
-  purrr::keep(google_files, ~ !file.exists(file.path(local_conn, paste0(., ".gz")))) |>
+  purrr::discard(google_files, ~ file.exists(file.path(local_conn, .))) |>
     purrr::walk(\(file) {
       paste0(remote_conn, file) |>
         readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
         readr::write_csv(file.path(local_conn, file))
-
-      if (rlang::is_installed("R.utils")) {
-        R.utils::gzip(file.path(local_conn, file))
-      }
     })
 }
 
 # Check that the files are available after attempting to download
-if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, paste0(., ".gz"))))) {
+if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
   stop("DiseasystoreGoogleCovid19: vignette data not available and could not be downloaded")
 }
 

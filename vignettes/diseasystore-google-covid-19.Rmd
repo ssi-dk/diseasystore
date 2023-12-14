@@ -77,22 +77,15 @@ if (rlang::is_installed("withr")) {
 
 if (!dir.exists(source_conn)) dir.create(source_conn, recursive = TRUE, showWarnings = FALSE)
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-files_to_download <- purrr::discard(google_files, ~ file.exists(file.path(source_conn, paste0(., ".gz"))))
+files_to_download <- purrr::discard(google_files, ~ file.exists(file.path(source_conn, .)))
 
 purrr::walk(files_to_download, ~ {
   url <- paste0(diseasyoption("remote_conn", "DiseasystoreGoogleCovid19"), .)
 
-  destfile <-
-    file.path(diseasyoption("source_conn", "DiseasystoreGoogleCovid19"), .)
+  destfile <- file.path(diseasyoption("source_conn", "DiseasystoreGoogleCovid19"), .)
 
-  if (!file.exists(paste0(destfile, ".gz"))) {
-    readr::read_csv(url, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-      readr::write_csv(destfile)
-
-    if (rlang::is_installed("R.utils")) {
-      R.utils::gzip(destfile)
-    }
-  }
+  readr::read_csv(url, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+    readr::write_csv(destfile)
 })
 ```
 
