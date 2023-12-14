@@ -637,7 +637,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
     # @description
     #   This function implements an intermediate filtering in the stratification pipeline.
-    #   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+    #   For semi-aggregated data like Google's COVID-19 data, some people are counted more than once.
     #   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
     # @param .data `r rd_.data()`
     # @param stratification_features (`character`)\cr
