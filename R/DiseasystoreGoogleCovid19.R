@@ -11,7 +11,7 @@
 #'   A new instance of `FeatureHandler` [R6][R6::R6Class] class corresponding to the epidemic metric.
 #' @importFrom rlang .data
 #' @noRd
-google_covid_19_metric <- function(google_pattern, out_name) {
+google_covid_19_metric <- function(google_pattern, out_name) {                                                          # nocov start
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()
@@ -38,7 +38,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
     },
     key_join = key_join_sum
   )
-}
+}                                                                                                                       # nocov end
 
 
 #' @title feature store handler of Google Health COVID-19 Open Data features
