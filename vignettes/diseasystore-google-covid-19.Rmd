@@ -27,7 +27,7 @@ if (rlang::is_installed("withr")) {
 }
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
-suggests_available = rlang::is_installed("RSQLite")
+suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 The Google COVID-19 data repository is a comprehensive open repository of COVID-19 data.
@@ -69,7 +69,7 @@ purrr::walk(google_files, ~ {
 # First we set the path we want to use as an option
 source_conn <- "vignette_data"
 if (rlang::is_installed("withr")) {
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn) 
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn)
 } else {
   opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn))
 }

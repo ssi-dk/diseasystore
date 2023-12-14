@@ -28,7 +28,7 @@ if (rlang::is_installed("withr")) {
 }
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
-suggests_available = rlang::is_installed("RSQLite")
+suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 # Available diseasystores
