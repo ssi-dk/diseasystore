@@ -5,7 +5,7 @@
 \title{Drop feature stores from DB}
 \usage{
 drop_diseasystore(
-  pattern = ".*",
+  pattern = NULL,
   schema = diseasyoption("target_schema"),
   conn = SCDB::get_connection()
 )
@@ -27,4 +27,6 @@ Drop feature stores from DB
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 
   drop_diseasystore(conn = conn)
+
+  DBI::dbDisconnect(conn)
 }

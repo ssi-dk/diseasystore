@@ -12,7 +12,7 @@ They define the three methods associated with features (\code{compute}, \code{ge
 }
 \examples{
   # The FeatureHandler is typically configured as part of making a new Diseasystore.
-  # Most often, we need only specifiy `compute` and `key_join` to get a functioning FeatureHandler
+  # Most often, we need only specify `compute` and `key_join` to get a functioning FeatureHandler
 
   # In this example we use mtcars as the basis for our features
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
@@ -27,11 +27,11 @@ They define the three methods associated with features (\code{compute}, \code{ge
 
   dplyr::copy_to(conn, data, "mtcars")
 
-  # In this example, the feature we want is the "maximum miles per galon"
-  # The feature in question in the mtcars dataset is then "mpg" and when we need to reduce
+  # In this example, the feature we want is the "maximum miles per gallon"
+  # The feature in question in the mtcars data set is then "mpg" and when we need to reduce
   # our data set, we want to use the "max()" function.
 
-  # We first write a compute function for the mpg in our modified mtcars dataset
+  # We first write a compute function for the mpg in our modified mtcars data set
   # Our goal is to get the mpg of all cars that were in production at the between start/end_date
   compute_mpg <- function(start_date, end_date, slice_ts, source_conn) {
     out <- SCDB::get_table(source_conn, "mtcars", slice_ts = slice_ts) |>
@@ -47,6 +47,7 @@ They define the three methods associated with features (\code{compute}, \code{ge
   # We can now combine into our FeatureHandler
   fh_max_mpg <- FeatureHandler$new(compute = compute_mpg, key_join = key_join_max)
 
+  DBI::dbDisconnect(conn)
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
@@ -85,14 +86,28 @@ Creates a new instance of the \code{FeatureHandler} \link[R6:R6Class]{R6} class.
 \describe{
 \item{\code{compute}}{(\code{function})\cr
 A function of the form "function(start_date, end_date, slice_ts, source_conn)".
-This function should compute the feature from the source connection.}
+This function should return a \code{data.frame} with the computed feature (computed from the source connection).
+The \code{data.frame} should contain the following columns:
+\itemize{
+\item key_\*: One (or more) columns containing keys to link this feature with other features
+\item \*: One (or more) columns containing the features that are computed
+\item valid_from/until: A set of columns containing the time period for which this feature information is valid.
+\cr
+}}
 
 \item{\code{get}}{(\code{function})\cr
-A function of the form "function(target_table, slice_ts, target_conn)".
-This function should retrieve the computed feature from the target connection.}
+(Optional). A function of the form "function(target_table, slice_ts, target_conn)".
+This function should retrieve the computed feature from the target connection.\cr}
 
 \item{\code{key_join}}{(\code{function})\cr
-One of the aggregators from \code{\link[=aggregators]{aggregators()}}.}
+A function like one of the aggregators from \code{\link[=aggregators]{aggregators()}}.
+
+The function should return an expression on the form:
+dplyr::summarise(.data,
+dplyr::across(.cols = tidyselect::all_of(feature),
+.fns = list(n = ~ \if{html}{\out{<aggregation function>}}),
+.names = "{.fn}"),
+.groups = "drop")}
 }
 \if{html}{\out{</div>}}
 }

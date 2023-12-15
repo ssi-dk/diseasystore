@@ -4,20 +4,31 @@
 \name{diseasystore-package}
 \alias{diseasystore}
 \alias{diseasystore-package}
-\title{diseasystore: Feature Stores For The `diseasy` Framework}
+\title{diseasystore: Feature Stores for the `diseasy` Framework}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-This package handles the feature store data model for the diseasy framework.
+Simple feature stores and tools for creating personalised feature stores. `diseasystore` powers feature stores which can automatically link and aggregate features to a given stratification level. These feature stores are automatically time-versioned (powered by the `SCDB` package) and allows you to easily and dynamically compute features as part of your continuous integration.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ssi-dk/diseasystore}
+  \item \url{https://ssi-dk.github.io/diseasystore/}
+  \item Report bugs at \url{https://github.com/ssi-dk/diseasystore/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Rasmus Skytte Randløv \email{rske@ssi.dk} (\href{https://orcid.org/0000-0002-5860-3838}{ORCID})
 
-Authors:
+Other contributors:
 \itemize{
-  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID})
-  \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID})
-  \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID})
+  \item Marcus Munch Grünewald \email{mmgr@ssi.dk} (\href{https://orcid.org/0009-0006-8090-406X}{ORCID}) [contributor]
+  \item Kaare Græsbøll \email{kagr@ssi.dk} (\href{https://orcid.org/0000-0002-6258-8212}{ORCID}) [contributor]
+  \item Kasper Schou Telkamp \email{kasper.telkamp@gmail.com} (\href{https://orcid.org/0009-0001-5126-0190}{ORCID}) [contributor]
+  \item Lasse Engbo Christiansen \email{lsec@ssi.dk} (\href{https://orcid.org/0000-0001-5019-1931}{ORCID}) [contributor]
+  \item Statens Serum Institut, SSI [copyright holder, funder]
 }
 
 }

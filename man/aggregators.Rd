@@ -23,7 +23,7 @@ key_join_count(.data, feature)
 Name of the feature to perform the aggregation over}
 }
 \value{
-A dplyr::summarize to aggregate the features together using the given function (sum/max/min/count)
+A dplyr::summarise to aggregate the features together using the given function (sum/max/min/count)
 }
 \description{
 Feature aggregators

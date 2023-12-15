@@ -8,13 +8,15 @@
 #'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 #'
 #'   drop_diseasystore(conn = conn)
+#'
+#'   DBI::dbDisconnect(conn)
 #' @export
-drop_diseasystore <- function(pattern = ".*",
+drop_diseasystore <- function(pattern = NULL,
                               schema = diseasyoption("target_schema"),
                               conn = SCDB::get_connection()) {
 
   coll <- checkmate::makeAssertCollection()
-  checkmate::assert_character(pattern, add = coll)
+  checkmate::assert_character(pattern, null.ok = TRUE, add = coll)
   checkmate::assert_character(schema, add = coll)
   checkmate::assert_class(conn, "DBIConnection", add = coll)
   checkmate::reportAssertions(coll)
@@ -30,7 +32,7 @@ drop_diseasystore <- function(pattern = ".*",
   # Check if logs is in the table, if yes, all tables must be deleted
   if ("logs" %in% tables_to_delete &&
         !identical(tables_to_delete, purrr::keep(tables, ~ stringr::str_detect(., glue::glue("^{schema}\\..*"))))) {
-    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire featurestore is dropped."))
+    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped."))
   }
 
   tables_to_delete |>
@@ -38,7 +40,7 @@ drop_diseasystore <- function(pattern = ".*",
 
   # Delete from logs
   if (SCDB::table_exists(conn, glue::glue("{schema}.logs"))) {
-    log_records_to_delete <- suppressMessages(SCDB::get_table(conn, glue::glue("{schema}.logs"))) |>
+    log_records_to_delete <- SCDB::get_table(conn, glue::glue("{schema}.logs")) |>
       tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE) |>
       dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
       dplyr::select("log_file")

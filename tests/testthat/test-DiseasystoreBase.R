@@ -1,3 +1,6 @@
+# Set testing options
+withr::local_options("diseasystore.target_schema" = target_schema_1)
+
 test_that("DiseasystoreBase works", {
 
   # Test different initialization of the base module
@@ -6,16 +9,16 @@ test_that("DiseasystoreBase works", {
   expect_error(DiseasystoreBase$new(), regexp = "source_conn option not defined")
 
   # 2)
-  expect_error(DiseasystoreBase$new(source_conn = "/some/path"), regexp = "target_conn option not defined")
+  expect_error(DiseasystoreBase$new(source_conn = file.path("some", "path")), regexp = "target_conn option not defined")
 
   # 3)
-  withr::local_options("diseasystore.source_conn" = "/some/path")
+  withr::local_options("diseasystore.source_conn" = file.path("some", "path"))
   expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
   withr::local_options("diseasystore.source_conn" = NULL)
 
   # 4)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi()
   )
   expect_null(ds %.% start_date)
@@ -24,7 +27,7 @@ test_that("DiseasystoreBase works", {
 
   # 5)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi(),
     start_date = as.Date("2020-03-01")
   )
@@ -34,7 +37,7 @@ test_that("DiseasystoreBase works", {
 
   # 6)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi(),
     start_date = as.Date("2020-03-01"),
     end_date   = as.Date("2020-06-01")
@@ -45,7 +48,7 @@ test_that("DiseasystoreBase works", {
 
   # 7)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi(),
     start_date = as.Date("2020-03-01"),
     end_date   = as.Date("2020-06-01"),
@@ -58,15 +61,15 @@ test_that("DiseasystoreBase works", {
 
   # 8)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi()
   )
-  expect_identical(ds %.% target_schema, options() %.% "diseasystore.target_schema")
+  expect_identical(ds %.% target_schema, getOption("diseasystore.target_schema"))
   rm(ds)
 
   # 9)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi(),
     target_schema = "test_ds"
   )
@@ -76,7 +79,7 @@ test_that("DiseasystoreBase works", {
   # 10)
   withr::local_options("diseasystore.target_schema" = "test_ds")
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi()
   )
   expect_identical(ds %.% target_schema, "test_ds")
@@ -84,7 +87,7 @@ test_that("DiseasystoreBase works", {
 
   # 11)
   ds <- DiseasystoreBase$new(
-    source_conn = "/some/path",
+    source_conn = file.path("some", "path"),
     target_conn = dbplyr::simulate_dbi(),
     target_schema = "test_ds"
   )
@@ -99,6 +102,48 @@ test_that("DiseasystoreBase works", {
 })
 
 
+test_that("$get_feature verbosity works", {
+
+  # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+    classname = "DiseasystoreBase",
+    inherit = DiseasystoreBase,
+    private = list(
+      .ds_map = list("cyl" = "dummy_mtcars"),
+      dummy_mtcars = FeatureHandler$new(
+        compute = function(start_date, end_date, slice_ts, source_conn) {
+          return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
+        }
+      )
+    )
+  )
+
+  # Create an instance with verbose = TRUE
+  ds <- DiseasystoreDummy$new(
+    source_conn = file.path("some", "path"),
+    target_conn = DBI::dbConnect(RSQLite::SQLite()),
+    verbose = TRUE
+  )
+
+  # Capture the messages from a get_feature call and compare with expectation
+  messages <- capture.output(
+    invisible(suppressWarnings(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date()))),
+    type = "message"
+  )
+  checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date inter.")
+  checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
+
+  # Second identical call should give no messages
+  messages <- capture.output(
+    invisible(suppressWarnings(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date()))),
+    type = "message"
+  )
+  expect_equal(messages, character(0))
+
+  rm(ds)
+})
+
+
 test_that("DiseasystoreBase$determine_new_ranges works", {
 
   start_date <- as.Date("2020-01-01")
@@ -106,81 +151,101 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
-  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = target_schema_1)
-  logs <- suppressMessages(SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn))
-  rows_append(logs, data.frame(date = slice_ts,
-                               table = "table1",
-                               message = glue::glue("ds-range: {start_date} - {end_date}"),
-                               success = TRUE,
-                               log_file = "1"),
-              copy = TRUE, in_place = TRUE)
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
+  logs <- suppressWarnings(suppressMessages(
+    SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
+  ))
+
+  dplyr::rows_append(
+    logs,
+    data.frame(date = slice_ts,
+               table = "table1",
+               message = glue::glue("ds-range: {start_date} - {end_date}"),
+               success = TRUE,
+               log_file = "1"),
+    copy = TRUE, in_place = TRUE
+  )
 
   determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 
-  expect_equal(determine_new_ranges("table1", start_date, end_date, slice_ts),
-               tibble::tibble(start_date = as.Date(character(0)),
-                              end_date   = as.Date(character(0))))
+  expect_identical(
+    determine_new_ranges("table1", start_date, end_date, slice_ts),
+    tibble::tibble(start_date = as.Date(character(0)),
+                   end_date   = as.Date(character(0)))
+  )
 
-  expect_equal(determine_new_ranges("table2", start_date, end_date, slice_ts),
-               tibble::tibble(start_date = !!start_date,
-                              end_date   = !!end_date))
+  expect_identical(
+    determine_new_ranges("table2", start_date, end_date, slice_ts),
+    tibble::tibble(start_date = !!start_date,
+                   end_date   = !!end_date)
+  )
 
-  expect_equal(determine_new_ranges("table1", start_date, end_date + lubridate::days(5), slice_ts),
-               tibble::tibble(start_date = !!end_date + lubridate::days(1),
-                              end_date   = !!end_date + lubridate::days(5)))
+  expect_identical(
+    determine_new_ranges("table1", start_date, end_date + lubridate::days(5), slice_ts),
+    tibble::tibble(start_date = !!end_date + lubridate::days(1),
+                   end_date   = !!end_date + lubridate::days(5))
+  )
 
-  expect_equal(determine_new_ranges("table1", start_date - lubridate::days(5), end_date, slice_ts),
-               tibble::tibble(start_date = !!start_date - lubridate::days(5),
-                              end_date   = !!start_date - lubridate::days(1)))
+  expect_identical(
+    determine_new_ranges("table1", start_date - lubridate::days(5), end_date, slice_ts),
+    tibble::tibble(start_date = !!start_date - lubridate::days(5),
+                   end_date   = !!start_date - lubridate::days(1))
+  )
 
-  expect_equal(determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), slice_ts),
-               tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
-                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5))))
+  expect_identical(
+    determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), slice_ts),
+    tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                   end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5)))
+  )
 
-  expect_equal(determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), slice_ts),
-               tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
-                              end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3))))
+  expect_identical(
+    determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), slice_ts),
+    tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                   end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3)))
+  )
+
+  rm(ds)
 })
 
 
 test_that("active binding: ds_map works", {
-  m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the ds_map
-  expect_equal(m$ds_map, NULL)
+  expect_null(ds$ds_map)
 
   # Try to set the ds_map
-  expect_equal(tryCatch(m$ds_map <- list("testing" = "n_positive"), error = \(e) e),
-               simpleError("`$ds_map` is read only"))
-  expect_equal(m$ds_map, NULL)
-  rm(m)
+  expect_identical(tryCatch(ds$ds_map <- list("testing" = "n_positive"), error = \(e) e),                               # nolint: implicit_assignment_linter
+                   simpleError("`$ds_map` is read only"))
+  expect_null(ds$ds_map)
+  rm(ds)
 })
 
 
 test_that("active binding: available_features works", {
-  m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the available_features
-  expect_equal(m$available_features, NULL)
+  expect_null(ds$available_features)
 
   # Try to set the available_features
   # test_that cannot capture this error, so we have to hack it
-  expect_equal(tryCatch(m$available_features <- list("n_test", "n_positive"), error = \(e) e),
-               simpleError("`$available_features` is read only"))
-  expect_equal(m$available_features, NULL)
-  rm(m)
+  expect_identical(tryCatch(ds$available_features <- list("n_test", "n_positive"), error = \(e) e),                     # nolint: implicit_assignment_linter
+                   simpleError("`$available_features` is read only"))
+  expect_null(ds$available_features)
+  rm(ds)
 })
 
 
 test_that("active binding: label works", {
-  m <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the label
-  expect_equal(m$label, NULL)
+  expect_null(ds$label)
 
   # Try to set the label
-  expect_equal(tryCatch(m$label <- "test", error = \(e) e),
-               simpleError("`$label` is read only"))
-  expect_equal(m$label, NULL)
-  rm(m)
+  expect_identical(tryCatch(ds$label <- "test", error = \(e) e),                                                        # nolint: implicit_assignment_linter
+                   simpleError("`$label` is read only"))
+  expect_null(ds$label)
+  rm(ds)
 })

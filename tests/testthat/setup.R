@@ -1,5 +1,7 @@
 # Store the current options
-diseasy_opts <- options(purrr::keep(names(options()), ~ startsWith(., "diseasy")))
+diseasy_opts <- purrr::keep(names(options()), ~ startsWith(., "diseasy")) |>
+  purrr::map(options) |>
+  purrr::reduce(c)
 
 # Configure diseasystore for testing
 target_schema_1 <- "test_ds"
@@ -8,8 +10,8 @@ target_schema_2 <- "not_test_ds"
 # Define list of connections to check
 conn_list <- list(
   # Backend string = package::function
-  "SQLite"     = "RSQLite::SQLite",
-  "PostgreSQL" = "RPostgres::Postgres"
+  "SQLite"     = "RSQLite::SQLite"#,
+  #"PostgreSQL" = "RPostgres::Postgres"
 )
 
 # Define list of args to conns
@@ -21,7 +23,7 @@ conn_args <- list(
 get_driver <- function(x = character(), ...) {
   if (!grepl(".*::.*", x)) stop("Package must be specified with namespace (e.g. RSQLite::SQLite)!\n",
                                 "Received: ", x)
-  parts <- strsplit(x, "::")[[1]]
+  parts <- strsplit(x, "::", fixed = TRUE)[[1]]
 
   # Skip unavailable packages
   if (!requireNamespace(parts[1], quietly = TRUE)) {

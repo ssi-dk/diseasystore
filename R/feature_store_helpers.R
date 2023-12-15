@@ -8,11 +8,11 @@ to_diseasystore_case <- function(label) {
 
   # First convert to diseasystore case
   diseasystore_case <- label |>
-    stringr::str_replace_all("_", " ") |>
+    stringr::str_replace_all(stringr::fixed("_"), " ") |>
     stringr::str_replace_all("(?<=[a-z])([A-Z])", " \\1") |>
     stringr::str_to_title() |>
-    stringr::str_replace_all(" ", "") |>
-    stringr::str_replace_all("-", "") |>
+    stringr::str_replace_all(stringr::fixed(" "), "") |>
+    stringr::str_replace_all(stringr::fixed("-"), "") |>
     (\(.) paste0("Diseasystore", .))()
 
   return(diseasystore_case)
@@ -36,7 +36,7 @@ available_diseasystores <- function() {
     purrr::map(ls) |>
     purrr::reduce(c) |>
     purrr::keep(~ startsWith(., "Diseasystore")) |>
-    purrr::discard(~ . %in% c("DiseasystoreBase", "DiseasystoreGeneric"))
+    purrr::discard(~ . == "DiseasystoreBase")
 
   return(available_diseasystores)
 }
@@ -65,7 +65,6 @@ diseasystore_exists <- function(label) {
 #'   ds <- get_diseasystore("Google COVID-19")  # Returns the DiseasystoreGoogleCovid19 generator
 #' @export
 get_diseasystore <- function(label) {
-
   checkmate::assert_true(diseasystore_exists(label))
 
   return(get(to_diseasystore_case(label)))
@@ -111,7 +110,7 @@ source_conn_path <- function(source_conn, file) {
 
   # Determine the type of location
   if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
-    # If source_conn is a dirctory, look for files in the folder and keep the ones that match the requested file
+    # If source_conn is a directory, look for files in the folder and keep the ones that match the requested file
     # This way, if the file exists in a zipped form, it is still retrieved
     matching_file <- purrr::keep(dir(source_conn), ~ startsWith(., file)) |>
       purrr::pluck(1) # Ensure we only have one match
@@ -121,7 +120,7 @@ source_conn_path <- function(source_conn, file) {
     file_location <- file.path(source_conn, matching_file)
 
   } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
-    file_location <- paste0(stringr::str_remove(source_conn, "/$"), "/", file)
+    file_location <- file.path(stringr::str_remove(source_conn, "/$"), file)
   } else {
     stop("source_conn could not be parsed to valid directory or URL\n")
   }

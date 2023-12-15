@@ -19,9 +19,18 @@ library(diseasystore)
 ```
 
 ```{r hidden_options, include = FALSE}
-withr::local_options("tibble.print_min" = 5)
-withr::local_options("tibble.print_max" = 5)
-withr::local_options("diseasystore.verbose" = FALSE)
+if (rlang::is_installed("withr")) {
+  withr::local_options("tibble.print_min" = 5)
+  withr::local_options("tibble.print_max" = 5)
+  withr::local_options("diseasystore.verbose" = FALSE)
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
+} else {
+  opts <- options("tibble.print_min" = 5, "tibble.print_max" = 5, "diseasystore.verbose" = FALSE,
+                  "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
+}
+
+# We have a "hard" dependency for RSQLite to render parts of this vignette
+suggests_available <- rlang::is_installed("RSQLite")
 ```
 
 # Available diseasystores
@@ -49,7 +58,7 @@ For this Quick start, we will configure a `DiseasystoreGoogleCovid19` to use a l
 Ideally, we want to use a faster, more capable, data base to store the features in.
 The `diseasystores` uses `SCDB` in the back end and can use any data base back end supported by `SCDB`.
 
-```{r google_setup_hidden, include = FALSE}
+```{r google_setup_hidden, include = FALSE, eval = suggests_available}
 # We assume the data is made available to us in a "vignette_data" folder
 # If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for this vignette
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
@@ -57,36 +66,34 @@ local_conn <- "vignette_data"
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 
 # Check that the files are available
-vignette_data_missing <- purrr::some(paste0(google_files, ".gz"), ~ !file.exists(file.path(local_conn, .)))
+vignette_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
 
-if (vignette_data_missing && curl::has_internet()) {
+if (vignette_data_missing) {
 
   # Ensure download folder exists
   if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
 
   # Then we download the first n rows of each data set of interest
-  purrr::keep(google_files, ~ !file.exists(file.path(local_conn, paste0(., ".gz")))) |>
+  purrr::discard(google_files, ~ file.exists(file.path(local_conn, .))) |>
     purrr::walk(\(file) {
       paste0(remote_conn, file) |>
         readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
         readr::write_csv(file.path(local_conn, file))
-
-      R.utils::gzip(file.path(local_conn, file))
     })
 }
 
 # Check that the files are available after attempting to download
-if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, paste0(., ".gz"))))) {
+if (purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))) {
   stop("DiseasystoreGoogleCovid19: vignette data not available and could not be downloaded")
 }
 
 ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite()),
-                                    source_conn = "vignette_data",
+                                    source_conn = local_conn,
                                     start_date = as.Date("2020-03-01"),
                                     end_date = as.Date("2020-03-15"))
 ```
 
-```{r google_setup, eval = FALSE}
+```{r google_setup, eval = FALSE, eval = suggests_available}
 ds <- DiseasystoreGoogleCovid19$new(
   target_conn = DBI::dbConnect(RSQLite::SQLite()),
   start_date = as.Date("2020-03-01"),
@@ -97,20 +104,20 @@ When we create our new `diseasystore` instance, we also supply `start_date` and 
 These are not strictly required, but make getting features for this time interval simpler.
 
 Once configured we can query the available features in the `diseasystore`
-```{r google_available_features}
+```{r google_available_features, eval = suggests_available}
 ds$available_features
 ```
 
 These features can be retrieved individually
 (using the `start_date` and `end_date` we specified during creation of `ds`):
-```{r google_get_feature_example_1}
+```{r google_get_feature_example_1, eval = suggests_available}
 ds$get_feature("n_hospital")
 ```
 Notice that features have associated "key_*" and "valid_from/until" columns.
 These are used for one of the primary selling points of `diseasystore`, namely [automatic aggregation](#automatic-aggregation).
 
 Go get features for other time intervals, we can manually supply `start_date` and/or `end_date`:
-```{r google_get_feature_example_2}
+```{r google_get_feature_example_2, eval = suggests_available}
 ds$get_feature("n_hospital",
                start_date = as.Date("2020-03-01"),
                end_date = as.Date("2020-03-02"))
@@ -150,7 +157,7 @@ To use this method, you need to provide the `observable` that you want to aggreg
 to apply to the aggregation.
 
 Lets start with an simple example where we request no stratification (`NULL`):
-```{r google_key_join_features_example_1}
+```{r google_key_join_features_example_1, eval = suggests_available}
 ds$key_join_features(observable = "n_hospital",
                      stratification = NULL)
 ```
@@ -160,13 +167,13 @@ observable per day (in this case, the number of people hospitalised).
 
 To specify a level of `stratification`, we need to supply a list of `quosures`
 (see `help("topic-quosure", package = "rlang")`).
-```{r google_key_join_features_example_2}
+```{r google_key_join_features_example_2, eval = suggests_available}
 ds$key_join_features(observable = "n_hospital",
                      stratification = rlang::quos(country_id))
 ```
 
 The `stratification` argument is very flexible, so we can supply any valid R expression:
-```{r google_key_join_features_example_3}
+```{r google_key_join_features_example_3, eval = suggests_available}
 ds$key_join_features(observable = "n_hospital",
                      stratification = rlang::quos(country_id,
                                                   old = age_group == "90+"))
@@ -179,11 +186,11 @@ For this purpose, we provide the `drop_diseasystore()` function.
 By default, this deletes all stored features in the default `diseasystore` schema.
 A `pattern` argument to match tables by and a `schema` argument to specify the schema to delete from[^1].
 
-```{r drop_diseasystore_example_1}
+```{r drop_diseasystore_example_1, eval = suggests_available}
 SCDB::get_tables(ds$target_conn)
 ```
 
-```{r drop_diseasystore_example_2}
+```{r drop_diseasystore_example_2, eval = suggests_available}
 drop_diseasystore(conn = ds$target_conn)
 
 SCDB::get_tables(ds$target_conn)
@@ -220,9 +227,16 @@ diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 
 If we change our general setting for `source_conn` and retry, we see that we get the fallback value.
 ```{r diseasyoption_example_3}
-options("diseasystore.source_conn" = "/local/file/path")
+options("diseasystore.source_conn" = file.path("local", "path"))
 diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 ```
 
 [^1]: If using `SQLite` as the back end, it will instead prepend the schema specification to the pattern before matching (e.g. "ds\\..*").
 [^2]: R's `options()` does not allow setting an option to `NULL`. By setting options as empty strings, the user can see the available options to set.
+
+```{r cleanup, include = FALSE}
+rm(ds)
+if (!rlang::is_installed("withr")) {
+  options(opts)
+}
+```

@@ -139,10 +139,10 @@ test_that("source_conn_path works for URLs", {
 
 
   # Test the different combinations
-  expect_character(source_conn_path(test_url1, test_file),
-                   pattern = paste0(stringr::str_remove(test_url1, "/$"), "/", test_file))
+  checkmate::expect_character(source_conn_path(test_url1, test_file),
+                              pattern = paste0(stringr::str_remove(test_url1, "/$"), "/", test_file))                   # nolint: paste_linter
 
-  expect_character(source_conn_path(test_url2, test_file),
-                   pattern = paste0(stringr::str_remove(test_url2, "/$"), "/", test_file))
+  checkmate::expect_character(source_conn_path(test_url2, test_file),
+                              pattern = paste0(stringr::str_remove(test_url2, "/$"), "/", test_file))                   # nolint: paste_linter
 
 })

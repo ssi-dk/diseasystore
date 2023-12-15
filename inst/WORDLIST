@@ -25,18 +25,28 @@ dtplyr
 
 Engbo
 
+fn
+fns
 FeatureHandler
 FeatureHandlers
 
+Institut
+
 Lasse
+linter
+linters
+lintr
 
 tbl
+Telkamp
 tibble
+tidyselect
 TODOs
 ts
 
 md
 
+nolint
 nrow
 
 OO
@@ -51,5 +61,9 @@ Rasmus
 regex
 rm
 
+SCDB
+Schou
 Skytte
+SSI
+Statens
 sql

@@ -12,7 +12,7 @@ It defines the primary methods of each feature stores as well as all of the publ
 }
 \examples{
   # DiseasystoreBase is mostly used as the basis of other, more specific, classes
-  # The DiseasystoreBase can be initialized individually if needed.
+  # The DiseasystoreBase can be initialised individually if needed.
 
   ds <- DiseasystoreBase$new(source_conn = NULL,
                              target_conn = DBI::dbConnect(RSQLite::SQLite()))

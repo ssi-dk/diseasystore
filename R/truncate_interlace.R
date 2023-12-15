@@ -87,7 +87,7 @@ truncate_interlace <- function(primary, secondary = NULL) {
   # Determine the keys of the primary data
   primary_keys <- colnames(primary)[startsWith(colnames(primary), "key_")]
 
-  # Find all secondary information that is vaild while primary information is valid
+  # Find all secondary information that is valid while primary information is valid
   secondary_truncated <- secondary |>
     purrr::map(~ {
       # First we find keys that are common with current secondary table and the primary table

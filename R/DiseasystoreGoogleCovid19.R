@@ -1,17 +1,17 @@
 #' `FeatureHandler` factory for Google COVID-19 epidemic metrics
 #'
 #' @description
-#'   This function implements a `FeatureHandler` factory for Google COIVD-19 epidemic metrics.
+#'   This function implements a `FeatureHandler` factory for Google COVID-19 epidemic metrics.
 #'   This factory is used when defining the `DiseasystoreGoogleCovid19` feature store.
 #' @param google_pattern (`character`)\cr
-#'   A regexp pattern that matches Googles naming of the metric in "by-age.csv.gz".
+#'   A regexp pattern that matches Google's naming of the metric in "by-age.csv.gz".
 #' @param out_name (`character`)\cr
 #'   A the name to store the metric in our our feature store.
 #' @return
 #'   A new instance of `FeatureHandler` [R6][R6::R6Class] class corresponding to the epidemic metric.
 #' @importFrom rlang .data
 #' @noRd
-google_covid_19_metric <- function(google_pattern, out_name) {
+google_covid_19_metric <- function(google_pattern, out_name) {                                                          # nocov start
   FeatureHandler$new(
     compute = function(start_date, end_date, slice_ts, source_conn) {
       coll <- checkmate::makeAssertCollection()
@@ -22,7 +22,8 @@ google_covid_19_metric <- function(google_pattern, out_name) {
 
       # Load and parse
       data <- source_conn_path(source_conn, "by-age.csv") |>
-        readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
+        readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+                        show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
@@ -38,7 +39,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
     },
     key_join = key_join_sum
   )
-}
+}                                                                                                                       # nocov end
 
 
 #' @title feature store handler of Google Health COVID-19 Open Data features
@@ -55,7 +56,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {
 #'   A new instance of the `DiseasystoreGoogleCovid19` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
+DiseasystoreGoogleCovid19 <- R6::R6Class(                                                                               # nolint: object_name_linter.
   classname = "DiseasystoreGoogleCovid19",
   inherit = DiseasystoreBase,
 
@@ -90,7 +91,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         # Load and parse
         out <- source_conn_path(source_conn, "demographics.csv") |>
-          readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
+          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+                          show_col_types = FALSE) |>
           dplyr::select("location_key", tidyselect::starts_with("population_age_")) |>
           tidyr::pivot_longer(!"location_key",
                               names_to = c("tmp", "age_group"),
@@ -118,7 +120,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         # Load and parse
         out <- source_conn_path(source_conn, "index.csv") |>
-          readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
+          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+                          show_col_types = FALSE) |>
           dplyr::transmute("key_location" = .data$location_key,
                            "country_id"   = .data$country_code,
                            "country"      = .data$country_name,
@@ -158,7 +161,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         # Load and parse
         out <- source_conn_path(source_conn, "by-age.csv") |>
-          readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE)
+          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+                          show_col_types = FALSE)
 
         # We need a map between age_bin and age_group
         age_bin_map <- out |>
@@ -210,7 +214,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         # Load and parse
         out <- source_conn_path(source_conn, "weather.csv") |>
-          readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
+          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+                          show_col_types = FALSE) |>
           dplyr::mutate("date" = as.Date(.data$date)) |>
           dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
           dplyr::select("key_location" = "location_key",
@@ -233,7 +238,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
         # Load and parse
         out <- source_conn_path(source_conn, "weather.csv") |>
-          readr::read_csv(n_max = ifelse(testthat::is_testing(), 1000, Inf), show_col_types = FALSE) |>
+          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+                          show_col_types = FALSE) |>
           dplyr::mutate("date" = as.Date(.data$date)) |>
           dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
           dplyr::select("key_location" = "location_key",
@@ -249,7 +255,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class( # nolint: object_name_linter.
 
     # @description
     #   This function implements an intermediate filtering in the stratification pipeline.
-    #   For semi-aggregated data like Googles COVID-19 data, some people are counted more than once.
+    #   For semi-aggregated data like Google's COVID-19 data, some people are counted more than once.
     #   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
     # @param .data `r rd_.data()`
     # @param stratification_features (`character`)\cr

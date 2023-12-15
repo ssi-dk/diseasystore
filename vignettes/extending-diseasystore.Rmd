@@ -14,10 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(diseasystore)
-```
-
 This vignette gives you the knowledge you need to create your own `diseasystore`.
 
 # The diseasy data model
