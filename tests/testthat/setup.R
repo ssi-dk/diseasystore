@@ -113,6 +113,3 @@ purrr::walk(conns, ~ {
   DBI::dbDisconnect(.)
   rm(.)
 })
-
-# Set testing options
-withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)

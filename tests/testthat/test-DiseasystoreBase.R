@@ -1,3 +1,6 @@
+# Set testing options
+withr::local_options("diseasystore.target_schema" = target_schema_1)
+
 test_that("DiseasystoreBase works", {
 
   # Test different initialization of the base module
@@ -102,8 +105,8 @@ test_that("DiseasystoreBase works", {
 test_that("$get_feature verbosity works", {
 
   # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-  DummyDiseasystoreBase <- R6::R6Class(                                                                                 # nolint: object_name_linter
-    classname = "DummyDiseasystoreBase",
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+    classname = "DiseasystoreBase",
     inherit = DiseasystoreBase,
     private = list(
       .ds_map = list("cyl" = "dummy_mtcars"),
@@ -116,7 +119,7 @@ test_that("$get_feature verbosity works", {
   )
 
   # Create an instance with verbose = TRUE
-  ds <- DummyDiseasystoreBase$new(
+  ds <- DiseasystoreDummy$new(
     source_conn = file.path("some", "path"),
     target_conn = DBI::dbConnect(RSQLite::SQLite()),
     verbose = TRUE
@@ -148,7 +151,7 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
-  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn, target_schema = target_schema_1)
+  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
   logs <- suppressWarnings(suppressMessages(
     SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
   ))

@@ -1,4 +1,7 @@
+# Set testing options
 withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = target_schema_1)
+withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
+
 
 # Store the current options
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
