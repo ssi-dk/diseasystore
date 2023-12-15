@@ -14,7 +14,7 @@ Simple feature stores and tools for creating personalised feature stores. `disea
 Useful links:
 \itemize{
   \item \url{https://github.com/ssi-dk/diseasystore}
-  \item \url{https://ssi-dk.github.io/diseasystore}
+  \item \url{https://ssi-dk.github.io/diseasystore/}
   \item Report bugs at \url{https://github.com/ssi-dk/diseasystore/issues}
 }
 

@@ -52,6 +52,6 @@ Suggests:
     spelling,
     withr
 VignetteBuilder: knitr
-URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore
+URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore/
 BugReports: https://github.com/ssi-dk/diseasystore/issues
 Config/testthat/edition: 3
