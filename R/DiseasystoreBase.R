@@ -211,7 +211,14 @@ DiseasystoreBase <- R6::R6Class(                                                
             ds_updated_feature <- ds_feature
           }
 
-          # Commit to DB
+          # Configure the Logger
+          if (!(paste(c(self %.% target_schema, "logs"), collapse = ".") == "test_ds.logs")) {
+            print(paste(c(self %.% target_schema, "logs"), collapse = "."))
+            stop()
+          }
+
+          log_table_id <- paste(c(self %.% target_schema, "logs"), collapse = ".")
+
           logger <- suppressMessages(SCDB::Logger$new(
             output_to_console = FALSE,
             log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
@@ -219,10 +226,14 @@ DiseasystoreBase <- R6::R6Class(                                                
           ))
 
           if (dbplyr::remote_name(logger$log_tbl) == "logs") {
+            print("log_table_id")
+            print(log_table_id)
+            print("print(dbplyr::remote_name(logger$log_tbl))")
             print(dbplyr::remote_name(logger$log_tbl))
             stop()
           }
 
+          # Commit to DB
           suppressMessages(SCDB::update_snapshot(
             .data = ds_updated_feature,
             conn = self %.% target_conn,
