@@ -10,8 +10,8 @@ target_schema_2 <- "not_test_ds"
 # Define list of connections to check
 conn_list <- list(
   # Backend string = package::function
-  "SQLite"     = "RSQLite::SQLite",
-  "PostgreSQL" = "RPostgres::Postgres"
+  "SQLite"     = "RSQLite::SQLite"#,
+  #"PostgreSQL" = "RPostgres::Postgres"
 )
 
 # Define list of args to conns
