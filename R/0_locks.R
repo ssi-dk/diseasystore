@@ -111,7 +111,7 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
     dplyr::pull("pid") |>
     as.integer()
 
-  return(isTRUE(lock_owner == Sys.getpid()))
+  return(lock_owner == Sys.getpid())
 }
 
 
