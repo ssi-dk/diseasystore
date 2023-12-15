@@ -221,7 +221,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           logger <- suppressMessages(SCDB::Logger$new(
             output_to_console = FALSE,
-            log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
+            log_table_id = log_table_id,
             log_conn = self %.% target_conn
           ))
 
