@@ -73,8 +73,10 @@ purrr::walk(google_files, ~ {
 source_conn <- "vignette_data"
 if (rlang::is_installed("withr")) {
   withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn)
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
 } else {
-  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn))
+  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = source_conn,
+                          "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000))
 }
 
 if (!dir.exists(source_conn)) dir.create(source_conn, recursive = TRUE, showWarnings = FALSE)

@@ -23,8 +23,10 @@ if (rlang::is_installed("withr")) {
   withr::local_options("tibble.print_min" = 5)
   withr::local_options("tibble.print_max" = 5)
   withr::local_options("diseasystore.verbose" = FALSE)
+  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
 } else {
-  opts <- options("tibble.print_min" = 5, "tibble.print_max" = 5, "diseasystore.verbose" = FALSE)
+  opts <- options("tibble.print_min" = 5, "tibble.print_max" = 5, "diseasystore.verbose" = FALSE,
+                  "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
 }
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
