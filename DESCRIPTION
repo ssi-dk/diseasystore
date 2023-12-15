@@ -37,7 +37,6 @@ Imports:
     R6,
     SCDB,
     stringr,
-    testthat (>= 3.0.0),
     tidyr,
     tidyselect,
     zoo
@@ -48,6 +47,7 @@ Suggests:
     rmarkdown,
     RSQLite,
     RPostgres,
+    testthat (>= 3.0.0),
     tibble,
     spelling,
     withr
