@@ -212,15 +212,24 @@ DiseasystoreBase <- R6::R6Class(                                                
           }
 
           # Commit to DB
+          logger <- suppressMessages(SCDB::Logger$new(
+            output_to_console = FALSE,
+            log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
+            log_conn = self %.% target_conn
+          ))
+
+          if (dbplyr::remote_name(lg$log_tbl) == "logs") {
+            print(dbplyr::remote_name(lg$log_tbl))
+            stop()
+          }
+
           suppressMessages(SCDB::update_snapshot(
             .data = ds_updated_feature,
             conn = self %.% target_conn,
             db_table = target_table,
             timestamp = slice_ts,
             message = glue::glue("ds-range: {start_date} - {end_date}"),
-            logger = SCDB::Logger$new(output_to_console = FALSE,
-                                      log_table_id = paste(c(self %.% target_schema, "logs"), collapse = "."),
-                                      log_conn = self %.% target_conn),
+            logger = logger,
             enforce_chronological_order = FALSE
           ))
         })
