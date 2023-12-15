@@ -15,7 +15,7 @@ Authors@R:
       person("Statens Serum Institut, SSI", role = c("cph", "fnd")))
 Description:
   Simple feature stores and tools for creating personalised feature stores.
-  `diseasystore` powers feature store which can automatically link and aggregate features to a given stratification
+  `diseasystore` powers feature stores which can automatically link and aggregate features to a given stratification
   level. These feature stores are automatically time-versioned (powered by the `SCDB` package) and allows you to easily
   and dynamically compute features as part of your continuous integration.
 License: GPL (>= 3)
@@ -52,6 +52,6 @@ Suggests:
     spelling,
     withr
 VignetteBuilder: knitr
-URL: https://github.com/ssi-dk/diseasystore
+URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore
 BugReports: https://github.com/ssi-dk/diseasystore/issues
 Config/testthat/edition: 3
