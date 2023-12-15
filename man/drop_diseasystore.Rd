@@ -27,4 +27,6 @@ Drop feature stores from DB
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 
   drop_diseasystore(conn = conn)
+
+  DBI::dbDisconnect(conn)
 }

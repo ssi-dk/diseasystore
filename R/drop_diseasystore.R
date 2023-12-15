@@ -8,6 +8,8 @@
 #'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 #'
 #'   drop_diseasystore(conn = conn)
+#'
+#'   DBI::dbDisconnect(conn)
 #' @export
 drop_diseasystore <- function(pattern = NULL,
                               schema = diseasyoption("target_schema"),

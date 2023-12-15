@@ -47,6 +47,7 @@ They define the three methods associated with features (\code{compute}, \code{ge
   # We can now combine into our FeatureHandler
   fh_max_mpg <- FeatureHandler$new(compute = compute_mpg, key_join = key_join_max)
 
+  DBI::dbDisconnect(conn)
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}

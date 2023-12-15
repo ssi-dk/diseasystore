@@ -40,6 +40,7 @@
 #'   # We can now combine into our FeatureHandler
 #'   fh_max_mpg <- FeatureHandler$new(compute = compute_mpg, key_join = key_join_max)
 #'
+#'   DBI::dbDisconnect(conn)
 #' @return
 #'   A new instance of the `FeatureHandler` [R6][R6::R6Class] class.
 #' @export
