@@ -130,6 +130,7 @@ ds$get_feature(feature = "n_hospital",
 
 
 ```{r cleanup, include = FALSE}
+rm(ds)
 if (!rlang::is_installed("withr")) {
   options(opts)
 }

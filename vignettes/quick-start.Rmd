@@ -233,6 +233,7 @@ diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 [^2]: R's `options()` does not allow setting an option to `NULL`. By setting options as empty strings, the user can see the available options to set.
 
 ```{r cleanup, include = FALSE}
+rm(ds)
 if (!rlang::is_installed("withr")) {
   options(opts)
 }

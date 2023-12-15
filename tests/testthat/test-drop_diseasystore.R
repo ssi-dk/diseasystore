@@ -42,6 +42,7 @@ test_that("drop_diseasystore can delete entire default schema", {
 
     DBI::dbDisconnect(conn)
   }
+  invisible(gc())
 })
 
 
@@ -98,4 +99,5 @@ test_that("drop_diseasystore can delete single table in default schema", {
 
     DBI::dbDisconnect(conn)
   }
+  invisible(gc())
 })

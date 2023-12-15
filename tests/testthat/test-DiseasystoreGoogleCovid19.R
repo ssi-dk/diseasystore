@@ -143,6 +143,7 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
 
     rm(ds)
   }
+  invisible(gc())
 })
 
 
@@ -181,6 +182,7 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
 
     rm(ds)
   }
+  invisible(gc())
 })
 
 
@@ -251,6 +253,7 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
 
     rm(ds)
   }
+  invisible(gc())
 })
 
 
@@ -323,4 +326,5 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
     # Clean up
     rm(ds)
   }
+  invisible(gc())
 })
