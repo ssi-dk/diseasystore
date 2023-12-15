@@ -218,8 +218,8 @@ DiseasystoreBase <- R6::R6Class(                                                
             log_conn = self %.% target_conn
           ))
 
-          if (dbplyr::remote_name(lg$log_tbl) == "logs") {
-            print(dbplyr::remote_name(lg$log_tbl))
+          if (dbplyr::remote_name(logger$log_tbl) == "logs") {
+            print(dbplyr::remote_name(logger$log_tbl))
             stop()
           }
 
