@@ -212,13 +212,24 @@ DiseasystoreBase <- R6::R6Class(                                                
           }
 
           # Configure the Logger
-          log_table_id <- paste(c(self %.% target_schema, "logs"), collapse = ".")
+          log_table_id <- SCDB::id(
+            paste(c(self %.% target_schema, "logs"), collapse = "."),
+            self %.% target_conn
+          )
 
           logger <- suppressMessages(SCDB::Logger$new(
             output_to_console = FALSE,
             log_table_id = log_table_id,
             log_conn = self %.% target_conn
           ))
+
+          if (dbplyr::remote_name(logger$log_tbl) == "logs") {
+            print("log_table_id")
+            print(log_table_id)
+            print("print(dbplyr::remote_name(logger$log_tbl))")
+            print(dbplyr::remote_name(logger$log_tbl))
+            stop()
+          }
 
           # Commit to DB
           suppressMessages(SCDB::update_snapshot(
