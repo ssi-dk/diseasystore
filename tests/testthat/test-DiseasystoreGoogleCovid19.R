@@ -56,6 +56,8 @@ test_that("DiseasystoreGoogleCovid19 initialises correctly", {
     checkmate::expect_function(.x %.% get)
     checkmate::expect_function(.x %.% key_join)
   })
+
+  rm(ds)
 })
 
 

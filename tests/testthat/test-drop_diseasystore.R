@@ -39,6 +39,8 @@ test_that("drop_diseasystore can delete entire default schema", {
         }
         expect_false(SCDB::table_exists(conn, .))
       })
+
+    DBI::dbDisconnect(conn)
   }
 })
 
@@ -93,5 +95,7 @@ test_that("drop_diseasystore can delete single table in default schema", {
         }
         expect_false(SCDB::table_exists(conn, .))
       })
+
+    DBI::dbDisconnect(conn)
   }
 })

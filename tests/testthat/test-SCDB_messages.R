@@ -19,7 +19,7 @@ test_that("SCDB gives too many messages", {
   conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = tempfile())
   expect_warning(SCDB::get_tables(conn), "Check user privileges / database configuration")
   dplyr::copy_to(conn, iris, name = "iris")
-
+  DBI::dbDisconnect(conn)
 
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
