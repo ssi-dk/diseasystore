@@ -89,9 +89,9 @@ A function of the form "function(start_date, end_date, slice_ts, source_conn)".
 This function should return a \code{data.frame} with the computed feature (computed from the source connection).
 The \code{data.frame} should contain the following columns:
 \itemize{
-\item key_\*: One (or more) columns containing keys to link this feature with other features
-\item \*: One (or more) columns containing the features that are computed
-\item valid_from/until: A set of columns containing the time period for which this feature information is valid.
+\item key_*: One (or more) columns containing keys to link this feature with other features
+\item *: One (or more) columns containing the features that are computed
+\item valid_from, valid_until: A set of columns containing the time period for which this feature information is valid.
 \cr
 }}
 
@@ -105,8 +105,8 @@ A function like one of the aggregators from \code{\link[=aggregators]{aggregator
 The function should return an expression on the form:
 dplyr::summarise(.data,
 dplyr::across(.cols = tidyselect::all_of(feature),
-.fns = list(n = ~ \if{html}{\out{<aggregation function>}}),
-.names = "{.fn}"),
+.fns = list(n = ~ aggregation function),
+.names = "\{.fn\}"),
 .groups = "drop")}
 }
 \if{html}{\out{</div>}}
