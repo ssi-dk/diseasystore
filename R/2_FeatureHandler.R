@@ -56,10 +56,10 @@ FeatureHandler <- R6::R6Class(                                                  
     #'   A function of the form "function(start_date, end_date, slice_ts, source_conn)".
     #'   This function should return a `data.frame` with the computed feature (computed from the source connection).
     #'   The `data.frame` should contain the following columns:
-    #'    * key_\*: One (or more) columns containing keys to link this feature with other features
-    #'    * \*: One (or more) columns containing the features that are computed
-    #'    * valid_from/until: A set of columns containing the time period for which this feature information is valid.
-    #'    \cr
+    #'    * key_*: One (or more) columns containing keys to link this feature with other features
+    #'    * *: One (or more) columns containing the features that are computed
+    #'    * valid_from, valid_until: A set of columns containing the time period for which this feature information
+    #'    is valid.\cr
     #' @param get (`function`)\cr
     #'   (Optional). A function of the form "function(target_table, slice_ts, target_conn)".
     #'   This function should retrieve the computed feature from the target connection.\cr
@@ -69,8 +69,8 @@ FeatureHandler <- R6::R6Class(                                                  
     #'   The function should return an expression on the form:
     #'   dplyr::summarise(.data,
     #'     dplyr::across(.cols = tidyselect::all_of(feature),
-    #'                   .fns = list(n = ~ <aggregation function>),
-    #'                   .names = "{.fn}"),
+    #'                   .fns = list(n = ~ aggregation function),
+    #'                   .names = "\{.fn\}"),
     #'     .groups = "drop")
     #' @return
     #'   A new instance of the `FeatureHandler` [R6][R6::R6Class] class.

@@ -16,6 +16,7 @@ DBIConnection
 DBIDriver
 dbplyr
 diseasy
+diseasystore
 DiseasystoreBase
 DiseasystoreGoogleCovid
 diseasystores

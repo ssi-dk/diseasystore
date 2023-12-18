@@ -15,6 +15,7 @@ See the vignette("google_covid_19_data") for details on how to configure the fea
   ds <- DiseasystoreGoogleCovid19$new(source_conn = ".",
                                       target_conn = DBI::dbConnect(RSQLite::SQLite()))
 
+  rm(ds)
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}

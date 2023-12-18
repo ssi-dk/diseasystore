@@ -236,6 +236,7 @@ diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 
 ```{r cleanup, include = FALSE}
 rm(ds)
+gc()
 if (!rlang::is_installed("withr")) {
   options(opts)
 }

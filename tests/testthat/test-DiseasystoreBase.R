@@ -141,6 +141,7 @@ test_that("$get_feature verbosity works", {
   expect_equal(messages, character(0))
 
   rm(ds)
+  invisible(gc())
 })
 
 
@@ -205,6 +206,7 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
   )
 
   rm(ds)
+  invisible(gc())
 })
 
 

@@ -17,6 +17,7 @@ It defines the primary methods of each feature stores as well as all of the publ
   ds <- DiseasystoreBase$new(source_conn = NULL,
                              target_conn = DBI::dbConnect(RSQLite::SQLite()))
 
+  rm(ds)
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
