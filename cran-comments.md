@@ -3,3 +3,7 @@
 0 errors | 0 warnings | 1 note
 
 * This is a new release.
+
+This is re-upload following failed pre-checks.
+The pre-checks flagged some possible spelling mistakes in the Description.
+One of these words was missing from the WORDLIST but all are spelt as intended.
