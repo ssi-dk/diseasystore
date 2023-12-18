@@ -224,18 +224,6 @@ DiseasystoreBase <- R6::R6Class(                                                
             log_conn = self %.% target_conn
           ))
 
-          if (dbplyr::remote_name(logger$log_tbl) == "logs") {
-            print("log_table_id")
-            print(log_table_id)
-            print("logger$log_conn")
-            print(logger$log_conn)
-            print("logger$log_tbl")
-            print(logger$log_tbl)
-            print("print(dbplyr::remote_name(logger$log_tbl))")
-            print(dbplyr::remote_name(logger$log_tbl))
-            stop()
-          }
-
           # Commit to DB
           suppressMessages(SCDB::update_snapshot(
             .data = ds_updated_feature,
