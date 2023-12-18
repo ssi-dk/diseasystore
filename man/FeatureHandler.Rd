@@ -91,8 +91,8 @@ The \code{data.frame} should contain the following columns:
 \itemize{
 \item key_*: One (or more) columns containing keys to link this feature with other features
 \item *: One (or more) columns containing the features that are computed
-\item valid_from, valid_until: A set of columns containing the time period for which this feature information is valid.
-\cr
+\item valid_from, valid_until: A set of columns containing the time period for which this feature information
+is valid.\cr
 }}
 
 \item{\code{get}}{(\code{function})\cr

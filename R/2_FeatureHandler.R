@@ -58,8 +58,8 @@ FeatureHandler <- R6::R6Class(                                                  
     #'   The `data.frame` should contain the following columns:
     #'    * key_*: One (or more) columns containing keys to link this feature with other features
     #'    * *: One (or more) columns containing the features that are computed
-    #'    * valid_from, valid_until: A set of columns containing the time period for which this feature information is valid.
-    #'    \cr
+    #'    * valid_from, valid_until: A set of columns containing the time period for which this feature information
+    #'    is valid.\cr
     #' @param get (`function`)\cr
     #'   (Optional). A function of the form "function(target_table, slice_ts, target_conn)".
     #'   This function should retrieve the computed feature from the target connection.\cr
