@@ -10,6 +10,7 @@
 #'   ds <- DiseasystoreBase$new(source_conn = NULL,
 #'                              target_conn = DBI::dbConnect(RSQLite::SQLite()))
 #'
+#'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
 #' @export

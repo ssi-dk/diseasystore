@@ -53,6 +53,8 @@ test_that("diseasyoption works", {
   expect_identical(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_2)
   expect_identical(diseasyoption("target_schema", ds), target_schema_2)
 
+  rm(ds)
+  invisible(gc())
 })
 
 
@@ -107,6 +109,8 @@ test_that("parse_diseasyconn works", {
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "source_conn"))
   expect_identical(conn, valid_dbi_conn)
+  checkmate::expect_class(conn, "DBIConnection")
+
 
   conn <- expect_no_condition(parse_diseasyconn(valid_str_conn, type = "source_conn"))
   expect_identical(conn, valid_str_conn)
@@ -128,6 +132,7 @@ test_that("parse_diseasyconn works", {
 
   conn <- expect_no_condition(parse_diseasyconn(valid_dbi_conn, type = "target_conn"))
   expect_identical(conn, valid_dbi_conn)
+  checkmate::expect_class(conn, "DBIConnection")
 
 
   expect_error(parse_diseasyconn(valid_str_conn, type = "target_conn"),
@@ -136,4 +141,7 @@ test_that("parse_diseasyconn works", {
 
   conn <- expect_no_condition(parse_diseasyconn(null_conn, type = "target_conn"))
   expect_null(conn)
+
+  # Test clean up
+  DBI::dbDisconnect(valid_dbi_conn)
 })
