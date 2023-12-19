@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Simple feature stores and tools for creating personalised feature stores. `diseasystore` powers feature stores which can automatically link and aggregate features to a given stratification level. These feature stores are automatically time-versioned (powered by the `SCDB` package) and allows you to easily and dynamically compute features as part of your continuous integration.
+Simple feature stores and tools for creating personalised feature stores. 'diseasystore' powers feature stores which can automatically link and aggregate features to a given stratification level. These feature stores are automatically time-versioned (powered by the 'SCDB' package) and allows you to easily and dynamically compute features as part of your continuous integration.
 }
 \seealso{
 Useful links:

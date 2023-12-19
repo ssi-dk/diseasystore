@@ -59,15 +59,19 @@ Ideally, we want to use a faster, more capable, data base to store the features 
 The `diseasystores` uses `SCDB` in the back end and can use any data base back end supported by `SCDB`.
 
 ```{r google_setup_hidden, include = FALSE, eval = suggests_available}
-# We assume the data is made available to us in a "vignette_data" folder
-# If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for this vignette
+# The files we need are stored remotely in Google's API
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-local_conn <- "vignette_data"
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
+
+# In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
+# This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
+local_conns <- c("vignette_data", file.path(tempdir(), "vignette_data"))
+local_conn <- purrr::detect(local_conns, checkmate::test_directory_exists, .default = local_conns[2])
 
 # Check that the files are available
 vignette_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
 
+# If they aren't, we download some of the Google COVID-19 data for this vignette
 if (vignette_data_missing) {
 
   # Ensure download folder exists

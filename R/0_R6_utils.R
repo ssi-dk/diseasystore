@@ -114,9 +114,9 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #'  t %.% a   # 1
 #'
 #'  t$c # NULL
-#'  \dontrun{
-#'  t %.% c # ERROR a not found in t
-#'  }
+#'
+#'  # Gives error
+#'  # t %.% c
 #' @export
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))
