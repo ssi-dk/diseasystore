@@ -7,5 +7,4 @@
 This is re-upload following comments from the CRAN team.
 * back ticks in the Description have been replaced with undirected single-quotes
 
-* The pre-checks flagged some malformed formatting in the file `FeatureHandler.Rd`.
-  These are now changed so no errors should be produced
+* Previously, the package would download vignette and testing data to the package directory. This is now changed to download to tempdir() by default and only optionally use the package directory to store these files.

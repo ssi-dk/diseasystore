@@ -8,25 +8,32 @@ remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 source_conn <- diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 target_conn <- diseasyoption("target_conn", "DiseasystoreGoogleCovid19")
 
-# We assume the data is made available to us in a "test_data" folder
-# If it isn't, and we have an internet connection, we download some of the Google COVID-19 data for testing
+
+# The files we need are stored remotely in Google's API
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
-local_conn <- testthat::test_path("test_data")
+remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
+
+# In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
+# This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
+local_conns <- c(testthat::test_path("test_data"), file.path(tempdir(), "test_data"))
+local_conn <- purrr::detect(local_conns, checkmate::test_directory_exists, .default = local_conns[2])
 
 # Check that the files are available
 test_data_missing <- purrr::some(google_files, ~ !file.exists(file.path(local_conn, .)))
 
-if (test_data_missing && curl::has_internet()) {
+# If they aren't, we download some of the Google COVID-19 data for this vignette
+if (test_data_missing) {
 
   # Ensure download folder exists
   if (!checkmate::test_directory_exists(local_conn)) dir.create(local_conn)
 
   # Then we download the first n rows of each data set of interest
-  purrr::walk(google_files, \(file) {
-    paste0(remote_conn, file) |>
-      readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-      readr::write_csv(file.path(local_conn, file))
-  })
+  purrr::discard(google_files, ~ file.exists(file.path(local_conn, .))) |>
+    purrr::walk(\(file) {
+      paste0(remote_conn, file) |>
+        readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+        readr::write_csv(file.path(local_conn, file))
+    })
 }
 
 # Check that the files are available after attempting to download
