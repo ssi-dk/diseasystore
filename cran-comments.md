@@ -7,6 +7,8 @@
 This is re-upload following comments from the CRAN team.
 * back ticks in the Description have been replaced with undirected single-quotes
 
+* We have not used any references which describe the methods in the package.
+
 * An example for grapes-.-grapes.Rd was wrapped in \dontrun and is now commented out.
   For context: this example is present to highlight that %.% is designed to intentionally give an error in some cases.
 
