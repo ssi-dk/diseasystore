@@ -26,7 +26,7 @@ Existence aware pick operator
  t \%.\% a   # 1
 
  t$c # NULL
- \dontrun{
- t \%.\% c # ERROR a not found in t
- }
+
+ # Gives error
+ # t \%.\% c
 }
