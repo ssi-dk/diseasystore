@@ -4,9 +4,8 @@
 
 * This is a new release.
 
-This is re-upload following failed pre-checks.
-* The pre-checks flagged some possible spelling mistakes in the Description.
-  One of these words was missing from the WORDLIST but all are spelt as intended.
+This is re-upload following comments from the CRAN team.
+* back ticks in the Description have been replaced with undirected single-quotes
 
 * The pre-checks flagged some malformed formatting in the file `FeatureHandler.Rd`.
   These are now changed so no errors should be produced
