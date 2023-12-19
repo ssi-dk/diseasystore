@@ -1,5 +1,5 @@
 # Store the current options (for later conservation test -- see test-zzz.R)
-diseasy_opts <- purrr::keep(names(options()), ~ startsWith(., "diseasy")) |>
+diseasy_opts <- purrr::keep(names(options()), ~ startsWith(., "diseasystore.")) |>
   purrr::map(options) |>
   purrr::reduce(c)
 
