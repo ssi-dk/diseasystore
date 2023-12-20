@@ -114,9 +114,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #'  t %.% a   # 1
 #'
 #'  t$c # NULL
-#'
-#'  # Gives error
-#'  # t %.% c
+#'  try(t %.% c) # Gives error since "c" does not exist in "t"
 #' @export
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))
