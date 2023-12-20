@@ -95,7 +95,9 @@ purrr::discard(google_files, ~ checkmate::test_file_exists(file.path(local_conn,
 
 # Check that the files are available after attempting to download
 if (purrr::some(google_files, ~ !checkmate::test_file_exists(file.path(local_conn, .)))) {
-  stop("DiseasystoreGoogleCovid19: vignette data not available and could not be downloaded")
+  data_available <- FALSE
+} else {
+  data_available <- TRUE
 }
 ```
 
@@ -108,7 +110,7 @@ target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
 options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
 ```
 
-```{r configure_diseasystore_hidden, include = FALSE, eval = suggests_available}
+```{r configure_diseasystore_hidden, include = FALSE, eval = suggests_available && data_available}
 target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
 if (rlang::is_installed("withr")) {
   withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
@@ -119,17 +121,17 @@ if (rlang::is_installed("withr")) {
 
 
 Once the files are downloaded and the target DB is configured, we can initialize the `diseasystore` that uses the Google COVID-19 data.
-```{r initializing_diseasystore, eval = suggests_available}
+```{r initializing_diseasystore, eval = suggests_available && data_available}
 ds <- DiseasystoreGoogleCovid19$new()
 ```
 
 Once configured such, we can also use the feature store directly to get data.
-```{r using_diseasystore_example_1, eval = suggests_available}
+```{r using_diseasystore_example_1, eval = suggests_available && data_available}
 # We can see all the available features in the feature store
 ds$available_features
 ```
 
-```{r using_diseasystore_example_2, eval = suggests_available}
+```{r using_diseasystore_example_2, eval = suggests_available && data_available}
 # And then retrieve a feature from the feature store
 ds$get_feature(feature = "n_hospital",
                start_date = as.Date("2020-01-01"),
