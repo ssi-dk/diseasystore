@@ -42,7 +42,7 @@ A human readable label of the feature store. Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.  Read only.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date to slice the database on (used if source_conn is a database).  Read only.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).  Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -80,7 +80,7 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date to slice the database on (used if source_conn is a database).}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).}
 
 \item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
@@ -131,7 +131,7 @@ The name of a feature defined in the feature store.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date to slice the database on (used if source_conn is a database).}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).}
 }
 \if{html}{\out{</div>}}
 }

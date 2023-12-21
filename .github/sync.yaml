@@ -11,8 +11,7 @@ ssi-dk/diseasystore:
   - R/0_documentation.R
   - tests/testthat/test-0_documentation.R
 
-  - tests/testthat/test-0_return.R
-  - tests/testthat/test-0_examples.R
+  - tests/testthat/test-0_rd_files.R
 
 
 ssi-dk/diseasy:
@@ -28,5 +27,4 @@ ssi-dk/diseasy:
   - R/0_documentation.R
   - tests/testthat/test-0_documentation.R
 
-  - tests/testthat/test-0_return.R
-  - tests/testthat/test-0_examples.R
+  - tests/testthat/test-0_rd_files.R
