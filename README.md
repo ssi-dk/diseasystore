@@ -7,7 +7,7 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/diseasystore)](https://CRAN.R-project.org/package=diseasystore)
-[![R-CMD-check](https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml)
 [![codecov](https://codecov.io/gh/ssi-dk/diseasystore/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/diseasystore)
 
 <!-- badges: end -->

@@ -7,8 +7,7 @@ on:
   release:
   workflow_dispatch:
 
-name: Run all workflows
-
+name: CI tests
 jobs:
 
   # We call the reusable workflow that triggers all AEF-DDF workflows
