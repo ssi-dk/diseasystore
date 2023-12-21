@@ -21,13 +21,53 @@ read_only_error <- function(field) {
 
 
 #' cat printing with default new line
-#' @param ...  The normal input to cat
-#' @param file Path of an output file to append the output to
-#' @param sep The separator given to cat
+#' @param ...
+#'   The normal input to cat
+#' @param file
+#'   Path of an output file to append the output to
+#' @param sep (`character`)\cr
+#'   The separator given to cat
+#' @param max_width (`numeric`)\cr
+#'   The maximum number of characters to print before inserting a newline.
+#'   NULL (default) does not break up lines.
 #' @noRd
-printr <- function(..., file = nullfile(), sep = "") {
-  withr::local_output_sink(new = file, split = TRUE, append = TRUE)
-  cat(..., "\n", sep = sep)
+printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
+  sink(file = file, split = TRUE, append = TRUE, type = "output")
+
+  print_string <- paste(..., sep = sep)
+
+  # If a width limit is set, we iteratively determine the words that exceed the limit and
+  # insert a newline
+  if (!is.null(max_width)) {
+
+    # Get the current state of the string
+    split_string <- stringr::str_split_1(print_string, "\n")
+    segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
+
+    # While segments contain more than one word and is longer than max_width, split these segments
+    while (any(nchar(split_string) > max_width & segment_lengths > 1)) {
+      split_string <- split_string |>
+        purrr::map_if(
+          ~ nchar(.) > max_width,
+          ~ {
+            break_locations <- stringr::str_locate_all(., " |$")[[1]][, 1]
+            split_width <- break_locations[max(which((break_locations - 1) < max_width))]
+
+            stringr::str_replace(., paste0("(?<=^.{", split_width - 1, "})(\\w*) "), "\\1\n")
+          }
+        ) |>
+        stringr::str_split("\n") |>
+        purrr::reduce(c)
+
+      segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
+    }
+
+    # Collapse segments with the newline
+    print_string <- paste(split_string, collapse = "\n")
+  }
+
+  cat(print_string, "\n", sep = sep)
+  sink()
 }
 
 
@@ -44,7 +84,7 @@ printr <- function(..., file = nullfile(), sep = "") {
 #'   # Retrieve DiseasystoreGoogleCovid19 specific option for source conn
 #'   diseasyoption("source_conn", "DiseasystoreGoogleCovid19")
 #'
-#'   # Try to retrieve specific option for source conn for a non existent / un-configured diseasystore
+#'   # Try to retrieve specific option for source conn for a non existant / unconfigured diseasystore
 #'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 #' @export
 diseasyoption <- function(option, class = "DiseasystoreBase") {
@@ -53,7 +93,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
     class <- base::class(class)[1]
   }
 
-  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>                                                     # nolint: object_usage_linter
+  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |> # nolint: object_usage_linter
     stringr::str_to_lower()
 
   list(class, NULL) |>
@@ -61,7 +101,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase") {
     purrr::map(getOption) |>
     purrr::map(unlist) |>
     purrr::keep(purrr::negate(is.null)) |>
-    purrr::discard(~ identical(., "")) |>
+    purrr::discard(~ is.character(.) && . == "") |>
     purrr::pluck(1)
 }
 
@@ -78,7 +118,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   checkmate::assert(
     checkmate::check_function(conn, null.ok = TRUE),
     checkmate::check_class(conn, "DBIConnection", null.ok = TRUE),
-    checkmate::check_character(conn, null.ok = TRUE),
+    checkmate::check_character(conn, len = 1, null.ok = TRUE),
     add = coll
   )
   checkmate::assert_choice(type, c("source_conn", "target_conn"), add = coll)
@@ -87,7 +127,7 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
   if (is.null(conn)) {
     return(conn)
   } else if (is.function(conn)) {
-    tryCatch(conn <- conn(),                                                                                            # nolint: implicit_assignment_linter
+    tryCatch(conn <- conn(),
              error = \(e) stop("`conn` could not be parsed!"))
     return(conn)
   } else if (type == "target_conn" && inherits(conn, "DBIConnection")) {
@@ -114,7 +154,9 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 #'  t %.% a   # 1
 #'
 #'  t$c # NULL
-#'  try(t %.% c) # Gives error since "c" does not exist in "t"
+#'  \dontrun{
+#'  t %.% c # ERROR a not found in t
+#'  }
 #' @export
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))
