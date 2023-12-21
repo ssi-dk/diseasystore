@@ -2,6 +2,10 @@ ssi-dk/diseasystore:
   - .github/workflows/synchronise-files.yaml
   - .github/sync.yaml
 
+  - .lintr
+  - _pkgdown.yml
+  - inst/WORDLIST
+
   - R/0_linters.R
   - tests/testthat/test-0_linters.R
 
@@ -17,6 +21,10 @@ ssi-dk/diseasystore:
 ssi-dk/diseasy:
   - .github/workflows/synchronise-files.yaml
   - .github/sync.yaml
+
+  - .lintr
+  - _pkgdown.yml
+  - inst/WORDLIST
 
   - R/0_linters.R
   - tests/testthat/test-0_linters.R
