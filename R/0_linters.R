@@ -1,31 +1,24 @@
 #' The custom linters of `diseasy`
+#'
 #' @name diseasy_linters
-#' @description
-#' nolint_position_linter: Check that the `nolint:` statements occur after the character limit
-#'
-#' @param length maximum line length allowed. Default is 80L (Hollerith limit).
-#' @returns A list of `lintr::Lint`
 #' @examples
-#' ## nolint_position_linter
-#' # will produce lints
-#' lintr::lint(
-#'   text = paste0(strrep("x", 15L), "# nolint: object_name_linter"),
-#'   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
-#' )
-#'
-#' # okay
-#' lintr::lint(
-#'   text = paste0(strrep("x", 20L), "# nolint: object_name_linter"),
-#'   linters = c(nolint_position_linter(length = 20L), lintr::object_name_linter())
-#' )
-#'
-#' @seealso
-#' - [lintr::linters] for a complete list of linters available in lintr.
-#' - <https://style.tidyverse.org/syntax.html#long-lines>
+#'   diseasy_code_linters()
+#' @return A list of linters
 #' @export
+diseasy_code_linters <- function() {
+  linters <- list(
+    non_ascii_linter(),
+    todo_linter()
+  )
+
+  return(linters)
+}
+
+
+#' @rdname diseasy_linters
 #' @importFrom rlang .data
-nolint_position_linter <- function(length = 80L) {
-  general_msg <- paste("`nolint:` statements start at", length + 1, "characters.")
+non_ascii_linter <- function() {
+  general_msg <- paste("Code should not contain non-ASCII characters")
 
   lintr::Linter(
     function(source_expression) {
@@ -35,27 +28,28 @@ nolint_position_linter <- function(length = 80L) {
         return(list())
       }
 
-      nolint_info <- source_expression$content |>
-        stringr::str_locate_all(stringr::regex(r"{# *nolint}", ignore_case = TRUE))
+      detection_info <- source_expression$file_lines |>
+        stringr::str_locate_all(stringr::regex(r"{[^\x00-\x7f]}", ignore_case = TRUE))
 
-      nolint_info <- purrr::map2(
-        nolint_info,
-        seq_along(nolint_info),
+      detection_info <- purrr::map2(
+        detection_info,
+        seq_along(detection_info),
         ~ dplyr::mutate(as.data.frame(.x), line_number = .y)
-      ) |>
+      )
+
+      detection_info <- detection_info |>
         purrr::reduce(rbind) |>
-        dplyr::filter(!is.na(.data$start)) |>
-        dplyr::filter(.data$start <= length)
+        dplyr::filter(!is.na(.data$start))
 
       purrr::pmap(
-        nolint_info,
+        detection_info,
         \(start, end, line_number) {
           lintr::Lint(
             filename = source_expression$filename,
             line_number = line_number,
             column_number = start,
             type = "style",
-            message = paste(general_msg, "This statement starts at", start, "characters"),
+            message = paste(general_msg, "non-ASCII character found"),
             line = source_expression$file_lines[line_number],
             ranges = list(c(start, end))
           )
@@ -66,29 +60,9 @@ nolint_position_linter <- function(length = 80L) {
 }
 
 
-#' @name diseasy_linters
-#' @description
-#' nolint_line_length_linter: Check that lines adhere to a given character limit, ignoring `nolint` statements
-#'
-#' @param length maximum line length allowed. Default is 80L (Hollerith limit).
-#' @examples
-#' ## nolint_line_length_linter
-#' # will produce lints
-#' lintr::lint(
-#'   text = paste0(strrep("x", 25L), "# nolint: object_name_linter."),
-#'   linters = c(nolint_line_length_linter(length = 20L), lintr::object_name_linter())
-#' )
-#'
-#' # okay
-#' lintr::lint(
-#'   text = paste0(strrep("x", 20L), "# nolint: object_name_linter."),
-#'   linters = c(nolint_line_length_linter(length = 20L), lintr::object_name_linter())
-#' )
-#'
-#' @export
-#' @importFrom rlang .data
-nolint_line_length_linter <- function(length = 80L) {
-  general_msg <- paste("Lines should not be more than", length, "characters.")
+#' @rdname diseasy_linters
+todo_linter <- function() {
+  general_msg <- paste("`TODO` statements should not be kept in code base:")
 
   lintr::Linter(
     function(source_expression) {
@@ -98,23 +72,31 @@ nolint_line_length_linter <- function(length = 80L) {
         return(list())
       }
 
-      nolint_regex <- r"{# ?no(lint|cov) ?(start|end)?:?.*}"
+      todo_info <- source_expression$file_lines |>
+        stringr::str_locate_all(stringr::regex(r"{(?<=\s|^)todos?:?(?=\s|$)}", ignore_case = TRUE))
 
-      file_lines_nolint_excluded <- source_expression$file_lines |>
-        purrr::map_chr(\(s) stringr::str_remove(s, nolint_regex))
+      todo_info <- purrr::map2(
+        todo_info,
+        seq_along(todo_info),
+        ~ dplyr::mutate(as.data.frame(.x), line_number = .y)
+      ) |>
+        purrr::reduce(rbind) |>
+        dplyr::filter(!is.na(.data$start))
 
-      line_lengths <- nchar(file_lines_nolint_excluded)
-      long_lines <- which(line_lengths > length)
-      Map(function(long_line, line_length) {
-        lintr::Lint(
-          filename = source_expression$filename,
-          line_number = long_line,
-          column_number = length + 1L, type = "style",
-          message = paste(general_msg, "This line is", line_length, "characters."),
-          line = source_expression$file_lines[long_line],
-          ranges = list(c(1L, line_length))
-        )
-      }, long_lines, line_lengths[long_lines])
+      purrr::pmap(
+        todo_info,
+        \(start, end, line_number) {
+          lintr::Lint(
+            filename = source_expression$filename,
+            line_number = line_number,
+            column_number = start,
+            type = "style",
+            message = paste(general_msg, "`TODO` statement found"),
+            line = source_expression$file_lines[line_number],
+            ranges = list(c(start, end))
+          )
+        }
+      )
     }
   )
 }
