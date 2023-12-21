@@ -1,16 +1,40 @@
-rd_aggregation <- function(type = "param") {
+rd_activity_units <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`list`(`quosures`))\\cr",
-        "Default NULL.",
-        "If given, expressions in aggregation evaluated to give the aggregation level.",
+  paste("(`list(list())`)\\cr",
+        "A nested list of all possible 'units' of activity that can be opened or closed.",
         ifelse(type == "field", " Read only.", ""))
 }
 
 
-rd_diseasystore_label <- function(type = "param") {
+rd_stratification <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`list`(`quosures`))\\cr",
+        "Default NULL.",
+        "If given, expressions in stratification evaluated to give the stratification level.",
+        ifelse(type == "field", " Read only.", ""))
+}
+
+
+rd_diseasystore <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
         "A character string that controls which feature store to get data from.",
+        ifelse(type == "field", " Read only.", ""))
+}
+
+
+rd_contact_basis <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste("(`list(list())`)\\cr",
+        "A nested list with all the needed information for the contact_basis\\cr",
+        "* `counts` contains the age stratified contact counts across the arenas of the basis",
+        "  (e.g. 'work', 'home', 'school', 'other')\\cr",
+        "* `proportion` contains a list of the proportion of population in each age-group\\cr",
+        "* `demography` contains a `data.frame` with the columns\\cr",
+        "  * `age` (`integer()`) 1-year age group\\cr",
+        "  * `population` (`numeric()`) size of population in age group\\cr",
+        "  * `proportion` (`numeric()`) proportion of total population in age group\\cr",
+        "* `description` contains information about the source of the contact basis.",
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -53,7 +77,7 @@ rd_scale <- function(type = "param") {
 
 rd_source_conn <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`DBIConnection` or `file path`)\\cr",
+  paste("source_conn\\cr",
         "Used to specify where data is located.",
         ifelse(type == "field", " Read only.", ""),
         "Can be `DBIConnection` or file path depending on the `diseasystore`.")
@@ -96,7 +120,7 @@ rd_start_date <- function(type = "param") {
 rd_slice_ts <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`Date` or `character`)\\cr",
-        "Date to slice the database on (used if source_conn is a database).",
+        "Date or timestamp (parseable by `as.POSIXct`) to slice the database on (used if source_conn is a database).",
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -111,8 +135,8 @@ rd_end_date <- function(type = "param") {
 
 rd_.data <- function(type = "param") {                                                                                  # nolint: object_name_linter
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`any`)\\cr",
-        "The data object to perform the operation on.",
+  paste(".data\\cr",
+        "The data object on which to perform the operation.",
         ifelse(type == "field", " Read only.", ""))
 }
 
@@ -120,12 +144,12 @@ rd_.data <- function(type = "param") {                                          
 rd_describe <- "Prints a human readable report of the internal state of the module."
 
 rd_get_results_description <- paste(
-  "The primary method used to request model results of a given observable at a given aggregation."
+  "The primary method used to request model results of a given observable at a given stratification"
 )
 
 rd_get_results_return <- paste(
-  "A `tibble` [tibble::tibble] with predictions at the level specified by aggregation level.",
-  "In addition to aggregation columns, the output has the columns:\\cr",
+  "A `tibble` [tibble::tibble] with predictions at the level specified by stratification level.",
+  "In addition to stratification columns, the output has the columns:\\cr",
   "  date (`Date`) specifying the date of the prediction\\cr",
   "  realization_id (`character`) giving a unique id for each realization in the ensemble\\cr",
   "  model (`character`) the name (classname) of the model used to provide the prediction."
@@ -153,4 +177,19 @@ rd_quantiles <- paste(
 rd_training_length <- paste(
   "(`numeric`)\\cr",
   "The number of days that should be included in the training of the model."
+)
+
+
+rd_side_effects <- "NULL (called for side effects)"
+
+
+
+rd_age_cuts_lower <- paste(
+  "(`numeric`)\\cr",
+  "vector of ages defining the lower bound for each age group. If NULL (default), age groups of contact_basis is used."
+)
+
+rd_activity_weights <- paste(
+  "(`numeric(4)`)\\cr",
+  "vector of weights for the four types of contacts. If NULL (default), no weighting is done."
 )
