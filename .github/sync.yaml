@@ -1,6 +1,6 @@
 group:
   repos: |
-    ssi-dk/diseasystore:
+    ssi-dk/diseasystore
     ssi-dk/diseasy
   files:
     - .github/workflows
