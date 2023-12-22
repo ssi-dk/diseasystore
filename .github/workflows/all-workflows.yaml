@@ -5,8 +5,8 @@ jobs:
 
   # We call the reusable workflow that triggers all AEF-DDF workflows
   run-all-AEF-DFF-workflows:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name
-    name: ⚙️ Run all AEF-DDF workflows
+    if: github.event_name != 'push' || (github.event_name == 'push' && github.base_ref != '')
+    name: ⚙️ Dispatch
     uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@workflows
     with:
       # We pass information about the triggering event
