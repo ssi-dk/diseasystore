@@ -52,7 +52,7 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
           ~ {
             break_locations <- stringr::str_locate_all(., " |$")[[1]][, 1]
 
-            split_index <- max(purrr::pluck(break_locations - 1 < max_width, which, .default = 1))
+            split_index <- max(c(1, which(break_locations - 1 < max_width)))
 
             split_width <- break_locations[split_index]
 
