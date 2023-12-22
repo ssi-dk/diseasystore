@@ -51,7 +51,10 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
           ~ nchar(.) > max_width,
           ~ {
             break_locations <- stringr::str_locate_all(., " |$")[[1]][, 1]
-            split_width <- break_locations[max(which((break_locations - 1) < max_width))]
+
+            split_index <- max(purrr::pluck(break_locations - 1 < max_width, which, .default = 1))
+
+            split_width <- break_locations[split_index]
 
             stringr::str_replace(., paste0("(?<=^.{", split_width - 1, "})(\\w*) "), "\\1\n")
           }
