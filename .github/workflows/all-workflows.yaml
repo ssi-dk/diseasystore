@@ -5,7 +5,7 @@ jobs:
 
   # We call the reusable workflow that triggers all AEF-DDF workflows
   run-all-AEF-DFF-workflows:
-    if: github.event_name != 'push' || (github.event_name == 'push' && github.base_ref != '')
+    if: github.event_name != 'push' || (github.event_name == 'push' && github.base_ref == '')
     name: ⚙️ Dispatch
     uses: ssi-dk/AEF-DDF/.github/workflows/workflow-dispatcher.yaml@workflows
     with:
