@@ -1,10 +1,15 @@
 test_that("printr: printing to console works", {
   # 1)
-  checkmate::expect_character(capture.output(printr("test string")),               pattern = r"{test string}")
+  checkmate::expect_character(capture.output(printr("test string")),               pattern = r"{^test string$}")
+
   # 2)
-  checkmate::expect_character(capture.output(printr("test1", "test2")),            pattern = r"{test1test2}")
+  checkmate::expect_character(capture.output(printr("test1", "test2")),            pattern = r"{^test1test2$}")
+
   # 3)
-  checkmate::expect_character(capture.output(printr("test1", "test2", sep = " ")), pattern = r"{test1 test2}")
+  checkmate::expect_character(capture.output(printr("test1", "test2", sep = " ")), pattern = r"{^test1 test2$}")
+
+  # 4)
+  checkmate::expect_character(capture.output(printr("test1", "test2", sep = "-")), pattern = r"{^test1-test2$}")
 })
 
 
@@ -34,17 +39,18 @@ test_that("printr: printing to file works", {
                               pattern = r"{test1 test2}")
   checkmate::expect_character(readLines(test_file),
                               pattern = r"{test1 test2}")
+
 })
 
 
 test_that("printr: printing to console works with max_width", {
-  checkmate::expect_character(capture.output(printr("test1, test2, test3", sep = " ", max_width = 5)),
-                              pattern = r"{test1,\ntest2,test3}")
+  checkmate::expect_character(capture.output(printr("test1, test2, test3", max_width = 5)),
+                              pattern = r"{test1,\ntest2,\ntest3}")
 
-  checkmate::expect_character(capture.output(printr("test1, test2, test3", sep = " ", max_width = 15)),
+  checkmate::expect_character(capture.output(printr("test1, test2, test3", max_width = 15)),
                               pattern = r"{test1, test2,\ntest3}")
 
-  checkmate::expect_character(capture.output(printr("test1, test2, test3", sep = " ", max_width = 25)),
+  checkmate::expect_character(capture.output(printr("test1, test2, test3", max_width = 25)),
                               pattern = r"{test1, test2, test3}")
 })
 
