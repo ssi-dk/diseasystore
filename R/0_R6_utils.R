@@ -32,7 +32,7 @@ read_only_error <- function(field) {
 #'   NULL (default) does not break up lines.
 #' @noRd
 printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
-  sink(file = file, split = TRUE, append = TRUE, type = "output")
+  withr::local_output_sink(new = file, split = TRUE, append = TRUE)
 
   print_string <- paste(..., sep = sep)
 
@@ -70,7 +70,6 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
   }
 
   cat(print_string, "\n", sep = sep)
-  sink()
 }
 
 
