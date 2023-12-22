@@ -22,11 +22,11 @@ read_only_error <- function(field) {
 
 #' cat printing with default new line
 #' @param ...
-#'   The normal input to cat
+#'   The normal input to cat.
 #' @param file
-#'   Path of an output file to append the output to
+#'   Path of an output file to append the output to.
 #' @param sep (`character`)\cr
-#'   The separator given to cat
+#'   If multiple arguments are supplied to ..., the separator is used to collapse the arguments.
 #' @param max_width (`numeric`)\cr
 #'   The maximum number of characters to print before inserting a newline.
 #'   NULL (default) does not break up lines.
@@ -69,7 +69,7 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
     print_string <- paste(split_string, collapse = "\n")
   }
 
-  cat(print_string, "\n", sep = sep)
+  cat(print_string, "\n", sep = "")
 }
 
 
