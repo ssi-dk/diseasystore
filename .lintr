@@ -1,6 +1,5 @@
 linters: c(
-    nolint_line_length_linter(120),
-    nolint_position_linter(120),
+    diseasy_code_linters(),
     all_linters(
       line_length_linter = NULL,          # We use 120, nolint-aware line length linter instead
       cyclocomp_linter = NULL,            # Not required in diseasy style guide

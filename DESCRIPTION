@@ -43,6 +43,7 @@ Imports:
 Suggests:
     curl,
     knitr,
+    pkgload,
     R.utils,
     rmarkdown,
     RSQLite,

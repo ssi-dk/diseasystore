@@ -1,8 +1,18 @@
-test_that(r"{.Rd files have \examples}", {
+test_field_in_documentation <- function(field) {
+
+  # Load .Rd files based on environment
+  # When using R-CMD-Check the deployment is different from when using devtools::test().
+  # Deployment on Github is also different from running R-CMD-Check locally
+  # Here we need to read directly from a .rdx database stored in the "help" folder
+  # If we are testing locally, we read from the "man" folder
+  # Note that `devtools::test()`, `devtools::check()` and GitHub workflows all have different
+  # folder structures during testing, so we need to account for these differences
 
   # Look for the source of .Rd files
   help_dir <- system.file("help", package = testthat::testing_package())
   man_dir <- system.file("man", package = testthat::testing_package())
+
+  testthat::expect_true(any(dir.exists(c(help_dir, man_dir))))
 
   if (checkmate::test_directory_exists(help_dir)) {
 
@@ -31,7 +41,17 @@ test_that(r"{.Rd files have \examples}", {
 
   # Check renaming
   for (rd_id in seq_along(rd_files)) {
-    has_example <- any(stringr::str_detect(rd_files[[rd_id]], stringr::fixed(r"{\example}")))
-    expect_true(has_example, label = paste("File:", names(rd_files)[[rd_id]]))
+    has_field <- any(stringr::str_detect(rd_files[[rd_id]], paste0(r"{\\}", field)))
+    testthat::expect_true(has_field, label = paste("File:", names(rd_files)[[rd_id]]))
   }
+}
+
+
+test_that(r"{.Rd files have \examples}", {
+  test_field_in_documentation("example")
+})
+
+
+test_that(r"{.Rd files have \value}", {
+  test_field_in_documentation("value")
 })
