@@ -44,14 +44,20 @@ test_that("printr: printing to file works", {
 
 
 test_that("printr: printing to console works with max_width", {
-  checkmate::expect_character(capture.output(printr("test1, test2, test3", max_width = 5)),
-                              pattern = r"{test1,\ntest2,\ntest3}")
+  expect_identical(
+    capture.output(printr("test1, test2, test3", max_width = 5)),
+    c("test1,", "test2,", "test3")
+  )
 
-  checkmate::expect_character(capture.output(printr("test1, test2, test3", max_width = 15)),
-                              pattern = r"{test1, test2,\ntest3}")
+  expect_identical(
+    capture.output(printr("test1, test2, test3", max_width = 15)),
+    c("test1, test2,", "test3")
+  )
 
-  checkmate::expect_character(capture.output(printr("test1, test2, test3", max_width = 25)),
-                              pattern = r"{test1, test2, test3}")
+  expect_identical(
+    capture.output(printr("test1, test2, test3", max_width = 25)),
+    "test1, test2, test3"
+  )
 })
 
 
