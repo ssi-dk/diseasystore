@@ -28,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 # paste output within this block for formatting
 ```
 
-* [ ] I have checked that the bug is not already described in [open issues](https://github.com/ssi-dk/{{ repo }}/issues?q=is%3Aopen)
+* [ ] I have checked that the bug is not already described in [open issues](https://github.com/ssi-dk/{{ repo.name }}/issues?q=is%3Aopen)
 
 **Additional context**
 Add any other context about the problem here.
