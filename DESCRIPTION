@@ -41,6 +41,7 @@ Imports:
     tidyselect,
     zoo
 Suggests:
+    devtools,
     curl,
     knitr,
     pkgload,
