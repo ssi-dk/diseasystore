@@ -1,6 +1,7 @@
 {% extends '.github/templates/README_template.Rmd' %}
-## Overview
 
+{% block body %}
+## Overview
 The `diseasystore` package provides feature stores implemented in R
 specifically designed for serve disease data for epidemic preparedness.
 
@@ -12,7 +13,6 @@ Consult the Quick start vignette to see it in action
 The package forms the data-backbone of the `{diseasy}` package.
 
 ## Handling of diverse data sources
-
 Different data sources are handled by individual `diseasystores` which
 each facilitate access to the relevant disease data for the given data
 source.
@@ -30,4 +30,4 @@ dynamic and can adapt to (virtually) any stratification that the user
 specifies. If the data conversely is semi-aggregated, the data can only
 be stratified at the levels of the semi-aggregation (or at higher
 levels).
-{% block body %}
+{% endblock %}
