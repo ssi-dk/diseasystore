@@ -36,37 +36,9 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 
   print_string <- paste(..., sep = sep)
 
-  # If a width limit is set, we iteratively determine the words that exceed the limit and
-  # insert a newline
+  # If a width limit is set, we iteratively determine the words that exceed the limit and insert a newline
   if (!is.null(max_width)) {
-
-    # Get the current state of the string
-    split_string <- stringr::str_split_1(print_string, "\n")
-    segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
-
-    # While segments contain more than one word and is longer than max_width, split these segments
-    while (any(nchar(split_string) > max_width & segment_lengths > 1)) {
-      split_string <- split_string |>
-        purrr::map_if(
-          ~ nchar(.) > max_width,
-          ~ {
-            break_locations <- stringr::str_locate_all(., " |$")[[1]][, 1]
-
-            split_index <- max(c(1, which(break_locations - 1 < max_width)))
-
-            split_width <- break_locations[split_index]
-
-            stringr::str_replace(., paste0("(?<=^.{", split_width - 1, "})(\\w*) "), "\\1\n")
-          }
-        ) |>
-        stringr::str_split(stringr::fixed("\n")) |>
-        purrr::reduce(c)
-
-      segment_lengths <- purrr::map_dbl(split_string, ~ length(stringr::str_split_1(., " ")))
-    }
-
-    # Collapse segments with the newline
-    print_string <- paste(split_string, collapse = "\n")
+    print_string <- stringr::str_wrap(print_string, width = max_width)
   }
 
   cat(print_string, "\n", sep = "")
