@@ -1,5 +1,13 @@
 # diseasystore (development version)
 
+## Fixes:
+
+* `printr()`: replace `sink` with `withr::local_output_sink` for stability.
+
+## Testing:
+
+* Added tests for `printr()` when `max_width` is set
+
 # diseasystore 0.1
 
 ## Features:
