@@ -44,8 +44,6 @@ Suggests:
     devtools,
     curl,
     knitr,
-    pkgload,
-    R.utils,
     rmarkdown,
     RSQLite,
     RPostgres,
