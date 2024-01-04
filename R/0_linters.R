@@ -1,7 +1,26 @@
-#' The custom linters of `diseasy`
-#' @name diseasy_linters
+#' @title
+#'   The custom linters of `diseasy`
 #' @description
-#' nolint_position_linter: Check that the `nolint:` statements occur after the character limit
+#'   A curated list of linters to ensure adherence to the `diseasy` documentation and code standards
+#' @name diseasy_linters
+#' @examples
+#'   diseasy_code_linters()
+#' @return A list of linters
+#' @noRd
+diseasy_code_linters <- function() {
+  linters <- list(
+    nolint_position_linter(120),
+    nolint_line_length_linter(120),
+    non_ascii_linter()
+  )
+
+  return(linters)
+}
+
+
+#' @rdname diseasy_linters
+#' @description
+#' nolint_position_linter: Ensure `nolint:` statements occur after the character limit
 #'
 #' @param length maximum line length allowed. Default is 80L (Hollerith limit).
 #' @returns A list of `lintr::Lint`
@@ -22,8 +41,8 @@
 #' @seealso
 #' - [lintr::linters] for a complete list of linters available in lintr.
 #' - <https://style.tidyverse.org/syntax.html#long-lines>
-#' @export
 #' @importFrom rlang .data
+#' @noRd
 nolint_position_linter <- function(length = 80L) {
   general_msg <- paste("`nolint:` statements start at", length + 1, "characters.")
 
@@ -66,9 +85,9 @@ nolint_position_linter <- function(length = 80L) {
 }
 
 
-#' @name diseasy_linters
+#' @rdname diseasy_linters
 #' @description
-#' nolint_line_length_linter: Check that lines adhere to a given character limit, ignoring `nolint` statements
+#' nolint_line_length_linter: Ensure lines adhere to a given character limit, ignoring `nolint` statements
 #'
 #' @param length maximum line length allowed. Default is 80L (Hollerith limit).
 #' @examples
@@ -85,8 +104,8 @@ nolint_position_linter <- function(length = 80L) {
 #'   linters = c(nolint_line_length_linter(length = 20L), lintr::object_name_linter())
 #' )
 #'
-#' @export
 #' @importFrom rlang .data
+#' @noRd
 nolint_line_length_linter <- function(length = 80L) {
   general_msg <- paste("Lines should not be more than", length, "characters.")
 
@@ -115,6 +134,69 @@ nolint_line_length_linter <- function(length = 80L) {
           ranges = list(c(1L, line_length))
         )
       }, long_lines, line_lengths[long_lines])
+    }
+  )
+}
+
+
+#' @rdname diseasy_linters
+#' @description
+#' non_ascii_linter: Ensure the code base only contains ASCII symbols
+#'
+#' @examples
+#' ## non_ascii_linter
+#' # will produce lints
+#' lintr::lint(
+#'   text = "a-å",                                                                                                      # nolint: non_ascii_linter
+#'   linters = non_ascii_linter()
+#' )
+#'
+#' # okay
+#' lintr::lint(
+#'   text = "a-z",                                                                                                      # nolint: non_ascii_linter
+#'   linters = non_ascii_linter()
+#' )
+#'
+#' @importFrom rlang .data
+#' @noRd
+non_ascii_linter <- function() {
+  general_msg <- paste("Code should not contain non-ASCII characters")
+
+  lintr::Linter(
+    function(source_expression) {
+
+      # Only go over complete file
+      if (!lintr::is_lint_level(source_expression, "file")) {
+        return(list())
+      }
+
+      detection_info <- source_expression$file_lines |>
+        stringr::str_locate_all(stringr::regex(r"{[^\x00-\x7f]}", ignore_case = TRUE))
+
+      detection_info <- purrr::map2(
+        detection_info,
+        seq_along(detection_info),
+        ~ dplyr::mutate(as.data.frame(.x), line_number = .y)
+      )
+
+      detection_info <- detection_info |>
+        purrr::reduce(rbind) |>
+        dplyr::filter(!is.na(.data$start))
+
+      purrr::pmap(
+        detection_info,
+        \(start, end, line_number) {
+          lintr::Lint(
+            filename = source_expression$filename,
+            line_number = line_number,
+            column_number = start,
+            type = "style",
+            message = paste(general_msg, "non-ASCII character found"),
+            line = source_expression$file_lines[line_number],
+            ranges = list(c(start, end))
+          )
+        }
+      )
     }
   )
 }

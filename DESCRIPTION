@@ -1,6 +1,6 @@
 Package: diseasystore
 Title: Feature Stores for the 'diseasy' Framework
-Version: 0.1
+Version: 0.1.0.9000
 Authors@R:
     c(person("Rasmus Skytte", "Randl\u00F8v", , "rske@ssi.dk", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-5860-3838")),
@@ -41,6 +41,7 @@ Imports:
     tidyselect,
     zoo
 Suggests:
+    devtools,
     curl,
     knitr,
     rmarkdown,
