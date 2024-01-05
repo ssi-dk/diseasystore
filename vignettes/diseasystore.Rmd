@@ -1,8 +1,8 @@
 ---
-title: "Quick start"
+title: "diseasystore: quick start guide"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Quick start}
+  %\VignetteIndexEntry{diseasystore: quick start guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

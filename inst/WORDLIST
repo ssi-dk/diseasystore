@@ -40,18 +40,20 @@ ds
 dtplyr
 
 Eggo
+endblock
 Engbo
-
-gov
-Gruson
-
-ij
-Institut
 
 fn
 fns
 FeatureHandler
 FeatureHandlers
+
+github
+gov
+Gruson
+
+ij
+Institut
 
 ji
 Jit
@@ -86,6 +88,8 @@ PLoS
 POSIXct
 pid
 
+param
+
 quos
 
 R's
@@ -93,8 +97,9 @@ Randl
 Rasmus
 regex
 rlang
-RM
 rm
+RM
+Rmd
 
 SCDB
 Schou

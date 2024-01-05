@@ -1,13 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
 
-# diseasystore <a href="https://ssi-dk.github.io/diseasystore/"><img src="man/figures/logo.png" alt="SCDB website" align="right" height="138"/></a>
+# diseasy <a href="https://ssi-dk.github.io/diseasystore/"><img src="man/figures/logo.png" align="right" height="138" alt="diseasystore website" /></a>
 
 <!-- badges: start -->
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/diseasystore)](https://CRAN.R-project.org/package=diseasystore)
-[![R-CMD-check](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml)
+[![CI
+tests](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml/badge.svg)](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml)
 [![codecov](https://codecov.io/gh/ssi-dk/diseasystore/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ssi-dk/diseasystore)
 
 <!-- badges: end -->
@@ -54,3 +55,7 @@ install.packages("diseasystore")
 # install.packages("devtools")
 devtools::install_github("ssi-dk/diseasystore")
 ```
+
+## Usage
+
+For basic usage examples, see `vignette("diseasystore")`.
