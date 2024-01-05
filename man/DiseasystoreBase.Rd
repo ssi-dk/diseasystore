@@ -36,7 +36,7 @@ A human readable label of the feature store. Read only.}
 
 \item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.  Read only.}
 
-\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  Read only. If the database backend does not support schema, the tables will be prefixed with target_schema.}
+\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  Read only. If the database backend does not support schema, the tables will be prefixed with <target_schema>.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.  Read only.}
 
@@ -86,7 +86,7 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
 
 \item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.}
 
-\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with target_schema.}
+\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with <target_schema>.}
 
 \item{\code{verbose}}{(\code{boolean})\cr
 Boolean that controls enables debugging information.}

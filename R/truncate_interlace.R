@@ -4,10 +4,11 @@
 #'   Using the primary table as the basis of keys and validity, the secondary tables are joined to the
 #'   primary table according to the shared keys and then truncated to the validity of the primary table
 #'
-#' @param primary
+#' @param primary (`.data`)\cr
 #'   The table with the keys the interlacing is done by (first "key_" column in primary).
 #'   The secondary tables are matched to the validity interval of the primary table before interlacing
-#' @param secondary A list of tables that should be matched and joined to the primary table
+#' @param secondary (`list`(`.data`))\cr
+#'   A list of tables that should be matched and joined to the primary table
 #' @return An object the same type as the primary. If secondary is NULL, primary is returned.
 #'   If secondary is given, the output is the join of the secondary onto primary.
 #' @examples

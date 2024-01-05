@@ -1,9 +1,11 @@
 #' Drop feature stores from DB
 #' @importFrom rlang .data
-#' @param pattern Pattern to match the tables by
-#' @param schema Schema the diseasystore uses to store data in
-#' @param conn DB connection
-#' @return No return value, called for side effects
+#' @param pattern (`character(1)`)\cr
+#'   Pattern to match the tables by
+#' @param schema (`character(1)`)\cr
+#'   Schema the diseasystore uses to store data in
+#' @param conn `r rd_conn()`
+#' @return `r rd_side_effects`
 #' @examples
 #'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 #'
