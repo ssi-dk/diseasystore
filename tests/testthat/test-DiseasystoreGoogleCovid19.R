@@ -18,18 +18,33 @@ remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 local_conn <- purrr::detect("test_data", checkmate::test_directory_exists, .default = tempdir())
 
 # Then we download the first n rows of each data set of interest
-purrr::discard(google_files, ~ checkmate::test_file_exists(file.path(local_conn, .))) |>
-  purrr::walk(\(file) {
-    paste0(remote_conn, file) |>
-      readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+remote_data_available <- curl::has_internet() # Assume available
+purrr::walk(google_files, \(file) {
+  remote_url <- paste0(remote_conn, file)
+
+  if (RCurl::url.exists(remote_url)) {
+    readr::read_csv(remote_url, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
       readr::write_csv(file.path(local_conn, file))
-  })
+  } else {
+    remote_data_available <- FALSE
+  }
+})
+
+# Throw warning if data unavailable
+if (curl::has_internet() && !remote_data_available) {
+  warning("remote_conn for DiseasystoreGoogleCovid19 unavailable!")
+}
 
 # Check that the files are available after attempting to download
 if (purrr::some(google_files, ~ !checkmate::test_file_exists(file.path(local_conn, .)))) {
   data_unavailable <- TRUE
 } else {
   data_unavailable <- FALSE
+}
+
+# Throw warning if data unavailable
+if (curl::has_internet() && data_unavailable) {
+  warning("local_conn for DiseasystoreGoogleCovid19 unavailable!")
 }
 
 
@@ -65,6 +80,7 @@ test_that("DiseasystoreGoogleCovid19 initialises correctly", {
 
 test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
   testthat::skip_if_not(curl::has_internet())
+  testthat::skip_if_not(remote_data_available)
 
   # Ensure source is set as the remote
   withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = remote_conn)
