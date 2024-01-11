@@ -268,15 +268,15 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
             start_date, end_date
           )
         },
-        warning = function(w) {
-          checkmate::expect_character(w$message, pattern = "Observable already stratified by")
-          return(NULL)
-        },
         error = function(e) {
           expect_identical(
             e$message,
             paste("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
           )
+          return(NULL)
+        },
+        warning = function(w) {
+          checkmate::expect_character(w$message, pattern = "Observable already stratified by")
           return(NULL)
         })
 
