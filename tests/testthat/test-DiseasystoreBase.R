@@ -127,7 +127,7 @@ test_that("$get_feature verbosity works", {
 
   # Capture the messages from a get_feature call and compare with expectation
   messages <- capture.output(
-    invisible(suppressWarnings(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date()))),
+    invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
     type = "message"
   )
   checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date inter.")
@@ -135,7 +135,7 @@ test_that("$get_feature verbosity works", {
 
   # Second identical call should give no messages
   messages <- capture.output(
-    invisible(suppressWarnings(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date()))),
+    invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
     type = "message"
   )
   expect_equal(messages, character(0))
@@ -153,9 +153,7 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
-  logs <- suppressWarnings(suppressMessages(
-    SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
-  ))
+  logs <- SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
 
   dplyr::rows_append(
     logs,
