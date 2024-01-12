@@ -4,6 +4,8 @@
 
 * Improved the stability of internal functions.
 
+* Adapted to release of SCDB v0.3.
+
 ## Testing:
 
 * Improved test stability when internet is unavailable.
