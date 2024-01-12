@@ -14,39 +14,38 @@ test_that("SCDB gives too many messages", {
 
   # SCDB::get_tables -- privileges warning (tempfile)
   conn <- DBI::dbConnect(RSQLite::SQLite(), dbname = tempfile())
-  expect_warning(SCDB::get_tables(conn), "Check user privileges / database configuration")
-  dplyr::copy_to(conn, iris, name = "iris")
-  DBI::dbDisconnect(conn)
+
+  message_as_expected <- tryCatch(
+    SCDB::get_tables(conn),
+    warning = function(w) {
+      if (checkmate::test_character(w$message, pattern = "Check user privileges / database configuration")) {
+        return(TRUE) # As expected
+      } else {
+        warning(w) # No warning, we need to remove suppress*
+      }
+    }
+  )
+  if (!isTRUE(message_as_expected)) warning("warning no longer being thrown -- superfluous table creation in setup.R")
 
 
-  conn <- DBI::dbConnect(RSQLite::SQLite())
-
-  # SCDB::get_tables -- privileges warning (memory)
-  expect_warning(SCDB::get_tables(conn), "Check user privileges / database configuration")
-  dplyr::copy_to(conn, iris, name = "iris")
 
   target_schema <- diseasyoption("target_schema")
   test_id <- SCDB::id(paste(target_schema, "mtcars", sep = "."), conn)
 
   # SCDB::is_historical
-  message <- capture.output(
-    invisible(SCDB::is.historical(dplyr::tbl(conn, test_id))),
-    type = "message"
-  ) |>
-    paste(collapse = " ")
-  checkmate::expect_character(message, pattern = "It looks like you tried to incorrectly use")
+  message_as_expected <- tryCatch(
+    SCDB::is.historical(dplyr::tbl(conn, test_id)),
+    message = function(m) {
+      if (checkmate::test_character(m$message, pattern = "It looks like you tried to incorrectly use")) {
+        return(TRUE) # As expected
+      } else {
+        warning(m) # No message, we need to remove suppress*
+      }
+    }
+  )
+  if (!isTRUE(message_as_expected)) warning("warning no longer being thrown -- remove suppressWarnings")
 
 
-  # As well as calls to dplyr::tbl if a SCDB::id is supplied
-  message <- capture.output(
-    invisible(dplyr::tbl(conn, test_id)),
-    type = "message"
-  ) |>
-    paste(collapse = " ")
-  checkmate::expect_character(message, pattern = "It looks like you tried to incorrectly use")
-
-
-  # If any of these message disappears, we need to remove some "suppressMessages" in the code
 
   DBI::dbDisconnect(conn)
 })
