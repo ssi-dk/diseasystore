@@ -6,6 +6,10 @@
 
 * Adapted to release of SCDB v0.3.
 
+## Documentation:
+
+* Improved documentation of functions.
+
 ## Testing:
 
 * Improved test stability when internet is unavailable.
