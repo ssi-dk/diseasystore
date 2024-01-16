@@ -32,6 +32,12 @@ for (conn in get_test_conns()) {
   drop_diseasystore(schema = target_schema_1, conn = conn)
   drop_diseasystore(schema = target_schema_2, conn = conn)
 
+  # Check test schemas are empty
+  n_tables_in_test_schemas <- SCDB::get_tables(conn) |>
+      dplyr::filter(.data$schema %in% c(target_schema_1, target_schema_2)) |>
+      nrow()
+  checkmate::assert_true(n_tables_in_test_schemas == 0)
+
   # Disconnect
   DBI::dbDisconnect(conn)
 }
