@@ -131,11 +131,11 @@ DiseasystoreBase <- R6::R6Class(                                                
       feature_loader <- purrr::pluck(ds_map, feature)
 
       # Determine where these features are stored
-      target_table <- paste(c(self %.% target_schema, feature_loader), collapse = ".")
+      target_table <- paste(self %.% target_schema, feature_loader, sep = ".")
 
 
       # Create log table
-      SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
+      SCDB::create_logs_if_missing(log_table = paste(self %.% target_schema, "logs", sep = "."),
                                    conn = self %.% target_conn)
 
       # Determine dates that need computation
@@ -213,7 +213,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Configure the Logger
           log_table_id <- SCDB::id(
-            paste(c(self %.% target_schema, "logs"), collapse = "."),
+            paste(self %.% target_schema, "logs", sep = "."),
             self %.% target_conn
           )
 
@@ -601,7 +601,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,
-                         SCDB::id(paste(c(self %.% target_schema, "logs"), collapse = "."), self %.% target_conn),
+                         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn),
                          check_from = FALSE) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
