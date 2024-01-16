@@ -4,6 +4,8 @@
 
 * Improved the stability of internal functions.
 
+* Adapted to release of SCDB v0.3.
+
 ## Documentation:
 
 * Improved documentation of functions.

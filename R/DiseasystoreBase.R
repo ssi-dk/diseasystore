@@ -135,10 +135,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
       # Create log table
-      suppressMessages(
-        SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
-                                     conn = self %.% target_conn)
-      )
+      SCDB::create_logs_if_missing(log_table = paste(c(self %.% target_schema, "logs"), collapse = "."),
+                                   conn = self %.% target_conn)
 
       # Determine dates that need computation
       ds_missing_ranges <- private$determine_new_ranges(target_table = target_table,
@@ -218,14 +216,14 @@ DiseasystoreBase <- R6::R6Class(                                                
             self %.% target_conn
           )
 
-          logger <- suppressMessages(SCDB::Logger$new(
+          logger <- SCDB::Logger$new(
             output_to_console = FALSE,
             log_table_id = log_table_id,
             log_conn = self %.% target_conn
-          ))
+          )
 
           # Commit to DB
-          suppressMessages(SCDB::update_snapshot(
+          SCDB::update_snapshot(
             .data = ds_updated_feature,
             conn = self %.% target_conn,
             db_table = target_table,
@@ -233,7 +231,7 @@ DiseasystoreBase <- R6::R6Class(                                                
             message = glue::glue("ds-range: {start_date} - {end_date}"),
             logger = logger,
             enforce_chronological_order = FALSE
-          ))
+          )
         })
 
         # Release the lock on the table

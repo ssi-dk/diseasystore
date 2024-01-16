@@ -83,7 +83,7 @@ get_test_conns <- function() {
 
     # SQLite back end gives an error in SCDB if there are no tables (it assumes a bad configuration)
     # We create a table to suppress this warning
-    if (checkmate::test_class(conn, "SQLiteConnection")) {
+    if (!DBI::dbExistsTable(conn, "iris")) {
       DBI::dbWriteTable(conn, "iris", iris)
     }
 

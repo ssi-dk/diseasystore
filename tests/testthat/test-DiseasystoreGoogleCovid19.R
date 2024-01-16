@@ -76,7 +76,7 @@ test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
     verbose = FALSE
   ))
 
-  expect_no_error(suppressWarnings(ds$get_feature("n_hospital")))
+  expect_no_error(ds$get_feature("n_hospital"))
 
   rm(ds)
   invisible(gc())
@@ -97,7 +97,7 @@ test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
     verbose = FALSE
   ))
 
-  expect_no_error(suppressWarnings(ds$get_feature("n_hospital")))
+  expect_no_error(ds$get_feature("n_hospital"))
 
   rm(ds)
   invisible(gc())
