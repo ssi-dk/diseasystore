@@ -11,14 +11,16 @@ drop_diseasystore(
 )
 }
 \arguments{
-\item{pattern}{Pattern to match the tables by}
+\item{pattern}{(\code{character(1)})\cr
+Pattern to match the tables by}
 
-\item{schema}{Schema the diseasystore uses to store data in}
+\item{schema}{(\code{character(1)})\cr
+Schema the diseasystore uses to store data in}
 
-\item{conn}{DB connection}
+\item{conn}{(\code{DBIConnection})\cr A database connection}
 }
 \value{
-No return value, called for side effects
+NULL (called for side effects)
 }
 \description{
 Drop feature stores from DB

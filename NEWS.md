@@ -4,6 +4,10 @@
 
 * Improved the stability of internal functions.
 
+## Documentation:
+
+* Improved documentation of functions.
+
 ## Testing:
 
 * Improved test stability when internet is unavailable.

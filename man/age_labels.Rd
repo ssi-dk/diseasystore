@@ -7,7 +7,8 @@
 age_labels(age_cuts)
 }
 \arguments{
-\item{age_cuts}{The lower bound of the groups (0 is implicitly included)}
+\item{age_cuts}{(\code{numeric()})\cr
+The lower bound of the groups (0 is implicitly included)}
 }
 \value{
 A vector of labels with zero-padded numerics so they can be sorted easily

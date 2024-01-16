@@ -72,7 +72,8 @@ get_diseasystore <- function(label) {
 
 
 #' Provides age_labels that follows the mg standard
-#' @param age_cuts The lower bound of the groups (0 is implicitly included)
+#' @param age_cuts (`numeric()`)\cr
+#'   The lower bound of the groups (0 is implicitly included)
 #' @return A vector of labels with zero-padded numerics so they can be sorted easily
 #' @examples
 #'   age_labels(c(5, 12, 20, 30))
@@ -98,8 +99,10 @@ age_labels <- function(age_cuts) {
 #' @description
 #'   This helper determines whether source_conn is a file path or URL and creates the full path to the
 #'   the file as needed based on the type of source_conn
-#' @param source_conn File location (path or URL)
-#' @param file Name of the file at the location
+#' @param source_conn (`character(1)`)\cr
+#'   File location (path or URL)
+#' @param file (`character(1)`)\cr
+#'   Name of the file at the location
 #' @noRd
 source_conn_path <- function(source_conn, file) {
   url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
