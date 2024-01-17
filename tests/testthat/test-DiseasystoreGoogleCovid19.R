@@ -150,9 +150,9 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
       reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
       reference <- reference_generator(start_date  = start_date,
-                                      end_date    = end_date,
-                                      slice_ts    = ds %.% slice_ts,
-                                      source_conn = ds %.% source_conn) |>
+                                       end_date    = end_date,
+                                       slice_ts    = ds %.% slice_ts,
+                                       source_conn = ds %.% source_conn) |>
         dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
         dplyr::collect()
 
