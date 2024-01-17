@@ -190,7 +190,8 @@ DiseasystoreBase <- R6::R6Class(                                                
           # Check it table is copied to target DB
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
             ds_feature <- ds_feature |>
-              dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_", feature_loader), overwrite = TRUE)
+              dplyr::copy_to(self %.% target_conn, df = _,
+                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"), overwrite = TRUE)
           }
 
           # Add the existing computed data for given slice_ts
@@ -252,7 +253,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
-        dplyr::copy_to(self %.% target_conn, df = _, "ds_validities", overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()), overwrite = TRUE)
 
       out <- dplyr::inner_join(out, validities,
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
@@ -308,7 +309,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = "ds_study_dates", overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()), overwrite = TRUE)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
@@ -440,7 +441,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         # Copy if needed
         if (is.null(stratification)) {
           all_combinations <- all_combinations |>
-            dplyr::copy_to(self %.% target_conn, df = _, name = "ds_all_combinations", overwrite = TRUE)
+            dplyr::copy_to(self %.% target_conn, df = _,
+                           name = paste0("ds_all_combinations_", Sys.getpid()), overwrite = TRUE)
         }
       }
 
