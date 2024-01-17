@@ -431,7 +431,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         all_combinations <- all_dates
 
         # Copy if needed
-        if (!is.null(stratification)) {
+        if (is.null(stratification)) {
           all_combinations <- dplyr::copy_to(self %.% target_conn, all_combinations, "ds_tmp", overwrite = TRUE)
         }
       }
