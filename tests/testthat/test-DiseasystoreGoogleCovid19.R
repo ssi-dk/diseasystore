@@ -141,6 +141,13 @@ test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", 
         sort()
 
       expect_identical(feature_checksum, reference_checksum)
+
+      # Stop-gap measure to clear dbplyr_### tables
+      SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+        dplyr::pull(table) |>
+        purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+        purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+
     })
 
     rm(ds)
@@ -182,6 +189,12 @@ test_that("DiseasystoreGoogleCovid19 can extend existing features", {
         sort()
 
       expect_identical(feature, reference)
+
+      # Stop-gap measure to clear dbplyr_### tables
+      SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+        dplyr::pull(table) |>
+        purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+        purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
     })
 
     rm(ds)
@@ -255,6 +268,12 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
         if (!is.null(output)) {
           key_join_features_tester(dplyr::collect(output), start_date, end_date)
         }
+
+        # Stop-gap measure to clear dbplyr_### tables
+        SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+          dplyr::pull(table) |>
+          purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+          purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
       })
 
     rm(ds)
@@ -300,6 +319,12 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
         if (!is.null(output)) {
           key_join_features_tester(dplyr::collect(output), start_date, end_date)
         }
+
+        # Stop-gap measure to clear dbplyr_### tables
+        SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+          dplyr::pull(table) |>
+          purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+          purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
       })
 
 
@@ -328,6 +353,12 @@ test_that("DiseasystoreGoogleCovid19 key_join fails gracefully", {
         if (!is.null(output)) {
           key_join_features_tester(dplyr::collect(output), start_date, end_date)
         }
+
+        # Stop-gap measure to clear dbplyr_### tables
+        SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+          dplyr::pull(table) |>
+          purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+          purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
       })
 
 
