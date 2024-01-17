@@ -104,51 +104,6 @@ test_that("DiseasystoreGoogleCovid19 works with directory source_conn", {
 })
 
 
-test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", {
-  testthat::skip_if(data_unavailable)
-
-  for (conn in get_test_conns()) {
-
-    # Initialise without start_date and end_date
-    ds <- expect_no_error(DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
-
-    # Attempt to get features from the feature store
-    # then check that they match the expected value from the generators
-    purrr::walk2(ds$available_features, ds$ds_map, ~ {
-      start_date <- as.Date("2020-03-01")
-      end_date   <- as.Date("2020-03-05")
-
-      feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-        dplyr::collect()
-
-      feature_checksum <- feature |>
-        SCDB::digest_to_checksum() |>
-        dplyr::pull("checksum") |>
-        sort()
-
-      reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
-
-      reference <- reference_generator(start_date  = start_date,
-                                       end_date    = end_date,
-                                       slice_ts    = ds %.% slice_ts,
-                                       source_conn = ds %.% source_conn) |>
-        dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-        dplyr::collect()
-
-      reference_checksum <- reference |>
-        SCDB::digest_to_checksum() |>
-        dplyr::pull("checksum") |>
-        sort()
-
-      expect_identical(feature_checksum, reference_checksum)
-    })
-
-    rm(ds)
-  }
-  invisible(gc())
-})
-
-
 # As a stop-gap measure for the following tests, we close the connections more often to clear dbplyr_### tables
 # and, hopefully, prevent the intermittent errors we have been receiving (see issue 113)
 
@@ -167,6 +122,52 @@ ds_map <- ds$ds_map
 
 rm(ds)
 invisible(gc())
+
+
+test_that("DiseasystoreGoogleCovid19 can retrieve features from a fresh state", {
+  testthat::skip_if(data_unavailable)
+
+  # Attempt to get features from the feature store
+  # then check that they match the expected value from the generators
+  start_date <- as.Date("2020-03-01")
+  end_date   <- as.Date("2020-03-05")
+
+  purrr::walk2(available_features, ds_map, ~ {
+
+    for (conn in get_test_conns()) {
+
+      # Initialise without start_date and end_date
+      ds <- expect_no_error(DiseasystoreGoogleCovid19$new(verbose = FALSE, target_conn = conn))
+
+      feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        dplyr::collect()
+
+      feature_checksum <- feature |>
+        SCDB::digest_to_checksum() |>
+        dplyr::pull("checksum") |>
+        sort()
+
+      reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
+
+      reference <- reference_generator(start_date  = start_date,
+                                      end_date    = end_date,
+                                      slice_ts    = ds %.% slice_ts,
+                                      source_conn = ds %.% source_conn) |>
+        dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
+        dplyr::collect()
+
+      reference_checksum <- reference |>
+        SCDB::digest_to_checksum() |>
+        dplyr::pull("checksum") |>
+        sort()
+
+      expect_identical(feature_checksum, reference_checksum)
+
+      rm(ds)
+      invisible(gc())
+    }
+  })
+})
 
 
 test_that("DiseasystoreGoogleCovid19 can extend existing features", {
