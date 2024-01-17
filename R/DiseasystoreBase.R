@@ -258,7 +258,8 @@ DiseasystoreBase <- R6::R6Class(                                                
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
-        dplyr::select(!c("valid_from.p", "valid_until.p"))
+        dplyr::select(!c("valid_from.p", "valid_until.p")) |>
+        dplyr::compute()
 
 
       # Clean up
