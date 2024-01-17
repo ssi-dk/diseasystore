@@ -395,8 +395,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, stratification_data) |>
         private$key_join_filter(stratification_features, start_date, end_date) |>
-        dplyr::compute() |>
-        dplyr::group_by(!!!stratification)
+        dplyr::compute()
 
       # Retrieve the aggregators (and ensure they work together)
       key_join_aggregators <- c(purrr::pluck(private, purrr::pluck(ds_map, observable)) %.% key_join,
@@ -411,6 +410,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Add the new valid counts
       t_add <- out |>
+        dplyr::group_by(!!!stratification) |>
         dplyr::group_by(date = valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename(n_add = n) |>
@@ -418,6 +418,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Add the new invalid counts
       t_remove <- out |>
+        dplyr::group_by(!!!stratification) |>
         dplyr::group_by(date = valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename(n_remove = n) |>
