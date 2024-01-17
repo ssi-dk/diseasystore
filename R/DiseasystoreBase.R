@@ -429,12 +429,16 @@ DiseasystoreBase <- R6::R6Class(                                                
           dplyr::compute()
       } else {
         all_combinations <- all_dates
+
+        # Copy if needed
+        if (!is.null(stratification)) {
+          all_combinations <- dplyr::copy_to(self %.% target_conn, all_combinations, "ds_tmp", overwrite = TRUE)
+        }
       }
 
       # Aggregate across dates
       data <- t_add |>
-        dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na",
-                          copy = is.null(stratification)) |>
+        dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
@@ -447,6 +451,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Ensure date is of type Date
       data <- data |>
         dplyr::mutate(date = as.Date(date))
+
+
+      # Clean up
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(out))
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_add))
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_remove))
+      if (inherits(all_combinations, "tbl_dbi")) DBI::dbRemoveTable(self %.% target_conn, SCDB::id(all_combinations))
 
       return(data)
     }
