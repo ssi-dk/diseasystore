@@ -31,7 +31,6 @@ get_test_conns <- function() {
     # Define our local connection backends
     conn_list <- list(
       # Backend string = package::function
-      "SQLite"     = "RSQLite::SQLite"
     )
 
   } else {
@@ -47,7 +46,6 @@ get_test_conns <- function() {
     # Define our local connection arguments
     conn_args <- list(
       # Backend string = list(named args)
-      "SQLite" = list(dbname = tempfile())
     )
 
   } else {
@@ -87,6 +85,11 @@ get_test_conns <- function() {
     }
 
     return(conn)
+  }
+
+  # Early return if no connections are defined
+  if (length(conn_list) == 0) {
+    return(list())
   }
 
   # Create connection generator
