@@ -31,6 +31,7 @@ if (rlang::is_installed("withr")) {
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
 suggests_available <- rlang::is_installed("RSQLite")
+not_on_cran <- interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "false"))
 ```
 
 # Available diseasystores
@@ -58,7 +59,7 @@ For this Quick start, we will configure a `DiseasystoreGoogleCovid19` to use a l
 Ideally, we want to use a faster, more capable, data base to store the features in.
 The `diseasystores` uses `SCDB` in the back end and can use any data base back end supported by `SCDB`.
 
-```{r google_setup_hidden, include = FALSE, eval = suggests_available}
+```{r google_setup_hidden, include = FALSE, eval = suggests_available && not_on_cran}
 # The files we need are stored remotely in Google's API
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
@@ -90,7 +91,7 @@ ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite
                                     end_date = as.Date("2020-03-15"))
 ```
 
-```{r google_setup, eval = FALSE, eval = suggests_available && data_available}
+```{r google_setup, eval = FALSE, eval = suggests_available && data_available && not_on_cran}
 ds <- DiseasystoreGoogleCovid19$new(
   target_conn = DBI::dbConnect(RSQLite::SQLite()),
   start_date = as.Date("2020-03-01"),
@@ -101,20 +102,20 @@ When we create our new `diseasystore` instance, we also supply `start_date` and 
 These are not strictly required, but make getting features for this time interval simpler.
 
 Once configured we can query the available features in the `diseasystore`
-```{r google_available_features, eval = suggests_available && data_available}
+```{r google_available_features, eval = suggests_available && data_available && not_on_cran}
 ds$available_features
 ```
 
 These features can be retrieved individually
 (using the `start_date` and `end_date` we specified during creation of `ds`):
-```{r google_get_feature_example_1, eval = suggests_available && data_available}
+```{r google_get_feature_example_1, eval = suggests_available && data_available && not_on_cran}
 ds$get_feature("n_hospital")
 ```
 Notice that features have associated "key_*" and "valid_from/until" columns.
 These are used for one of the primary selling points of `diseasystore`, namely [automatic aggregation](#automatic-aggregation).
 
 Go get features for other time intervals, we can manually supply `start_date` and/or `end_date`:
-```{r google_get_feature_example_2, eval = suggests_available && data_available}
+```{r google_get_feature_example_2, eval = suggests_available && data_available && not_on_cran}
 ds$get_feature("n_hospital",
                start_date = as.Date("2020-03-01"),
                end_date = as.Date("2020-03-02"))
@@ -154,7 +155,7 @@ To use this method, you need to provide the `observable` that you want to aggreg
 to apply to the aggregation.
 
 Lets start with an simple example where we request no stratification (`NULL`):
-```{r google_key_join_features_example_1, eval = suggests_available && data_available}
+```{r google_key_join_features_example_1, eval = suggests_available && data_available && not_on_cran}
 ds$key_join_features(observable = "n_hospital",
                      stratification = NULL)
 ```
@@ -164,13 +165,13 @@ observable per day (in this case, the number of people hospitalised).
 
 To specify a level of `stratification`, we need to supply a list of `quosures`
 (see `help("topic-quosure", package = "rlang")`).
-```{r google_key_join_features_example_2, eval = suggests_available && data_available}
+```{r google_key_join_features_example_2, eval = suggests_available && data_available && not_on_cran}
 ds$key_join_features(observable = "n_hospital",
                      stratification = rlang::quos(country_id))
 ```
 
 The `stratification` argument is very flexible, so we can supply any valid R expression:
-```{r google_key_join_features_example_3, eval = suggests_available && data_available}
+```{r google_key_join_features_example_3, eval = suggests_available && data_available && not_on_cran}
 ds$key_join_features(observable = "n_hospital",
                      stratification = rlang::quos(country_id,
                                                   old = age_group == "90+"))
@@ -183,11 +184,11 @@ For this purpose, we provide the `drop_diseasystore()` function.
 By default, this deletes all stored features in the default `diseasystore` schema.
 A `pattern` argument to match tables by and a `schema` argument to specify the schema to delete from[^1].
 
-```{r drop_diseasystore_example_1, eval = suggests_available && data_available}
+```{r drop_diseasystore_example_1, eval = suggests_available && data_available && not_on_cran}
 SCDB::get_tables(ds$target_conn)
 ```
 
-```{r drop_diseasystore_example_2, eval = suggests_available && data_available}
+```{r drop_diseasystore_example_2, eval = suggests_available && data_available && not_on_cran}
 drop_diseasystore(conn = ds$target_conn)
 
 SCDB::get_tables(ds$target_conn)
@@ -232,7 +233,7 @@ diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 [^2]: R's `options()` does not allow setting an option to `NULL`. By setting options as empty strings, the user can see the available options to set.
 
 ```{r cleanup, include = FALSE}
-rm(ds)
+if (exists("ds")) rm(ds)
 gc()
 if (!rlang::is_installed("withr")) {
   options(opts)
