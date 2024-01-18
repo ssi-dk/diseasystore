@@ -22,24 +22,23 @@ remote_data_available <- curl::has_internet() # Assume available
 purrr::walk(google_files, \(file) {
   remote_url <- paste0(remote_conn, file)
 
-  if (RCurl::url.exists(remote_url)) {
-
-    # If we have the file locally, do not re-download but check it exists
-    if (checkmate::test_file_exists(file.path(local_conn, file))) {
-      tryCatch(
-        readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE),
-        error = function(e) {
-          remote_data_available <- FALSE
-        }
-      )
-    } else { # If we don't have the file locally, copy it down
+  # If we have the file locally, do not re-download but check it exists
+  if (checkmate::test_file_exists(file.path(local_conn, file))) {
+    tryCatch(
+      readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE),
+      error = function(e) {
+        remote_data_available <- FALSE
+      }
+    )
+  } else { # If we don't have the file locally, copy it down
+    tryCatch(
       readr::read_csv(remote_url, n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max"),
                       show_col_types = FALSE, progress = FALSE) |>
-        readr::write_csv(file.path(local_conn, file))
-    }
-
-  } else {
-    remote_data_available <- FALSE
+        readr::write_csv(file.path(local_conn, file)),
+      error = function(e) {
+        remote_data_available <- FALSE
+      }
+    )
   }
 })
 
