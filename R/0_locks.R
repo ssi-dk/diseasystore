@@ -62,8 +62,6 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 
       dplyr::rows_insert(lock_table, lock, by = "db_table", conflict = "ignore", in_place = TRUE)
 
-      # Clean up
-      DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
     },
     error = function(e) {
       print(e$message)
@@ -101,8 +99,6 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 
       dplyr::rows_delete(lock_table, lock, by = c("db_table", "pid"), unmatched = "ignore", in_place = TRUE)
 
-      # Clean up
-      DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
     },
     error = function(e) {
       print(e$message)

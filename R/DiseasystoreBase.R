@@ -262,10 +262,6 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::select(!c("valid_from.p", "valid_until.p")) |>
         dplyr::compute()
 
-
-      # Clean up
-      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(validities))
-
       return(out)
     },
 
@@ -464,11 +460,9 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
       # Clean up
-      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(study_dates))
       DBI::dbRemoveTable(self %.% target_conn, SCDB::id(out))
       DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_add))
       DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_remove))
-      if (inherits(all_combinations, "tbl_dbi")) DBI::dbRemoveTable(self %.% target_conn, SCDB::id(all_combinations))
 
       return(data)
     }
