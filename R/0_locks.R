@@ -51,22 +51,24 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 
   # We then try to insert a lock, if none exists, our process ID (pid) will be assigned to the table
   # if one already exists, our insert will fail.
-  lock <- dplyr::copy_to(
-    conn,
-    data.frame("db_table" = db_table, "pid" = Sys.getpid(), "lock_start" = as.numeric(Sys.time())),
-    name = paste0("ds_lock_", Sys.getpid()),
-    overwrite = TRUE
-  )
-
   tryCatch(
-    dplyr::rows_insert(lock_table, lock, by = "db_table", conflict = "ignore", in_place = TRUE),
+    {
+      lock <- dplyr::copy_to(
+        conn,
+        data.frame("db_table" = db_table, "pid" = Sys.getpid(), "lock_start" = as.numeric(Sys.time())),
+        name = paste0("ds_lock_", Sys.getpid()),
+        overwrite = TRUE
+      )
+
+      dplyr::rows_insert(lock_table, lock, by = "db_table", conflict = "ignore", in_place = TRUE),
+
+      # Clean up
+      DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
+    },
     error = function(e) {
-      print(e)
+      print(e$message)
     }
   )
-
-  # Clean up
-  DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
 
   return()
 }
@@ -88,17 +90,24 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
   lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
 
   # Delete locks matching  our process ID (pid) and the given db_table
-  lock <- dplyr::copy_to(
-    conn,
-    data.frame("db_table" = db_table, "pid" = Sys.getpid()),
-    name = paste0("ds_lock_", Sys.getpid()),
-    overwrite = TRUE
+  tryCatch(
+    {
+      lock <- dplyr::copy_to(
+        conn,
+        data.frame("db_table" = db_table, "pid" = Sys.getpid()),
+        name = paste0("ds_lock_", Sys.getpid()),
+        overwrite = TRUE
+      )
+
+      dplyr::rows_delete(lock_table, lock, by = c("db_table", "pid"), unmatched = "ignore", in_place = TRUE)
+
+      # Clean up
+      DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
+    },
+    error = function(e) {
+      print(e$message)
+    }
   )
-
-  dplyr::rows_delete(lock_table, lock, by = c("db_table", "pid"), unmatched = "ignore", in_place = TRUE)
-
-  # Clean up
-  DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
 
   return()
 }
