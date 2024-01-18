@@ -188,9 +188,10 @@ DiseasystoreBase <- R6::R6Class(                                                
                                             slice_ts = slice_ts, source_conn = self %.% source_conn))
 
           # Check it table is copied to target DB
-          if (!inherits(ds_feature, "tbl_dbi") ||
-                !identical(self %.% source_conn, self %.% target_conn)) {
-            ds_feature <- dplyr::copy_to(self %.% target_conn, ds_feature, "ds_tmp", overwrite = TRUE)
+          if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
+            ds_feature <- ds_feature |>
+              dplyr::copy_to(self %.% target_conn, df = _,
+                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"), overwrite = TRUE)
           }
 
           # Add the existing computed data for given slice_ts
@@ -251,13 +252,19 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
-      out <- dplyr::inner_join(out,
-                               data.frame(valid_from = start_date, valid_until = end_date) |>
-                                 dplyr::copy_to(self %.% target_conn, df = _, "ds_tmp", overwrite = TRUE),
+      validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()), overwrite = TRUE)
+
+      out <- dplyr::inner_join(out, validities,
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
-        dplyr::select(!c("valid_from.p", "valid_until.p"))
+        dplyr::select(!c("valid_from.p", "valid_until.p")) |>
+        dplyr::compute()
+
+
+      # Clean up
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(validities))
 
       return(out)
     },
@@ -302,7 +309,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()), overwrite = TRUE)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
@@ -390,8 +397,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, stratification_data) |>
         private$key_join_filter(stratification_features, start_date, end_date) |>
-        dplyr::compute() |>
-        dplyr::group_by(!!!stratification)
+        dplyr::compute()
 
       # Retrieve the aggregators (and ensure they work together)
       key_join_aggregators <- c(purrr::pluck(private, purrr::pluck(ds_map, observable)) %.% key_join,
@@ -406,6 +412,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Add the new valid counts
       t_add <- out |>
+        dplyr::group_by(!!!stratification) |>
         dplyr::group_by(date = valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename(n_add = n) |>
@@ -413,6 +420,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Add the new invalid counts
       t_remove <- out |>
+        dplyr::group_by(!!!stratification) |>
         dplyr::group_by(date = valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename(n_remove = n) |>
@@ -429,12 +437,18 @@ DiseasystoreBase <- R6::R6Class(                                                
           dplyr::compute()
       } else {
         all_combinations <- all_dates
+
+        # Copy if needed
+        if (is.null(stratification)) {
+          all_combinations <- all_combinations |>
+            dplyr::copy_to(self %.% target_conn, df = _,
+                           name = paste0("ds_all_combinations_", Sys.getpid()), overwrite = TRUE)
+        }
       }
 
       # Aggregate across dates
       data <- t_add |>
-        dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na",
-                          copy = is.null(stratification)) |>
+        dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
         tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
@@ -447,6 +461,14 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Ensure date is of type Date
       data <- data |>
         dplyr::mutate(date = as.Date(date))
+
+
+      # Clean up
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(study_dates))
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(out))
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_add))
+      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_remove))
+      if (inherits(all_combinations, "tbl_dbi")) DBI::dbRemoveTable(self %.% target_conn, SCDB::id(all_combinations))
 
       return(data)
     }
