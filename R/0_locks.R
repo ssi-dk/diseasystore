@@ -70,7 +70,7 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
     }
   )
 
-  return()
+  return(NULL)
 }
 
 
@@ -83,7 +83,7 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    return()
+    return(NULL)
   }
 
   # Get a reference to the table
@@ -109,7 +109,7 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
     }
   )
 
-  return()
+  return(NULL)
 }
 
 
@@ -122,7 +122,7 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    return()
+    return(NULL)
   }
 
   # Get a reference to the table
@@ -145,7 +145,7 @@ remove_expired_locks <- function(conn, schema = NULL) {
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    return()
+    return(NULL)
   }
 
   # Get a reference to the table
@@ -157,5 +157,5 @@ remove_expired_locks <- function(conn, schema = NULL) {
     dplyr::select("db_table")
   dplyr::rows_delete(lock_table, old_locks, by = "db_table", unmatched = "ignore", in_place = TRUE)
 
-  return()
+  return(NULL)
 }
