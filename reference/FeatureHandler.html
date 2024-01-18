@@ -12,7 +12,7 @@ They define the three methods associated with features (compute, get and key_joi
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +20,10 @@ They define the three methods associated with features (compute, get and key_joi
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/diseasystore.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
@@ -28,7 +31,6 @@ They define the three methods associated with features (compute, get and key_joi
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
-    <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -111,10 +113,10 @@ One of the aggregators from <a href="aggregators.html">aggregators</a>.</p></dd>
 <dd><p>(<code>function</code>)<br>
 A function of the form "function(start_date, end_date, slice_ts, source_conn)".
 This function should return a <code>data.frame</code> with the computed feature (computed from the source connection).
-The <code>data.frame</code> should contain the following columns:</p><ul><li><p>key_\*: One (or more) columns containing keys to link this feature with other features</p></li>
-<li><p>\*: One (or more) columns containing the features that are computed</p></li>
-<li><p>valid_from/until: A set of columns containing the time period for which this feature information is valid.
-<br></p></li>
+The <code>data.frame</code> should contain the following columns:</p><ul><li><p>key_*: One (or more) columns containing keys to link this feature with other features</p></li>
+<li><p>*: One (or more) columns containing the features that are computed</p></li>
+<li><p>valid_from, valid_until: A set of columns containing the time period for which this feature information
+is valid.<br></p></li>
 </ul></dd>
 
 
@@ -130,9 +132,9 @@ A function like one of the aggregators from <code><a href="aggregators.html">agg
 <p>The function should return an expression on the form:
 dplyr::summarise(.data,
 dplyr::across(.cols = tidyselect::all_of(feature),
-.fns = list(n = ~ <aggregation function>),
-.names = ".fn"),
-.groups = "drop")</aggregation></p></dd>
+.fns = list(n = ~ aggregation function),
+.names = "{.fn}"),
+.groups = "drop")</p></dd>
 
 
 </dl><p></p></div>

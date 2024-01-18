@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="
   Simple feature stores and tools for creating personalised feature stores.
-  `diseasystore` powers feature stores which can automatically link and aggregate features to a given stratification
-  level. These feature stores are automatically time-versioned (powered by the `SCDB` package) and allows you to easily
+  diseasystore powers feature stores which can automatically link and aggregate features to a given stratification
+  level. These feature stores are automatically time-versioned (powered by the SCDB package) and allows you to easily
   and dynamically compute features as part of your continuous integration.">
-<title>Feature Stores for the `diseasy` Framework • diseasystore</title>
+<title>Feature Stores for the diseasy Framework • diseasystore</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -21,11 +21,11 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Feature Stores for the `diseasy` Framework">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Feature Stores for the diseasy Framework">
 <meta property="og:description" content="
   Simple feature stores and tools for creating personalised feature stores.
-  `diseasystore` powers feature stores which can automatically link and aggregate features to a given stratification
-  level. These feature stores are automatically time-versioned (powered by the `SCDB` package) and allows you to easily
+  diseasystore powers feature stores which can automatically link and aggregate features to a given stratification
+  level. These feature stores are automatically time-versioned (powered by the SCDB package) and allows you to easily
   and dynamically compute features as part of your continuous integration.">
 <meta property="og:image" content="https://ssi-dk.github.io/diseasystore/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -41,7 +41,7 @@
     
     <a class="navbar-brand me-2" href="index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,9 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="articles/diseasystore.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
@@ -58,7 +61,6 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="articles/extending-diseasystore.html">Extending diseasystore</a>
-    <a class="dropdown-item" href="articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -85,8 +87,8 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="diseasystore-">diseasystore 
-<a class="anchor" aria-label="anchor" href="#diseasystore-"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="diseasy-">diseasy 
+<a class="anchor" aria-label="anchor" href="#diseasy-"></a>
 </h1>
 </div>
 <!-- badges: start -->
@@ -96,7 +98,7 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>The <code>diseasystore</code> package provides feature stores implemented in R specifically designed for serve disease data for epidemic preparedness.</p>
-<p>What makes a <code>diseasystore</code> special, is that features can be automatically coupled and stratified within the <code>diseasystore</code> package. Consult the Quick start vignette to see it in action (<code><a href="articles/quick-start.html">vignette("quick-start", package = "diseasystore")</a></code>).</p>
+<p>What makes a <code>diseasystore</code> special, is that features can be automatically coupled and stratified within the <code>diseasystore</code> package. Consult the Quick start vignette to see it in action (<code><a href="https://ssi-dk.github.io/diseasystore/articles/quick-start.html">vignette("quick-start", package = "diseasystore")</a></code>).</p>
 <p>The package forms the data-backbone of the <code>{diseasy}</code> package.</p>
 </div>
 <div class="section level2">
@@ -118,10 +120,16 @@
 <span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ssi-dk/diseasystore"</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p>For basic usage examples, see <code><a href="articles/diseasystore.html">vignette("diseasystore")</a></code>.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=diseasystore" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/ssi-dk/diseasystore/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/ssi-dk/diseasystore/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -157,7 +165,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=diseasystore" class="external-link"><img src="https://www.r-pkg.org/badges/version/diseasystore" alt="CRAN status"></a></li>
-<li><a href="https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ssi-dk/diseasystore/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml" class="external-link"><img src="https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.yaml/badge.svg" alt="CI tests"></a></li>
 <li><a href="https://app.codecov.io/gh/ssi-dk/diseasystore" class="external-link"><img src="https://codecov.io/gh/ssi-dk/diseasystore/branch/main/graph/badge.svg" alt="codecov"></a></li>
 </ul>
 </div>

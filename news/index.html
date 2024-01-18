@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,6 +19,9 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/diseasystore.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
@@ -26,7 +29,6 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
-    <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="active nav-item">
@@ -53,12 +55,66 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1" id="diseasystore-01">diseasystore 0.1<a class="anchor" aria-label="anchor" href="#diseasystore-01"></a></h2>
-<p>Features: * DiseasystoreBase: A base class for the diseasystores * R6 class that defines the interface for the diseasystores * DiseasystoreGoogleCovid19: A feature store that uses the Google COVID-19 Open Data repository * R6 class that builds on the base class to provide interface to the Google COVID-19 data * FeatureHandler: A simple class to handle individual feature computations * Defines the interface for each individual feature in the diseasystores * Aggregators: A set of aggregators for the FeatureHandlers to use * drop_diseasystore: A function to remove data from a feature store * Added a informative operator to access data <code>%.%</code> * Gives error instead of NULL if element does not exist * age_labels: A function to generate human-readable and sortable age groupings</p>
-<p>Testing: * Most package functions are tested here</p>
-<p>Documentation * The functions are fully documented * Vignette for the Google COVID-19 data is included * vignette(“google_covid_19_data”)</p>
+<h2 class="pkg-version" data-toc-text="0.1.1" id="diseasystore-011">diseasystore 0.1.1<a class="anchor" aria-label="anchor" href="#diseasystore-011"></a></h2>
+<div class="section level3">
+<h3 id="fixes-0-1-1">Fixes:<a class="anchor" aria-label="anchor" href="#fixes-0-1-1"></a></h3>
+<ul><li><p>Improved the stability of internal functions.</p></li>
+<li><p>Adapted to release of SCDB v0.3.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-1-1">Documentation:<a class="anchor" aria-label="anchor" href="#documentation-0-1-1"></a></h3>
+<ul><li>Improved documentation of functions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-0-1-1">Testing:<a class="anchor" aria-label="anchor" href="#testing-0-1-1"></a></h3>
+<ul><li><p>Improved test stability when internet is unavailable.</p></li>
+<li><p>Reduced the data footprint during tests.</p></li>
+</ul></div>
 </div>
-  </main></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1" id="diseasystore-01">diseasystore 0.1<a class="anchor" aria-label="anchor" href="#diseasystore-01"></a></h2><p class="text-muted">CRAN release: 2023-12-20</p>
+<div class="section level3">
+<h3 id="features-0-1">Features:<a class="anchor" aria-label="anchor" href="#features-0-1"></a></h3>
+<ul><li>
+<p><code>DiseasystoreBase</code>: A base class for the diseasystores.</p>
+<ul><li>R6 class that defines the interface for the diseasystores.</li>
+</ul></li>
+<li>
+<p><code>DiseasystoreGoogleCovid19</code>: A feature store that uses the Google COVID-19 Open Data repository.</p>
+<ul><li>R6 class that builds on the base class to provide interface to the Google COVID-19 data.</li>
+</ul></li>
+<li>
+<p><code>FeatureHandler</code>: A simple class to handle individual feature computations.</p>
+<ul><li>Defines the interface for each individual feature in the diseasystores.</li>
+</ul></li>
+<li><p>Aggregators: A set of aggregators for the <code>FeatureHandler</code> to use.</p></li>
+<li><p><code><a href="../reference/drop_diseasystore.html">drop_diseasystore()</a></code>: A function to remove data from a feature store.</p></li>
+<li>
+<p>Added a informative operator to access data <code>%.%</code>.</p>
+<ul><li>Gives error instead of <code>NULL</code> if element does not exist.</li>
+</ul></li>
+<li><p><code><a href="../reference/age_labels.html">age_labels()</a></code>: A function to generate human-readable and sortable age groupings.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-0-1">Testing:<a class="anchor" aria-label="anchor" href="#testing-0-1"></a></h3>
+<ul><li>Most package functions are tested here.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-1">Documentation:<a class="anchor" aria-label="anchor" href="#documentation-0-1"></a></h3>
+<ul><li><p>The functions are fully documented.</p></li>
+<li>
+<p>Vignettes for the use of the package is included.</p>
+<ul><li><code>vignette("quick-start")</code></li>
+<li><code><a href="../articles/extending-diseasystore.html">vignette("extending-diseasystore")</a></code></li>
+</ul></li>
+<li>
+<p>Vignette for the Google COVID-19 data is included.</p>
+<ul><li><code><a href="../articles/diseasystore-google-covid-19.html">vignette("diseasystore-google-covid-19")</a></code></li>
+</ul></li>
+</ul></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

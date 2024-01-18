@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,9 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="../articles/diseasystore.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="active nav-item dropdown">
@@ -50,7 +53,6 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
-    <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -155,9 +157,7 @@ get data.</p>
 <span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span>feature <span class="op">=</span> <span class="st">"n_hospital"</span>,</span>
 <span>               start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>,</span>
 <span>               end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-06-01"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in get_tables.SQLiteConnection(conn): No tables found. Check user</span></span>
-<span><span class="co">#&gt; privileges / database configuration</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_006&gt; [?? x 5]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.44.2 []</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>

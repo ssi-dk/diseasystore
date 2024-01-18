@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,9 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="../articles/diseasystore.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="active nav-item dropdown">
@@ -50,7 +53,6 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
-    <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -212,7 +214,7 @@ function which must be on the form:</p>
 <pre><code>compute = function(start_date, end_date, slice_ts, source_conn)</code></pre>
 <p>The arguments <code>start_date</code> and <code>end_date</code>
 indicates the period for which features should be computed. The
-<code>diseasystores</code> are <a href="quick-start.html#dynamically-expanded">dynamically expanded</a>,
+<code>diseasystores</code> are <a href="diseasystore.html#dynamically-expanded">dynamically expanded</a>,
 so feature computation is often restricted to limited time intervals as
 indicated by <code>start_date</code> and <code>end_date</code>.</p>
 <p>As mentioned <a href="#from_ts-and-until_ts">above</a>
@@ -258,7 +260,7 @@ arguments are as follows:</p>
 <ul>
 <li><p><code>.data</code> is a grouped <code>data.frame</code> whose
 groups are those specified by the <code>stratification</code> argument
-(see <a href="quick-start.html#automatic-aggregation">Automatic
+(see <a href="diseasystore.html#automatic-aggregation">Automatic
 aggregation</a>).</p></li>
 <li><p><code>feature</code> is the name of the feature(s) to
 aggregate.</p></li>
@@ -321,7 +323,7 @@ snake_case and contain a <code>diseasystore</code> specific prefix
 <p>These names are used as the table names when storing the features in
 the data base, and the prefix helps structure the data base
 accordingly.</p>
-<p>This latter part becomes important when <a href="quick-start.html#dropping-computed-features">clean up</a> for the
+<p>This latter part becomes important when <a href="diseasystore.html#dropping-computed-features">clean up</a> for the
 data base needs to be performed.</p>
 </div>
 <div class="section level3">

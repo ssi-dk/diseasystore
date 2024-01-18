@@ -13,13 +13,13 @@
     <loc>https://ssi-dk.github.io/diseasystore/articles/diseasystore-google-covid-19.html</loc>
   </url>
   <url>
+    <loc>https://ssi-dk.github.io/diseasystore/articles/diseasystore.html</loc>
+  </url>
+  <url>
     <loc>https://ssi-dk.github.io/diseasystore/articles/extending-diseasystore.html</loc>
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ssi-dk.github.io/diseasystore/articles/quick-start.html</loc>
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/authors.html</loc>
@@ -47,9 +47,6 @@
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/reference/available_diseasystores.html</loc>
-  </url>
-  <url>
-    <loc>https://ssi-dk.github.io/diseasystore/reference/diseasy_linters.html</loc>
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/reference/diseasyoption.html</loc>

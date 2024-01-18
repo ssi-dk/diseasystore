@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +18,10 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/diseasystore.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
@@ -26,7 +29,6 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
-    <a class="dropdown-item" href="../articles/quick-start.html">Quick start</a>
   </div>
 </li>
 <li class="nav-item">
@@ -49,7 +51,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Existence aware pick operator</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/HEAD/R/0_R6_utils.R" class="external-link"><code>R/0_R6_utils.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/HEAD/R/grapes-.-grapes.R" class="external-link"><code>R/grapes-.-grapes.R</code></a></small>
       <div class="d-none name"><code>grapes-.-grapes.Rd</code></div>
     </div>
 
@@ -94,9 +96,8 @@ The name of the field to pick from <code>env</code></p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span> <span class="va">t</span><span class="op">$</span><span class="va">c</span> <span class="co"># NULL</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-in"><span> <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span> <span class="va">t</span> <span class="op">%.%</span> <span class="va">c</span> <span class="co"># ERROR a not found in t</span></span></span>
-<span class="r-in"><span> <span class="op">}</span></span></span>
+<span class="r-in"><span> <span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="va">t</span> <span class="op">%.%</span> <span class="va">c</span><span class="op">)</span> <span class="co"># Gives error since "c" does not exist in "t"</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Error in t %.% c : c not found in t</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
