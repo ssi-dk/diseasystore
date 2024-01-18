@@ -28,6 +28,7 @@ if (rlang::is_installed("withr")) {
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
 suggests_available <- rlang::is_installed("RSQLite")
+not_on_cran <- interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "false"))
 ```
 
 The Google COVID-19 data repository is a comprehensive open repository of COVID-19 data.
@@ -68,14 +69,14 @@ purrr::walk(google_files, ~ {
 })
 ```
 
-```{r download_data_hidden, include = FALSE}
+```{r download_data_hidden, include = FALSE, eval = not_on_cran}
 # The files we need are stored remotely in Google's API
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 
 # In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
 # This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
-local_conn <- purrr::detect("test_data", checkmate::test_directory_exists, .default = tempdir())
+local_conn <- purrr::detect("vignette_data", checkmate::test_directory_exists, .default = tempdir())
 
 if (rlang::is_installed("withr")) {
   withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
@@ -86,12 +87,14 @@ if (rlang::is_installed("withr")) {
 }
 
 # Then we download the first n rows of each data set of interest
-purrr::discard(google_files, ~ checkmate::test_file_exists(file.path(local_conn, .))) |>
-  purrr::walk(\(file) {
-    paste0(remote_conn, file) |>
-      readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-      readr::write_csv(file.path(local_conn, file))
-  })
+try({
+  purrr::discard(google_files, ~ checkmate::test_file_exists(file.path(local_conn, .))) |>
+    purrr::walk(\(file) {
+      paste0(remote_conn, file) |>
+        readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+        readr::write_csv(file.path(local_conn, file))
+    })
+})
 
 # Check that the files are available after attempting to download
 if (purrr::some(google_files, ~ !checkmate::test_file_exists(file.path(local_conn, .)))) {
@@ -110,7 +113,7 @@ target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
 options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
 ```
 
-```{r configure_diseasystore_hidden, include = FALSE, eval = suggests_available && data_available}
+```{r configure_diseasystore_hidden, include = FALSE, eval = not_on_cran && suggests_available && data_available}
 target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
 if (rlang::is_installed("withr")) {
   withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
@@ -121,17 +124,17 @@ if (rlang::is_installed("withr")) {
 
 
 Once the files are downloaded and the target DB is configured, we can initialize the `diseasystore` that uses the Google COVID-19 data.
-```{r initializing_diseasystore, eval = suggests_available && data_available}
+```{r initializing_diseasystore, eval = not_on_cran && suggests_available && data_available}
 ds <- DiseasystoreGoogleCovid19$new()
 ```
 
 Once configured such, we can also use the feature store directly to get data.
-```{r using_diseasystore_example_1, eval = suggests_available && data_available}
+```{r using_diseasystore_example_1, eval = not_on_cran && suggests_available && data_available}
 # We can see all the available features in the feature store
 ds$available_features
 ```
 
-```{r using_diseasystore_example_2, eval = suggests_available && data_available}
+```{r using_diseasystore_example_2, eval = not_on_cran && suggests_available && data_available}
 # And then retrieve a feature from the feature store
 ds$get_feature(feature = "n_hospital",
                start_date = as.Date("2020-01-01"),
@@ -140,7 +143,7 @@ ds$get_feature(feature = "n_hospital",
 
 
 ```{r cleanup, include = FALSE}
-rm(ds)
+if (exists("ds")) rm(ds)
 gc()
 if (!rlang::is_installed("withr")) {
   options(opts)

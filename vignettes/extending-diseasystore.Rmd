@@ -92,7 +92,7 @@ The `FeatureHandler` defines a `compute` function which must be on the form:
 compute = function(start_date, end_date, slice_ts, source_conn)
 ```
 The arguments `start_date` and `end_date` indicates the period for which features should be computed.
-The `diseasystores` are [dynamically expanded](quick-start.html#dynamically-expanded), so feature computation is often
+The `diseasystores` are [dynamically expanded](diseasystore.html#dynamically-expanded), so feature computation is often
 restricted to limited time intervals as indicated by `start_date` and `end_date`.
 
 As mentioned [above](#from_ts-and-until_ts) `slice_ts` specifies what date the should be computed for.
@@ -129,7 +129,7 @@ In most cases, you should be able to use the bundled `key_join_*` functions (see
 In the event, that you need to create your own aggregator the arguments are as follows:
 
 * `.data` is a grouped `data.frame` whose groups are those specified by the `stratification` argument
-  (see [Automatic aggregation](quick-start.html#automatic-aggregation)).
+  (see [Automatic aggregation](diseasystore.html#automatic-aggregation)).
 
 * `feature` is the name of the feature(s) to aggregate.
 
@@ -178,7 +178,7 @@ By convention, the name of the `FeatureHandler` should be snake_case and contain
 These names are used as the table names when storing the features in the data base, and the prefix helps structure the
 data base accordingly.
 
-This latter part becomes important when [clean up](quick-start.html#dropping-computed-features) for the data base needs
+This latter part becomes important when [clean up](diseasystore.html#dropping-computed-features) for the data base needs
 to be performed.
 
 ## Key join filter

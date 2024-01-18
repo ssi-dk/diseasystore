@@ -18,18 +18,45 @@ remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 local_conn <- purrr::detect("test_data", checkmate::test_directory_exists, .default = tempdir())
 
 # Then we download the first n rows of each data set of interest
-purrr::discard(google_files, ~ checkmate::test_file_exists(file.path(local_conn, .))) |>
-  purrr::walk(\(file) {
-    paste0(remote_conn, file) |>
-      readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
-      readr::write_csv(file.path(local_conn, file))
-  })
+remote_data_available <- curl::has_internet() # Assume available
+purrr::walk(google_files, \(file) {
+  remote_url <- paste0(remote_conn, file)
+
+  # If we have the file locally, do not re-download but check it exists
+  if (checkmate::test_file_exists(file.path(local_conn, file))) {
+    tryCatch(
+      readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE),
+      error = function(e) {
+        remote_data_available <- FALSE
+      }
+    )
+  } else { # If we don't have the file locally, copy it down
+    tryCatch(
+      readr::read_csv(remote_url, n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max"),
+                      show_col_types = FALSE, progress = FALSE) |>
+        readr::write_csv(file.path(local_conn, file)),
+      error = function(e) {
+        remote_data_available <- FALSE
+      }
+    )
+  }
+})
+
+# Throw warning if data unavailable
+if (curl::has_internet() && !remote_data_available) {
+  warning("remote_conn for DiseasystoreGoogleCovid19 unavailable!")
+}
 
 # Check that the files are available after attempting to download
 if (purrr::some(google_files, ~ !checkmate::test_file_exists(file.path(local_conn, .)))) {
   data_unavailable <- TRUE
 } else {
   data_unavailable <- FALSE
+}
+
+# Throw warning if data unavailable
+if (curl::has_internet() && data_unavailable) {
+  warning("local_conn for DiseasystoreGoogleCovid19 unavailable!")
 }
 
 
@@ -65,6 +92,7 @@ test_that("DiseasystoreGoogleCovid19 initialises correctly", {
 
 test_that("DiseasystoreGoogleCovid19 works with URL source_conn", {
   testthat::skip_if_not(curl::has_internet())
+  testthat::skip_if_not(remote_data_available)
 
   # Ensure source is set as the remote
   withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = remote_conn)
@@ -252,15 +280,15 @@ test_that("DiseasystoreGoogleCovid19 can key_join features", {
             start_date, end_date
           )
         },
-        warning = function(w) {
-          checkmate::expect_character(w$message, pattern = "Observable already stratified by")
-          return(NULL)
-        },
         error = function(e) {
           expect_identical(
             e$message,
             paste("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
           )
+          return(NULL)
+        },
+        warning = function(w) {
+          checkmate::expect_character(w$message, pattern = "Observable already stratified by")
           return(NULL)
         })
 

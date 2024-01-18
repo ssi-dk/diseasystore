@@ -30,7 +30,7 @@
 add_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Determine lock table id
-  lock_table_id <- SCDB::id(paste(c(schema, "locks"), collapse = "."), conn)
+  lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
@@ -62,15 +62,13 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 
       dplyr::rows_insert(lock_table, lock, by = "db_table", conflict = "ignore", in_place = TRUE)
 
-      # Clean up
-      DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
     },
     error = function(e) {
       print(e$message)
     }
   )
 
-  return()
+  return(NULL)
 }
 
 
@@ -79,11 +77,11 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 remove_table_lock <- function(conn, db_table, schema = NULL) {
 
   # Determine lock table id
-  lock_table_id <- SCDB::id(paste(c(schema, "locks"), collapse = "."), conn)
+  lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    return()
+    return(NULL)
   }
 
   # Get a reference to the table
@@ -101,15 +99,13 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 
       dplyr::rows_delete(lock_table, lock, by = c("db_table", "pid"), unmatched = "ignore", in_place = TRUE)
 
-      # Clean up
-      DBI::dbRemoveTable(conn, SCDB::id(lock, conn))
     },
     error = function(e) {
       print(e$message)
     }
   )
 
-  return()
+  return(NULL)
 }
 
 
@@ -118,11 +114,11 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 is_lock_owner <- function(conn, db_table, schema = NULL) {
 
   # Determine lock table id
-  lock_table_id <- SCDB::id(paste(c(schema, "locks"), collapse = "."), conn)
+  lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    return()
+    return(NULL)
   }
 
   # Get a reference to the table
@@ -141,11 +137,11 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
 remove_expired_locks <- function(conn, schema = NULL) {
 
   # Determine lock table id
-  lock_table_id <- SCDB::id(paste(c(schema, "locks"), collapse = "."), conn)
+  lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
   # Create lock table if missing
   if (!SCDB::table_exists(conn, lock_table_id)) {
-    return()
+    return(NULL)
   }
 
   # Get a reference to the table
@@ -157,5 +153,5 @@ remove_expired_locks <- function(conn, schema = NULL) {
     dplyr::select("db_table")
   dplyr::rows_delete(lock_table, old_locks, by = "db_table", unmatched = "ignore", in_place = TRUE)
 
-  return()
+  return(NULL)
 }

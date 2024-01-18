@@ -1,5 +1,7 @@
 # diseasystore (development version)
 
+# diseasystore 0.1.1
+
 ## Fixes:
 
 * Improved the stability of internal functions.
