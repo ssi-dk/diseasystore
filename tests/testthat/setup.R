@@ -31,8 +31,7 @@ get_test_conns <- function() {
     # Define our local connection backends
     conn_list <- list(
       # Backend string = package::function
-      "SQLite"     = "RSQLite::SQLite",
-      "PostgreSQL" = "RPostgres::Postgres"
+      "SQLite"     = "RSQLite::SQLite"
     )
 
   } else {
