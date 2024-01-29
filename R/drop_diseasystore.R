@@ -25,6 +25,7 @@ drop_diseasystore <- function(pattern = NULL,
 
   # List all tables
   tables <- SCDB::get_tables(conn, pattern) |>
+    dplyr::mutate("schema" = dplyr::if_else(is.na(.data$schema), SCDB::get_schema(conn), .data$schema)) |>
     tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE)
 
 
