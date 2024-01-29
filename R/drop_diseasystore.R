@@ -24,7 +24,15 @@ drop_diseasystore <- function(pattern = NULL,
   checkmate::reportAssertions(coll)
 
   # List all tables
-  tables <- SCDB::get_tables(conn, pattern) |>
+  tables <- SCDB::get_tables(conn, pattern)
+
+  # Early return if no tables are found
+  if (nrow(tables) == 0) {
+    return(NULL)
+  }
+
+  # Concatenate schema and table to ids
+  tables <- tables |>
     dplyr::mutate("schema" = dplyr::if_else(is.na(.data$schema), SCDB::get_schema(conn), .data$schema)) |>
     tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE)
 
