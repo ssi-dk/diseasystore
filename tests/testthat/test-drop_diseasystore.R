@@ -19,7 +19,7 @@ test_that("drop_diseasystore can delete entire default schema", {
 
 
     for (id in ids) {
-      SCDB::create_table(mtcars, conn, id, temporary = FALSE)
+      DBI::dbWriteTable(conn, id, mtcars, temporary = FALSE, overwrite = TRUE)
     }
 
     # Try to delete the entire `target_schema_1` store
@@ -72,7 +72,7 @@ test_that("drop_diseasystore can delete single table in default schema", {
       purrr::map(~ SCDB::id(., conn))
 
     for (id in ids) {
-      SCDB::create_table(mtcars, conn, id, temporary = FALSE)
+      DBI::dbWriteTable(conn, id, mtcars, temporary = FALSE, overwrite = TRUE)
     }
 
     # Try to delete only mtcars_1 within the diseasystore
