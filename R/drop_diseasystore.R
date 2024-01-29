@@ -23,31 +23,47 @@ drop_diseasystore <- function(pattern = NULL,
   checkmate::assert_class(conn, "DBIConnection", add = coll)
   checkmate::reportAssertions(coll)
 
-  # Get tables to delete
+  # List all tables
   tables <- SCDB::get_tables(conn, pattern) |>
-    tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE) |>
-    dplyr::pull("db_table_id")
+    tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE)
 
-  tables_to_delete <- tables |>
-    purrr::keep(~ stringr::str_detect(., glue::glue("^{schema}\\.{ifelse(is.null(pattern), '', pattern)}")))
+
+  # Determine the schema-structure of the data base via SCDB::id
+  regex_id <- SCDB::id(paste(schema, NULL, sep = "."), conn)
+
+  regex <- paste(
+    c(
+      purrr::pluck(regex_id, "name", "schema"),
+      purrr::pluck(regex_id, "name", "table")
+    ),
+    collapse = "."
+  )
+
+  tables_to_delete <- dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0(regex, pattern)))
 
   # Check if logs is in the table, if yes, all tables must be deleted
-  if ("logs" %in% tables_to_delete &&
-        !identical(tables_to_delete, purrr::keep(tables, ~ stringr::str_detect(., glue::glue("^{schema}\\..*"))))) {
-    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped."))
+  if ("logs" %in% tables_to_delete$table &&
+        !identical(tables_to_delete, dplyr::filter(tables, stringr::str_detect(.data$db_table_id, regex)))) {
+    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
   }
 
   tables_to_delete |>
-    purrr::walk(~ DBI::dbRemoveTable(conn, SCDB::id(.x, conn = conn)))
+    purrr::pwalk(\(db_table_id, schema, table) DBI::dbRemoveTable(conn, DBI::Id(schema = schema, table = table)))
 
   # Delete from logs
-  if (SCDB::table_exists(conn, glue::glue("{schema}.logs"))) {
-    log_records_to_delete <- SCDB::get_table(conn, glue::glue("{schema}.logs")) |>
+  logs_table <- tables |>
+    dplyr::filter(stringr::str_detect(.data$db_table_id, paste0(regex, "logs")))
+
+  logs_table_id <- DBI::Id(schema = logs_table$schema, table = logs_table$table)
+
+  if (SCDB::table_exists(conn, logs_table_id)) {
+
+    log_records_to_delete <- SCDB::get_table(conn, logs_table_id) |>
       tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE) |>
       dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
       dplyr::select("log_file")
 
-    dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(glue::glue("{schema}.logs"), conn), check_from = FALSE),
+    dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(logs_table_id, conn), check_from = FALSE),
                        log_records_to_delete,
                        by = "log_file",
                        in_place = TRUE,
