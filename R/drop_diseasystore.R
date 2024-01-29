@@ -57,7 +57,8 @@ drop_diseasystore <- function(pattern = NULL,
 
   # Check if logs is in the table, if yes, all tables must be deleted
   if ("logs" %in% tables_to_delete$table &&
-        !identical(tables_to_delete, dplyr::filter(tables, stringr::str_detect(.data$db_table_id, regex)))) {
+        !identical(tables_to_delete,
+                   dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex))))) {
     stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
   }
 
