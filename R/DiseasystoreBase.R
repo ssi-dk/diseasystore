@@ -596,7 +596,6 @@ DiseasystoreBase <- R6::R6Class(                                                
     # @return (`tibble`)\cr
     #   A data frame containing continuous un-computed date-ranges
     #' @importFrom zoo as.Date
-    #' @importFrom SCDB as.character
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       if (inherits(target_table, "Id")) {
