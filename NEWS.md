@@ -1,5 +1,9 @@
 # diseasystore (development version)
 
+## Features:
+
+* Add support for SQLite with attached schemas (#121).
+
 # diseasystore 0.1.1
 
 ## Fixes:
