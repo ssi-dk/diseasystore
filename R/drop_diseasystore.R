@@ -34,7 +34,7 @@ drop_diseasystore <- function(pattern = NULL,
 
   regex <- paste(
     c(
-      purrr::pluck(regex_id, "name", "schema"),
+      purrr::pluck(regex_id, "name", "schema", .default = SCDB::get_schema(conn)),
       purrr::pluck(regex_id, "name", "table")
     ),
     collapse = "."
