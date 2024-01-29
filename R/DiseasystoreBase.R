@@ -205,7 +205,7 @@ DiseasystoreBase <- R6::R6Class(                                                
             ds_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
                                       check_from = FALSE)
 
-            if (suppressMessages(SCDB::is.historical(ds_existing))) {
+            if (SCDB::is.historical(ds_existing)) {
               ds_existing <- ds_existing |>
                 dplyr::filter(.data$from_ts == slice_ts) |>
                 dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
@@ -597,6 +597,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     # @return (`tibble`)\cr
     #   A data frame containing continuous un-computed date-ranges
     #' @importFrom zoo as.Date
+    #' @importFrom SCDB as.character
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Get a list of the logs for the target_table on the slice_ts
@@ -605,7 +606,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                          check_from = FALSE) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!target_table, .data$date == !!slice_ts)
+        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
