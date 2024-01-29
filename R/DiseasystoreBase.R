@@ -131,7 +131,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       feature_loader <- purrr::pluck(ds_map, feature)
 
       # Determine where these features are stored
-      target_table <- paste(self %.% target_schema, feature_loader, sep = ".")
+      target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
+      schema <- paste(
+        c(purrr::pluck(target_table, "schema"),
+          purrr::pluck(target_table, "table")
+        ),
+        collapse = "."
+      )
 
 
       # Create log table
