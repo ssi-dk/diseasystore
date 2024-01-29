@@ -132,9 +132,9 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Determine where these features are stored
       target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
-      schema <- paste(
-        c(purrr::pluck(target_table, "schema"),
-          purrr::pluck(target_table, "table")
+      target_table <- paste(
+        c(purrr::pluck(target_table, "name", "schema"),
+          purrr::pluck(target_table, "name", "table")
         ),
         collapse = "."
       )
@@ -599,6 +599,15 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @importFrom zoo as.Date
     #' @importFrom SCDB as.character
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
+
+      if (inherits(target_table, "Id")) {
+        target_table <- paste(
+          c(purrr::pluck(target_table, "schema"),
+            purrr::pluck(target_table, "table")
+          ),
+          collapse = "."
+        )
+      }
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,
