@@ -40,7 +40,12 @@ drop_diseasystore <- function(pattern = NULL,
     collapse = "."
   )
 
-  tables_to_delete <- dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0(regex, pattern)))
+  tables_to_delete <- dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex, pattern)))
+
+  # Ensure schema is the same for all identified tables (if not, we have unwanted ambiguity)
+  if (length(unique(dplyr::pull(tables_to_delete, "schema"))) > 1) {
+    stop("Tables marked for deletion spread across schemas. Unwanted ambiguity detected")
+  }
 
   # Check if logs is in the table, if yes, all tables must be deleted
   if ("logs" %in% tables_to_delete$table &&
