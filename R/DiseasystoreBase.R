@@ -131,14 +131,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       feature_loader <- purrr::pluck(ds_map, feature)
 
       # Determine where these features are stored
-      target_table_id <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
-      target_table <- paste(
-        c(purrr::pluck(target_table_id, "name", "schema"),
-          purrr::pluck(target_table_id, "name", "table")
-        ),
-        collapse = "."
-      )
-
+      target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
 
       # Create log table
       SCDB::create_logs_if_missing(log_table = paste(self %.% target_schema, "logs", sep = "."),
@@ -202,7 +195,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Add the existing computed data for given slice_ts
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
-            ds_existing <- dplyr::tbl(self %.% target_conn, target_table_id, check_from = FALSE)
+            ds_existing <- dplyr::tbl(self %.% target_conn, target_table, check_from = FALSE)
 
             if (SCDB::is.historical(ds_existing)) {
               ds_existing <- ds_existing |>
@@ -232,7 +225,7 @@ DiseasystoreBase <- R6::R6Class(                                                
           SCDB::update_snapshot(
             .data = ds_updated_feature,
             conn = self %.% target_conn,
-            db_table = target_table_id,
+            db_table = target_table,
             timestamp = slice_ts,
             message = glue::glue("ds-range: {start_date} - {end_date}"),
             logger = logger,
@@ -252,7 +245,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Finally, return the data to the user
       out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
-                     args = list(target_table = target_table_id,
+                     args = list(target_table = target_table,
                                  slice_ts = slice_ts, target_conn = self %.% target_conn))
 
       # We need to slice to the period of interest.
@@ -598,15 +591,6 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @importFrom zoo as.Date
     #' @importFrom SCDB as.character
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
-
-      if (inherits(target_table, "Id")) {
-        target_table <- paste(
-          c(purrr::pluck(target_table, "schema"),
-            purrr::pluck(target_table, "table")
-          ),
-          collapse = "."
-        )
-      }
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,

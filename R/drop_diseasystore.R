@@ -30,15 +30,8 @@ drop_diseasystore <- function(pattern = NULL,
 
 
   # Determine the schema-structure of the data base via SCDB::id
-  regex_id <- SCDB::id(paste(schema, NULL, sep = "."), conn)
-
-  regex <- paste(
-    c(
-      purrr::pluck(regex_id, "name", "schema", .default = SCDB::get_schema(conn)),
-      purrr::pluck(regex_id, "name", "table")
-    ),
-    collapse = "."
-  )
+  regex <- SCDB::id(paste(schema, NULL, sep = "."), conn) |>
+    as.character()
 
   tables_to_delete <- dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex, pattern)))
 

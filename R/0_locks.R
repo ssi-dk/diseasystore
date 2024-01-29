@@ -29,16 +29,6 @@
 #' @noRd
 add_table_lock <- function(conn, db_table, schema = NULL) {
 
-  if (inherits(db_table, "Id")) {
-    db_table <- paste(
-      c(purrr::pluck(db_table, "name", "schema"),
-        purrr::pluck(db_table, "name", "table")
-      ),
-      collapse = "."
-    )
-  }
-
-
   # Determine lock table id
   lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
@@ -86,15 +76,6 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 #' @noRd
 remove_table_lock <- function(conn, db_table, schema = NULL) {
 
-  if (inherits(db_table, "Id")) {
-    db_table <- paste(
-      c(purrr::pluck(db_table, "name", "schema"),
-        purrr::pluck(db_table, "name", "table")
-      ),
-      collapse = "."
-    )
-  }
-
   # Determine lock table id
   lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
@@ -131,15 +112,6 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 #' @rdname db_locks
 #' @noRd
 is_lock_owner <- function(conn, db_table, schema = NULL) {
-
-  if (inherits(db_table, "Id")) {
-    db_table <- paste(
-      c(purrr::pluck(db_table, "name", "schema"),
-        purrr::pluck(db_table, "name", "table")
-      ),
-      collapse = "."
-    )
-  }
 
   # Determine lock table id
   lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
