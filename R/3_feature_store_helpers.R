@@ -94,7 +94,7 @@ age_labels <- function(age_cuts) {
 }
 
 
-#' File path helper for source_conn
+#' File path helper for static url / directory source_conn
 #'
 #' @description
 #'   This helper determines whether source_conn is a file path or URL and creates the full path to the
@@ -129,4 +129,102 @@ source_conn_path <- function(source_conn, file) {
   }
 
   return(file_location)
+}
+
+
+#' File path helper for github repositories
+#'
+#' @description
+#'   This helper determines whether source_conn is a git directory or a GitHub API creates the full path to the
+#'   the file as needed based on the type of source_conn.
+#'
+#'   If the basename of the requested file contains a date, the function will use fuzzy-matching to determine the
+#'   closest matching, chronologically earlier, file location to return.
+#' @param source_conn (`character(1)`)\cr
+#'   Repository location (path or github API URL)
+#' @param file (`character(1)`)\cr
+#'   Name (and path) of the file at the location.
+#' @noRd
+source_conn_github <- function(source_conn, file) {
+  url_regex <- r"{https?:\/\/api.github.com\/repos\/[a-zA-Z-]*\/[a-zA-Z-]*}"
+  checkmate::assert(
+    checkmate::check_directory_exists(source_conn),
+    checkmate::check_character(source_conn, pattern = url_regex)
+  )
+
+  relative_path <- dirname(file)
+
+  # We prepare the incoming file for fuzzy matching
+  date_regex <- "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+  file_date <- lubridate::ymd(stringr::str_extract(file, date_regex))
+  file_pattern <- stringr::str_replace(basename(file), date_regex, date_regex)
+
+  # And generate a small helper function to do the matching
+  fuzzy_match <- \(files) {
+    data.frame(path = files) |>
+      dplyr::filter(stringr::str_detect(.data$path, file_pattern)) |>
+      dplyr::mutate("file_date" = as.Date(stringr::str_extract(.data$path, date_regex))) |>
+      dplyr::filter(.data$file_date <= !!file_date) |>
+      dplyr::slice_max(.data$file_date) |>
+      dplyr::pull("path")
+  }
+
+
+  # Determine the type of location
+  if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
+    # If source_conn is a directory, ensure repos is updated, then look for files in the folder and keep the ones that
+    # match the requested file.
+
+    # Update the local repo -- give warning if we cannot
+    tryCatch(
+      msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),
+      warning = function(w) {
+        stop(paste(c("Your local repository could not be updated!", msg), collapse = "\n"))
+      }
+    )
+
+    dir_content <- file.path(source_conn, relative_path) |>
+      dir(pattern = file_pattern)
+
+    # Perform the fuzzy matching and determine file location
+    return_file <- fuzzy_match(dir_content)
+
+    return(file.path(source_conn, relative_path, return_file))
+
+
+  } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
+
+    # Get repo content from github API at one level higher than the requested path
+    # This allows us to determine the sha of the requested path and retrieve the contents
+    # of the path using the trees API instead of the content API.
+    # The former API has a limit of 100.000 returns whereas the latter has limit of 1000 returns.
+    # Since the contents can contain more than 1000 files within a few years, we go the extra step
+    # now to use the trees API
+    repo_content <- jsonlite::fromJSON(paste(source_conn, "contents", dirname(relative_path), sep = "/"))
+
+    # Determine sha of the relative path
+    dir_sha <- repo_content |>
+      dplyr::filter(.data$name == basename(relative_path)) |>
+      dplyr::pull("sha")
+
+    # Get all files at the relative path
+    dir_content <- jsonlite::fromJSON(paste(source_conn, "git/trees", dir_sha, sep = "/"))
+
+    if (dir_content$truncated) {
+      warning(
+        "Data returned from GitHub API has been truncated! ",
+        "The returned file may not be correct.",
+        "Consider cloning the repository and use a local source_conn."
+      )
+    }
+
+    # Perform the fuzzy matching and generate a download link
+    return_file <- fuzzy_match(dir_content$tree$path)
+
+    return(jsonlite::fromJSON(paste(source_conn, "contents", relative_path, return_file, sep = "/"))$download_url)
+
+  } else {
+    stop("source_conn could not be parsed to valid GitHub repository or GitHub API URL\n")
+  }
+
 }
