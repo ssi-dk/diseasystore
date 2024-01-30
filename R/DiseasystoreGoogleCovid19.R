@@ -47,10 +47,12 @@ google_covid_19_metric <- function(google_pattern, out_name) {                  
 #' @description
 #'   This `DiseasystoreGoogleCovid19` [R6][R6::R6Class] brings support for using the Google
 #'   Health COVID-19 Open Data repository.
-#'   See the vignette("google_covid_19_data") for details on how to configure the feature store
+#'   See the vignette("diseasystore-google-covid-19") for details on how to configure the feature store
 #' @examples
-#'   ds <- DiseasystoreGoogleCovid19$new(source_conn = ".",
-#'                                       target_conn = DBI::dbConnect(RSQLite::SQLite()))
+#'   ds <- DiseasystoreGoogleCovid19$new(
+#'     source_conn = ".",
+#'     target_conn = DBI::dbConnect(RSQLite::SQLite())
+#'   )
 #'
 #'   rm(ds)
 #' @return
@@ -254,17 +256,6 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     ),
 
 
-    # @description
-    #   This function implements an intermediate filtering in the stratification pipeline.
-    #   For semi-aggregated data like Google's COVID-19 data, some people are counted more than once.
-    #   The `key_join_filter` is inserted into the stratification pipeline to remove this double counting.
-    # @param .data `r rd_.data()`
-    # @param stratification_features (`character`)\cr
-    #   A list of the features included in the stratification process.
-    # @param start_date `r rd_start_date()`
-    # @param end_date `r rd_end_date()`
-    # @return
-    #   A subset of `.data` filtered to remove double counting
     key_join_filter = function(.data, stratification_features,
                                start_date = private %.% start_date,
                                end_date = private %.% end_date) {
@@ -299,7 +290,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
       } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
         return(.data |> dplyr::filter(key_location == subregion_id))
       } else {
-        rlang::abort("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
+        stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
       }
     }
   )
