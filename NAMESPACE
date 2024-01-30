@@ -2,6 +2,7 @@
 
 export("%.%")
 export(DiseasystoreBase)
+export(DiseasystoreEcdcRespitoryViruses)
 export(DiseasystoreGoogleCovid19)
 export(FeatureHandler)
 export(age_labels)
