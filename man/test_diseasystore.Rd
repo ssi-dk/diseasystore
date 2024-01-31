@@ -42,7 +42,7 @@ If \code{remote} is set \code{TRUE}, the tests will check that the first feature
 \examples{
   test_diseasystore(
     DiseasystoreGoogleCovid19,
-    get_test_conns,
+    \() list(DBI::dbConnect(RSQLite::SQLite())),
     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
     target_schema = "test_ds"
   )
