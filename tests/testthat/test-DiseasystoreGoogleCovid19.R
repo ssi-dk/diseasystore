@@ -32,7 +32,7 @@ purrr::walk(google_files, \(file) {
     )
   } else { # If we don't have the file locally, copy it down
     tryCatch(
-      readr::read_csv(remote_url, n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max"),
+      readr::read_csv(remote_url, n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19"),
                       show_col_types = FALSE, progress = FALSE) |>
         readr::write_csv(file.path(local_conn, file)),
       error = function(e) {
