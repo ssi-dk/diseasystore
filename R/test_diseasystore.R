@@ -26,7 +26,7 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #' @examples
 #'   test_diseasystore(
 #'     DiseasystoreGoogleCovid19,
-#'     get_test_conns,
+#'     \() list(DBI::dbConnect(RSQLite::SQLite())),
 #'     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
 #'     target_schema = "test_ds"
 #'   )
