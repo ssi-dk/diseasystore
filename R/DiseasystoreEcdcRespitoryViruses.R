@@ -21,8 +21,9 @@ DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                
 
   private = list(
     .ds_map = list(
-      "iliari_rates" = "ecdc_respitory_viruses_iliari_rates",
-      "age_group"    = "ecdc_respitory_viruses_iliari_rates"
+      "iliari_rates"   = "ecdc_respitory_viruses_iliari_rates",
+      "infection_type" = "ecdc_respitory_viruses_iliari_rates",
+      "age_group"      = "ecdc_respitory_viruses_iliari_rates"
     ),
     .label = "ECDC Respitory Viruses",
 
@@ -38,22 +39,24 @@ DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                
         # Load and parse
         out <- source_conn_github(source_conn, glue::glue("data/snapshots/{as.Date(slice_ts)}_ILIARIRates.csv")) |>
           readr::read_csv(n_max = getOption("diseasystore.DiseasystoreEcdcRespitoryViruses.n_max", default = Inf),
-                          show_col_types = FALSE) #|>
-
-        out |>
-          dplyr::transmute("key_location" = .data$countryname,
-                           "yearweek" = paste(.data$yearweek, 1, sep = "-"),
-                           "age_group" = .data$age,
-                           "rate" = .data$value) |>
-          dplyr::mutate("age_group" = dplyr::case_when(
-            .data$age_group == "0-4" ~ "00-04",
-            .data$age_group == "5-14" ~ "00-14",
-            .data$age_group == "total" ~ NA,
-            TRUE ~ .data$age_group)
-          ) |>
-          dplyr::mutate(valid_from = ISOweek::ISOweek2date(.data$yearweek),
-                        valid_until = valid_from + lubridate::days(7)) |>
-          dplyr::select(!"yearweek")
+                          show_col_types = FALSE) |>
+          dplyr::transmute(
+            "key_location" = .data$countryname,
+            "age_group" = dplyr::case_when(
+              .data$age == "0-4" ~ "00-04",
+              .data$age == "5-14" ~ "00-14",
+              .data$age == "total" ~ NA,
+              TRUE ~ .data$age
+            ),
+            "infection_type" = dplyr::case_when(
+              .data$indicator == "ILIconsultationrate" ~ "ILI",
+              .data$indicator == "ARIconsultationrate" ~ "ARI",
+              TRUE ~ NA
+            ),
+            "rate" = .data$value,
+            "valid_from" = ISOweek::ISOweek2date(paste(.data$yearweek, 1, sep = "-")),
+            "valid_until" = .data$valid_from + lubridate::days(7)
+          )
 
         return(out)
       },
