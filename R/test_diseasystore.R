@@ -24,12 +24,14 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #'   The data base schema where the tests should be run.
 #' @return `r rd_side_effects`
 #' @examples
+#' \dontrun{
 #'   test_diseasystore(
 #'     DiseasystoreGoogleCovid19,
 #'     \() list(DBI::dbConnect(RSQLite::SQLite())),
 #'     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
 #'     target_schema = "test_ds"
 #'   )
+#' }
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
                               data_files = NULL, target_schema = "test_ds") {
