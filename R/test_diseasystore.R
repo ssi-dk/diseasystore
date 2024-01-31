@@ -1,3 +1,6 @@
+utils::globalVariables(c("source_conn_path", "source_conn_github"))
+
+
 #' Test a given diseasy store
 #' @description
 #'   This function runs a battery of tests of the given diseasystore.
@@ -45,8 +48,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   # Store the current options for the connections
   remote_conn <- diseasyoption("remote_conn", diseasystore_class)
-  source_conn <- diseasyoption("source_conn", diseasystore_class)
-  target_conn <- diseasyoption("target_conn", diseasystore_class)
 
   # Check file availability
   # In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
@@ -68,28 +69,28 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
     # Then look for availability of files and download if needed
-    purrr::walk(data_files, \(file) {
+    for (file in data_files) {
       remote_url <- source_conn_helper(remote_conn, file)
 
       # If we have the file locally, do not re-download but check it exists
       if (checkmate::test_file_exists(file.path(local_conn, file))) {
-        tryCatch(
-          readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE),
-          error = function(e) {
-            remote_data_available <- FALSE
-          }
+        remote_data_available <- identical(
+          class(try(readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE))),
+          "try-error"
         )
       } else { # If we don't have the file locally, copy it down
-        tryCatch(
-          readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),
-                          show_col_types = FALSE, progress = FALSE) |>
-            readr::write_csv(file.path(local_conn, file)),
-          error = function(e) {
-            remote_data_available <- FALSE
-          }
+        remote_data_available <- identical(
+          class(
+            try({
+              readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),
+                              show_col_types = FALSE, progress = FALSE) |>
+                readr::write_csv(file.path(local_conn, file))
+            })
+          ),
+          "try-error"
         )
       }
-    })
+    }
   }
 
 
@@ -114,18 +115,18 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
 
-  ######## ########  ######  ########  ######     ########  ########  ######   #### ##    ##  ######
-     ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ###   ## ##    ##
-     ##    ##       ##          ##    ##          ##     ## ##       ##         ##  ####  ## ##
-     ##    ######    ######     ##     ######     ########  ######   ##   ####  ##  ## ## ##  ######
-     ##    ##             ##    ##          ##    ##     ## ##       ##    ##   ##  ##  ####       ##
-     ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ##   ### ##    ##
-     ##    ########  ######     ##     ######     ########  ########  ######   #### ##    ##  ######
+  # ######## ########  ######  ########  ######     ########  ########  ######   #### ##    ##  ######
+  #    ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ###   ## ##    ##
+  #    ##    ##       ##          ##    ##          ##     ## ##       ##         ##  ####  ## ##
+  #    ##    ######    ######     ##     ######     ########  ######   ##   ####  ##  ## ## ##  ######
+  #    ##    ##             ##    ##          ##    ##     ## ##       ##    ##   ##  ##  ####       ##
+  #    ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ##   ### ##    ##
+  #    ##    ########  ######     ##     ######     ########  ########  ######   #### ##    ##  ######
 
-  test_that(glue::glue("{diseasystore_class} initialises correctly"), {
+  testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
 
     # Initialise without start_date and end_date
-    ds <- expect_no_error(diseasystore_generator$new(
+    ds <- testthat::expect_no_error(diseasystore_generator$new(
       verbose = FALSE,
       target_conn = DBI::dbConnect(RSQLite::SQLite())
     ))
@@ -149,7 +150,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
-  test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
+  testthat::test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
 
@@ -161,45 +162,45 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       )
     )
 
-    ds <- expect_no_error(diseasystore_generator$new(
+    ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = as.Date("2020-03-01"),
       end_date = as.Date("2020-03-01"),
       verbose = FALSE
     ))
 
-    feature <- expect_no_error(ds$available_features[[1]])
-    expect_no_error(ds$get_feature(feature))
+    feature <- testthat::expect_no_error(ds$available_features[[1]])
+    testthat::expect_no_error(ds$get_feature(feature))
 
     rm(ds)
     invisible(gc())
   })
 
 
-  test_that(glue::glue("{diseasystore_class} can initialise with directory source_conn"), {
+  testthat::test_that(glue::glue("{diseasystore_class} can initialise with directory source_conn"), {
     testthat::skip_if_not(local)
 
-    ds <- expect_no_error(diseasystore_generator$new(
+    ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = as.Date("2020-03-01"),
       end_date = as.Date("2020-03-01"),
       verbose = FALSE
     ))
 
-    expect_no_error(ds$get_feature(ds$available_features[[1]]))
+    testthat::expect_no_error(ds$get_feature(ds$available_features[[1]]))
 
     rm(ds)
     invisible(gc())
   })
 
 
-  test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
+  testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
 
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
@@ -218,9 +219,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
         reference <- reference_generator(start_date  = start_date,
-                                        end_date    = end_date,
-                                        slice_ts    = ds %.% slice_ts,
-                                        source_conn = ds %.% source_conn) |>
+                                         end_date    = end_date,
+                                         slice_ts    = ds %.% slice_ts,
+                                         source_conn = ds %.% source_conn) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
           dplyr::collect()
 
@@ -229,7 +230,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           dplyr::pull("checksum") |>
           sort()
 
-        expect_identical(feature_checksum, reference_checksum)
+        testthat::expect_identical(feature_checksum, reference_checksum)
 
         # Stop-gap measure to clear dbplyr_### tables
         SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
@@ -244,13 +245,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
-  test_that(glue::glue("{diseasystore_class} can extend existing features"), {
+  testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
 
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
@@ -267,16 +268,16 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
         reference <- reference_generator(start_date  = start_date,
-                                        end_date    = end_date,
-                                        slice_ts    = ds %.% slice_ts,
-                                        source_conn = ds %.% source_conn) |>
+                                         end_date    = end_date,
+                                         slice_ts    = ds %.% slice_ts,
+                                         source_conn = ds %.% source_conn) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
           dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
-        expect_identical(feature, reference)
+        testthat::expect_identical(feature, reference)
 
         # Stop-gap measure to clear dbplyr_### tables
         SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
@@ -292,7 +293,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Helper function that checks the output of key_joins
-  key_join_features_tester <- function(output, start_date, end_date) {
+  key_join_features_tester <- function(output, start_date, end_date) {                                                  # nolint: object_usage_linter
     # The output dates should match start and end date
     testthat::expect_equal(min(output$date), start_date)
     testthat::expect_equal(max(output$date), end_date)
@@ -300,18 +301,18 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Set start and end dates for the rest of the tests
-  start_date <- as.Date("2020-03-01")
-  end_date   <- as.Date("2020-03-10")
+  start_date <- as.Date("2020-03-01")                                                                                   # nolint: object_usage_linter
+  end_date   <- as.Date("2020-03-10")                                                                                   # nolint: object_usage_linter
 
 
 
-  test_that(glue::glue("{diseasystore_class} can key_join features"), {
+  testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
 
       # Attempt to perform the possible key_joins
       available_observables  <- ds$available_features |>
@@ -322,10 +323,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
       # First check we can aggregate without a stratification
-      purrr::walk(available_observables,
-                  ~ expect_no_error(ds$key_join_features(observable = as.character(.x),
-                                                        stratification = NULL,
-                                                        start_date, end_date)))
+      for (observable in available_observables) {
+        testthat::expect_no_error(
+          ds$key_join_features(observable = observable, stratification = NULL, start_date, end_date)
+        )
+      }
+
 
 
       # Then test combinations with non-NULL stratifications
@@ -341,7 +344,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             )
           },
           error = function(e) {
-            expect_identical(
+            testthat::expect_identical(
               e$message,
               paste("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
             )
@@ -370,13 +373,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
-  test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
+  testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
 
 
       # Attempt to perform the possible key_joins
@@ -431,8 +434,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             checkmate::expect_character(
               e$message,
               pattern = glue::glue("Stratification variable not found. ",
-                                  "Available stratification variables are: ",
-                                  "{toString(available_stratifications)}")
+                                   "Available stratification variables are: ",
+                                   "{toString(available_stratifications)}")
             )
             return(NULL)
           })
