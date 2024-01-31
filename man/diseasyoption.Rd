@@ -33,5 +33,5 @@ Helper function to get options related to diseasy
   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 
   # Try to retrieve specific non-existent option
-  diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this") # Returns the .default value
+  diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
 }

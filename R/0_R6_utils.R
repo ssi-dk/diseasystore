@@ -68,7 +68,7 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'   diseasyoption("source_conn", "DiseasystoreNonExistent") # Returns default source_conn
 #'
 #'   # Try to retrieve specific non-existent option
-#'   diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this") # Returns the .default value
+#'   diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
 #' @export
 diseasyoption <- function(option, class = "DiseasystoreBase", .default = NULL) {
 
