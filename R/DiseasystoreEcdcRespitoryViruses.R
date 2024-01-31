@@ -37,7 +37,10 @@ DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                
         checkmate::reportAssertions(coll)
 
         # Load and parse
-        out <- source_conn_github(source_conn, glue::glue("data/snapshots/{as.Date(slice_ts)}_ILIARIRates.csv")) |>
+        out <- source_conn_github(
+          source_conn, glue::glue("data/snapshots/{as.Date(slice_ts)}_ILIARIRates.csv"),
+          pull = diseasyoption("pull", "DiseasystoreEcdcRespitoryViruses", .default = TRUE)
+        ) |>
           readr::read_csv(n_max = getOption("diseasystore.DiseasystoreEcdcRespitoryViruses.n_max", default = Inf),
                           show_col_types = FALSE) |>
           dplyr::transmute(
@@ -96,4 +99,5 @@ rlang::on_load({
    "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data")
   options("diseasystore.DiseasystoreEcdcRespitoryViruses.target_conn" = "")
   options("diseasystore.DiseasystoreEcdcRespitoryViruses.target_schema" = "")
+  options("diseasystore.DiseasystoreEcdcRespitoryViruses.pull" = TRUE)
 })

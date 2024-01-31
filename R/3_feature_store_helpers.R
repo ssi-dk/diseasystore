@@ -144,8 +144,10 @@ source_conn_path <- function(source_conn, file) {
 #'   Repository location (path or github API URL)
 #' @param file (`character(1)`)\cr
 #'   Name (and path) of the file at the location.
+#' @param pull (`logical(1)`)\cr
+#'   Should "git pull" be called on the local repository before reading files?
 #' @noRd
-source_conn_github <- function(source_conn, file) {
+source_conn_github <- function(source_conn, file, pull = TRUE) {
   url_regex <- r"{https?:\/\/api.github.com\/repos\/[a-zA-Z-]*\/[a-zA-Z-]*}"
   checkmate::assert(
     checkmate::check_directory_exists(source_conn),
@@ -176,12 +178,14 @@ source_conn_github <- function(source_conn, file) {
     # match the requested file.
 
     # Update the local repo -- give warning if we cannot
-    tryCatch(
-      msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),
-      warning = function(w) {
-        stop(paste(c("Your local repository could not be updated!", msg), collapse = "\n"))
-      }
-    )
+    if (pull) {
+      tryCatch(
+        msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),
+        warning = function(w) {
+          stop(paste(c("Your local repository could not be updated!", msg), collapse = "\n"))
+        }
+      )
+    }
 
     dir_content <- file.path(source_conn, relative_path) |>
       dir(pattern = file_pattern)
