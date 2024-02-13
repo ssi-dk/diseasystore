@@ -131,7 +131,11 @@ DiseasystoreBase <- R6::R6Class(                                                
       feature_loader <- purrr::pluck(ds_map, feature)
 
       # Determine where these features are stored
-      target_table <- paste(self %.% target_schema, feature_loader, sep = ".")
+      if (packageVersion("SCDB") < "0.4.0") {
+        target_table <- paste(self %.% target_schema, feature_loader, sep = ".")
+      } else {
+        target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
+      }
 
 
       # Create log table
@@ -148,7 +152,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       if (nrow(ds_missing_ranges) > 0) {
 
         # Add a LOCK to the diseasystore
+        if (packageVersion("SCDB") >= "0.4.0") {
+          add_table_lock <- SCDB::add_table_lock
+          is_lock_owner <- SCDB::is_lock_owner
+          remove_table_lock <- SCDB::remove_table_lock
+        }
         add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+
 
         # Check if we have ownership of the update of the target_table
         # If not, keep retrying and wait for up to 30 minutes before giving up
@@ -199,11 +209,20 @@ DiseasystoreBase <- R6::R6Class(                                                
             ds_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
                                       check_from = FALSE)
 
-            if (suppressMessages(SCDB::is.historical(ds_existing))) {
-              ds_existing <- ds_existing |>
-                dplyr::filter(.data$from_ts == slice_ts) |>
-                dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
-                dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
+            if (packageVersion("SCDB") < "0.4.0") {
+              if (suppressMessages(SCDB::is.historical(ds_existing))) {
+                ds_existing <- ds_existing |>
+                  dplyr::filter(.data$from_ts == slice_ts) |>
+                  dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
+                  dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
+              }
+            } else {
+              if (SCDB::is.historical(ds_existing)) {
+                ds_existing <- ds_existing |>
+                  dplyr::filter(.data$from_ts == slice_ts) |>
+                  dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
+                  dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
+              }
             }
 
             ds_updated_feature <- dplyr::union_all(ds_existing, ds_feature) |> dplyr::compute()
@@ -217,11 +236,22 @@ DiseasystoreBase <- R6::R6Class(                                                
             self %.% target_conn
           )
 
-          logger <- SCDB::Logger$new(
-            output_to_console = FALSE,
-            log_table_id = log_table_id,
-            log_conn = self %.% target_conn
-          )
+          if (packageVersion("SCDB") < "0.4.0") {
+            logger <- SCDB::Logger$new(
+              output_to_console = FALSE,
+              log_table_id = log_table_id,
+              log_conn = self %.% target_conn
+            )
+          } else {
+            logger <- SCDB::Logger$new(
+              db_table = target_table,
+              timestamp = slice_ts,
+              output_to_console = FALSE,
+              log_table_id = log_table_id,
+              log_conn = self %.% target_conn
+            )
+          }
+
 
           # Commit to DB
           SCDB::update_snapshot(
@@ -599,7 +629,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                          check_from = FALSE) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!target_table, .data$date == !!slice_ts)
+        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
