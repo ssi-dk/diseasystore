@@ -5,7 +5,12 @@ test_that("drop_diseasystore can delete entire default schema", {
 
     # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
     logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_logs_if_missing(logs_id, conn)
+    if (packageVersion("SCDB") < "0.4.0") {
+      SCDB::create_logs_if_missing(logs_id, conn)
+    } else {
+      SCDB::create_logs_if_missing(conn = conn, log_table = logs_id)
+    }
+
 
     # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
     # and in other places which should be untouched by our tests
@@ -27,12 +32,12 @@ test_that("drop_diseasystore can delete entire default schema", {
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(conn = conn)
 
-    expect_false(SCDB::table_exists(conn, paste(target_schema_1, "logs",     sep = ".")))
-    expect_false(SCDB::table_exists(conn, paste(target_schema_1, "mtcars_1", sep = ".")))
-    expect_false(SCDB::table_exists(conn, paste(target_schema_1, "mtcars_2", sep = ".")))
+    expect_false(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "logs",     sep = "."), conn)))
+    expect_false(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "mtcars_1", sep = "."), conn)))
+    expect_false(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "mtcars_2", sep = "."), conn)))
 
     expect_true(SCDB::table_exists(conn, "mtcars_1"))
-    expect_true(SCDB::table_exists(conn, paste(target_schema_2, "mtcars_1", sep = ".")))
+    expect_true(SCDB::table_exists(conn, SCDB::id(paste(target_schema_2, "mtcars_1", sep = "."), conn)))
 
 
     # Make sure all tables have been removed
@@ -60,7 +65,11 @@ test_that("drop_diseasystore can delete single table in default schema", {
 
     # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
     logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_logs_if_missing(logs_id, conn)
+    if (packageVersion("SCDB") < "0.4.0") {
+      SCDB::create_logs_if_missing(logs_id, conn)
+    } else {
+      SCDB::create_logs_if_missing(conn = conn, log_table = logs_id)
+    }
 
     # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
     # and in other places which should be untouched by our tests
@@ -81,24 +90,24 @@ test_that("drop_diseasystore can delete single table in default schema", {
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_1", conn = conn)
 
-    expect_true(SCDB::table_exists(conn, paste(target_schema_1, "logs", sep = ".")))
-    expect_false(SCDB::table_exists(conn, paste(target_schema_1, "mtcars_1", sep = ".")))
-    expect_true(SCDB::table_exists(conn, paste(target_schema_1, "mtcars_2", sep = ".")))
+    expect_true(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)))
+    expect_false(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "mtcars_1", sep = "."), conn)))
+    expect_true(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "mtcars_2", sep = "."), conn)))
 
     expect_true(SCDB::table_exists(conn, "mtcars_1"))
-    expect_true(SCDB::table_exists(conn, paste(target_schema_2, "mtcars_1", sep = ".")))
+    expect_true(SCDB::table_exists(conn, SCDB::id(paste(target_schema_2, "mtcars_1", sep = "."), conn)))
 
     # Try to delete only mtcars_2 within the diseasystore
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_2", conn = conn)
 
-    expect_true(SCDB::table_exists(conn, paste(target_schema_1, "logs", sep = ".")))
-    expect_false(SCDB::table_exists(conn, paste(target_schema_1, "mtcars_1", sep = ".")))
-    expect_false(SCDB::table_exists(conn, paste(target_schema_1, "mtcars_2", sep = ".")))
+    expect_true(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)))
+    expect_false(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "mtcars_1", sep = "."), conn)))
+    expect_false(SCDB::table_exists(conn, SCDB::id(paste(target_schema_1, "mtcars_2", sep = "."), conn)))
 
     expect_true(SCDB::table_exists(conn, "mtcars_1"))
-    expect_true(SCDB::table_exists(conn, paste(target_schema_2, "mtcars_1", sep = ".")))
+    expect_true(SCDB::table_exists(conn, SCDB::id(paste(target_schema_2, "mtcars_1", sep = "."), conn)))
 
     # Make sure all tables have been removed
     c(paste(target_schema_1, "logs",     sep = "."),

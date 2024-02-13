@@ -621,13 +621,15 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @importFrom SCDB as.character
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
-      if (inherits(target_table, "Id")) {
-        target_table <- paste(
-          c(purrr::pluck(target_table, "schema"),
-            purrr::pluck(target_table, "table")
-          ),
-          collapse = "."
-        )
+      if (packageVersion("SCDB") < "0.4.0") {
+        if (inherits(target_table, "Id")) {
+          target_table <- paste(
+            c(purrr::pluck(target_table, "schema"),
+              purrr::pluck(target_table, "table")
+            ),
+            collapse = "."
+          )
+        }
       }
 
       # Get a list of the logs for the target_table on the slice_ts
