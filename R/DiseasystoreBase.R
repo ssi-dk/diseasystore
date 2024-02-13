@@ -132,7 +132,13 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Determine where these features are stored
       if (packageVersion("SCDB") < "0.4.0") {
-        target_table <- paste(self %.% target_schema, feature_loader, sep = ".")
+        target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
+        target_table <- paste(
+          c(purrr::pluck(target_table, "name", "schema"),
+            purrr::pluck(target_table, "name", "table")
+          ),
+          collapse = "."
+        )
       } else {
         target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
       }
@@ -209,20 +215,11 @@ DiseasystoreBase <- R6::R6Class(                                                
             ds_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
                                       check_from = FALSE)
 
-            if (packageVersion("SCDB") < "0.4.0") {
-              if (suppressMessages(SCDB::is.historical(ds_existing))) {
-                ds_existing <- ds_existing |>
-                  dplyr::filter(.data$from_ts == slice_ts) |>
-                  dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
-                  dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
-              }
-            } else {
-              if (SCDB::is.historical(ds_existing)) {
-                ds_existing <- ds_existing |>
-                  dplyr::filter(.data$from_ts == slice_ts) |>
-                  dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
-                  dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
-              }
+            if (SCDB::is.historical(ds_existing)) {
+              ds_existing <- ds_existing |>
+                dplyr::filter(.data$from_ts == slice_ts) |>
+                dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
+                dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
             }
 
             ds_updated_feature <- dplyr::union_all(ds_existing, ds_feature) |> dplyr::compute()
@@ -621,7 +618,17 @@ DiseasystoreBase <- R6::R6Class(                                                
     # @return (`tibble`)\cr
     #   A data frame containing continuous un-computed date-ranges
     #' @importFrom zoo as.Date
+    #' @importFrom SCDB as.character
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
+
+      if (inherits(target_table, "Id")) {
+        target_table <- paste(
+          c(purrr::pluck(target_table, "schema"),
+            purrr::pluck(target_table, "table")
+          ),
+          collapse = "."
+        )
+      }
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,

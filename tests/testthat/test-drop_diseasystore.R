@@ -3,15 +3,24 @@ withr::local_options("diseasystore.target_schema" = target_schema_1)
 test_that("drop_diseasystore can delete entire default schema", {
   for (conn in get_test_conns()) {
 
-    # Create logs table in `target_schema_1` schema and add mtcars to the schema
-    # to simulate a diseasystore on the connection
-    SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_table(mtcars, conn, paste(target_schema_1, "mtcars_1", sep = "."), temporary = FALSE)
-    SCDB::create_table(mtcars, conn, paste(target_schema_1, "mtcars_2", sep = "."), temporary = FALSE)
+    # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
+    logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
+    SCDB::create_logs_if_missing(logs_id, conn)
 
-    # Add some other tables to simulate data that should not be touched
-    SCDB::create_table(mtcars, conn, "mtcars_1",                                    temporary = FALSE)
-    SCDB::create_table(mtcars, conn, paste(target_schema_2, "mtcars_1", sep = "."), temporary = FALSE)
+    # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
+    # and in other places which should be untouched by our tests
+    ids <- c(
+      paste(target_schema_1, "mtcars_1", sep = "."),
+      paste(target_schema_1, "mtcars_2", sep = "."),
+      "mtcars_1",
+      paste(target_schema_2, "mtcars_1", sep = ".")
+    ) |>
+      purrr::map(~ SCDB::id(., conn))
+
+
+    for (id in ids) {
+      SCDB::create_table(mtcars, conn, id, temporary = FALSE)
+    }
 
     # Try to delete the entire `target_schema_1` store
     # But first, verify that the testing target_schema has been set
@@ -49,15 +58,23 @@ test_that("drop_diseasystore can delete entire default schema", {
 test_that("drop_diseasystore can delete single table in default schema", {
   for (conn in get_test_conns()) {
 
-    # Create logs table in `target_schema_1` schema and add mtcars to the schema
-    # to simulate a diseasystore on the connection
-    SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_table(mtcars, conn, paste(target_schema_1, "mtcars_1", sep = "."), temporary = FALSE)
-    SCDB::create_table(mtcars, conn, paste(target_schema_1, "mtcars_2", sep = "."), temporary = FALSE)
+    # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
+    logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
+    SCDB::create_logs_if_missing(logs_id, conn)
 
-    # Add some other tables to simulate data that should not be touched
-    SCDB::create_table(mtcars, conn, "mtcars_1",                                    temporary = FALSE)
-    SCDB::create_table(mtcars, conn, paste(target_schema_2, "mtcars_1", sep = "."), temporary = FALSE)
+    # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
+    # and in other places which should be untouched by our tests
+    ids <- c(
+      paste(target_schema_1, "mtcars_1", sep = "."),
+      paste(target_schema_1, "mtcars_2", sep = "."),
+      "mtcars_1",
+      paste(target_schema_2, "mtcars_1", sep = ".")
+    ) |>
+      purrr::map(~ SCDB::id(., conn))
+
+    for (id in ids) {
+      SCDB::create_table(mtcars, conn, id, temporary = FALSE)
+    }
 
     # Try to delete only mtcars_1 within the diseasystore
     # But first, verify that the testing target_schema has been set
