@@ -47,6 +47,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
+  # Reduce the lock wait during test in case of deadlocks by failed test
+  withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
 
   # Store the current options for the connections
   remote_conn <- diseasyoption("remote_conn", diseasystore_class)
