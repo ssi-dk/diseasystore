@@ -105,6 +105,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @param slice_ts `r rd_slice_ts()`
     #' @return
     #'   A tbl_dbi with the requested feature for the study period.
+    #' @importFrom utils packageVersion
     get_feature = function(feature,
                            start_date = self %.% start_date,
                            end_date   = self %.% end_date,

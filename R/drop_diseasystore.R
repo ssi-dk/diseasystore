@@ -13,6 +13,7 @@
 #'
 #'   DBI::dbDisconnect(conn)
 #' @export
+#' @importFrom utils packageVersion
 drop_diseasystore <- function(pattern = NULL,
                               schema = diseasyoption("target_schema"),
                               conn = SCDB::get_connection()) {
