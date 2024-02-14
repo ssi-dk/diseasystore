@@ -103,8 +103,10 @@ truncate_interlace <- function(primary, secondary = NULL) {
                       (.data$valid_until > .data$valid_from.y)  |   # of the primary data.
                         is.na(.data$valid_until) |
                         is.na(.data$valid_until.y)) |>
-        dplyr::mutate("valid_from"  = pmax(.data$valid_from,  .data$valid_from.y,  na.rm = TRUE),
-                      "valid_until" = pmin(.data$valid_until, .data$valid_until.y, na.rm = TRUE)) |>
+        dplyr::mutate(
+          "valid_from"  = ifelse(.data$valid_from  >= .data$valid_from.y,  .data$valid_from, .data$valid_from.y),
+          "valid_until" = ifelse(.data$valid_until <= .data$valid_until.y, .data$valid_from, .data$valid_from.y)
+          ) |>
         dplyr::select(-tidyselect::ends_with(".y"))
     })
 
