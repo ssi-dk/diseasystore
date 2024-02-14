@@ -25,46 +25,67 @@ drop_diseasystore <- function(pattern = NULL,
 
 
   if (packageVersion("SCDB") < "0.4.0") {
-    # Get list of tables
-    tables <- SCDB::get_tables(conn, pattern) |>
-      tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE) |>
-      dplyr::pull("db_table_id")
+    # List all tables
+    tables <- SCDB::get_tables(conn, pattern)
 
-    # Determine pattern to delete tables with
-    ds_table_pattern <- SCDB::id(paste(c(schema, purrr::pluck(pattern, .default = "*")), collapse = "."), conn)
-    ds_table_pattern <- paste(
-      c(purrr::pluck(ds_table_pattern, "name", "schema"),
-        purrr::pluck(ds_table_pattern, "name", "table")
+    # Early return if no tables are found
+    if (nrow(tables) == 0) {
+      return(NULL)
+    }
+
+    # Concatenate schema and table to ids
+    tables <- tables |>
+      dplyr::mutate("schema" = dplyr::if_else(is.na(.data$schema), SCDB::get_schema(conn), .data$schema)) |>
+      tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE)
+
+
+    # Determine the schema-structure of the data base via SCDB::id
+    regex_id <- SCDB::id(paste(schema, NULL, sep = "."), conn)
+
+    regex <- paste(
+      c(
+        purrr::pluck(regex_id, "name", "schema", .default = SCDB::get_schema(conn)),
+        purrr::pluck(regex_id, "name", "table")
       ),
       collapse = "."
     )
-    ds_context <- stringr::str_remove(ds_table_pattern, r"{\.[^\.]+$}")
 
-    tables_to_delete <- purrr::keep(tables, ~ stringr::str_detect(., ds_table_pattern))
+    tables_to_delete <- dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex, pattern)))
+
+    # Ensure schema is the same for all identified tables (if not, we have unwanted ambiguity)
+    if (length(unique(dplyr::pull(tables_to_delete, "schema"))) > 1) {
+      stop("Tables marked for deletion spread across schemas. Unwanted ambiguity detected")
+    }
 
     # Check if logs is in the table, if yes, all tables must be deleted
-    if ("logs" %in% tables_to_delete &&
-          !identical(tables_to_delete, purrr::keep(tables, ~ stringr::str_detect(., paste0(ds_context, ".*"))))) {
-      stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped."))
+    if ("logs" %in% tables_to_delete$table &&
+          !identical(tables_to_delete,
+                    dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex))))) {
+      stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
     }
 
     tables_to_delete |>
-      purrr::walk(~ DBI::dbRemoveTable(conn, SCDB::id(.x, conn = conn)))
+      purrr::pwalk(\(db_table_id, schema, table) DBI::dbRemoveTable(conn, DBI::Id(schema = schema, table = table)))
 
     # Delete from logs
-    if (SCDB::table_exists(conn, glue::glue("{ds_context}.logs"))) {
-      log_records_to_delete <- SCDB::get_table(conn, glue::glue("{ds_context}.logs")) |>
+    logs_table <- tables |>
+      dplyr::filter(stringr::str_detect(.data$db_table_id, paste0(regex, "logs")))
+
+    logs_table_id <- DBI::Id(schema = logs_table$schema, table = logs_table$table)
+
+    if (SCDB::table_exists(conn, logs_table_id)) {
+
+      log_records_to_delete <- SCDB::get_table(conn, logs_table_id) |>
         tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE) |>
         dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
         dplyr::select("log_file")
 
-      dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(glue::glue("{ds_context}.logs"), conn), check_from = FALSE),
-                         log_records_to_delete,
-                         by = "log_file",
-                         in_place = TRUE,
-                         unmatched = "ignore")
+      dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(logs_table_id, conn), check_from = FALSE),
+                        log_records_to_delete,
+                        by = "log_file",
+                        in_place = TRUE,
+                        unmatched = "ignore")
     }
-
   } else {
     # Get list of tables
     tables <- SCDB::get_tables(conn, pattern) |>
