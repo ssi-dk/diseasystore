@@ -132,13 +132,13 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Determine where these features are stored
       if (packageVersion("SCDB") < "0.4.0") {
-              target_table_id <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
-      target_table <- paste(
-        c(purrr::pluck(target_table_id, "name", "schema"),
-          purrr::pluck(target_table_id, "name", "table")
-        ),
-        collapse = "."
-      )
+        target_table_id <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
+        target_table <- paste(
+          c(purrr::pluck(target_table_id, "name", "schema"),
+            purrr::pluck(target_table_id, "name", "table")
+          ),
+          collapse = "."
+        )
       } else {
         target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
       }
@@ -212,7 +212,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Add the existing computed data for given slice_ts
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
-            ds_existing <- dplyr::tbl(self %.% target_conn, target_table_id, check_from = FALSE)
+            if (packageVersion("SCDB") < "0.4.0") {
+              ds_existing <- dplyr::tbl(self %.% target_conn, target_table_id, check_from = FALSE)
+            } else {
+              ds_existing <- dplyr::tbl(self %.% target_conn, target_table, check_from = FALSE)
+            }
 
             if (SCDB::is.historical(ds_existing)) {
               ds_existing <- ds_existing |>
@@ -250,15 +254,27 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
           # Commit to DB
-          SCDB::update_snapshot(
-            .data = ds_updated_feature,
-            conn = self %.% target_conn,
-            db_table = target_table_id,
-            timestamp = slice_ts,
-            message = glue::glue("ds-range: {start_date} - {end_date}"),
-            logger = logger,
-            enforce_chronological_order = FALSE
-          )
+          if (packageVersion("SCDB") < "0.4.0") {
+            SCDB::update_snapshot(
+              .data = ds_updated_feature,
+              conn = self %.% target_conn,
+              db_table = target_table_id,
+              timestamp = slice_ts,
+              message = glue::glue("ds-range: {start_date} - {end_date}"),
+              logger = logger,
+              enforce_chronological_order = FALSE
+            )
+          } else {
+            SCDB::update_snapshot(
+              .data = ds_updated_feature,
+              conn = self %.% target_conn,
+              db_table = target_table,
+              timestamp = slice_ts,
+              message = glue::glue("ds-range: {start_date} - {end_date}"),
+              logger = logger,
+              enforce_chronological_order = FALSE
+            )
+          }
         })
 
         # Release the lock on the table
@@ -272,9 +288,15 @@ DiseasystoreBase <- R6::R6Class(                                                
       }
 
       # Finally, return the data to the user
-      out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
-                     args = list(target_table = target_table_id,
-                                 slice_ts = slice_ts, target_conn = self %.% target_conn))
+      if (packageVersion("SCDB") < "0.4.0") {
+        out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
+                       args = list(target_table = target_table_id,
+                                   slice_ts = slice_ts, target_conn = self %.% target_conn))
+      } else {
+        out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
+                       args = list(target_table = target_table,
+                                   slice_ts = slice_ts, target_conn = self %.% target_conn))
+      }
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
