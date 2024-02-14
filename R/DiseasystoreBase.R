@@ -355,9 +355,9 @@ DiseasystoreBase <- R6::R6Class(                                                
             self$get_feature(.x, start_date, end_date) |>
               dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
               dplyr::mutate(
-                "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),
-                "valid_until" =dplyr::coalesce(
-                  ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),
+                "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),    # nolint: ifelse_censor_linter
+                "valid_until" = dplyr::coalesce(
+                  ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),             # nolint: ifelse_censor_linter
                   .data$valid_until.d
                 )
               ) |>
@@ -374,9 +374,9 @@ DiseasystoreBase <- R6::R6Class(                                                
       observable_data <- self$get_feature(observable, start_date, end_date) |>
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
         dplyr::mutate(
-          "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),
+          "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),          # nolint: ifelse_censor_linter
           "valid_until" = dplyr::coalesce(
-            ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),
+            ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),                   # nolint: ifelse_censor_linter
             .data$valid_until.d
           )
         ) |>
