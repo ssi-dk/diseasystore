@@ -1,5 +1,6 @@
 # Set testing options
 withr::local_options("diseasystore.target_schema" = target_schema_1)
+withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
 
 test_that("DiseasystoreBase works", {
 

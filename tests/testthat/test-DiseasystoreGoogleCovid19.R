@@ -2,6 +2,9 @@
 withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = target_schema_1)
 withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
 
+# Reduce the lock wait during test in case of deadlocks by failed test
+withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
+
 
 # Store the current options
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
