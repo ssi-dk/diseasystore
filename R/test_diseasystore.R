@@ -24,7 +24,7 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #'   The data base schema where the tests should be run.
 #' @return `r rd_side_effects`
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'   test_diseasystore(
 #'     DiseasystoreGoogleCovid19,
 #'     \() list(DBI::dbConnect(RSQLite::SQLite())),

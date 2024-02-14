@@ -13,4 +13,4 @@ We checked 0 reverse dependencies, comparing R CMD check results across CRAN and
 
 ## Notes
 In the examples for `test_diseasystore()` -- one of the functions introduced in this release -- we have a wrapped the
-example in \dontrun{} since it takes longer than 5 seconds to run the example (running on a laptop it takes ~ 2 min).
+example in \donttest{} since it takes longer than 5 seconds to run the example (running on a laptop it takes ~ 2 min).
