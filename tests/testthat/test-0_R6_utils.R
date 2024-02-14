@@ -65,6 +65,7 @@ test_that("diseasyoption works", {
 
   # Check that diseasyoption works for default values
   expect_null(diseasyoption("non_existent_option"))
+  expect_true(diseasyoption("non_existent_option", .default = TRUE))
 
   withr::local_options("diseasystore.target_schema" = target_schema_1)
   expect_identical(diseasyoption("target_schema"), target_schema_1)

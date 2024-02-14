@@ -1,5 +1,9 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
+
 # diseasystore 0.1.1
 
 ## Fixes:

@@ -22,7 +22,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {                  
 
       # Load and parse
       data <- source_conn_path(source_conn, "by-age.csv") |>
-        readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+        readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                         show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
         dplyr::filter(.data$date >= as.Date("2020-01-01"),
@@ -92,7 +92,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # Load and parse
         out <- source_conn_path(source_conn, "demographics.csv") |>
-          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                           show_col_types = FALSE) |>
           dplyr::select("location_key", tidyselect::starts_with("population_age_")) |>
           tidyr::pivot_longer(!"location_key",
@@ -121,7 +121,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # Load and parse
         out <- source_conn_path(source_conn, "index.csv") |>
-          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                           show_col_types = FALSE) |>
           dplyr::transmute("key_location" = .data$location_key,
                            "country_id"   = .data$country_code,
@@ -162,7 +162,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # Load and parse
         out <- source_conn_path(source_conn, "by-age.csv") |>
-          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                           show_col_types = FALSE)
 
         # We need a map between age_bin and age_group
@@ -215,7 +215,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # Load and parse
         out <- source_conn_path(source_conn, "weather.csv") |>
-          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                           show_col_types = FALSE) |>
           dplyr::mutate("date" = as.Date(.data$date)) |>
           dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
@@ -239,7 +239,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # Load and parse
         out <- source_conn_path(source_conn, "weather.csv") |>
-          readr::read_csv(n_max = getOption("diseasystore.DiseasystoreGoogleCovid19.n_max", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                           show_col_types = FALSE) |>
           dplyr::mutate("date" = as.Date(.data$date)) |>
           dplyr::filter({{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
