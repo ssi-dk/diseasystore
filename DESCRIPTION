@@ -43,7 +43,6 @@ Imports:
 Suggests:
     devtools,
     curl,
-    jsonlite,
     knitr,
     rmarkdown,
     RSQLite,
