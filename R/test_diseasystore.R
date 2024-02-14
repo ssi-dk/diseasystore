@@ -24,7 +24,7 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #'   The data base schema where the tests should be run.
 #' @return `r rd_side_effects`
 #' @examples
-#' \dontrun{
+#' \donttest{
 #'   test_diseasystore(
 #'     DiseasystoreGoogleCovid19,
 #'     \() list(DBI::dbConnect(RSQLite::SQLite())),
@@ -78,12 +78,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
       # If we have the file locally, do not re-download but check it exists
       if (checkmate::test_file_exists(file.path(local_conn, file))) {
-        remote_data_available <- identical(
+        remote_data_available <- !identical(
           class(try(readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE))),
           "try-error"
         )
       } else { # If we don't have the file locally, copy it down
-        remote_data_available <- identical(
+        remote_data_available <- !identical(
           class(
             try({
               readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),

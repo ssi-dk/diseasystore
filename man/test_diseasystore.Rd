@@ -40,7 +40,7 @@ If the data is unavailable, \code{local} should be set to \code{FALSE} so tests 
 If \code{remote} is set \code{TRUE}, the tests will check that the first feature can be computed.
 }
 \examples{
-\dontrun{
+\donttest{
   test_diseasystore(
     DiseasystoreGoogleCovid19,
     \() list(DBI::dbConnect(RSQLite::SQLite())),
