@@ -45,6 +45,7 @@ Suggests:
     curl,
     jsonlite,
     knitr,
+    odbc,
     rmarkdown,
     RSQLite,
     RPostgres,
