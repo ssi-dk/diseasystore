@@ -2,7 +2,7 @@
 
 ## New Features:
 
-* With the relese of `{SCDB}` v0.4, we now support more database backends:
+* With the release of `{SCDB}` v0.4, we now support more database backends:
 
   * SQLite with attached schemas (#121).
 
