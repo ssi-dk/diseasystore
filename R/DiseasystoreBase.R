@@ -158,24 +158,31 @@ DiseasystoreBase <- R6::R6Class(                                                
       # If there are any missing ranges, put a lock on the data base
       if (nrow(ds_missing_ranges) > 0) {
 
-        # Add a LOCK to the diseasystore
-        if (packageVersion("SCDB") >= "0.4.0") {
-          add_table_lock <- SCDB::add_table_lock
-          is_lock_owner <- SCDB::is_lock_owner
-          remove_table_lock <- SCDB::remove_table_lock
-        }
-        add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-
-
-        # Check if we have ownership of the update of the target_table
-        # If not, keep retrying and wait for up to 30 minutes before giving up
-        wait_time <- 0 # seconds
-        while (!isTRUE(is_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
-          Sys.sleep(diseasyoption("lock_wait_increment"))
+        if (packageVersion("SCDB") < "0.4.0") {
+          # Add a LOCK to the diseasystore
           add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-          wait_time <- wait_time + diseasyoption("lock_wait_increment")
-          if (wait_time > diseasyoption("lock_wait_max")) {
-            rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+
+
+          # Check if we have ownership of the update of the target_table
+          # If not, keep retrying and wait for up to 30 minutes before giving up
+          wait_time <- 0 # seconds
+          while (!isTRUE(is_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
+            Sys.sleep(diseasyoption("lock_wait_increment"))
+            add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+            wait_time <- wait_time + diseasyoption("lock_wait_increment")
+            if (wait_time > diseasyoption("lock_wait_max")) {
+              rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+            }
+          }
+        } else {
+          # Add a LOCK to the diseasystore
+          wait_time <- 0 # seconds
+          while (!isTRUE(SCDB::lock_table(self %.% target_conn, target_table, self %.% target_schema))) {
+            Sys.sleep(diseasyoption("lock_wait_increment"))
+            wait_time <- wait_time + diseasyoption("lock_wait_increment")
+            if (wait_time > diseasyoption("lock_wait_max")) {
+              rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+            }
           }
         }
 
@@ -279,7 +286,11 @@ DiseasystoreBase <- R6::R6Class(                                                
         })
 
         # Release the lock on the table
-        remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        if (packageVersion("SCDB") < "0.4.0") {
+          remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        } else {
+          SCDB::unlock_table(self %.% target_conn, target_table, self %.% target_schema)
+        }
 
         # Inform how long has elapsed for updating data
         if (private$verbose && nrow(ds_missing_ranges) > 0) {
