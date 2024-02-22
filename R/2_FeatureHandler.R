@@ -3,7 +3,7 @@
 #' @description
 #'   This `FeatureHandler` [R6][R6::R6Class] handles individual features for the feature stores.
 #'   They define the three methods associated with features (`compute`, `get` and `key_join`).
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #'   # The FeatureHandler is typically configured as part of making a new Diseasystore.
 #'   # Most often, we need only specify `compute` and `key_join` to get a functioning FeatureHandler
 #'

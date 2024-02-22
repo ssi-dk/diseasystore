@@ -40,6 +40,7 @@ If the data is unavailable, \code{local} should be set to \code{FALSE} so tests 
 If \code{remote} is set \code{TRUE}, the tests will check that the first feature can be computed.
 }
 \examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
   test_diseasystore(
     DiseasystoreGoogleCovid19,
@@ -48,4 +49,5 @@ If \code{remote} is set \code{TRUE}, the tests will check that the first feature
     target_schema = "test_ds"
   )
 }
+\dontshow{\}) # examplesIf}
 }

@@ -23,7 +23,7 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #' @param target_schema (`character(1)`)\cr
 #'   The data base schema where the tests should be run.
 #' @return `r rd_side_effects`
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #' \donttest{
 #'   test_diseasystore(
 #'     DiseasystoreGoogleCovid19,
@@ -130,6 +130,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   #    ##    ########  ######     ##     ######     ########  ########  ######   #### ##    ##  ######
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
+    testthat::skip_if_not_installed("RSQLite")
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -157,6 +158,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
+    testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
 
@@ -184,6 +186,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with directory source_conn"), {
+    testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(local)
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
