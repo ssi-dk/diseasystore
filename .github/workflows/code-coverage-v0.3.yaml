@@ -183,7 +183,7 @@ jobs:
 
       - name: Collect docker logs
         if: always()
-        uses: jwalton/gh-docker-logs@v1
+        uses: jwalton/gh-docker-logs@v2
         with:
           dest: '${{ runner.workspace }}/logs-docker'
 
@@ -297,7 +297,7 @@ jobs:
 
       - name: Collect docker logs
         if: always()
-        uses: jwalton/gh-docker-logs@v1
+        uses: jwalton/gh-docker-logs@v2
         with:
           dest: '${{ runner.workspace }}/logs-docker'
 
