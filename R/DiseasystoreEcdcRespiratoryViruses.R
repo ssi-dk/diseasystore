@@ -15,7 +15,7 @@
 #'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                                                                        # nolint: object_name_linter.
+DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                                                                      # nolint: object_name_linter, object_length_linter
   classname = "DiseasystoreEcdcRespiratoryViruses",
   inherit = DiseasystoreBase,
 
@@ -93,10 +93,14 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
 
 # Set default options for the package related to the Google COVID-19 store
 rlang::on_load({
-  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.remote_conn" =
-   "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data")
-  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" =
-   "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data")
+  options(
+    "diseasystore.DiseasystoreEcdcRespiratoryViruses.remote_conn" =
+      "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data"
+  )
+  options(
+    "diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" =
+      "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data"
+  )
   options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = "")
   options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_schema" = "")
   options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = TRUE)

@@ -180,7 +180,7 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     # Update the local repo -- give warning if we cannot
     if (pull) {
       tryCatch(
-        msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),
+        msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),                               # nolint: implicit_assignment_linter
         warning = function(w) {
           stop(paste(c("Your local repository could not be updated!", msg), collapse = "\n"))
         }
@@ -204,7 +204,7 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     # The former API has a limit of 100.000 returns whereas the latter has limit of 1000 returns.
     # Since the contents can contain more than 1000 files within a few years, we go the extra step
     # now to use the trees API
-    repo_content <- jsonlite::fromJSON(paste(source_conn, "contents", dirname(relative_path), sep = "/"))
+    repo_content <- jsonlite::fromJSON(paste(source_conn, "contents", dirname(relative_path), sep = "/"))               # nolint: paste_linter
 
     # Determine sha of the relative path
     dir_sha <- repo_content |>
@@ -212,7 +212,7 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
       dplyr::pull("sha")
 
     # Get all files at the relative path
-    dir_content <- jsonlite::fromJSON(paste(source_conn, "git/trees", dir_sha, sep = "/"))
+    dir_content <- jsonlite::fromJSON(paste(source_conn, "git/trees", dir_sha, sep = "/"))                              # nolint: paste_linter
 
     if (dir_content$truncated) {
       warning(
@@ -225,7 +225,7 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     # Perform the fuzzy matching and generate a download link
     return_file <- fuzzy_match(dir_content$tree$path)
 
-    return(jsonlite::fromJSON(paste(source_conn, "contents", relative_path, return_file, sep = "/"))$download_url)
+    return(jsonlite::fromJSON(paste(source_conn, "contents", relative_path, return_file, sep = "/"))$download_url)      # nolint: paste_linter
 
   } else {
     stop("source_conn could not be parsed to valid GitHub repository or GitHub API URL\n")
