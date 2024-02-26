@@ -1,22 +1,22 @@
 #' @title feature store handler of EU-ECDC Respiratory viruses features
 #'
 #' @description
-#'   This `DiseasystoreEcdcRespitoryViruses` [R6][R6::R6Class] brings support for using the EU-ECDC
+#'   This `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] brings support for using the EU-ECDC
 #'   Respiratory viruses weekly data repository.
 #'   See the vignette("diseasystore-flu-forecasting-hub") for details on how to configure the feature store
 #' @examples
-#'   ds <- DiseasystoreEcdcRespitoryViruses$new(
+#'   ds <- DiseasystoreEcdcRespiratoryViruses$new(
 #'     source_conn = ".",
 #'     target_conn = DBI::dbConnect(RSQLite::SQLite())
 #'   )
 #'
 #'   rm(ds)
 #' @return
-#'   A new instance of the `DiseasystoreEcdcRespitoryViruses` [R6][R6::R6Class] class.
+#'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                                                        # nolint: object_name_linter.
-  classname = "DiseasystoreEcdcRespitoryViruses",
+DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                                                                        # nolint: object_name_linter.
+  classname = "DiseasystoreEcdcRespiratoryViruses",
   inherit = DiseasystoreBase,
 
   private = list(
@@ -39,9 +39,9 @@ DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                
         # Load and parse
         out <- source_conn_github(
           source_conn, glue::glue("data/snapshots/{as.Date(slice_ts)}_ILIARIRates.csv"),
-          pull = diseasyoption("pull", "DiseasystoreEcdcRespitoryViruses", .default = TRUE)
+          pull = diseasyoption("pull", "DiseasystoreEcdcRespiratoryViruses", .default = TRUE)
         ) |>
-          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreEcdcRespitoryViruses", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreEcdcRespiratoryViruses", default = Inf),
                           show_col_types = FALSE) |>
           dplyr::transmute(
             "key_location" = .data$countryname,
@@ -93,11 +93,11 @@ DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                
 
 # Set default options for the package related to the Google COVID-19 store
 rlang::on_load({
-  options("diseasystore.DiseasystoreEcdcRespitoryViruses.remote_conn" =
+  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.remote_conn" =
    "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data")
-  options("diseasystore.DiseasystoreEcdcRespitoryViruses.source_conn" =
+  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" =
    "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data")
-  options("diseasystore.DiseasystoreEcdcRespitoryViruses.target_conn" = "")
-  options("diseasystore.DiseasystoreEcdcRespitoryViruses.target_schema" = "")
-  options("diseasystore.DiseasystoreEcdcRespitoryViruses.pull" = TRUE)
+  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = "")
+  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_schema" = "")
+  options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = TRUE)
 })
