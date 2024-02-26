@@ -47,7 +47,7 @@ DiseasystoreEcdcRespitoryViruses <- R6::R6Class(                                
             "key_location" = .data$countryname,
             "age_group" = dplyr::case_when(
               .data$age == "0-4" ~ "00-04",
-              .data$age == "5-14" ~ "00-14",
+              .data$age == "5-14" ~ "05-14",
               .data$age == "total" ~ NA,
               TRUE ~ .data$age
             ),
