@@ -82,12 +82,6 @@ get_test_conns <- function() {
       }
     )
 
-    # SCDB gives an error if there are no tables (it assumes a bad configuration)
-    # We create a table to suppress this warning
-    if (!DBI::dbExistsTable(conn, "iris")) {
-      DBI::dbWriteTable(conn, "iris", iris, overwrite = TRUE)
-    }
-
     return(conn)
   }
 
