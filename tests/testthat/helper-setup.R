@@ -82,6 +82,12 @@ get_test_conns <- function() {
       }
     )
 
+    if (packageVersion("SCDB") < "0.4.0" && !DBI::dbExistsTable(conn, "iris")) {
+      # SCDB gives an error if there are no tables (it assumes a bad configuration)
+      # We create a table to suppress this warning
+      DBI::dbWriteTable(conn, "iris", iris, overwrite = TRUE)
+    }
+
     return(conn)
   }
 
