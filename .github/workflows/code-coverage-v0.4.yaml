@@ -1,13 +1,4 @@
-on:
-  push:
-    inputs:
-      cache_version:
-        type: string
-        default: '0'
-      schemas:
-        type: string
-        default: 'test_ds,not_test_ds'
-
+on: push
 
 jobs:
   code-coverage-sqlite:
@@ -26,7 +17,7 @@ jobs:
           - backend: SQLite - w. schemas
             id: sqlite-schemas
             args: 'list(dbname = file.path(tempdir(), "SQLite_schemas.SQLite"))'
-            schemas: ${{ inputs.schemas }}
+            schemas: 'test_ds,not_test_ds'
 
     env:
       BACKEND: ${{ matrix.config.backend }}
@@ -46,7 +37,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '0'
           extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
           needs: coverage
 
@@ -120,14 +111,14 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '0'
           extra-packages: any::covr
           needs: coverage
 
       - name: Setup BACKEND_POST_CONNECT
         run: |
           set -o xtrace
-          IFS=',' read -ra schemas <<< "${{ inputs.schemas }}"
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
 
           CONN_POST_CONNECT="list("
           for schema in "${schemas[@]}"; do
@@ -223,7 +214,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '0'
           extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
           needs: coverage
 
@@ -341,7 +332,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '0'
           extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
           needs: coverage
 

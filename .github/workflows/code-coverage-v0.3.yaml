@@ -1,13 +1,4 @@
-on:
-  push:
-    inputs:
-      cache_version:
-        type: string
-        default: '1'
-      schemas:
-        type: string
-        default: 'test_ds,not_test_ds'
-
+on: push
 
 jobs:
   code-coverage-sqlite:
@@ -26,7 +17,7 @@ jobs:
           - backend: SQLite - w. schemas
             id: sqlite-schemas
             args: 'list(dbname = file.path(tempdir(), "SQLite_schemas.SQLite"))'
-            schemas: ${{ inputs.schemas }}
+            schemas: 'test_ds,not_test_ds'
 
     env:
       BACKEND: ${{ matrix.config.backend }}
@@ -42,7 +33,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '1'
           extra-packages: any::covr
           needs: coverage
 
@@ -142,7 +133,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '1'
           extra-packages: any::covr
           needs: coverage
 
@@ -256,7 +247,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache-version: ${{ inputs.cache_version }}
+          cache-version: '1'
           extra-packages: any::covr
           needs: coverage
 
