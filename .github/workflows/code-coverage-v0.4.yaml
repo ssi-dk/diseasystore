@@ -194,10 +194,9 @@ jobs:
 
     steps:
       - name: Setup testing schemata in PostgreSQL
-        if: ${{ inputs.schemas != 'none' }}
         run: |
           set -o xtrace
-          IFS=',' read -ra schemas <<< "${{ inputs.schemas }}"
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
           for schema in "${schemas[@]}"; do
             psql test -c "CREATE SCHEMA \"$schema\";"
           done
@@ -303,13 +302,12 @@ jobs:
           show-log: true
 
       - name: Setup testing schemata in SQL server
-        if: ${{ inputs.schemas != 'none' }}
         run: |
           set -o xtrace
 
           sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -Q "ALTER LOGIN SA WITH DEFAULT_DATABASE = master;"
 
-          IFS=',' read -ra schemas <<< "${{ inputs.schemas }}"
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
           for schema in "${schemas[@]}"; do
             sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "CREATE SCHEMA [$schema];"
             sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "GO"
