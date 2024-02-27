@@ -1,6 +1,3 @@
-utils::globalVariables(c("source_conn_path", "source_conn_github"))
-
-
 #' Test a given diseasy store
 #' @description
 #'   This function runs a battery of tests of the given diseasystore.
