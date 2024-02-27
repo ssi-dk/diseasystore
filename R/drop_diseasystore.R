@@ -100,7 +100,7 @@ drop_diseasystore <- function(pattern = NULL,
 
 
     tables_to_delete <- tables |>
-      dplyr::filter(stringr::str_detect(.data$db_table_id, ds_table_pattern)) |>
+      dplyr::filter(stringr::str_starts(.data$db_table_id, ds_table_pattern)) |>
       dplyr::select(!"db_table_id")
 
 
