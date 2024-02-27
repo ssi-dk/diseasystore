@@ -311,12 +311,8 @@ jobs:
           for schema in "${schemas[@]}"; do
             sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "CREATE SCHEMA [$schema];"
             sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "GO"
+            sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = '[$schema]'"
           done
-
-          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT * FROM sys.schemas"
-
-          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = 'test'"
-          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = 'test.one'"
 
       - uses: actions/checkout@v4
 
