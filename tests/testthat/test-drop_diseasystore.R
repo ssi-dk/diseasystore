@@ -40,15 +40,10 @@ test_that("drop_diseasystore can delete entire default schema", {
     expect_true(DBI::dbExistsTable(conn, ids[[4]]))
 
     # Make sure all tables have been removed
-    c(paste(target_schema_1, "logs",     sep = "."),
-      paste(target_schema_1, "mtcars_1", sep = "."),
-      paste(target_schema_1, "mtcars_2", sep = "."),
-      "mtcars_1",
-      paste(target_schema_2, "mtcars_1", sep = ".")
-    ) |>
+    c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
       purrr::walk(~ {
         if (DBI::dbExistsTable(conn, .)) {
-          DBI::dbRemoveTable(conn, SCDB::id(., conn))
+          DBI::dbRemoveTable(conn, .)
         }
         expect_false(DBI::dbExistsTable(conn, .))
       })
@@ -111,15 +106,10 @@ test_that("drop_diseasystore can delete single table in default schema", {
 
 
     # Make sure all tables have been removed
-    c(paste(target_schema_1, "logs",     sep = "."),
-      paste(target_schema_1, "mtcars_1", sep = "."),
-      paste(target_schema_1, "mtcars_2", sep = "."),
-      "mtcars_1",
-      paste(target_schema_2, "mtcars_1", sep = ".")
-    ) |>
+    c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
       purrr::walk(~ {
         if (DBI::dbExistsTable(conn, .)) {
-          DBI::dbRemoveTable(conn, SCDB::id(., conn))
+          DBI::dbRemoveTable(conn, .)
         }
         expect_false(DBI::dbExistsTable(conn, .))
       })
