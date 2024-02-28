@@ -28,7 +28,8 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #'     DiseasystoreGoogleCovid19,
 #'     \() list(DBI::dbConnect(RSQLite::SQLite())),
 #'     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
-#'     target_schema = "test_ds"
+#'     target_schema = "test_ds",
+#'     test_start_date = as.Date("2020-03-01")
 #'   )
 #' }
 #' @export
