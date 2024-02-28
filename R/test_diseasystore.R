@@ -10,9 +10,6 @@ utils::globalVariables(c("source_conn_path", "source_conn_github"))
 #'   The tests assume that data has been made available locally to run the majority of the tests.
 #'   The location of the local data should be configured in the options for "source_conn" of the given
 #'   diseasystore before calling test_diseasystore.
-#'   If the data is unavailable, `local` should be set to `FALSE` so tests are skipped gracefully.
-#'
-#'   If `remote` is set `TRUE`, the tests will check that the first feature can be computed.
 #'
 #' @param diseasystore_generator (`Diseasystore*`)\cr
 #'   The diseasystore R6 class generator to test.
@@ -102,13 +99,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Throw warning if data unavailable
-  if (curl::has_internet() && !remote_data_available) {
+  if (!is.null(remote_conn) && curl::has_internet() && !remote_data_available) {
     warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
   }
 
   # Check that the files are available after attempting to download
   local <- purrr::every(data_files, ~ checkmate::test_file_exists(file.path(local_conn, .)))
-
 
 
   # Set testing options

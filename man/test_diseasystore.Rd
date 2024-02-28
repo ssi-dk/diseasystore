@@ -39,9 +39,6 @@ The supplied diseasystore must be a generator for the diseasystore, not an insta
 The tests assume that data has been made available locally to run the majority of the tests.
 The location of the local data should be configured in the options for "source_conn" of the given
 diseasystore before calling test_diseasystore.
-If the data is unavailable, \code{local} should be set to \code{FALSE} so tests are skipped gracefully.
-
-If \code{remote} is set \code{TRUE}, the tests will check that the first feature can be computed.
 }
 \examples{
 \donttest{
