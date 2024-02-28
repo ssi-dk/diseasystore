@@ -47,6 +47,7 @@ Imports:
 Suggests:
     devtools,
     duckdb,
+    epiparameter,
     ggplot2,
     here,
     knitr,
@@ -58,9 +59,15 @@ Suggests:
     RPostgres,
     testthat (>= 3.0.0),
     tibble,
+    simulist,
     spelling,
+    usethis,
     withr
 VignetteBuilder: knitr
+Remotes: https://github.com/epiverse-trace
 URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore/
 BugReports: https://github.com/ssi-dk/diseasystore/issues
 Config/testthat/edition: 3
+Depends:
+    R (>= 2.10)
+LazyData: true
