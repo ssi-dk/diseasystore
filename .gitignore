@@ -5,7 +5,6 @@
 .DS_Store
 inst/doc
 docs
-data-raw
 settings.json
 /doc/
 /Meta/
