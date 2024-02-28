@@ -42,9 +42,11 @@ Imports:
     zoo
 Suggests:
     devtools,
+    duckdb,
     curl,
     jsonlite,
     knitr,
+    odbc,
     rmarkdown,
     RSQLite,
     RPostgres,

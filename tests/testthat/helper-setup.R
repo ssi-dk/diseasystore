@@ -19,17 +19,31 @@ get_test_conns <- function() {
     # Define our local connection backends
     conn_list <- list(
       # Backend string = package::function
-      "SQLite" = "RSQLite::SQLite"
+      "SQLite"              = "RSQLite::SQLite",
+      "SQLite - w. schemas" = "RSQLite::SQLite",
+      "DuckDB"              = "duckdb::duckdb"
     )
 
     # Define our local connection arguments
     conn_args <- list(
       # Backend string = list(named args)
-      "SQLite" = list(dbname = file.path(tempdir(), "SQLite.SQLite"))
+      "SQLite"              = list(dbname = file.path(tempdir(), "SQLite.SQLite")),
+      "SQLite - w. schemas" = list(dbname = file.path(tempdir(), "SQLite_schemas.SQLite")),
+      "DuckDB"              = list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))
     )
 
     # Define post connection commands to run
-    conn_post_connect <- list()
+    conn_post_connect <- list(
+      # Backend string = list(named args)
+      "SQLite - w. schemas" = list(
+       paste0("ATTACH '", file.path(tempdir(), "SQLite_test_ds.SQLite"), "' AS 'test_ds'"),
+       paste0("ATTACH '", file.path(tempdir(), "SQLite_not_test_ds.SQLite"), "' AS 'not_test_ds'")
+      ),
+      "DuckDB" = list(
+        paste0("CREATE SCHEMA IF NOT EXISTS 'test_ds';"),
+        paste0("CREATE SCHEMA IF NOT EXISTS 'not_test_ds';")
+      )
+    )
 
   } else {
 
@@ -70,39 +84,41 @@ get_test_conns <- function() {
 
     # Skip unavailable packages
     if (!requireNamespace(parts[1], quietly = TRUE)) {
-      return()
+      warning("Library ", parts[1], " not available!")
+      return(NULL)
     }
 
-    drv <- getExportedValue(parts[1], parts[2])
-
-    conn <- tryCatch(
-      SCDB::get_connection(drv = drv(), ...),
-      error = function(e) {
-        return(NULL) # Return NULL, if we cannot connect
-      }
-    )
-
-    if (packageVersion("SCDB") < "0.4.0" && !DBI::dbExistsTable(conn, "iris")) {
-      # SCDB gives an error if there are no tables (it assumes a bad configuration)
-      # We create a table to suppress this warning
-      DBI::dbWriteTable(conn, "iris", iris, overwrite = TRUE)
-    }
-
-    return(conn)
+    return(getExportedValue(parts[1], parts[2])())
   }
 
   # Check all conn_args have associated entry in conn_list
   checkmate::assert_subset(names(conn_args), names(conn_list))
 
   # Open connections
-  test_conns <- names(conn_list) |>
-    purrr::map(~ do.call(get_driver, c(list(x = purrr::pluck(conn_list, .)), purrr::pluck(conn_args, .)))) |>
+  drivers <- names(conn_list) |>
+    purrr::map(~ do.call(get_driver, list(x = purrr::pluck(conn_list, .)))) |>
     stats::setNames(names(conn_list)) |>
+    purrr::discard(is.null)
+
+  test_conns <- names(drivers) |>
+    purrr::map(~ do.call(SCDB::get_connection, c(list(drv = purrr::pluck(drivers, .)), purrr::pluck(conn_args, .)))) |>
+    stats::setNames(names(drivers)) |>
     purrr::discard(is.null)
 
   # Run post_connect commands on the connections
   purrr::walk2(test_conns, names(test_conns),
                \(conn, conn_name) purrr::walk(purrr::pluck(conn_post_connect, conn_name), ~ DBI::dbExecute(conn, .)))
+
+  # Shutdown drivers that needs it
+  drivers |>
+    purrr::keep(~ inherits(., "duckdb_driver")) |>
+    purrr::walk(~ duckdb::duckdb_shutdown(.))
+
+  # SQLite back end gives an error in SCDB if there are no tables (it assumes a bad configuration)
+  # We create a table to suppress this warning
+  purrr::walk(test_conns, ~ if (checkmate::test_class(., "SQLiteConnection")) {
+    DBI::dbWriteTable(., "iris", iris, overwrite = TRUE)
+  })
 
   # Inform the user about the tested back ends:
   msg <- paste(sep = "\n",

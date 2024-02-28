@@ -51,7 +51,7 @@ test_that("age_on_date works for date input", {
       dplyr::pull(reference_ages, "age")
     )
 
-    DBI::dbDisconnect(conn)
+    DBI::dbDisconnect(conn, shutdown = TRUE)
   }
 })
 
@@ -99,6 +99,6 @@ test_that("age_on_date works for reference input", {
       dplyr::pull(reference_ages, "age")
     )
 
-    DBI::dbDisconnect(conn)
+    DBI::dbDisconnect(conn, shutdown = TRUE)
   }
 })

@@ -12,6 +12,37 @@ target_schema_2 <- "not_test_ds"
 
 
 # Ensure the target conns are empty and configured correctly
+coll <- checkmate::makeAssertCollection()
+conns <- get_test_conns()
+for (conn_id in seq_along(conns)) {
+
+  conn <- conns[[conn_id]]
+
+  # Ensure connections are valid
+  if (is.null(conn) || !DBI::dbIsValid(conn)) {
+    coll$push(glue::glue("Connection could not be made to backend ({names(conns)[[conn_id]]})."))
+  }
+
+
+  # Check schemas are configured correctly
+  if (!SCDB::schema_exists(conn, target_schema_1) && names(conns)[conn_id] != "SQLite") {
+    coll$push(
+      glue::glue("Tests require the schema '{target_schema_1}' to exist in connection ({names(conns)[[conn_id]]}).")
+    )
+  }
+
+  if (!SCDB::schema_exists(conn, target_schema_2) && names(conns)[conn_id] != "SQLite") {
+    coll$push(
+      glue::glue("Tests require the schema '{target_schema_2}' to exist in connection ({names(conns)[[conn_id]]}).")
+    )
+  }
+
+  DBI::dbDisconnect(conn, shutdown = TRUE)
+}
+checkmate::reportAssertions(coll)
+
+
+# Configure the data bases
 for (conn in get_test_conns()) {
 
   # Try to write to the target schema
@@ -39,5 +70,5 @@ for (conn in get_test_conns()) {
   checkmate::assert_true(n_tables_in_test_schemas == 0)
 
   # Disconnect
-  DBI::dbDisconnect(conn)
+  DBI::dbDisconnect(conn, shutdown = TRUE)
 }
