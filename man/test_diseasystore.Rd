@@ -8,7 +8,8 @@ test_diseasystore(
   diseasystore_generator = NULL,
   conn_generator = NULL,
   data_files = NULL,
-  target_schema = "test_ds"
+  target_schema = "test_ds",
+  test_start_date = NULL
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ List of files that should be available when testing.}
 
 \item{target_schema}{(\code{character(1)})\cr
 The data base schema where the tests should be run.}
+
+\item{test_start_date}{(\code{Date})\cr
+The earliest date to retrieve data from during tests.}
 }
 \value{
 NULL (called for side effects)
@@ -35,9 +39,6 @@ The supplied diseasystore must be a generator for the diseasystore, not an insta
 The tests assume that data has been made available locally to run the majority of the tests.
 The location of the local data should be configured in the options for "source_conn" of the given
 diseasystore before calling test_diseasystore.
-If the data is unavailable, \code{local} should be set to \code{FALSE} so tests are skipped gracefully.
-
-If \code{remote} is set \code{TRUE}, the tests will check that the first feature can be computed.
 }
 \examples{
 \dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
@@ -46,7 +47,8 @@ If \code{remote} is set \code{TRUE}, the tests will check that the first feature
     DiseasystoreGoogleCovid19,
     \() list(DBI::dbConnect(RSQLite::SQLite())),
     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
-    target_schema = "test_ds"
+    target_schema = "test_ds",
+    test_start_date = as.Date("2020-03-01")
   )
 }
 \dontshow{\}) # examplesIf}

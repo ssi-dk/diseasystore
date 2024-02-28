@@ -7,9 +7,6 @@
 #'   The tests assume that data has been made available locally to run the majority of the tests.
 #'   The location of the local data should be configured in the options for "source_conn" of the given
 #'   diseasystore before calling test_diseasystore.
-#'   If the data is unavailable, `local` should be set to `FALSE` so tests are skipped gracefully.
-#'
-#'   If `remote` is set `TRUE`, the tests will check that the first feature can be computed.
 #'
 #' @param diseasystore_generator (`Diseasystore*`)\cr
 #'   The diseasystore R6 class generator to test.
@@ -19,6 +16,8 @@
 #'   List of files that should be available when testing.
 #' @param target_schema (`character(1)`)\cr
 #'   The data base schema where the tests should be run.
+#' @param test_start_date (`Date`)\cr
+#'   The earliest date to retrieve data from during tests.
 #' @return `r rd_side_effects`
 #' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #' \donttest{
@@ -26,12 +25,13 @@
 #'     DiseasystoreGoogleCovid19,
 #'     \() list(DBI::dbConnect(RSQLite::SQLite())),
 #'     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
-#'     target_schema = "test_ds"
+#'     target_schema = "test_ds",
+#'     test_start_date = as.Date("2020-03-01")
 #'   )
 #' }
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
-                              data_files = NULL, target_schema = "test_ds") {
+                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL) {
 
   # Determine the class of the diseasystore being tested
   diseasystore_class <- diseasystore_generator$classname
@@ -41,6 +41,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   checkmate::assert_choice(as.character(diseasystore_generator$inherit), "DiseasystoreBase", add = coll)
   checkmate::assert_function(conn_generator, add = coll)
   purrr::walk(conn_generator(), ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  checkmate::assert_character(data_files, null.ok = TRUE, add = coll)
+  checkmate::assert_character(target_schema, add = coll)
+  checkmate::assert_date(test_start_date, add = coll)
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
@@ -98,13 +101,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Throw warning if data unavailable
-  if (curl::has_internet() && !remote_data_available) {
+  if (!is.null(remote_conn) && curl::has_internet() && !remote_data_available) {
     warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
   }
 
   # Check that the files are available after attempting to download
   local <- purrr::every(data_files, ~ checkmate::test_file_exists(file.path(local_conn, .)))
-
 
 
   # Set testing options
@@ -118,13 +120,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
 
-  # ######## ########  ######  ########  ######     ########  ########  ######   #### ##    ##  ######
-  #    ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ###   ## ##    ##
-  #    ##    ##       ##          ##    ##          ##     ## ##       ##         ##  ####  ## ##
-  #    ##    ######    ######     ##     ######     ########  ######   ##   ####  ##  ## ## ##  ######
-  #    ##    ##             ##    ##          ##    ##     ## ##       ##    ##   ##  ##  ####       ##
-  #    ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ##   ### ##    ##
-  #    ##    ########  ######     ##     ######     ########  ########  ######   #### ##    ##  ######
+  #     ######## ########  ######  ########  ######     ########  ########  ######   #### ##    ##  ######
+  #        ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ###   ## ##    ##
+  #        ##    ##       ##          ##    ##          ##     ## ##       ##         ##  ####  ## ##
+  #        ##    ######    ######     ##     ######     ########  ######   ##   ####  ##  ## ## ##  ######
+  #        ##    ##             ##    ##          ##    ##     ## ##       ##    ##   ##  ##  ####       ##
+  #        ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ##   ### ##    ##
+  #        ##    ########  ######     ##     ######     ########  ########  ######   #### ##    ##  ######
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
@@ -169,8 +171,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
-      start_date = as.Date("2020-03-01"),
-      end_date = as.Date("2020-03-01"),
+      start_date = test_start_date,
+      end_date = test_start_date,
       verbose = FALSE
     ))
 
@@ -182,14 +184,14 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
-  testthat::test_that(glue::glue("{diseasystore_class} can initialise with directory source_conn"), {
+  testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(local)
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
-      start_date = as.Date("2020-03-01"),
-      end_date = as.Date("2020-03-01"),
+      start_date = test_start_date,
+      end_date = test_start_date,
       verbose = FALSE
     ))
 
@@ -211,8 +213,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- as.Date("2020-03-01")
-        end_date   <- as.Date("2020-03-05")
+        start_date <- test_start_date
+        end_date   <- test_start_date + lubridate::days(4)
 
         feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           dplyr::collect()
@@ -264,8 +266,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- as.Date("2020-03-01")
-        end_date   <- as.Date("2020-03-10")
+        start_date <- test_start_date
+        end_date   <- test_start_date + lubridate::days(9)
 
         feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           dplyr::collect() |>
@@ -311,8 +313,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Set start and end dates for the rest of the tests
-  start_date <- as.Date("2020-03-01")                                                                                   # nolint: object_usage_linter
-  end_date   <- as.Date("2020-03-10")                                                                                   # nolint: object_usage_linter
+  start_date <- test_start_date                                                                                         # nolint: object_usage_linter
+  end_date   <- test_start_date + lubridate::days(9)                                                                    # nolint: object_usage_linter
 
 
 
