@@ -1,0 +1,104 @@
+# Create a test data set that contains all birth dates in 2000, 1970, and 1940 (no particular reason)
+test_data <- c(
+  seq.Date(from = as.Date("2000-01-01"), to = as.Date("2000-12-31"), by = "1 day"),
+  seq.Date(from = as.Date("1970-01-01"), to = as.Date("1970-12-31"), by = "1 day"),
+  seq.Date(from = as.Date("1940-01-01"), to = as.Date("1940-12-31"), by = "1 day")
+) |>
+  tibble::tibble(birth_date = _) |>
+  dplyr::mutate(reference_date = birth_date + lubridate::days(40 * dplyr::row_number()))
+
+
+test_that("age_on_date works for date input", {
+
+  test_date <- as.Date("2024-02-28")
+
+  for (conn in get_test_conns()) {
+
+    # Copy to the remote
+    test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+
+    # Compute the reference age using lubridate
+    reference_ages <- test_data |>
+      dplyr::mutate(age = floor(lubridate::interval(.data$birth_date, test_date) / lubridate::years(1)))
+
+
+    # SQLlite does not have a precise way to estimate age, so the age computation helper will throw a warning
+    # We here test that the warning is thrown, and filter out the known offending dates from the test
+    if (inherits(conn, "SQLiteConnection")) {
+
+      # Capture and check warning
+      test_ages <- tryCatch(
+        dplyr::mutate(test_ages, "age" = !!age_on_date("birth_date", test_date, conn)),
+        warning = function(w) {
+          expect_match(w$message, "Age computation on SQLite is not precise")
+          return(suppressWarnings(dplyr::mutate(test_ages, "age" = !!age_on_date("birth_date", test_date, conn))))
+        }
+      )
+
+      # Remove offending dates
+      test_ages      <- dplyr::filter(test_ages,      .data$birth_date != !!as.numeric(as.Date("1970-02-28")))
+      reference_ages <- dplyr::filter(reference_ages, .data$birth_date != as.Date("1970-02-28"))
+
+    } else {
+
+      # Compute the age using the age function
+      test_ages <- dplyr::mutate(test_ages, "age" = !!age_on_date("birth_date", test_date, conn))
+
+    }
+
+    expect_equal(
+      dplyr::pull(test_ages,      "age"),
+      dplyr::pull(reference_ages, "age")
+    )
+
+    DBI::dbDisconnect(conn)
+  }
+})
+
+
+test_that("age_on_date works for reference input", {
+
+  for (conn in get_test_conns()) {
+
+    # Copy to the remote
+    test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+
+    # Compute the reference age using lubridate
+    reference_ages <- test_data |>
+      dplyr::mutate(age = floor(lubridate::interval(.data$birth_date, .data$reference_date) / lubridate::years(1)))
+
+
+    # SQLlite does not have a precise way to estimate age, so the age computation helper will throw a warning
+    # We here test that the warning is thrown, and filter out the known offending dates from the test
+    if (inherits(conn, "SQLiteConnection")) {
+
+      # Capture and check warning
+      test_ages <- tryCatch(
+        dplyr::mutate(test_ages, "age" = !!age_on_date("birth_date", "reference_date", conn)),
+        warning = function(w) {
+          expect_match(w$message, "Age computation on SQLite is not precise")
+          return(
+            suppressWarnings(dplyr::mutate(test_ages, "age" = !!age_on_date("birth_date", "reference_date", conn)))
+          )
+        }
+      )
+
+      # Remove offending dates
+      test_ages      <- dplyr::filter(test_ages,      .data$birth_date != !!as.numeric(as.Date("2000-07-28")))
+      reference_ages <- dplyr::filter(reference_ages, .data$birth_date != as.Date("2000-07-28"))
+
+    } else {
+
+      # Compute the age using the age function
+      test_ages <- dplyr::mutate(test_ages, "age" = !!age_on_date("birth_date", "reference_date", conn))
+
+    }
+
+    expect_equal(
+      dplyr::pull(test_ages,      "age"),
+      dplyr::pull(reference_ages, "age")
+    )
+
+    DBI::dbDisconnect(conn)
+  }
+})
