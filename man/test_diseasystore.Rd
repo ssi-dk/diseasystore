@@ -8,7 +8,8 @@ test_diseasystore(
   diseasystore_generator = NULL,
   conn_generator = NULL,
   data_files = NULL,
-  target_schema = "test_ds"
+  target_schema = "test_ds",
+  test_start_date = NULL
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ List of files that should be available when testing.}
 
 \item{target_schema}{(\code{character(1)})\cr
 The data base schema where the tests should be run.}
+
+\item{test_start_date}{(\code{Date})\cr
+The earliest date to retrieve data from during tests.}
 }
 \value{
 NULL (called for side effects)
