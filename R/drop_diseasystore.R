@@ -61,7 +61,7 @@ drop_diseasystore <- function(pattern = NULL,
     # Check if logs is in the table, if yes, all tables must be deleted
     if ("logs" %in% tables_to_delete$table &&
           !identical(tables_to_delete,
-                    dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex))))) {
+                     dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex))))) {
       stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
     }
 
@@ -81,11 +81,13 @@ drop_diseasystore <- function(pattern = NULL,
         dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
         dplyr::select("log_file")
 
-      dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(logs_table_id, conn), check_from = FALSE),
-                        log_records_to_delete,
-                        by = "log_file",
-                        in_place = TRUE,
-                        unmatched = "ignore")
+      dplyr::rows_delete(
+        dplyr::tbl(conn, SCDB::id(logs_table_id, conn), check_from = FALSE),
+        log_records_to_delete,
+        by = "log_file",
+        in_place = TRUE,
+        unmatched = "ignore"
+      )
     }
   } else {
     # Get list of tables
@@ -106,7 +108,7 @@ drop_diseasystore <- function(pattern = NULL,
 
     # Check if logs is in the table, if yes, all tables must be deleted
     if (purrr::some(tables_to_delete$table, ~ endsWith(., ".logs")) &&
-        !identical(tables_to_delete, SCDB::get_tables(conn, ds_context))) {
+          !identical(tables_to_delete, SCDB::get_tables(conn, ds_context))) {
       stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped."))
     }
 
