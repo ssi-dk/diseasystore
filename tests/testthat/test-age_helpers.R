@@ -1,4 +1,26 @@
-# Create a test data set that contains all birth dates in 2000, 1970, and 1940 (no particular reason)
+test_that("age_labels() works", {
+
+  # Test simple use case
+  expect_identical(
+    age_labels(c(5, 12, 20, 30)),
+    c("00-04", "05-11", "12-19", "20-29", "30+")
+  )
+
+  # Test superfluous zeros are ignored
+  expect_identical(
+    age_labels(c(0, 5, 12, 20, 30)),
+    c("00-04", "05-11", "12-19", "20-29", "30+")
+  )
+
+  # Test zero-padding works for large ages
+  expect_identical(
+    age_labels(c(5, 12, 20, 30, 130)),
+    c("000-004", "005-011", "012-019", "020-029", "030-129", "130+")
+  )
+})
+
+
+# Create a test data set that contains all birth dates in 2000, 1970, and 1940 (years with, or almost with, leap years)
 test_data <- c(
   seq.Date(from = as.Date("2000-01-01"), to = as.Date("2000-12-31"), by = "1 day"),
   seq.Date(from = as.Date("1970-01-01"), to = as.Date("1970-12-31"), by = "1 day"),
@@ -8,7 +30,7 @@ test_data <- c(
   dplyr::mutate(reference_date = birth_date + lubridate::days(40 * dplyr::row_number()))
 
 
-test_that("age_on_date works for date input", {
+test_that("age_on_date() works for date input", {
 
   test_date <- as.Date("2024-02-28")
 
@@ -22,7 +44,7 @@ test_that("age_on_date works for date input", {
       dplyr::mutate(age = floor(lubridate::interval(.data$birth_date, test_date) / lubridate::years(1)))
 
 
-    # SQLlite does not have a precise way to estimate age, so the age computation helper will throw a warning
+    # SQLite does not have a precise way to estimate age, so the age computation helper will throw a warning
     # We here test that the warning is thrown, and filter out the known offending dates from the test
     if (inherits(conn, "SQLiteConnection")) {
 
@@ -56,7 +78,7 @@ test_that("age_on_date works for date input", {
 })
 
 
-test_that("age_on_date works for reference input", {
+test_that("age_on_date() works for reference input", {
 
   for (conn in get_test_conns()) {
 
@@ -68,7 +90,7 @@ test_that("age_on_date works for reference input", {
       dplyr::mutate(age = floor(lubridate::interval(.data$birth_date, .data$reference_date) / lubridate::years(1)))
 
 
-    # SQLlite does not have a precise way to estimate age, so the age computation helper will throw a warning
+    # SQLite does not have a precise way to estimate age, so the age computation helper will throw a warning
     # We here test that the warning is thrown, and filter out the known offending dates from the test
     if (inherits(conn, "SQLiteConnection")) {
 
