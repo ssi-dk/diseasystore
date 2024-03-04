@@ -27,8 +27,7 @@ test_data <- c(
   seq.Date(from = as.Date("1940-01-01"), to = as.Date("1940-12-31"), by = "1 day")
 ) |>
   tibble::tibble(birth_date = _) |>
-  dplyr::mutate(
-    reference_date = birth_date + lubridate::days(40 * dplyr::row_number()))
+  dplyr::mutate(reference_date = birth_date + lubridate::days(40 * dplyr::row_number()))
 
 
 test_that("age_on_date() works for date input", {
