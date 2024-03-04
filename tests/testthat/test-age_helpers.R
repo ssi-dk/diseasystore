@@ -38,8 +38,12 @@ test_that("age_on_date() works for date input", {
   for (conn in get_test_conns()) {
 
     # Copy to the remote
-    test_ages <- dplyr::copy_to(conn, test_data, "test_age")
-    SCDB::defer_db_cleanup(test_ages)
+    if (packageVersion("SCDB") > "0.3.0") {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age")
+      SCDB::defer_db_cleanup(test_ages)
+    } else {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    }
 
     # Compute the reference age using lubridate
     reference_ages <- test_data |>
@@ -85,8 +89,13 @@ test_that("age_on_date() works for reference input", {
   for (conn in get_test_conns()) {
 
     # Copy to the remote
-    test_ages <- dplyr::copy_to(conn, test_data, "test_age")
-    SCDB::defer_db_cleanup(test_ages)
+    if (packageVersion("SCDB") > "0.3.0") {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age")
+      SCDB::defer_db_cleanup(test_ages)
+    } else {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    }
+
 
     # Compute the reference age using lubridate
     reference_ages <- test_data |>
@@ -147,8 +156,12 @@ test_that("add_years() works for positive input", {
   for (conn in get_test_conns()) {
 
     # Copy to the remote
-    test_ages <- dplyr::copy_to(conn, test_data, "test_age")
-    SCDB::defer_db_cleanup(test_ages)
+    if (packageVersion("SCDB") > "0.3.0") {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age")
+      SCDB::defer_db_cleanup(test_ages)
+    } else {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    }
 
     # Compute the reference date using lubridate
     reference_ages <- test_data |>
@@ -207,8 +220,12 @@ test_that("add_years() works for negative input", {
   for (conn in get_test_conns()) {
 
     # Copy to the remote
-    test_ages <- dplyr::copy_to(conn, test_data, "test_age")
-    SCDB::defer_db_cleanup(test_ages)
+    if (packageVersion("SCDB") > "0.3.0") {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age")
+      SCDB::defer_db_cleanup(test_ages)
+    } else {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    }
 
     # Compute the reference date using lubridate
     reference_ages <- test_data |>
@@ -268,8 +285,12 @@ test_that("add_years() works for reference input", {
   for (conn in get_test_conns()) {
 
     # Copy to the remote
-    test_ages <- dplyr::copy_to(conn, test_data, "test_age")
-    SCDB::defer_db_cleanup(test_ages)
+    if (packageVersion("SCDB") > "0.3.0") {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age")
+      SCDB::defer_db_cleanup(test_ages)
+    } else {
+      test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    }
 
     # Compute the reference date using lubridate
     reference_ages <- test_data |>
