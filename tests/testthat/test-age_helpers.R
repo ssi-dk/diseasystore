@@ -275,6 +275,7 @@ test_that("add_years() works for reference input", {
     reference_ages <- test_data |>
       dplyr::mutate("first_birthday" = lubridate::`%m+%`(.data$birth_date, lubridate::years(1)))
 
+
     # SQLite does not have a precise way to estimate time, so the time computation helper will throw a warning
     # We here test that the warning is thrown, and filter out the known offending dates from the test
     if (inherits(conn, "SQLiteConnection")) {
