@@ -84,3 +84,61 @@ age_on_date.duckdb_connection <- function(birth, reference_date, conn) {
   if (inherits(reference_date, "Date")) reference_date <- glue::glue("DATE '{reference_date}'")
   return(dplyr::sql(glue::glue("DATE_SUB('year', {birth}, {reference_date})")))
 }
+
+
+#' Backend-dependent time interval (in years)
+#'
+#' @description
+#'   Provides the sql code for a time interval (in years).
+#' @param reference_date (`Date(1)` or `character(1)`)\cr
+#'   The date to add years to (or name of column containing the reference date).
+#' @param years (`numeric(1)` or `character(1)`)\cr
+#'   The length of the time interval in whole years (or name of column containing the number of years).
+#' @param conn `r rd_conn()`
+#' @return SQL query for the time interval.
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
+#'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
+#'
+#'   dplyr::copy_to(conn, data.frame(birth = as.Date("2001-04-03"), "test_age")) |>
+#'     dplyr::mutate(first_birthday = !!add_years("birth", 1, conn))
+#'
+#'   DBI::dbDisconnect(conn)
+#' @export
+add_years <- function(reference_date, years, conn) {
+  checkmate::assert(
+    checkmate::check_date(reference_date),
+    checkmate::check_character(reference_date)
+  )
+  checkmate::assert(
+    checkmate::check_integerish(years),
+    checkmate::check_character(years)
+  )
+  checkmate::assert_class(conn, "DBIConnection")
+
+  UseMethod("add_years", conn)
+}
+
+#' @export
+add_years.SQLiteConnection <- function(reference_date, years, conn) {
+  warning("Time computation on SQLite is not precise! For long time intervals, the result may be off by 1+ days.")
+  if (inherits(reference_date, "Date")) reference_date <- as.numeric(reference_date)
+  return(dplyr::sql(glue::glue("ROUND({reference_date} + {years} * 365.242374)")))
+}
+
+#' @export
+add_years.PqConnection <- function(reference_date, years, conn) {
+  if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'")
+  return(dplyr::sql(glue::glue("{reference_date} + INTERVAL '{years} year'")))
+}
+
+#' @export
+`add_years.Microsoft SQL Server` <- function(reference_date, years, conn) {
+  if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'")
+  return(dplyr::sql(glue::glue("DATEADD(year, {years}, reference_date")))
+}
+
+#' @export
+add_years.duckdb_connection <- function(years, conn) {
+  if (inherits(reference_date, "Date")) reference_date <- glue::glue("DATE '{reference_date}'")
+  return(dplyr::sql(glue::glue("DATE_ADD({reference_date}, INTERVAL {years} YEAR)")))
+}
