@@ -11,6 +11,7 @@ This \code{DiseasystoreBase} \link[R6:R6Class]{R6} class forms the basis of all 
 It defines the primary methods of each feature stores as well as all of the public methods.
 }
 \examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   # DiseasystoreBase is mostly used as the basis of other, more specific, classes
   # The DiseasystoreBase can be initialised individually if needed.
 
@@ -18,6 +19,7 @@ It defines the primary methods of each feature stores as well as all of the publ
                              target_conn = DBI::dbConnect(RSQLite::SQLite()))
 
   rm(ds)
+\dontshow{\}) # examplesIf}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}

@@ -80,15 +80,15 @@ OO
 ORCID
 org
 
+param
 parsable
 PascalCase
 pcbi
+pid
 Plesner
 PLoS
 POSIXct
-pid
-
-param
+PostgreSQL
 
 quos
 
@@ -108,6 +108,7 @@ Skytte
 SSI
 Statens
 sql
+SQLite
 
 tbl
 Telkamp

@@ -1,5 +1,21 @@
 # diseasystore (development version)
 
+## New Features:
+
+* With the release of `{SCDB}` v0.4, we now support more database backends:
+
+  * SQLite with attached schemas (#121).
+
+  * Microsoft SQL Server (#111).
+
+  * PostgreSQL.
+
+* `test_diseasystore()` is added to provide a standardised method for testing new diseasystores (#123).
+
+## Minor Improvements and Fixes:
+
+* `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
+
 # diseasystore 0.1.1
 
 ## Fixes:

@@ -3,7 +3,7 @@
 #' @description
 #'   This `DiseasystoreBase` [R6][R6::R6Class] class forms the basis of all feature stores.
 #'   It defines the primary methods of each feature stores as well as all of the public methods.
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #'   # DiseasystoreBase is mostly used as the basis of other, more specific, classes
 #'   # The DiseasystoreBase can be initialised individually if needed.
 #'
@@ -105,6 +105,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @param slice_ts `r rd_slice_ts()`
     #' @return
     #'   A tbl_dbi with the requested feature for the study period.
+    #' @importFrom utils packageVersion
     get_feature = function(feature,
                            start_date = self %.% start_date,
                            end_date   = self %.% end_date,
@@ -131,7 +132,17 @@ DiseasystoreBase <- R6::R6Class(                                                
       feature_loader <- purrr::pluck(ds_map, feature)
 
       # Determine where these features are stored
-      target_table <- paste(self %.% target_schema, feature_loader, sep = ".")
+      if (packageVersion("SCDB") < "0.4.0") {
+        target_table_id <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
+        target_table <- paste(
+          c(purrr::pluck(target_table_id, "name", "schema"),
+            purrr::pluck(target_table_id, "name", "table")
+          ),
+          collapse = "."
+        )
+      } else {
+        target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
+      }
 
 
       # Create log table
@@ -147,18 +158,31 @@ DiseasystoreBase <- R6::R6Class(                                                
       # If there are any missing ranges, put a lock on the data base
       if (nrow(ds_missing_ranges) > 0) {
 
-        # Add a LOCK to the diseasystore
-        add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-
-        # Check if we have ownership of the update of the target_table
-        # If not, keep retrying and wait for up to 30 minutes before giving up
-        wait_time <- 0 # seconds
-        while (!isTRUE(is_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
-          Sys.sleep(diseasyoption("lock_wait_increment"))
+        if (packageVersion("SCDB") < "0.4.0") {
+          # Add a LOCK to the diseasystore
           add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-          wait_time <- wait_time + diseasyoption("lock_wait_increment")
-          if (wait_time > diseasyoption("lock_wait_max")) {
-            rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+
+
+          # Check if we have ownership of the update of the target_table
+          # If not, keep retrying and wait for up to 30 minutes before giving up
+          wait_time <- 0 # seconds
+          while (!isTRUE(is_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
+            Sys.sleep(diseasyoption("lock_wait_increment"))
+            add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+            wait_time <- wait_time + diseasyoption("lock_wait_increment")
+            if (wait_time > diseasyoption("lock_wait_max")) {
+              stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+            }
+          }
+        } else {
+          # Add a LOCK to the diseasystore
+          wait_time <- 0 # seconds
+          while (!isTRUE(SCDB::lock_table(self %.% target_conn, target_table, self %.% target_schema))) {
+            Sys.sleep(diseasyoption("lock_wait_increment"))
+            wait_time <- wait_time + diseasyoption("lock_wait_increment")
+            if (wait_time > diseasyoption("lock_wait_max")) {
+              stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+            }
           }
         }
 
@@ -196,10 +220,13 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Add the existing computed data for given slice_ts
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
-            ds_existing <- dplyr::tbl(self %.% target_conn, SCDB::id(target_table, self %.% target_conn),
-                                      check_from = FALSE)
+            if (packageVersion("SCDB") < "0.4.0") {
+              ds_existing <- dplyr::tbl(self %.% target_conn, target_table_id, check_from = FALSE)
+            } else {
+              ds_existing <- dplyr::tbl(self %.% target_conn, target_table, check_from = FALSE)
+            }
 
-            if (suppressMessages(SCDB::is.historical(ds_existing))) {
+            if (SCDB::is.historical(ds_existing)) {
               ds_existing <- ds_existing |>
                 dplyr::filter(.data$from_ts == slice_ts) |>
                 dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
@@ -217,26 +244,53 @@ DiseasystoreBase <- R6::R6Class(                                                
             self %.% target_conn
           )
 
-          logger <- SCDB::Logger$new(
-            output_to_console = FALSE,
-            log_table_id = log_table_id,
-            log_conn = self %.% target_conn
-          )
+          if (packageVersion("SCDB") < "0.4.0") {
+            logger <- SCDB::Logger$new(
+              output_to_console = FALSE,
+              log_table_id = log_table_id,
+              log_conn = self %.% target_conn
+            )
+          } else {
+            logger <- SCDB::Logger$new(
+              db_table = target_table,
+              timestamp = slice_ts,
+              output_to_console = FALSE,
+              log_table_id = log_table_id,
+              log_conn = self %.% target_conn
+            )
+          }
+
 
           # Commit to DB
-          SCDB::update_snapshot(
-            .data = ds_updated_feature,
-            conn = self %.% target_conn,
-            db_table = target_table,
-            timestamp = slice_ts,
-            message = glue::glue("ds-range: {start_date} - {end_date}"),
-            logger = logger,
-            enforce_chronological_order = FALSE
-          )
+          if (packageVersion("SCDB") < "0.4.0") {
+            SCDB::update_snapshot(
+              .data = ds_updated_feature,
+              conn = self %.% target_conn,
+              db_table = target_table_id,
+              timestamp = slice_ts,
+              message = glue::glue("ds-range: {start_date} - {end_date}"),
+              logger = logger,
+              enforce_chronological_order = FALSE
+            )
+          } else {
+            SCDB::update_snapshot(
+              .data = ds_updated_feature,
+              conn = self %.% target_conn,
+              db_table = target_table,
+              timestamp = slice_ts,
+              message = glue::glue("ds-range: {start_date} - {end_date}"),
+              logger = logger,
+              enforce_chronological_order = FALSE
+            )
+          }
         })
 
         # Release the lock on the table
-        remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        if (packageVersion("SCDB") < "0.4.0") {
+          remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        } else {
+          SCDB::unlock_table(self %.% target_conn, target_table, self %.% target_schema)
+        }
 
         # Inform how long has elapsed for updating data
         if (private$verbose && nrow(ds_missing_ranges) > 0) {
@@ -246,9 +300,15 @@ DiseasystoreBase <- R6::R6Class(                                                
       }
 
       # Finally, return the data to the user
-      out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
-                     args = list(target_table = target_table,
-                                 slice_ts = slice_ts, target_conn = self %.% target_conn))
+      if (packageVersion("SCDB") < "0.4.0") {
+        out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
+                       args = list(target_table = target_table_id,
+                                   slice_ts = slice_ts, target_conn = self %.% target_conn))
+      } else {
+        out <- do.call(what = purrr::pluck(private, feature_loader) %.% get,
+                       args = list(target_table = target_table,
+                                   slice_ts = slice_ts, target_conn = self %.% target_conn))
+      }
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
@@ -348,10 +408,13 @@ DiseasystoreBase <- R6::R6Class(                                                
             #  and end dates to simplify the interlaced output
             self$get_feature(.x, start_date, end_date) |>
               dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
-              dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d, na.rm = TRUE),
-                            "valid_until" =
-                              dplyr::coalesce(pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
-                                              .data$valid_until.d)) |>
+              dplyr::mutate(
+                "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),    # nolint: ifelse_censor_linter
+                "valid_until" = dplyr::coalesce(
+                  ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),             # nolint: ifelse_censor_linter
+                  .data$valid_until.d
+                )
+              ) |>
               dplyr::select(!ends_with(".d"))
           })
       } else {
@@ -364,10 +427,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       # to simplify the interlaced output
       observable_data <- self$get_feature(observable, start_date, end_date) |>
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
-        dplyr::mutate("valid_from" = pmax(.data$valid_from, .data$valid_from.d, na.rm = TRUE),
-                      "valid_until" =
-                        dplyr::coalesce(pmin(.data$valid_until, .data$valid_until.d, na.rm = TRUE),
-                                        .data$valid_until.d)) |>
+        dplyr::mutate(
+          "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),          # nolint: ifelse_censor_linter
+          "valid_until" = dplyr::coalesce(
+            ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),                   # nolint: ifelse_censor_linter
+            .data$valid_until.d
+          )
+        ) |>
         dplyr::select(!ends_with(".d"))
 
       # Determine the keys
@@ -593,13 +659,22 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @importFrom zoo as.Date
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
+      if (packageVersion("SCDB") < "0.4.0" && inherits(target_table, "Id")) {
+        target_table <- paste(
+          c(purrr::pluck(target_table, "schema"),
+            purrr::pluck(target_table, "table")
+          ),
+          collapse = "."
+        )
+      }
+
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(self %.% target_conn,
                          SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn),
                          check_from = FALSE) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!target_table, .data$date == !!slice_ts)
+        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {

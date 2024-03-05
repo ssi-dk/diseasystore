@@ -26,9 +26,11 @@ NULL (called for side effects)
 Drop feature stores from DB
 }
 \examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 
   drop_diseasystore(conn = conn)
 
   DBI::dbDisconnect(conn)
+\dontshow{\}) # examplesIf}
 }
