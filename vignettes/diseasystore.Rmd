@@ -229,6 +229,13 @@ options("diseasystore.source_conn" = file.path("local", "path"))
 diseasyoption("source_conn", class = "DiseasystoreDiseaseY")
 ```
 
+Finally, we can use the `.default` argument as a final fallback value in case no option is set for either general or
+specific case.
+```{r diseasyoption_example_4}
+diseasyoption("non_existent", class = "DiseasystoreDiseaseY", .default = "final fallback")
+```
+
+
 [^1]: If using `SQLite` as the back end, it will instead prepend the schema specification to the pattern before matching (e.g. "ds\\..*").
 [^2]: R's `options()` does not allow setting an option to `NULL`. By setting options as empty strings, the user can see the available options to set.
 
