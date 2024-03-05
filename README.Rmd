@@ -19,9 +19,9 @@ source.
 
 Data for different diseases will typically be structured in different
 ways. The `diseasystore` package currently implements the Google Health
-COVID-19 Open Repository with more one `diseasystores` the way.
+COVID-19 Open Repository with more `diseasystores` on the way.
 
-The `diseasystore` package is designed to handled both individual-level
+The `diseasystore` package is designed to handle both individual-level
 data (examples to come) and semi-aggregated (typically publicly
 available) data.
 
