@@ -83,7 +83,7 @@ diseasyoption <- function(option, class = "DiseasystoreBase", .default = NULL) {
     purrr::map(~ paste(c(base_class, .x, option), collapse = ".")) |>
     purrr::map(getOption) |>
     purrr::map(unlist) |>
-    purrr::keep(purrr::negate(is.null)) |>
+    purrr::discard(is.null) |>
     purrr::discard(~ identical(., "")) |>
     purrr::pluck(1, .default = .default)
 
