@@ -87,7 +87,7 @@ get_test_conns <- function() {
     purrr::discard(is.null)
 
   test_conns <- names(drivers) |>
-    purrr::map(~ do.call(get_connection, c(list(drv = purrr::pluck(drivers, .)), purrr::pluck(conn_args, .)))) |>
+    purrr::map(~ do.call(SCDB::get_connection, c(list(drv = purrr::pluck(drivers, .)), purrr::pluck(conn_args, .)))) |>
     stats::setNames(names(drivers)) |>
     purrr::discard(is.null)
 
