@@ -128,7 +128,7 @@ add_years.SQLiteConnection <- function(reference_date, years, conn) {
 #' @export
 add_years.PqConnection <- function(reference_date, years, conn) {
   if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'")
-  return(dplyr::sql(glue::glue("{reference_date} + INTERVAL '{years} year'")))
+  return(dplyr::sql(glue::glue("({reference_date} + INTERVAL '{years} year')::date")))
 }
 
 #' @export
