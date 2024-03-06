@@ -42,15 +42,16 @@ Imports:
     zoo
 Suggests:
     devtools,
-    curl,
+    duckdb,
     jsonlite,
     knitr,
+    odbc,
     rmarkdown,
     RSQLite,
     RPostgres,
     testthat (>= 3.0.0),
     tibble,
-    spelling,
+spelling,
     withr
 VignetteBuilder: knitr
 URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore/
