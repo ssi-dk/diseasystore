@@ -134,7 +134,7 @@ add_years.PqConnection <- function(reference_date, years, conn) {
 #' @export
 `add_years.Microsoft SQL Server` <- function(reference_date, years, conn) {
   if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'")
-  return(dplyr::sql(glue::glue("DATEADD(year, {years}, reference_date)")))
+  return(dplyr::sql(glue::glue("DATEADD(year, {years}, {reference_date})")))
 }
 
 #' @export
