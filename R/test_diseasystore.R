@@ -29,6 +29,7 @@
 #'     test_start_date = as.Date("2020-03-01")
 #'   )
 #' }
+#' @importFrom curl has_internet
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
                               data_files = NULL, target_schema = "test_ds", test_start_date = NULL) {
