@@ -1,9 +1,5 @@
 on:
-  push:
-    inputs:
-      schemas:
-        type: string
-        default: 'test_ds,not_test_ds'
+  push
 
 
 jobs:
@@ -23,7 +19,7 @@ jobs:
           - backend: SQLite - w. schemas
             id: sqlite-schemas
             args: 'list(dbname = file.path(tempdir(), "SQLite_schemas.SQLite"))'
-            schemas: ${{ inputs.schemas }}
+            schemas: test_ds,not_test_ds
 
     env:
       BACKEND: ${{ matrix.config.backend }}
@@ -128,7 +124,7 @@ jobs:
       - name: Setup BACKEND_POST_CONNECT
         run: |
           set -o xtrace
-          IFS=',' read -ra schemas <<< "${{ inputs.schemas }}"
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
 
           CONN_POST_CONNECT="list("
           for schema in "${schemas[@]}"; do
@@ -207,7 +203,7 @@ jobs:
         if: ${{ inputs.schemas != 'none' }}
         run: |
           set -o xtrace
-          IFS=',' read -ra schemas <<< "${{ inputs.schemas }}"
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
           for schema in "${schemas[@]}"; do
             psql test -c "CREATE SCHEMA \"$schema\";"
           done
@@ -319,7 +315,7 @@ jobs:
 
           sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -Q "ALTER LOGIN SA WITH DEFAULT_DATABASE = master;"
 
-          IFS=',' read -ra schemas <<< "${{ inputs.schemas }}"
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
           for schema in "${schemas[@]}"; do
             sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "CREATE SCHEMA [$schema];"
             sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "GO"
