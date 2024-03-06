@@ -122,7 +122,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache-version: ${{ inputs.cache_version }}
-          extra-packages: any::covr
+          extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
           needs: coverage
 
       - name: Setup BACKEND_POST_CONNECT
