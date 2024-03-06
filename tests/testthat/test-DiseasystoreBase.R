@@ -3,6 +3,7 @@ withr::local_options("diseasystore.target_schema" = target_schema_1)
 withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
 
 test_that("DiseasystoreBase works", {
+  tic <- Sys.time()
 
   # Test different initialization of the base module
 
@@ -100,11 +101,13 @@ test_that("DiseasystoreBase works", {
   expect_identical(ds %.% target_conn, ds %.% source_conn)
   rm(ds)
 
+  benchmark_test("DiseasystoreBase works", tic)
 })
 
 
 test_that("$get_feature verbosity works", {
   skip_if_not_installed("RSQLite")
+  tic <- Sys.time()
 
   # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
   DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
@@ -144,11 +147,13 @@ test_that("$get_feature verbosity works", {
 
   rm(ds)
   invisible(gc())
+  benchmark_test("$get_feature verbosity works", tic)
 })
 
 
 test_that("DiseasystoreBase$determine_new_ranges works", {
   skip_if_not_installed("RSQLite")
+  tic <- Sys.time()
 
   start_date <- as.Date("2020-01-01")
   end_date   <- as.Date("2020-03-01")
@@ -214,10 +219,13 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
 
   rm(ds)
   invisible(gc())
+  benchmark_test("DiseasystoreBase$determine_new_ranges works", tic)
 })
 
 
 test_that("active binding: ds_map works", {
+  tic <- Sys.time()
+
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the ds_map
@@ -227,11 +235,15 @@ test_that("active binding: ds_map works", {
   expect_identical(tryCatch(ds$ds_map <- list("testing" = "n_positive"), error = \(e) e),                               # nolint: implicit_assignment_linter
                    simpleError("`$ds_map` is read only"))
   expect_null(ds$ds_map)
+
   rm(ds)
+  benchmark_test("active binding: ds_map works", tic)
 })
 
 
 test_that("active binding: available_features works", {
+  tic <- Sys.time()
+
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the available_features
@@ -242,11 +254,15 @@ test_that("active binding: available_features works", {
   expect_identical(tryCatch(ds$available_features <- list("n_test", "n_positive"), error = \(e) e),                     # nolint: implicit_assignment_linter
                    simpleError("`$available_features` is read only"))
   expect_null(ds$available_features)
+
   rm(ds)
+  benchmark_test("active binding: available_features works", tic)
 })
 
 
 test_that("active binding: label works", {
+  tic <- Sys.time()
+
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the label
@@ -256,5 +272,7 @@ test_that("active binding: label works", {
   expect_identical(tryCatch(ds$label <- "test", error = \(e) e),                                                        # nolint: implicit_assignment_linter
                    simpleError("`$label` is read only"))
   expect_null(ds$label)
+
   rm(ds)
+  benchmark_test("active binding: label works", tic)
 })

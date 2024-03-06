@@ -25,6 +25,7 @@ jobs:
       BACKEND: ${{ matrix.config.backend }}
       BACKEND_DRV: RSQLite::SQLite
       BACKEND_ARGS: ${{ matrix.config.args }}
+      BENCHMARK_TESTS: true
 
     steps:
       - uses: actions/checkout@v4
@@ -103,6 +104,7 @@ jobs:
       BACKEND: DuckDB
       BACKEND_DRV: duckdb::duckdb
       BACKEND_ARGS: 'list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))'
+      BENCHMARK_TESTS: true
 
     steps:
       - uses: actions/checkout@v4
@@ -191,6 +193,7 @@ jobs:
       BACKEND: PostgreSQL
       BACKEND_DRV: RPostgres::Postgres
       BACKEND_ARGS: ''
+      BENCHMARK_TESTS: true
 
       PGHOST: localhost
       PGPORT: 5432
@@ -289,6 +292,7 @@ jobs:
       BACKEND: MSSQL
       BACKEND_DRV: odbc::odbc
       BACKEND_ARGS: ''
+      BENCHMARK_TESTS: true
 
       CONN_ARGS_JSON: >
         {

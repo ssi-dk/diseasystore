@@ -128,18 +128,17 @@ get_test_conns <- function() {
 
 
 #' Report the duration of the test
-#'
+#' @param name (`character(1)`)\cr
+#'   The name of the test.
+#' @param tic (`POSIXct(1)`)\cr
+#'   The start time of the test.
+#' @param toc (`POSIXct(1)`)\cr
+#'   The end time of the test.
 #' @return
 #'   NULL (invisibly)
 #' @noRd
-benchmark_test <- function() {
-
-
-  withr::defer_parent(
-    if (DBI::dbIsValid(conn) && DBI::dbExistsTable(conn, db_table_id)) {
-      DBI::dbRemoveTable(conn, db_table_id)
-    }
-  )
-}
-
+benchmark_test <- function(name, tic, toc = Sys.time()) {
+  if (isTRUE(as.logical(Sys.getenv("BENCHMARK_TESTS")))) {
+    message(glue::glue("Test duration: {round(toc - tic, 1)}s ({name})"))
+  }
 }

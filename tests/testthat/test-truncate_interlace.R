@@ -1,5 +1,6 @@
 test_that("truncate_interlace works", {
   skip_if_not_installed("RSQLite")
+  tic <- Sys.time()
 
   conn <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
@@ -128,5 +129,5 @@ test_that("truncate_interlace works", {
 
   # Clean up
   DBI::dbDisconnect(conn)
-
+  benchmark_test("truncate_interlace works", tic)
 })

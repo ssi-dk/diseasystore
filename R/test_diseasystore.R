@@ -48,6 +48,24 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
+
+  # Report the duration of the test
+  # @param name (`character(1)`)\cr
+  #   The name of the test.
+  # @param tic (`POSIXct(1)`)\cr
+  #   The start time of the test.
+  # @param toc (`POSIXct(1)`)\cr
+  #   The end time of the test.
+  # @return
+  #   NULL (invisibly)
+  # @noRd
+  benchmark_test <- function(name, tic, toc = Sys.time()) {
+    if (isTRUE(as.logical(Sys.getenv("BENCHMARK_TESTS")))) {
+      message(glue::glue("Test duration: {round(toc - tic, 1)}s ({name})"))
+    }
+  }
+
+
   # Reduce the lock wait during test in case of deadlocks by failed test
   withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
 
@@ -131,6 +149,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
+    tic <- Sys.time()
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -154,6 +173,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     rm(ds)
     invisible(gc())
+    benchmark_test(glue::glue("{diseasystore_class} initialises correctly"), tic)
   })
 
 
@@ -161,6 +181,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
+    tic <- Sys.time()
 
     # Ensure source is set as the remote
     withr::local_options(
@@ -182,12 +203,14 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     rm(ds)
     invisible(gc())
+    benchmark_test(glue::glue("{diseasystore_class} can initialise with remote source_conn"), tic)
   })
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(local)
+    tic <- Sys.time()
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -200,11 +223,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     rm(ds)
     invisible(gc())
+    benchmark_test(glue::glue("{diseasystore_class} can initialise with default source_conn"), tic)
   })
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
+    tic <- Sys.time()
 
     for (conn in conn_generator()) {
 
@@ -214,6 +239,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
+        tic <- Sys.time()
         start_date <- test_start_date
         end_date   <- test_start_date + lubridate::days(4)
 
@@ -248,16 +274,21 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
             purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
         }
+
+        benchmark_test(glue::glue("{diseasystore_class} can retrieve features from a fresh state -- {.x}"), tic)
       })
 
       rm(ds)
       invisible(gc())
     }
+
+    benchmark_test(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), tic)
   })
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
     testthat::skip_if_not(local)
+    tic <- Sys.time()
 
     for (conn in conn_generator()) {
 
@@ -267,6 +298,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
+        tic <- Sys.time()
         start_date <- test_start_date
         end_date   <- test_start_date + lubridate::days(9)
 
@@ -297,11 +329,15 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
             purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
         }
+
+        benchmark_test(glue::glue("{diseasystore_class} can extend existing features -- {.x}"), tic)
       })
 
       rm(ds)
       invisible(gc())
     }
+
+    benchmark_test(glue::glue("{diseasystore_class} can extend existing features"), tic)
   })
 
 
@@ -321,6 +357,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
+    tic <- Sys.time()
 
     for (conn in conn_generator()) {
 
@@ -385,11 +422,14 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       rm(ds)
       invisible(gc())
     }
+
+    benchmark_test(glue::glue("{diseasystore_class} can key_join features"), tic)
   })
 
 
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
+    tic <- Sys.time()
 
     for (conn in conn_generator()) {
 
@@ -475,5 +515,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       rm(ds)
       invisible(gc())
     }
+
+    benchmark_test(glue::glue("{diseasystore_class} key_join fails gracefully"), tic)
   })
 }
