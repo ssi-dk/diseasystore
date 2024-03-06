@@ -125,3 +125,21 @@ get_test_conns <- function() {
 
   return(test_conns)
 }
+
+
+#' Report the duration of the test
+#'
+#' @return
+#'   NULL (invisibly)
+#' @noRd
+benchmark_test <- function() {
+
+
+  withr::defer_parent(
+    if (DBI::dbIsValid(conn) && DBI::dbExistsTable(conn, db_table_id)) {
+      DBI::dbRemoveTable(conn, db_table_id)
+    }
+  )
+}
+
+}
