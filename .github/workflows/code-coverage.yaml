@@ -100,7 +100,6 @@ jobs:
 
 
   code-coverage-duckdb-new:
-    if: ${{ inputs.run && !contains(inputs.backend_exclude, 'duckdb')}}
     name: "🧪 Tests: SCDB v0.4, DuckDB"
     runs-on: ubuntu-latest
 
