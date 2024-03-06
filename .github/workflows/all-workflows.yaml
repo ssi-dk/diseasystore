@@ -32,6 +32,7 @@ jobs:
       event_name: ${{ github.event_name }}
       run_id: ${{ github.run_id }}
       main_branches: main
+      skip: code-coverage,R-CMD-check
 
       # code-coverage creates data bases for the tests. Here you can specify the schemas you need for the workflow
       schemas: test_ds,not_test_ds
