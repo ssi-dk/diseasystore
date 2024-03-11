@@ -1,0 +1,614 @@
+on:
+  push
+
+
+jobs:
+  code-coverage-sqlite-old:
+    name: "🧪 Tests: SCDB v0.3, ${{ matrix.config.backend }}"
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - backend: SQLite
+            id: sqlite
+            args: 'list(dbname = file.path(tempdir(), "SQLite.SQLite"))'
+            schemas: ''
+
+          - backend: SQLite - w. schemas
+            id: sqlite-schemas
+            args: 'list(dbname = file.path(tempdir(), "SQLite_schemas.SQLite"))'
+            schemas: test_ds,not_test_ds
+
+    env:
+      BACKEND: ${{ matrix.config.backend }}
+      BACKEND_DRV: RSQLite::SQLite
+      BACKEND_ARGS: ${{ matrix.config.args }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: '1'
+          extra-packages: any::covr
+          needs: coverage
+
+      - name: Setup BACKEND_POST_CONNECT
+        if: ${{ matrix.config.schemas != '' }}
+        run: |
+          set -o xtrace
+          IFS=',' read -ra schemas <<< "${{ matrix.config.schemas }}"
+
+          CONN_POST_CONNECT="list("
+          for schema in "${schemas[@]}"; do
+            CONN_POST_CONNECT+="paste0(\"ATTACH '\", file.path(tempdir(), \"SQLite_schemas_${schema}.SQLite\"), \"' AS '${schema}'\"), "
+          done
+          # Trim trailing ", " from CONN_POST_CONNECT
+          CONN_POST_CONNECT=${CONN_POST_CONNECT%??}
+          CONN_POST_CONNECT+=")"
+
+          echo "BACKEND_POST_CONNECT=$CONN_POST_CONNECT" >> $GITHUB_ENV
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-${{ matrix.config.id }}-old
+          path: ${{ runner.temp }}/package
+
+
+  code-coverage-postgres-old:
+    name: "🧪 Tests: SCDB v0.3, PostgreSQL"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      BACKEND: PostgreSQL
+      BACKEND_DRV: RPostgres::Postgres
+      BACKEND_ARGS: ''
+
+      PGHOST: localhost
+      PGPORT: 5432
+      PGDATABASE: test
+      PGUSER: postgres
+      PGPASSWORD: postgres
+
+    steps:
+      - name: Setup testing schemata in PostgreSQL
+        if: ${{ inputs.schemas != 'none' }}
+        run: |
+          set -o xtrace
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
+          for schema in "${schemas[@]}"; do
+            psql test -c "CREATE SCHEMA \"$schema\";"
+          done
+
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: '1'
+          extra-packages: any::covr
+          needs: coverage
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-postgres-old
+          path: ${{ runner.temp }}/package
+
+      - name: Collect docker logs
+        if: always()
+        uses: jwalton/gh-docker-logs@v1
+        with:
+          dest: '${{ runner.workspace }}/logs-docker'
+
+      - name: Check docker logs for PostgreSQL ERRORs
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          log=$(find ${{ runner.workspace }}/logs-docker/ -name '*postgres*.log')
+
+          errors=$(awk '/(ERROR:|STATEMENT:)/{flag=1}/LOG:|^[A-Z]/{flag=0}flag {print $0}' $log)
+
+          echo "$output"
+
+          # Throw error if ERRORs are found
+          if [[ -n "$errors" ]]; then
+            echo "$errors"
+            exit 1
+          fi
+
+  code-coverage-mssql-old:
+    name: "🧪 Tests: SCDB v0.3, SQL Server 2019"
+    runs-on: ubuntu-latest
+
+    env:
+      BACKEND: MSSQL
+      BACKEND_DRV: odbc::odbc
+      BACKEND_ARGS: ''
+
+      CONN_ARGS_JSON: >
+        {
+          "MSSQL": {
+            "driver": "ODBC Driver 17 for SQL Server",
+            "server": "localhost",
+            "database": "master",
+            "UID": "SA",
+            "PWD": "dbatools.I0"
+          }
+        }
+
+    steps:
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          install: sqlengine, sqlpackage, sqlclient
+          show-log: true
+
+      - name: Setup testing schemata in SQL server
+        if: ${{ inputs.schemas != 'none' }}
+        run: |
+          set -o xtrace
+
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -Q "ALTER LOGIN SA WITH DEFAULT_DATABASE = master;"
+
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
+          for schema in "${schemas[@]}"; do
+            sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "CREATE SCHEMA [$schema];"
+            sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "GO"
+          done
+
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT * FROM sys.schemas"
+
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = 'test'"
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = 'test.one'"
+
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: '1'
+          extra-packages: any::covr
+          needs: coverage
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-mssql-old
+          path: ${{ runner.temp }}/package
+
+      - name: Collect docker logs
+        if: always()
+        uses: jwalton/gh-docker-logs@v1
+        with:
+          dest: '${{ runner.workspace }}/logs-docker'
+
+      - name: Check docker logs for SQL Server ERRORs
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          log=$(find ${{ runner.workspace }}/logs-docker/ -name 'sql.log')
+
+          cat "$log"
+
+  code-coverage-sqlite-new:
+    name: "🧪 Tests: SCDB v0.4, ${{ matrix.config.backend }}"
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - backend: SQLite
+            id: sqlite
+            args: 'list(dbname = file.path(tempdir(), "SQLite.SQLite"))'
+            schemas: ''
+
+          - backend: SQLite - w. schemas
+            id: sqlite-schemas
+            args: 'list(dbname = file.path(tempdir(), "SQLite_schemas.SQLite"))'
+            schemas: test_ds,not_test_ds
+
+    env:
+      BACKEND: ${{ matrix.config.backend }}
+      BACKEND_DRV: RSQLite::SQLite
+      BACKEND_ARGS: ${{ matrix.config.args }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set SCDB version to v0.4
+        run: |
+          perl -pi -e 's/SCDB \(>= 0.3.0\)/SCDB \(>= 0.4.0\)/g' DESCRIPTION
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: '0'
+          extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
+          needs: coverage
+
+      - name: Setup BACKEND_POST_CONNECT
+        if: ${{ matrix.config.schemas != '' }}
+        run: |
+          set -o xtrace
+          IFS=',' read -ra schemas <<< "${{ matrix.config.schemas }}"
+
+          CONN_POST_CONNECT="list("
+          for schema in "${schemas[@]}"; do
+            CONN_POST_CONNECT+="paste0(\"ATTACH '\", file.path(tempdir(), \"SQLite_schemas_${schema}.SQLite\"), \"' AS '${schema}'\"), "
+          done
+          # Trim trailing ", " from CONN_POST_CONNECT
+          CONN_POST_CONNECT=${CONN_POST_CONNECT%??}
+          CONN_POST_CONNECT+=")"
+
+          echo "BACKEND_POST_CONNECT=$CONN_POST_CONNECT" >> $GITHUB_ENV
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-${{ matrix.config.id }}-new
+          path: ${{ runner.temp }}/package
+
+
+  code-coverage-postgres-new:
+    name: "🧪 Tests: SCDB v0.4, PostgreSQL"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd "pg_isready -U postgres" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      BACKEND: PostgreSQL
+      BACKEND_DRV: RPostgres::Postgres
+      BACKEND_ARGS: ''
+
+      PGHOST: localhost
+      PGPORT: 5432
+      PGDATABASE: test
+      PGUSER: postgres
+      PGPASSWORD: postgres
+
+    steps:
+      - name: Setup testing schemata in PostgreSQL
+        if: ${{ inputs.schemas != 'none' }}
+        run: |
+          set -o xtrace
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
+          for schema in "${schemas[@]}"; do
+            psql test -c "CREATE SCHEMA \"$schema\";"
+          done
+
+      - uses: actions/checkout@v4
+
+      - name: Set SCDB version to v0.4
+        run: |
+          perl -pi -e 's/SCDB \(>= 0.3.0\)/SCDB \(>= 0.4.0\)/g' DESCRIPTION
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: '0'
+          extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
+          needs: coverage
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-postgres-new
+          path: ${{ runner.temp }}/package
+
+      - name: Collect docker logs
+        if: always()
+        uses: jwalton/gh-docker-logs@v1
+        with:
+          dest: '${{ runner.workspace }}/logs-docker'
+
+      - name: Check docker logs for PostgreSQL ERRORs
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          log=$(find ${{ runner.workspace }}/logs-docker/ -name '*postgres*.log')
+
+          errors=$(awk '/(ERROR:|STATEMENT:)/{flag=1}/LOG:|^[A-Z]/{flag=0}flag {print $0}' $log)
+
+          echo "$output"
+
+          # Throw error if ERRORs are found
+          if [[ -n "$errors" ]]; then
+            echo "$errors"
+            exit 1
+          fi
+
+  code-coverage-mssql-new:
+    name: "🧪 Tests: SCDB v0.4, SQL Server 2019"
+    runs-on: ubuntu-latest
+
+    env:
+      BACKEND: MSSQL
+      BACKEND_DRV: odbc::odbc
+      BACKEND_ARGS: ''
+
+      CONN_ARGS_JSON: >
+        {
+          "MSSQL": {
+            "driver": "ODBC Driver 17 for SQL Server",
+            "server": "localhost",
+            "database": "master",
+            "UID": "SA",
+            "PWD": "dbatools.I0"
+          }
+        }
+
+    steps:
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.7
+        with:
+          install: sqlengine, sqlpackage, sqlclient
+          show-log: true
+
+      - name: Setup testing schemata in SQL server
+        if: ${{ inputs.schemas != 'none' }}
+        run: |
+          set -o xtrace
+
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -Q "ALTER LOGIN SA WITH DEFAULT_DATABASE = master;"
+
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
+          for schema in "${schemas[@]}"; do
+            sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "CREATE SCHEMA [$schema];"
+            sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "GO"
+          done
+
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT * FROM sys.schemas"
+
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = 'test'"
+          sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -d master -Q "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA WHERE schema_name = 'test.one'"
+
+      - uses: actions/checkout@v4
+
+      - name: Set SCDB version to v0.4
+        run: |
+          perl -pi -e 's/SCDB \(>= 0.3.0\)/SCDB \(>= 0.4.0\)/g' DESCRIPTION
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: '0'
+          extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
+          needs: coverage
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-mssql-new
+          path: ${{ runner.temp }}/package
+
+      - name: Collect docker logs
+        if: always()
+        uses: jwalton/gh-docker-logs@v1
+        with:
+          dest: '${{ runner.workspace }}/logs-docker'
+
+      - name: Check docker logs for SQL Server ERRORs
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          log=$(find ${{ runner.workspace }}/logs-docker/ -name 'sql.log')
+
+          cat "$log"

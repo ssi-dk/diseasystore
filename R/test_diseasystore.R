@@ -109,9 +109,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   # - set the target_schema for the diseasystore during tests
   # - limit the number of records to use in tests
   # - Use the local test data directory for testing
+  # - Reduce the lock wait during test in case of deadlocks by failed test (1 minute during tests)
   withr::local_options(stats::setNames(target_schema, glue::glue("diseasystore.{diseasystore_class}.target_schema")))
   withr::local_options(stats::setNames(local_conn,    glue::glue("diseasystore.{diseasystore_class}.source_conn")))
   withr::local_options(stats::setNames(1000,          glue::glue("diseasystore.{diseasystore_class}.n_max")))
+  withr::local_options(stats::setNames(60,            glue::glue("diseasystore.{diseasystore_class}.lock_wait_max")))
 
 
 
