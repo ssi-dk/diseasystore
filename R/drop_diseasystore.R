@@ -23,18 +23,54 @@ drop_diseasystore <- function(pattern = NULL,
   checkmate::assert_class(conn, "DBIConnection", add = coll)
   checkmate::reportAssertions(coll)
 
-  # Get tables to delete
-  tables <- SCDB::get_tables(conn, pattern) |>
-    tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE) |>
-    dplyr::pull("db_table_id")
+  # List all tables
+  tables <- SCDB::get_tables(conn, pattern)
 
-  tables_to_delete <- tables |>
-    purrr::keep(~ stringr::str_detect(., glue::glue("^{schema}\\.{ifelse(is.null(pattern), '', pattern)}")))
+  # Early return if no tables are found
+  if (nrow(tables) == 0) {
+    return(NULL)
+  }
 
-  # Check if logs is in the table, if yes, all tables must be deleted
-  if ("logs" %in% tables_to_delete &&
-        !identical(tables_to_delete, purrr::keep(tables, ~ stringr::str_detect(., glue::glue("^{schema}\\..*"))))) {
-    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped."))
+  # Concatenate schema and table to ids
+  tables <- tables |>
+    dplyr::mutate("schema" = dplyr::if_else(is.na(.data$schema), SCDB::get_schema(conn), .data$schema)) |>
+    tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE)
+
+
+  # Determine the schema-structure of the database via SCDB::id.
+  # E.g. if a database does not contain the schema, the main schema is used.
+  # Rather than manually handing these cases, we let SCDB resolve the location where the diseasystore tables are stored.
+  # SCDB::id will determine the schema / table structure that we need to delete.
+  # We construct a regex from this structure to match the tables to delete.
+  # E.g. SQLite without schema: # regex = "main.<schema>."
+  # E.g. SQLite with schema: # regex = "<schema>."
+  regex_id <- SCDB::id(paste(schema, NULL, sep = "."), conn)
+
+  if (packageVersion("SCDB") <= "0.3") {
+    regex <- paste(
+      c(
+        purrr::pluck(regex_id, "name", "schema", .default = SCDB::get_schema(conn)),
+        purrr::pluck(regex_id, "name", "table")
+      ),
+      collapse = "."
+    )
+  } else {
+    regex <- as.character(regex_id)
+  }
+
+  # Use regex to match tables to delete
+  tables_to_delete <- dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex, pattern)))
+
+  # Ensure schema is the same for all identified tables (if not, we have unwanted ambiguity)
+  if (length(unique(dplyr::pull(tables_to_delete, "schema"))) > 1) {
+    stop("Tables marked for deletion spread across schemas. Unwanted ambiguity detected!")
+  }
+
+  # Check if the table "logs" is in the list of tables tp delete, if yes, all tables must be deleted.
+  if ("logs" %in% tables_to_delete$table &&
+        !identical(tables_to_delete,
+                   dplyr::filter(tables, stringr::str_detect(.data$db_table_id, paste0("^", regex))))) {
+    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
   }
 
   tables_to_delete |>
