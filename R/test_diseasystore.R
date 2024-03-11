@@ -399,12 +399,17 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           output <- tryCatch({
             ds$key_join_features(
               observable = as.character(observable),
-              stratification = stratification,
+              stratification = as.character(stratification), # Output of expand.grid is a factor.
               start_date = start_date,
               end_date = end_date
             )
           }, error = function(e) {
-            checkmate::expect_character(e$message, pattern = "Must be element of set")
+            checkmate::expect_character(
+              e$message,
+              pattern = glue::glue("Stratification variable not found. ",
+                                   "Available stratification variables are: ",
+                                   "{toString(available_stratifications)}")
+            )
             return(NULL)
           })
 

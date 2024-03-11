@@ -288,9 +288,8 @@ DiseasystoreBase <- R6::R6Class(                                                
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(observable, available_observables, add = coll)
       checkmate::assert(
-        checkmate::check_choice(stratification, available_stratifications, null.ok = TRUE),
-        checkmate::check_class(stratification, "quosure", null.ok = TRUE),
-        checkmate::check_class(stratification, "quosures", null.ok = TRUE),
+        checkmate::check_list(stratification, types = "character", null.ok = TRUE),
+        checkmate::check_multi_class(stratification, c("character", "quosure", "quosures"), null.ok = TRUE),
         add = coll
       )
       checkmate::assert_date(start_date, add = coll)
