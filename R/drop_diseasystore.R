@@ -73,17 +73,24 @@ drop_diseasystore <- function(pattern = NULL,
     stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
   }
 
+  # Delete tables
   tables_to_delete |>
-    purrr::walk(~ DBI::dbRemoveTable(conn, SCDB::id(.x, conn = conn)))
+    purrr::pwalk(\(db_table_id, schema, table) DBI::dbRemoveTable(conn, DBI::Id(schema = schema, table = table)))
 
-  # Delete from logs
-  if (SCDB::table_exists(conn, glue::glue("{schema}.logs"))) {
-    log_records_to_delete <- SCDB::get_table(conn, glue::glue("{schema}.logs")) |>
+  # Delete entries from logs
+  logs_table <- tables |>
+    dplyr::filter(stringr::str_detect(.data$db_table_id, paste0(regex, "logs")))
+
+  logs_table_id <- DBI::Id(schema = logs_table$schema, table = logs_table$table)
+
+  if (SCDB::table_exists(conn, logs_table_id)) {
+
+    log_records_to_delete <- SCDB::get_table(conn, logs_table_id) |>
       tidyr::unite("db_table_id", "schema", "table", sep = ".", na.rm = TRUE, remove = FALSE) |>
       dplyr::filter(.data$db_table_id %in% tables_to_delete) |>
       dplyr::select("log_file")
 
-    dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(glue::glue("{schema}.logs"), conn), check_from = FALSE),
+    dplyr::rows_delete(dplyr::tbl(conn, SCDB::id(logs_table_id, conn), check_from = FALSE),
                        log_records_to_delete,
                        by = "log_file",
                        in_place = TRUE,
