@@ -177,10 +177,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         }
 
         # Call the feature loader on the dates
-        purrr::pwalk(ds_missing_ranges, ~ {
-
-          start_date <- ..1
-          end_date   <- ..2
+        purrr::pwalk(ds_missing_ranges, \(start_date, end_date) {
 
           # Compute the feature for the date range
           ds_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,

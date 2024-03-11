@@ -336,12 +336,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Then test combinations with non-NULL stratifications
       expand.grid(observable     = available_observables,
                   stratification = available_stratifications) |>
-        purrr::pwalk(~ {
+        purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
           output <- tryCatch({
             ds$key_join_features(
-              observable = as.character(..1),
-              stratification = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+              observable = as.character(observable),
+              stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
               start_date, end_date
             )
           },
@@ -394,12 +394,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Test key_join with malformed inputs
       expand.grid(observable     = available_observables,
                   stratification = "non_existent_stratification") |>
-        purrr::pwalk(~ {
+        purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
           output <- tryCatch({
             ds$key_join_features(
-              observable = as.character(..1),
-              stratification = ..2,
+              observable = as.character(observable),
+              stratification = stratification,
               start_date = start_date,
               end_date = end_date
             )
@@ -423,12 +423,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
       expand.grid(observable     = available_observables,
                   stratification = "test = non_existent_stratification") |>
-        purrr::pwalk(~ {
+        purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
           output <- tryCatch({
             ds$key_join_features(
-              observable = as.character(..1),
-              stratification = eval(parse(text = glue::glue("rlang::quos({..2})"))),
+              observable = as.character(observable),
+              stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
               start_date = start_date,
               end_date = end_date
             )
