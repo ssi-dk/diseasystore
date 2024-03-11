@@ -365,7 +365,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           }
 
           # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+          SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
             dplyr::pull(table) |>
             purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
             purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
@@ -421,7 +421,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           }
 
           # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+          SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
             dplyr::pull(table) |>
             purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
             purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
@@ -455,7 +455,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           }
 
           # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+          SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
             dplyr::pull(table) |>
             purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
             purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
