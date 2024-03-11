@@ -1,5 +1,9 @@
 # diseasystore (development version)
 
+## Features:
+
+* Add support for SQLite with attached schemas (#121).
+
 ## Minor Improvements and Fixes
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
