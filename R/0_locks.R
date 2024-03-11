@@ -29,6 +29,16 @@
 #' @noRd
 add_table_lock <- function(conn, db_table, schema = NULL) {
 
+  if (inherits(db_table, "Id")) {
+    db_table <- paste(
+      c(purrr::pluck(db_table, "name", "schema"),
+        purrr::pluck(db_table, "name", "table")
+      ),
+      collapse = "."
+    )
+  }
+
+
   # Determine lock table id
   lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
@@ -39,7 +49,7 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
                      data.frame("db_table" = character(0),
                                 "lock_start" = numeric(0),
                                 "pid" = numeric(0)),
-                     lock_table_id, temporary = FALSE, unique_indexes = "db_table")
+                     lock_table_id, temporary = FALSE)
     )
   }
 
@@ -55,7 +65,7 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
     {
       lock <- dplyr::copy_to(
         conn,
-        data.frame("db_table" = db_table, "pid" = Sys.getpid(), "lock_start" = as.numeric(Sys.time())),
+        data.frame("db_table" = as.character(db_table), "pid" = Sys.getpid(), "lock_start" = as.numeric(Sys.time())),
         name = paste0("ds_lock_", Sys.getpid()),
         overwrite = TRUE
       )
@@ -76,6 +86,15 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
 #' @noRd
 remove_table_lock <- function(conn, db_table, schema = NULL) {
 
+  if (inherits(db_table, "Id")) {
+    db_table <- paste(
+      c(purrr::pluck(db_table, "name", "schema"),
+        purrr::pluck(db_table, "name", "table")
+      ),
+      collapse = "."
+    )
+  }
+
   # Determine lock table id
   lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
@@ -92,7 +111,7 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
     {
       lock <- dplyr::copy_to(
         conn,
-        data.frame("db_table" = db_table, "pid" = Sys.getpid()),
+        data.frame("db_table" = as.character(db_table), "pid" = Sys.getpid()),
         name = paste0("ds_lock_", Sys.getpid()),
         overwrite = TRUE
       )
@@ -113,6 +132,15 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
 #' @noRd
 is_lock_owner <- function(conn, db_table, schema = NULL) {
 
+  if (inherits(db_table, "Id")) {
+    db_table <- paste(
+      c(purrr::pluck(db_table, "name", "schema"),
+        purrr::pluck(db_table, "name", "table")
+      ),
+      collapse = "."
+    )
+  }
+
   # Determine lock table id
   lock_table_id <- SCDB::id(paste(schema, "locks", sep = "."), conn)
 
@@ -123,7 +151,7 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
 
   # Get a reference to the table
   lock_owner <- dplyr::tbl(conn, lock_table_id, check_from = FALSE) |>
-    dplyr::filter(.data$db_table == !!db_table) |>
+    dplyr::filter(.data$db_table == !!as.character(db_table)) |>
     dplyr::pull("pid") |>
     as.integer()
 
