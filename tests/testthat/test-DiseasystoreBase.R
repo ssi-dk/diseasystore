@@ -154,7 +154,13 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
 
   conn <- DBI::dbConnect(RSQLite::SQLite())
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
-  logs <- SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
+
+  if (packageVersion("SCDB") <= "0.3") {
+    logs <- SCDB::create_logs_if_missing(paste(target_schema_1, "logs", sep = "."), conn)
+  } else {
+    logs <- SCDB::create_logs_if_missing(conn = conn, log_table = paste(target_schema_1, "logs", sep = "."))
+  }
+
 
   dplyr::rows_append(
     logs,
