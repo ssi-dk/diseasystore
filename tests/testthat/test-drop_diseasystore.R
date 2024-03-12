@@ -31,21 +31,21 @@ test_that("drop_diseasystore can delete entire default schema", {
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(conn = conn)
 
-    expect_false(SCDB::table_exists(conn, logs_id))
-    expect_false(SCDB::table_exists(conn, ids[[1]]))
-    expect_false(SCDB::table_exists(conn, ids[[2]]))
+    expect_false(DBI::dbExistsTable(conn, logs_id))
+    expect_false(DBI::dbExistsTable(conn, ids[[1]]))
+    expect_false(DBI::dbExistsTable(conn, ids[[2]]))
 
-    expect_true(SCDB::table_exists(conn, ids[[3]]))
-    expect_true(SCDB::table_exists(conn, ids[[4]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[3]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[4]]))
 
 
     # Make sure all tables have been removed
     c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
       purrr::walk(~ {
-        if (SCDB::table_exists(conn, .)) {
+        if (DBI::dbExistsTable(conn, .)) {
           DBI::dbRemoveTable(conn, .)
         }
-        expect_false(SCDB::table_exists(conn, .))
+        expect_false(DBI::dbExistsTable(conn, .))
       })
 
     DBI::dbDisconnect(conn)
@@ -84,32 +84,32 @@ test_that("drop_diseasystore can delete single table in default schema", {
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_1", conn = conn)
 
-    expect_true(SCDB::table_exists(conn, logs_id))
-    expect_false(SCDB::table_exists(conn, ids[[1]]))
-    expect_true(SCDB::table_exists(conn, ids[[2]]))
+    expect_true(DBI::dbExistsTable(conn, logs_id))
+    expect_false(DBI::dbExistsTable(conn, ids[[1]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[2]]))
 
-    expect_true(SCDB::table_exists(conn, ids[[3]]))
-    expect_true(SCDB::table_exists(conn, ids[[4]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[3]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[4]]))
 
     # Try to delete only mtcars_2 within the diseasystore
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_2", conn = conn)
 
-    expect_true(SCDB::table_exists(conn, logs_id))
-    expect_false(SCDB::table_exists(conn, ids[[1]]))
-    expect_false(SCDB::table_exists(conn, ids[[2]]))
+    expect_true(DBI::dbExistsTable(conn, logs_id))
+    expect_false(DBI::dbExistsTable(conn, ids[[1]]))
+    expect_false(DBI::dbExistsTable(conn, ids[[2]]))
 
-    expect_true(SCDB::table_exists(conn, ids[[3]]))
-    expect_true(SCDB::table_exists(conn, ids[[4]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[3]]))
+    expect_true(DBI::dbExistsTable(conn, ids[[4]]))
 
     # Make sure all tables have been removed
     c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
       purrr::walk(~ {
-        if (SCDB::table_exists(conn, .)) {
+        if (DBI::dbExistsTable(conn, .)) {
           DBI::dbRemoveTable(conn, .)
         }
-        expect_false(SCDB::table_exists(conn, .))
+        expect_false(DBI::dbExistsTable(conn, .))
       })
 
     DBI::dbDisconnect(conn)
