@@ -1,6 +1,10 @@
 # diseasystore (development version)
 
-## Minor Improvements and Fixes
+## Features:
+
+* `test_diseasystore()` is added to provide a standardised method for testing new diseasystores (#123).
+
+## Minor Improvements and Fixes:
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
 

@@ -12,14 +12,5 @@ We checked 0 reverse dependencies, comparing R CMD check results across CRAN and
 
 
 ## Notes
-This is a minor release focusing on fixing issues
-
-This update addresses the following issues:
-
-* On 11/01/2024, we were notified of a failing test on r-devel.
-  This error has been resurfacing intermittently and we believe we have identified the root cause and are mitigating it in this release.
-
-* In the same mail On 11/01/2024, we were notified that the package did not fail gracefully when internet resources are unavailable.
-  This is also being addressed in this update.
-
-* With the release of SCDB v0.3 on 13/01/2024, some tests were failing for this package. This is fixed in this update.
+In the examples for `test_diseasystore()` -- one of the functions introduced in this release -- we have a wrapped the
+example in \donttest{} since it takes longer than 5 seconds to run the example (running on a laptop it takes ~ 2 min).
