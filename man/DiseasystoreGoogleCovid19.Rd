@@ -12,12 +12,14 @@ Health COVID-19 Open Data repository.
 See the vignette("diseasystore-google-covid-19") for details on how to configure the feature store
 }
 \examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
   ds <- DiseasystoreGoogleCovid19$new(
     source_conn = ".",
     target_conn = DBI::dbConnect(RSQLite::SQLite())
   )
 
   rm(ds)
+\dontshow{\}) # examplesIf}
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
