@@ -1,4 +1,5 @@
 test_that("truncate_interlace works", {
+  skip_if_not_installed("RSQLite")
 
   conn <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 

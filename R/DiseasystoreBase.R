@@ -3,7 +3,7 @@
 #' @description
 #'   This `DiseasystoreBase` [R6][R6::R6Class] class forms the basis of all feature stores.
 #'   It defines the primary methods of each feature stores as well as all of the public methods.
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #'   # DiseasystoreBase is mostly used as the basis of other, more specific, classes
 #'   # The DiseasystoreBase can be initialised individually if needed.
 #'

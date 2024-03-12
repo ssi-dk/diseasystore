@@ -44,6 +44,7 @@ The location of the local data should be configured in the options for "source_c
 diseasystore before calling test_diseasystore.
 }
 \examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
   test_diseasystore(
     DiseasystoreGoogleCovid19,
@@ -53,4 +54,5 @@ diseasystore before calling test_diseasystore.
     test_start_date = as.Date("2020-03-01")
   )
 }
+\dontshow{\}) # examplesIf}
 }

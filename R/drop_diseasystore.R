@@ -6,7 +6,7 @@
 #'   Schema the diseasystore uses to store data in
 #' @param conn `r rd_conn()`
 #' @return `r rd_side_effects`
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #'   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 #'
 #'   drop_diseasystore(conn = conn)

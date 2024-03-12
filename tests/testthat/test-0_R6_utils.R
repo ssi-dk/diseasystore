@@ -85,6 +85,7 @@ test_that("diseasyoption works", {
 
 
 test_that("parse_diseasyconn works", {
+  skip_if_not_installed("RSQLite")
 
   # Define different types of conn
   valid_function_conn <- \() DBI::dbConnect(RSQLite::SQLite())
