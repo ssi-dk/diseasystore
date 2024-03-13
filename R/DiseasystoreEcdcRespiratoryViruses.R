@@ -15,6 +15,7 @@
 #'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
+#' @importFrom ISOweek ISOweek2date
 DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                                                                      # nolint: object_name_linter, object_length_linter
   classname = "DiseasystoreEcdcRespiratoryViruses",
   inherit = DiseasystoreBase,
