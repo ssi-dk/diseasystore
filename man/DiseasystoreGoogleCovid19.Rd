@@ -9,7 +9,7 @@ A new instance of the \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} cla
 \description{
 This \code{DiseasystoreGoogleCovid19} \link[R6:R6Class]{R6} brings support for using the Google
 Health COVID-19 Open Data repository.
-See the vignette("diseasystore-google-covid-19") for details on how to configure the feature store
+See the vignette("diseasystore-google-covid-19") for details on how to configure the feature store.
 }
 \examples{
 \dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

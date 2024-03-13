@@ -47,7 +47,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {                  
 #' @description
 #'   This `DiseasystoreGoogleCovid19` [R6][R6::R6Class] brings support for using the Google
 #'   Health COVID-19 Open Data repository.
-#'   See the vignette("diseasystore-google-covid-19") for details on how to configure the feature store
+#'   See the vignette("diseasystore-google-covid-19") for details on how to configure the feature store.
 #' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #'   ds <- DiseasystoreGoogleCovid19$new(
 #'     source_conn = ".",
