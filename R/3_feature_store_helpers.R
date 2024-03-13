@@ -94,16 +94,32 @@ age_labels <- function(age_cuts) {
 }
 
 
-#' File path helper for static url / directory source_conn
+#' File path helper for different source_conns
 #'
+#' @name source_conn_helpers
 #' @description
-#'   This helper determines whether source_conn is a file path or URL and creates the full path to the
-#'   the file as needed based on the type of source_conn
+#'  * source_conn_path: static url / directory.
+#'    This helper determines whether source_conn is a file path or URL and creates the full path to the
+#'    the file as needed based on the type of source_conn.
 #' @param source_conn (`character(1)`)\cr
-#'   File location (path or URL)
+#'   File location (path or URL).
 #' @param file (`character(1)`)\cr
-#'   Name of the file at the location
-#' @noRd
+#'   Name (including path) of the file at the
+#' @return (`character(1)`)\cr
+#'   The full path to the requested file.
+#' @examples
+#'   # Simulating a data directory
+#'   source_conn <- "data_dir"
+#'   dir.create(source_conn)
+#'   write.csv(mtcars, file.path(source_conn, "mtcars.csv"))
+#'   write.csv(iris, file.path(source_conn, "iris.csv"))
+#'
+#'   # Get file path for mtcars.csv
+#'   source_conn_path(source_conn, "mtcars.csv")
+#'
+#'   # Clean up
+#'   unlink(source_conn)
+#' @export
 source_conn_path <- function(source_conn, file) {
   url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
   checkmate::assert(
@@ -132,21 +148,17 @@ source_conn_path <- function(source_conn, file) {
 }
 
 
-#' File path helper for github repositories
-#'
+#' @rdname source_conn_helpers
 #' @description
+#' * source_conn_github: static GitHub API url / git directory.
 #'   This helper determines whether source_conn is a git directory or a GitHub API creates the full path to the
 #'   the file as needed based on the type of source_conn.
 #'
 #'   If the basename of the requested file contains a date, the function will use fuzzy-matching to determine the
 #'   closest matching, chronologically earlier, file location to return.
-#' @param source_conn (`character(1)`)\cr
-#'   Repository location (path or github API URL)
-#' @param file (`character(1)`)\cr
-#'   Name (and path) of the file at the location.
 #' @param pull (`logical(1)`)\cr
 #'   Should "git pull" be called on the local repository before reading files?
-#' @noRd
+#' @export
 source_conn_github <- function(source_conn, file, pull = TRUE) {
   url_regex <- r"{https?:\/\/api.github.com\/repos\/[a-zA-Z-]*\/[a-zA-Z-]*}"
   checkmate::assert(

@@ -87,11 +87,11 @@ test_file <- "data/snapshots/2023-11-24_ILIARIRates.csv"
 dir.create(dirname(file.path(local_conn, test_file)), recursive = TRUE, showWarnings = FALSE)
 
 if (!file.exists(file.path(local_conn, test_file))) {
-  remote_file <- diseasystore:::source_conn_github(
+  remote_file <- source_conn_github(
     diseasyoption("remote_conn", "DiseasystoreEcdcRespiratoryViruses"),
     test_file
   )
-  
+
   readr::read_csv(remote_file, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
     readr::write_csv(file.path(local_conn, test_file))
 }
