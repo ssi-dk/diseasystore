@@ -7,3 +7,41 @@ authors:
     href: https://www.ssi.dk/
     html: >-
       <img src="https://www.ssi.dk/assets/images/ssi-logo-optimeret.svg" alt="SSI" height="64" style="margin-bottom: 0.5em; margin-top: 1.5em;" />
+
+reference:
+  - title: Diseasystores
+    desc: Feature stores that provide disease outbreak data.
+    contents:
+    - starts_with("Diseasystore")
+
+  - title: Helper functions
+    desc: Tools to interact with Diseasystores.
+    contents:
+    - age_labels
+    - available_diseasystores
+    - diseasyoption
+    - drop_diseasystore
+    - get_diseasystore
+    - diseasystore_exists
+    - to_diseasystore_case
+
+  - title: Developer functions
+    desc: Functions to create and manage Diseasystores.
+    contents:
+    - DiseasystoreBase
+    - FeatureHandler
+    - starts_with("key_join")
+    - test_diseasystore
+    - source_conn_helpers
+    - "%.%"
+
+articles:
+- title: Package usage
+  navbar: Package usage
+  contents:
+  - starts_with("diseasystore")
+
+- title: Developer guides
+  navbar: Developer guides
+  contents:
+  - extending-diseasystore
