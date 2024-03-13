@@ -41,7 +41,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
           source_conn, glue::glue("data/snapshots/{as.Date(slice_ts)}_ILIARIRates.csv"),
           pull = diseasyoption("pull", "DiseasystoreEcdcRespiratoryViruses", .default = TRUE)
         ) |>
-          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreEcdcRespiratoryViruses", default = Inf),
+          readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreEcdcRespiratoryViruses", .default = Inf),
                           show_col_types = FALSE) |>
           dplyr::transmute(
             "key_location" = .data$countryname,
