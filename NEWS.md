@@ -2,9 +2,11 @@
 
 ## Features:
 
+* Add support for SQLite with attached schemas (#121).
+
 * `test_diseasystore()` is added to provide a standardised method for testing new diseasystores (#123).
 
-## Minor Improvements and Fixes:
+## Minor Improvements and Fixes
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
 
