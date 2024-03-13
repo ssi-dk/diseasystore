@@ -5,8 +5,9 @@ withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FA
 
 # Call the testing suite
 test_diseasystore(
-  DiseasystoreEcdcRespiratoryViruses,
-  get_test_conns,
+  diseasystore_generator = DiseasystoreEcdcRespiratoryViruses,
+  conn_generator = get_test_conns,
   data_files = ecdc_files,
-  target_schema = target_schema_1
+  target_schema = target_schema_1,
+  test_start_date = as.Date("2024-01-01")
 )
