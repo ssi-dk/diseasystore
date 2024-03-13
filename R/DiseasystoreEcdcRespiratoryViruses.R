@@ -3,7 +3,7 @@
 #' @description
 #'   This `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] brings support for using the EU-ECDC
 #'   Respiratory viruses weekly data repository.
-#'   See the vignette("diseasystore-flu-forecasting-hub") for details on how to configure the feature store
+#'   See the vignette("diseasystore-ecdc-respiratory-viruses") for details on how to configure the feature store.
 #' @examples
 #'   ds <- DiseasystoreEcdcRespiratoryViruses$new(
 #'     source_conn = ".",
