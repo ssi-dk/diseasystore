@@ -31,8 +31,8 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
     ecdc_respitory_viruses_iliari_rates = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn) {
         coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+        checkmate::assert_date(start_date, lower = as.Date("2014-09-29"), add = coll)
+        checkmate::assert_date(end_date,   upper = Sys.Date(), add = coll)
         checkmate::assert_character(source_conn, len = 1, add = coll)
         checkmate::reportAssertions(coll)
 
