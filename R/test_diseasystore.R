@@ -54,7 +54,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   remote_conn <- diseasyoption("remote_conn", diseasystore_class)
 
   # Check file availability
-  # In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
+  # In practice, it is best to make a local copy of the data which is stored in the "test_data" folder
   # This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
   local_conn <- purrr::detect("test_data", checkmate::test_directory_exists, .default = tempdir())
 
