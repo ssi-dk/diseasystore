@@ -33,7 +33,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
       compute = function(start_date, end_date, slice_ts, source_conn) {
         coll <- checkmate::makeAssertCollection()
         checkmate::assert_date(start_date, lower = as.Date("2014-09-29"), add = coll)
-        checkmate::assert_date(end_date,   upper = Sys.Date(), add = coll)
+        checkmate::assert_date(end_date,   upper = as.Date(slice_ts), add = coll)
         checkmate::assert_character(source_conn, len = 1, add = coll)
         checkmate::reportAssertions(coll)
 
