@@ -4,7 +4,7 @@
 \alias{source_conn_helpers}
 \alias{source_conn_path}
 \alias{source_conn_github}
-\title{File path helper for different source_conns}
+\title{File path helper for different source_conn}
 \usage{
 source_conn_path(source_conn, file)
 

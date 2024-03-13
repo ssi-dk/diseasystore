@@ -94,7 +94,7 @@ age_labels <- function(age_cuts) {
 }
 
 
-#' File path helper for different source_conns
+#' File path helper for different source_conn
 #'
 #' @name source_conn_helpers
 #' @description
