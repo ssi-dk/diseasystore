@@ -220,29 +220,29 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         start_date <- test_start_date
         end_date   <- test_start_date + lubridate::days(4)
 
-        feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect()
-
-        feature_checksum <- feature |>
+        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
+
 
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(start_date  = start_date,
-                                         end_date    = end_date,
-                                         slice_ts    = ds %.% slice_ts,
-                                         source_conn = ds %.% source_conn) |>
+        reference_checksums <- reference_generator(
+          start_date  = start_date,
+          end_date    = end_date,
+          slice_ts    = ds %.% slice_ts,
+          source_conn = ds %.% source_conn
+        ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-          dplyr::collect()
-
-        reference_checksum <- reference |>
+          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
-        testthat::expect_identical(feature_checksum, reference_checksum)
+
+        testthat::expect_identical(feature_checksums, reference_checksums)
 
         # Stop-gap measure to clear dbplyr_### tables
         SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
@@ -271,25 +271,29 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         start_date <- test_start_date
         end_date   <- test_start_date + lubridate::days(9)
 
-        feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
+
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(start_date  = start_date,
-                                         end_date    = end_date,
-                                         slice_ts    = ds %.% slice_ts,
-                                         source_conn = ds %.% source_conn) |>
+        reference_checksums <- reference_generator(
+          start_date  = start_date,
+          end_date    = end_date,
+          slice_ts    = ds %.% slice_ts,
+          source_conn = ds %.% source_conn
+        ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
           dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
-        testthat::expect_identical(feature, reference)
+
+        testthat::expect_identical(feature_checksums, reference_checksums)
 
         # Stop-gap measure to clear dbplyr_### tables
         SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
