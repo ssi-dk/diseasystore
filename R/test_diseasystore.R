@@ -62,8 +62,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   if (remote_data_available) {
 
     # Determine the type of source_conn_helper needed for the generator
-    if (stringr::str_detect(remote_conn,
-                            r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
+    if (stringr::str_detect(remote_conn, r"{https?:\/\/api.github.com\/repos\/[a-zA-Z-]*\/[a-zA-Z-]*}")) {
+      source_conn_helper <- source_conn_github                                                                          # nolint: object_usage_linter
+    } else if (stringr::str_detect(remote_conn,
+                                   r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
       source_conn_helper <- source_conn_path                                                                            # nolint: object_usage_linter
     } else {
       stop("source_conn_helper could not be determined")
