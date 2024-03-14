@@ -154,6 +154,8 @@ source_conn_path <- function(source_conn, file) {
 #'   This helper determines whether source_conn is a git directory or a GitHub API creates the full path to the
 #'   the file as needed based on the type of source_conn.
 #'
+#'   A GitHub token can be configured in the "GITHUB_PAT" environment variable to avoid rate limiting.
+#'
 #'   If the basename of the requested file contains a date, the function will use fuzzy-matching to determine the
 #'   closest matching, chronologically earlier, file location to return.
 #' @param pull (`logical(1)`)\cr
@@ -216,7 +218,20 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     # The former API has a limit of 100.000 returns whereas the latter has limit of 1000 returns.
     # Since the contents can contain more than 1000 files within a few years, we go the extra step
     # now to use the trees API
-    repo_content <- jsonlite::fromJSON(paste(source_conn, "contents", dirname(relative_path), sep = "/"))               # nolint: paste_linter
+
+    handle <- curl::new_handle()
+    token <- Sys.getenv("GITHUB_PAT")
+
+    if (!is.null(token)) {
+      curl::handle_setheaders(
+        handle,
+        "Content-Type" = "application/json",
+        "Authorization" = glue::glue("Bearer {token}")
+      )
+    }
+
+    repo_content <- curl::curl(glue::glue("{source_conn}/contents/{dirname(relative_path)}"), handle = handle) |>
+      jsonlite::fromJSON()
 
     # Determine sha of the relative path
     dir_sha <- repo_content |>
@@ -224,7 +239,8 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
       dplyr::pull("sha")
 
     # Get all files at the relative path
-    dir_content <- jsonlite::fromJSON(paste(source_conn, "git/trees", dir_sha, sep = "/"))                              # nolint: paste_linter
+    dir_content <- curl::curl(glue::glue("{source_conn}/git/trees/{dir_sha}"), handle = handle) |>
+      jsonlite::fromJSON()
 
     if (dir_content$truncated) {
       warning(
@@ -237,7 +253,11 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     # Perform the fuzzy matching and generate a download link
     return_file <- fuzzy_match(dir_content$tree$path)
 
-    return(jsonlite::fromJSON(paste(source_conn, "contents", relative_path, return_file, sep = "/"))$download_url)      # nolint: paste_linter
+    file_path <- curl::curl(glue::glue("{source_conn}/contents/{relative_path}/{return_file}"), handle = handle) |>
+      jsonlite::fromJSON() |>
+      purrr::pluck("download_url")
+
+    return(file_path)
 
   } else {
     stop("source_conn could not be parsed to valid GitHub repository or GitHub API URL\n")

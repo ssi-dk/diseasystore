@@ -36,6 +36,8 @@ the file as needed based on the type of source_conn.
 This helper determines whether source_conn is a git directory or a GitHub API creates the full path to the
 the file as needed based on the type of source_conn.
 
+A GitHub token can be configured in the "GITHUB_PAT" environment variable to avoid rate limiting.
+
 If the basename of the requested file contains a date, the function will use fuzzy-matching to determine the
 closest matching, chronologically earlier, file location to return.
 }
