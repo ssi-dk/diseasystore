@@ -42,7 +42,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
-        checkmate::check_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", null.ok = TRUE),
+        checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
       checkmate::assert_logical(verbose, add = coll)
@@ -120,7 +120,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
-        checkmate::check_character(slice_ts, pattern = r"{\d{4}-\d{2}-\d{2}(<? \d{2}:\d{2}:\d{2})}", null.ok = TRUE),
+        checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
       checkmate::assert(!is.null(self %.% source_conn), add = coll)
