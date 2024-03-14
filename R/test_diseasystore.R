@@ -18,6 +18,8 @@
 #'   The data base schema where the tests should be run.
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
+#' @param ...
+#'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
 #' @examples
 #' \donttest{
@@ -31,7 +33,7 @@
 #' }
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
-                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL) {
+                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
 
   # Determine the class of the diseasystore being tested
   diseasystore_class <- diseasystore_generator$classname
@@ -133,7 +135,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       verbose = FALSE,
-      target_conn = DBI::dbConnect(RSQLite::SQLite())
+      target_conn = DBI::dbConnect(RSQLite::SQLite()),
+      ...
     ))
 
     # Check feature store has been created
@@ -171,7 +174,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = test_start_date,
       end_date = test_start_date,
-      verbose = FALSE
+      verbose = FALSE,
+      ...
     ))
 
     feature <- testthat::expect_no_error(ds$available_features[[1]])
@@ -190,7 +194,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = test_start_date,
       end_date = test_start_date,
-      verbose = FALSE
+      verbose = FALSE,
+      ...
     ))
 
     testthat::expect_no_error(ds$get_feature(ds$available_features[[1]]))
@@ -206,7 +211,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
@@ -257,7 +262,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
@@ -318,7 +323,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to perform the possible key_joins
       available_observables  <- ds$available_features |>
@@ -385,7 +390,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
 
       # Attempt to perform the possible key_joins
