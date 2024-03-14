@@ -88,6 +88,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         remote_data_available <- !identical(
           class(
             try({
+              dir.create(file.path(local_conn, dirname(file)), recursive = TRUE, showWarnings = FALSE)
               readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),
                               show_col_types = FALSE, progress = FALSE) |>
                 readr::write_csv(file.path(local_conn, file))
