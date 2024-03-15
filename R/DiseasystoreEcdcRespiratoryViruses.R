@@ -86,13 +86,9 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
 
       # Manually perform filtering
       if ("age_group" %in% stratification_features) {
-
         return(dplyr::filter(.data, !is.na(.data$age_group)))
-
       } else {
-
-        return(dplyr::filter(.data, !is.na(.data$age_group)))
-
+        return(dplyr::filter(.data, is.na(.data$age_group)))
       }
     }
   )
