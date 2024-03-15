@@ -22,7 +22,7 @@
 #'   source_conn_path(source_conn, "mtcars.csv")
 #'
 #'   # Clean up
-#'   unlink(source_conn)
+#'   unlink(source_conn, recursive = TRUE)
 #' @export
 source_conn_path <- function(source_conn, file) {
   url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"

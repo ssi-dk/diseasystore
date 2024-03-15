@@ -53,5 +53,5 @@ closest matching, chronologically earlier, file location to return.
   source_conn_path(source_conn, "mtcars.csv")
 
   # Clean up
-  unlink(source_conn)
+  unlink(source_conn, recursive = TRUE)
 }
