@@ -126,19 +126,34 @@ if (rlang::is_installed("withr")) {
 ```
 
 
-Once the files are downloaded and the target DB is configured, we can initialize the `diseasystore` that uses the
+Once the files are downloaded and the target database is configured, we can initialize the `diseasystore` that uses the
 ECDC Respiratory Viruses Weekly data.
 ```{r initializing_diseasystore, eval = not_on_cran && suggests_available && data_available}
 ds <- DiseasystoreEcdcRespiratoryViruses$new()
 ```
 
-Once configured such, we can also use the feature store directly to get data.
+Once configured such, we can use the feature store directly to get data.
 ```{r using_diseasystore_example_1, eval = not_on_cran && suggests_available && data_available}
 # We can see all the available features in the feature store
 ds$available_features
 ```
 
-```{r using_diseasystore_example_2, eval = not_on_cran && suggests_available && data_available}
+If you have locally cloned the repository, you may consider pulling data from the repository manually and disabling
+automatic pulls. Otherwise, the `diseasystore` will check for updates every time you request a feature.
+```{r using_diseasystore_example_2, eval = FALSE}
+# Manually update the repository
+system2(
+  "git",
+  args = paste("-C", diseasyoption("source_conn", "DiseasystoreEcdcRespiratoryViruses")),
+  stdout = TRUE
+)
+
+# Disable automatic pulls
+options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
+```
+
+
+```{r using_diseasystore_example_3, eval = not_on_cran && suggests_available && data_available}
 # And then retrieve a feature from the feature store
 ds$get_feature(feature = "iliari_rates",
                start_date = as.Date("2024-01-01"),
