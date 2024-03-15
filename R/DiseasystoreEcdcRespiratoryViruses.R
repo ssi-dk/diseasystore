@@ -64,10 +64,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
 
         # Trim output to include all weeks within (fully or partially) the requested time frame
         out <- out |>
-          dplyr::filter(
-            lubridate::floor_date(start_date, week_start = 1, unit = "day") <= .data$valid_from,
-            .data$valid_until <= lubridate::ceiling_date(end_date, week_start = 1, unit = "week")
-          )
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
 
         return(out)
       },
