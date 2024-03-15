@@ -1,4 +1,3 @@
-
 #' File path helper for different source_conn
 #'
 #' @name source_conn_helpers
