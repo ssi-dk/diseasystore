@@ -15,7 +15,7 @@ source_conn_github(source_conn, file, pull = TRUE)
 File location (path or URL).}
 
 \item{file}{(\code{character(1)})\cr
-Name (including path) of the file at the}
+Name (including path) of the file at the location.}
 
 \item{pull}{(\code{logical(1)})\cr
 Should "git pull" be called on the local repository before reading files?}

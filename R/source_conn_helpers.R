@@ -9,7 +9,7 @@
 #' @param source_conn (`character(1)`)\cr
 #'   File location (path or URL).
 #' @param file (`character(1)`)\cr
-#'   Name (including path) of the file at the
+#'   Name (including path) of the file at the location.
 #' @return (`character(1)`)\cr
 #'   The full path to the requested file.
 #' @examples
