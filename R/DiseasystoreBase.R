@@ -219,11 +219,23 @@ DiseasystoreBase <- R6::R6Class(                                                
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
             ds_existing <- dplyr::tbl(self %.% target_conn, target_table_id, check_from = FALSE)
 
-            if (SCDB::is.historical(ds_existing)) {
+            if (SCDB::is.historical(ds_existing) && SCDB::nrow(ds_existing) > 0) {
               ds_existing <- ds_existing |>
-                dplyr::filter(.data$from_ts == slice_ts) |>
-                dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
-                dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
+                dplyr::filter(.data$from_ts == !!SCDB::db_timestamp(slice_ts, self %.% target_conn)) |>
+                dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts")))
+
+              # We need to remove the data that overlaps with our newly compute range before combining.
+              # To ensure proper conversion of variables, we first copy the limits over and then do an inner_join
+              requested_interval <- data.frame(start_date, end_date) |>
+                dplyr::copy_to(
+                  self %.% target_conn, df = _, name = paste0("ds_requested_interval_", Sys.getpid()), overwrite = TRUE
+                )
+
+              ds_existing <- dplyr::inner_join(
+                ds_existing, requested_interval,
+                sql_on = '"LHS"."valid_until" <= "RHS"."start_date" AND "LHS"."valid_from" < "RHS"."end_date"',
+              ) |>
+                dplyr::select(!c("start_date", "end_date"))
             }
 
             ds_updated_feature <- dplyr::union_all(ds_existing, ds_feature) |> dplyr::compute()
@@ -290,12 +302,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
         dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()), overwrite = TRUE)
 
-      out <- dplyr::inner_join(out, validities,
-                               sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
-                                         ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
-                               suffix = c("", ".p")) |>
-        dplyr::select(!c("valid_from.p", "valid_until.p")) |>
-        dplyr::compute()
+      out <- dplyr::inner_join(
+        out, validities,
+        sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
+                  ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
+        suffix = c("", ".p")
+      ) |>
+        dplyr::select(!c("valid_from.p", "valid_until.p"))
 
       return(out)
     },
