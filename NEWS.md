@@ -2,6 +2,8 @@
 
 ## Features:
 
+* `DiseasystoreEcdcRespiratoryViruses`: A feature store that uses the ECDC Respiratory viruses weekly repository (#124).
+
 * Add support for SQLite with attached schemas (#121).
 
 * `test_diseasystore()` is added to provide a standardised method for testing new diseasystores (#123).
