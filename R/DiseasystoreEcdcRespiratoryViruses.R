@@ -80,7 +80,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
                                end_date = private %.% end_date) {
 
       # The EU-ECDC data contains surplus data depending for the age groups.
-      # Ie. individual age_groups are included as well as the total.
+      # I.e. individual age_groups are included as well as the total.
       # We need to filter at the appropriate stratification level when these doubly counted
       # features are requested.
 

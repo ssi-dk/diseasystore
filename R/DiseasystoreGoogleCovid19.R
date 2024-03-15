@@ -261,7 +261,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
                                end_date = private %.% end_date) {
 
       # The Google data contains surplus data depending on the stratification.
-      # Ie. some individuals are counted more than once.
+      # I.e. some individuals are counted more than once.
       # Eg. once at the country level, and then again at the region level etc.
       # We need to filter at the appropriate stratification level when these doubly counted
       # features are requested.
