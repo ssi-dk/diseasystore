@@ -223,7 +223,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         end_date   <- test_start_date + lubridate::days(4)
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -238,7 +237,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           source_conn = ds %.% source_conn
         ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -276,7 +274,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         end_date   <- test_start_date + lubridate::days(9)
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -291,7 +288,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           source_conn = ds %.% source_conn
         ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
