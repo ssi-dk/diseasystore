@@ -86,15 +86,15 @@ OO
 ORCID
 org
 
+param
 parsable
 PascalCase
 pcbi
+pid
 Plesner
 PLoS
 POSIXct
-pid
-
-param
+PostgreSQL
 
 quos
 

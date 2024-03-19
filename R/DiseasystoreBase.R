@@ -105,6 +105,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @param slice_ts `r rd_slice_ts()`
     #' @return
     #'   A tbl_dbi with the requested feature for the study period.
+    #' @importFrom utils packageVersion
     get_feature = function(feature,
                            start_date = self %.% start_date,
                            end_date   = self %.% end_date,
@@ -158,18 +159,30 @@ DiseasystoreBase <- R6::R6Class(                                                
       # If there are any missing ranges, put a lock on the data base
       if (nrow(ds_missing_ranges) > 0) {
 
-        # Add a LOCK to the diseasystore
-        add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-
-        # Check if we have ownership of the update of the target_table
-        # If not, keep retrying and wait for up to 30 minutes before giving up
-        wait_time <- 0 # seconds
-        while (!isTRUE(is_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
-          Sys.sleep(diseasyoption("lock_wait_increment"))
+        if (packageVersion("SCDB") <= "0.3") {
+          # Add a LOCK to the diseasystore
           add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
-          wait_time <- wait_time + diseasyoption("lock_wait_increment")
-          if (wait_time > diseasyoption("lock_wait_max")) {
-            rlang::abort(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+
+          # Check if we have ownership of the update of the target_table
+          # If not, keep retrying and wait for up to 30 minutes before giving up
+          wait_time <- 0 # seconds
+          while (!isTRUE(is_lock_owner(self %.% target_conn, target_table, self %.% target_schema))) {
+            Sys.sleep(diseasyoption("lock_wait_increment"))
+            add_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+            wait_time <- wait_time + diseasyoption("lock_wait_increment")
+            if (wait_time > diseasyoption("lock_wait_max")) {
+              stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+            }
+          }
+        } else {
+          # Add a LOCK to the diseasystore
+          wait_time <- 0 # seconds
+          while (!isTRUE(SCDB::lock_table(self %.% target_conn, target_table, self %.% target_schema))) {
+            Sys.sleep(diseasyoption("lock_wait_increment"))
+            wait_time <- wait_time + diseasyoption("lock_wait_increment")
+            if (wait_time > diseasyoption("lock_wait_max")) {
+              stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+            }
           }
         }
 
@@ -224,11 +237,22 @@ DiseasystoreBase <- R6::R6Class(                                                
             self %.% target_conn
           )
 
-          logger <- SCDB::Logger$new(
-            output_to_console = FALSE,
-            log_table_id = log_table_id,
-            log_conn = self %.% target_conn
-          )
+          if (packageVersion("SCDB") <= "0.3") {
+            logger <- SCDB::Logger$new(
+              output_to_console = FALSE,
+              log_table_id = log_table_id,
+              log_conn = self %.% target_conn
+            )
+          } else {
+            logger <- SCDB::Logger$new(
+              db_table = target_table,
+              timestamp = slice_ts,
+              output_to_console = FALSE,
+              log_table_id = log_table_id,
+              log_conn = self %.% target_conn
+            )
+          }
+
 
           # Commit to DB
           SCDB::update_snapshot(
@@ -243,7 +267,11 @@ DiseasystoreBase <- R6::R6Class(                                                
         })
 
         # Release the lock on the table
-        remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        if (packageVersion("SCDB") <= "0.3") {
+          remove_table_lock(self %.% target_conn, target_table, self %.% target_schema)
+        } else {
+          SCDB::unlock_table(self %.% target_conn, target_table, self %.% target_schema)
+        }
 
         # Inform how long has elapsed for updating data
         if (private$verbose && nrow(ds_missing_ranges) > 0) {
@@ -605,7 +633,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @importFrom zoo as.Date
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
-      if (inherits(target_table, "Id")) {
+      if (packageVersion("SCDB") <= "0.3" && inherits(target_table, "Id")) {
         target_table <- paste(
           c(purrr::pluck(target_table, "schema"),
             purrr::pluck(target_table, "table")

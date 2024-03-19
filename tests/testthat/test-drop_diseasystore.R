@@ -5,7 +5,12 @@ test_that("drop_diseasystore can delete entire default schema", {
 
     # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
     logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_logs_if_missing(logs_id, conn)
+    if (packageVersion("SCDB") <= "0.3") {
+      SCDB::create_logs_if_missing(logs_id, conn)
+    } else {
+      SCDB::create_logs_if_missing(conn = conn, log_table = logs_id)
+    }
+
 
     # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
     # and in other places which should be untouched by our tests
@@ -26,26 +31,32 @@ test_that("drop_diseasystore can delete entire default schema", {
       }
     }
 
+    if (packageVersion("SCDB") <= "0.3") {
+      table_checker <- DBI::dbExistsTable
+    } else {
+      table_checker <- SCDB::table_exists
+    }
+
     # Try to delete the entire `target_schema_1` store
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(conn = conn)
 
-    expect_false(DBI::dbExistsTable(conn, logs_id))
-    expect_false(DBI::dbExistsTable(conn, ids[[1]]))
-    expect_false(DBI::dbExistsTable(conn, ids[[2]]))
+    expect_false(table_checker(conn, logs_id))
+    expect_false(table_checker(conn, ids[[1]]))
+    expect_false(table_checker(conn, ids[[2]]))
 
-    expect_true(DBI::dbExistsTable(conn, ids[[3]]))
-    expect_true(DBI::dbExistsTable(conn, ids[[4]]))
+    expect_true(table_checker(conn, ids[[3]]))
+    expect_true(table_checker(conn, ids[[4]]))
 
 
     # Make sure all tables have been removed
     c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
       purrr::walk(~ {
-        if (DBI::dbExistsTable(conn, .)) {
+        if (table_checker(conn, .)) {
           DBI::dbRemoveTable(conn, .)
         }
-        expect_false(DBI::dbExistsTable(conn, .))
+        expect_false(table_checker(conn, .))
       })
 
     DBI::dbDisconnect(conn)
@@ -59,7 +70,11 @@ test_that("drop_diseasystore can delete single table in default schema", {
 
     # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
     logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_logs_if_missing(logs_id, conn)
+    if (packageVersion("SCDB") <= "0.3") {
+      SCDB::create_logs_if_missing(logs_id, conn)
+    } else {
+      SCDB::create_logs_if_missing(conn = conn, log_table = logs_id)
+    }
 
     # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
     # and in other places which should be untouched by our tests
@@ -79,37 +94,43 @@ test_that("drop_diseasystore can delete single table in default schema", {
       }
     }
 
+    if (packageVersion("SCDB") <= "0.3") {
+      table_checker <- DBI::dbExistsTable
+    } else {
+      table_checker <- SCDB::table_exists
+    }
+
     # Try to delete only mtcars_1 within the diseasystore
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_1", conn = conn)
 
-    expect_true(DBI::dbExistsTable(conn, logs_id))
-    expect_false(DBI::dbExistsTable(conn, ids[[1]]))
-    expect_true(DBI::dbExistsTable(conn, ids[[2]]))
+    expect_true(table_checker(conn, logs_id))
+    expect_false(table_checker(conn, ids[[1]]))
+    expect_true(table_checker(conn, ids[[2]]))
 
-    expect_true(DBI::dbExistsTable(conn, ids[[3]]))
-    expect_true(DBI::dbExistsTable(conn, ids[[4]]))
+    expect_true(table_checker(conn, ids[[3]]))
+    expect_true(table_checker(conn, ids[[4]]))
 
     # Try to delete only mtcars_2 within the diseasystore
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
     drop_diseasystore(pattern = "mtcars_2", conn = conn)
 
-    expect_true(DBI::dbExistsTable(conn, logs_id))
-    expect_false(DBI::dbExistsTable(conn, ids[[1]]))
-    expect_false(DBI::dbExistsTable(conn, ids[[2]]))
+    expect_true(table_checker(conn, logs_id))
+    expect_false(table_checker(conn, ids[[1]]))
+    expect_false(table_checker(conn, ids[[2]]))
 
-    expect_true(DBI::dbExistsTable(conn, ids[[3]]))
-    expect_true(DBI::dbExistsTable(conn, ids[[4]]))
+    expect_true(table_checker(conn, ids[[3]]))
+    expect_true(table_checker(conn, ids[[4]]))
 
     # Make sure all tables have been removed
     c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
       purrr::walk(~ {
-        if (DBI::dbExistsTable(conn, .)) {
+        if (table_checker(conn, .)) {
           DBI::dbRemoveTable(conn, .)
         }
-        expect_false(DBI::dbExistsTable(conn, .))
+        expect_false(table_checker(conn, .))
       })
 
     DBI::dbDisconnect(conn)

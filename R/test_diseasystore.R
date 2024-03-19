@@ -244,11 +244,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
-        # Stop-gap measure to clear dbplyr_### tables
-        SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
-          dplyr::pull(table) |>
-          purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-          purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+        if (packageVersion("SCDB") <= "0.3") {
+          # Stop-gap measure to clear dbplyr_### tables
+          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+            dplyr::pull(table) |>
+            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+        }
       })
 
       rm(ds)
@@ -295,11 +297,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
-        # Stop-gap measure to clear dbplyr_### tables
-        SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
-          dplyr::pull(table) |>
-          purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-          purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+        if (packageVersion("SCDB") <= "0.3") {
+          # Stop-gap measure to clear dbplyr_### tables
+          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
+            dplyr::pull(table) |>
+            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+        }
       })
 
       rm(ds)
@@ -376,11 +380,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             key_join_features_tester(dplyr::collect(output), start_date, end_date)
           }
 
-          # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
-            dplyr::pull(table) |>
-            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+          if (packageVersion("SCDB") <= "0.3") {
+            # Stop-gap measure to clear dbplyr_### tables
+            SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
+              dplyr::pull(table) |>
+              purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+              purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+          }
         })
 
       rm(ds)
@@ -432,11 +438,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             key_join_features_tester(dplyr::collect(output), start_date, end_date)
           }
 
-          # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
-            dplyr::pull(table) |>
-            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+          if (packageVersion("SCDB") <= "0.3") {
+            # Stop-gap measure to clear dbplyr_### tables
+            SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
+              dplyr::pull(table) |>
+              purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+              purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+          }
         })
 
 
@@ -466,11 +474,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             key_join_features_tester(dplyr::collect(output), start_date, end_date)
           }
 
-          # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
-            dplyr::pull(table) |>
-            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+          if (packageVersion("SCDB") <= "0.3") {
+            # Stop-gap measure to clear dbplyr_### tables
+            SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
+              dplyr::pull(table) |>
+              purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
+              purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
+          }
         })
 
       # Clean up
