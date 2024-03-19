@@ -91,6 +91,78 @@ jobs:
           name: coverage-test-failures-${{ matrix.config.id }}-old
           path: ${{ runner.temp }}/package
 
+  code-coverage-duckdb-old:
+    name: "🧪 Tests: SCDB v0.3, DuckDB"
+    runs-on: ubuntu-latest
+
+    env:
+      BACKEND: DuckDB
+      BACKEND_DRV: duckdb::duckdb
+      BACKEND_ARGS: 'list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))'
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: ${{ inputs.cache_version }}
+          extra-packages: any::covr
+          needs: coverage
+
+      - name: Setup BACKEND_POST_CONNECT
+        run: |
+          set -o xtrace
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
+
+          CONN_POST_CONNECT="list("
+          for schema in "${schemas[@]}"; do
+            CONN_POST_CONNECT+="\"CREATE SCHEMA IF NOT EXISTS '${schema}';\", "
+          done
+          # Trim trailing ", " from CONN_POST_CONNECT
+          CONN_POST_CONNECT=${CONN_POST_CONNECT%??}
+          CONN_POST_CONNECT+=")"
+
+          echo "BACKEND_POST_CONNECT=$CONN_POST_CONNECT" >> $GITHUB_ENV
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-duckdb-old
+          path: ${{ runner.temp }}/package
 
   code-coverage-postgres-old:
     name: "🧪 Tests: SCDB v0.3, PostgreSQL"
@@ -305,6 +377,7 @@ jobs:
 
           cat "$log"
 
+
   code-coverage-sqlite-new:
     name: "🧪 Tests: SCDB v0.4, ${{ matrix.config.backend }}"
     runs-on: ubuntu-latest
@@ -397,6 +470,82 @@ jobs:
           name: coverage-test-failures-${{ matrix.config.id }}-new
           path: ${{ runner.temp }}/package
 
+  code-coverage-duckdb-new:
+    name: "🧪 Tests: SCDB v0.4, DuckDB"
+    runs-on: ubuntu-latest
+
+    env:
+      BACKEND: DuckDB
+      BACKEND_DRV: duckdb::duckdb
+      BACKEND_ARGS: 'list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))'
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set SCDB version to v0.4
+        run: |
+          perl -pi -e 's/SCDB \(>= 0.3.0\)/SCDB \(>= 0.4.0\)/g' DESCRIPTION
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: ${{ inputs.cache_version }}
+          extra-packages: any::covr, github::ssi-dk/SCDB@rc-v0.4
+          needs: coverage
+
+      - name: Setup BACKEND_POST_CONNECT
+        run: |
+          set -o xtrace
+          IFS=',' read -ra schemas <<< "test_ds,not_test_ds"
+
+          CONN_POST_CONNECT="list("
+          for schema in "${schemas[@]}"; do
+            CONN_POST_CONNECT+="\"CREATE SCHEMA IF NOT EXISTS '${schema}';\", "
+          done
+          # Trim trailing ", " from CONN_POST_CONNECT
+          CONN_POST_CONNECT=${CONN_POST_CONNECT%??}
+          CONN_POST_CONNECT+=")"
+
+          echo "BACKEND_POST_CONNECT=$CONN_POST_CONNECT" >> $GITHUB_ENV
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+          )
+        shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          TESTTHAT_OUT=$(find ${{ runner.temp }}/package -name 'testthat.Rout*')
+
+          cat $TESTTHAT_OUT
+
+          # Throw errors on failures or warnings
+          grep -q "FAIL 0" $TESTTHAT_OUT || { echo "Test failures found"; exit 1; }
+          grep -q "WARN 0" $TESTTHAT_OUT || { echo "Test warnings found"; exit 1; }
+
+          # Throw error if error: are found
+          if grep -q "Error:" $TESTTHAT_OUT; then
+            echo "Error: found"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures-duckdb-new
+          path: ${{ runner.temp }}/package
 
   code-coverage-postgres-new:
     name: "🧪 Tests: SCDB v0.4, PostgreSQL"
