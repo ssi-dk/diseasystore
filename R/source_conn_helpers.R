@@ -97,6 +97,9 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
 
     # Update the local repo -- give warning if we cannot
     if (pull) {
+      if (!checkmate::test_directory_exists(file.path(source_conn, ".git"))) {
+        stop("The directory ", source_conn, " does not appear to be a git repository. Cannot pull.")
+      }
       tryCatch(
         msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),                               # nolint: implicit_assignment_linter
         warning = function(w) {
