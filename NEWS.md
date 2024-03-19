@@ -12,6 +12,8 @@
 
   * PostgreSQL (#128).
 
+  * DuckDB (#127).
+
 * `test_diseasystore()` is added to provide a standardised method for testing new diseasystores (#123).
 
 ## Minor Improvements and Fixes:

@@ -126,6 +126,6 @@ test_that("truncate_interlace works", {
                    truncate_interlace(x, list(y)) |> dplyr::collect())
 
   # Clean up
-  DBI::dbDisconnect(conn)
+  DBI::dbDisconnect(conn, shutdown = TRUE)
 
 })

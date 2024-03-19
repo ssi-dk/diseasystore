@@ -59,7 +59,7 @@ test_that("drop_diseasystore can delete entire default schema", {
         expect_false(table_checker(conn, .))
       })
 
-    DBI::dbDisconnect(conn)
+    DBI::dbDisconnect(conn, shutdown = TRUE)
   }
   invisible(gc())
 })
@@ -133,7 +133,7 @@ test_that("drop_diseasystore can delete single table in default schema", {
         expect_false(table_checker(conn, .))
       })
 
-    DBI::dbDisconnect(conn)
+    DBI::dbDisconnect(conn, shutdown = TRUE)
   }
   invisible(gc())
 })
