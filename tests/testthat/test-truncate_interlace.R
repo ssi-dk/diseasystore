@@ -51,14 +51,13 @@ test_that("truncate_interlace works", {
       dplyr::copy_to(conn, df = _, name = "z", overwrite = TRUE)
 
 
-    # Copy data to db
-    data <- dplyr::copy_to(conn, data, overwrite = TRUE)
-
-
     # We choose a couple of primary interval to test with
-    p1 <- dplyr::transmute(data, key_name, valid_from = as.Date("1985-01-01"), valid_until = as.Date(NA))
-    p2 <- dplyr::transmute(data, key_name, valid_from = as.Date("1995-01-01"), valid_until = as.Date("2005-01-01"))
-    p3 <- dplyr::transmute(data, key_name, valid_from = as.Date("2005-01-01"), valid_until = as.Date("2015-01-01"))
+    p1 <- dplyr::transmute(data, key_name, valid_from = as.Date("1985-01-01"), valid_until = as.Date(NA)) |>
+      dplyr::copy_to(conn, df = _, name = "p1", overwrite = TRUE)
+    p2 <- dplyr::transmute(data, key_name, valid_from = as.Date("1995-01-01"), valid_until = as.Date("2005-01-01")) |>
+      dplyr::copy_to(conn, df = _, name = "p2", overwrite = TRUE)
+    p3 <- dplyr::transmute(data, key_name, valid_from = as.Date("2005-01-01"), valid_until = as.Date("2015-01-01")) |>
+      dplyr::copy_to(conn, df = _, name = "p3", overwrite = TRUE)
 
 
     # We define a small helper function to test the interlace outputs
