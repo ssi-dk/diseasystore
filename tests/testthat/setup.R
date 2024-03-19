@@ -39,5 +39,5 @@ for (conn in get_test_conns()) {
   checkmate::assert_true(n_tables_in_test_schemas == 0)
 
   # Disconnect
-  DBI::dbDisconnect(conn)
+  DBI::dbDisconnect(conn, shutdown = TRUE)
 }

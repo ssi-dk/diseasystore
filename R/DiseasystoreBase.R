@@ -91,7 +91,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     finalize = function() {
       purrr::walk(list(self %.% target_conn, self %.% source_conn),
                   ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
-                    DBI::dbDisconnect(.)
+                    DBI::dbDisconnect(., shutdown = TRUE)
                   })
     },
 
