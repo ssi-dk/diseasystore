@@ -18,6 +18,8 @@
 #'   The data base schema where the tests should be run.
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
+#' @param ...
+#'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
 #' @examples
 #' \donttest{
@@ -31,7 +33,7 @@
 #' }
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
-                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL) {
+                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
 
   # Determine the class of the diseasystore being tested
   diseasystore_class <- diseasystore_generator$classname
@@ -62,8 +64,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   if (remote_data_available) {
 
     # Determine the type of source_conn_helper needed for the generator
-    if (stringr::str_detect(remote_conn,
-                            r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
+    if (stringr::str_detect(remote_conn, r"{https?:\/\/api.github.com\/repos\/[a-zA-Z-]*\/[a-zA-Z-]*}")) {
+      source_conn_helper <- source_conn_github                                                                          # nolint: object_usage_linter
+    } else if (stringr::str_detect(remote_conn,
+                                   r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
       source_conn_helper <- source_conn_path                                                                            # nolint: object_usage_linter
     } else {
       stop("source_conn_helper could not be determined")
@@ -84,6 +88,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         remote_data_available <- !identical(
           class(
             try({
+              dir.create(file.path(local_conn, dirname(file)), recursive = TRUE, showWarnings = FALSE)
               readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),
                               show_col_types = FALSE, progress = FALSE) |>
                 readr::write_csv(file.path(local_conn, file))
@@ -131,7 +136,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       verbose = FALSE,
-      target_conn = DBI::dbConnect(RSQLite::SQLite())
+      target_conn = DBI::dbConnect(RSQLite::SQLite()),
+      ...
     ))
 
     # Check feature store has been created
@@ -169,7 +175,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = test_start_date,
       end_date = test_start_date,
-      verbose = FALSE
+      verbose = FALSE,
+      ...
     ))
 
     feature <- testthat::expect_no_error(ds$available_features[[1]])
@@ -188,7 +195,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
       start_date = test_start_date,
       end_date = test_start_date,
-      verbose = FALSE
+      verbose = FALSE,
+      ...
     ))
 
     testthat::expect_no_error(ds$get_feature(ds$available_features[[1]]))
@@ -204,7 +212,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
@@ -212,29 +220,29 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         start_date <- test_start_date
         end_date   <- test_start_date + lubridate::days(4)
 
-        feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect()
-
-        feature_checksum <- feature |>
+        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
+
 
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(start_date  = start_date,
-                                         end_date    = end_date,
-                                         slice_ts    = ds %.% slice_ts,
-                                         source_conn = ds %.% source_conn) |>
+        reference_checksums <- reference_generator(
+          start_date  = start_date,
+          end_date    = end_date,
+          slice_ts    = ds %.% slice_ts,
+          source_conn = ds %.% source_conn
+        ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-          dplyr::collect()
-
-        reference_checksum <- reference |>
+          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
-        testthat::expect_identical(feature_checksum, reference_checksum)
+
+        testthat::expect_identical(feature_checksums, reference_checksums)
 
         if (packageVersion("SCDB") <= "0.3") {
           # Stop-gap measure to clear dbplyr_### tables
@@ -257,7 +265,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
@@ -265,25 +273,29 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         start_date <- test_start_date
         end_date   <- test_start_date + lubridate::days(9)
 
-        feature <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
+
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(start_date  = start_date,
-                                         end_date    = end_date,
-                                         slice_ts    = ds %.% slice_ts,
-                                         source_conn = ds %.% source_conn) |>
+        reference_checksums <- reference_generator(
+          start_date  = start_date,
+          end_date    = end_date,
+          slice_ts    = ds %.% slice_ts,
+          source_conn = ds %.% source_conn
+        ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
           dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
-        testthat::expect_identical(feature, reference)
+
+        testthat::expect_identical(feature_checksums, reference_checksums)
 
         if (packageVersion("SCDB") <= "0.3") {
           # Stop-gap measure to clear dbplyr_### tables
@@ -320,7 +332,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to perform the possible key_joins
       available_observables  <- ds$available_features |>
@@ -389,7 +401,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     for (conn in conn_generator()) {
 
       # Initialise without start_date and end_date
-      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn))
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
 
       # Attempt to perform the possible key_joins

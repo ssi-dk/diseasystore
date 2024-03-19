@@ -2,6 +2,8 @@
 
 ## New Features:
 
+* `DiseasystoreEcdcRespiratoryViruses`: A feature store that uses the ECDC Respiratory viruses weekly repository (#124).
+
 * With the release of `{SCDB}` v0.4, we now support more database backends:
 
   * SQLite with attached schemas (#121).

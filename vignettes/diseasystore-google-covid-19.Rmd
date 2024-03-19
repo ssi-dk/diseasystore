@@ -128,7 +128,7 @@ Once the files are downloaded and the target DB is configured, we can initialize
 ds <- DiseasystoreGoogleCovid19$new()
 ```
 
-Once configured such, we can also use the feature store directly to get data.
+Once configured such, we can use the feature store directly to get data.
 ```{r using_diseasystore_example_1, eval = not_on_cran && suggests_available && data_available}
 # We can see all the available features in the feature store
 ds$available_features
