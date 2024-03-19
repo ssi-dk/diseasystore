@@ -233,7 +233,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
               ds_existing <- dplyr::inner_join(
                 ds_existing, requested_interval,
-                sql_on = '"LHS"."valid_until" <= "RHS"."start_date" AND "LHS"."valid_from" < "RHS"."end_date"',
+                sql_on = '"LHS"."valid_until" <= "RHS"."start_date" AND "LHS"."valid_from" < "RHS"."end_date"'
               ) |>
                 dplyr::select(!c("start_date", "end_date"))
             }
