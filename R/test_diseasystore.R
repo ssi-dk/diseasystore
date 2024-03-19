@@ -22,6 +22,7 @@
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
 #' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
+#' \donttest{
 #'   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
 #'
 #'   test_diseasystore(
@@ -32,6 +33,7 @@
 #'     test_start_date = as.Date("2022-06-20"),
 #'     slice_ts = "2023-11-24"
 #'   )
+#' }
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
                               data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
