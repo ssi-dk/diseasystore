@@ -28,7 +28,7 @@ if (rlang::is_installed("withr")) {
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
 suggests_available <- rlang::is_installed("RSQLite")
-not_on_cran <- interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "true"))
+not_on_cran <- interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "false")) || as.logical(Sys.getenv("CI", unset = "false"))interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "true"))
 ```
 
 The Google COVID-19 data repository is a comprehensive open repository of COVID-19 data.
