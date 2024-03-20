@@ -65,47 +65,58 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   remote_data_available <- !is.null(remote_conn) && curl::has_internet() # Assume available
 
   if (remote_data_available) {
+    # Assume we can run on CRAN
+    skip_on_cran <- FALSE
 
     # Determine the type of source_conn_helper needed for the generator
     if (stringr::str_detect(remote_conn, r"{https?:\/\/api.github.com\/repos\/[a-zA-Z-]*\/[a-zA-Z-]*}")) {
       source_conn_helper <- source_conn_github                                                                          # nolint: object_usage_linter
+      skip_on_cran <- TRUE # CRAN tests cannot use authenticated API requests to Github and will fail
     } else if (stringr::str_detect(remote_conn,
                                    r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
       source_conn_helper <- source_conn_path                                                                            # nolint: object_usage_linter
     } else {
-      stop("source_conn_helper could not be determined")
+      stop("`source_conn_helper` could not be determined!")
     }
 
-
     # Then look for availability of files and download if needed
-    for (file in data_files) {
-      remote_url <- source_conn_helper(remote_conn, file)
+    on_cran <- !interactive() && !identical(Sys.getenv("NOT_CRAN"), "true") && !identical(Sys.getenv("CI"), "true")
 
-      # If we have the file locally, do not re-download but check it exists
-      if (checkmate::test_file_exists(file.path(local_conn, file))) {
-        remote_data_available <- !identical(
-          class(try(readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE))),
-          "try-error"
-        )
-      } else { # If we don't have the file locally, copy it down
-        remote_data_available <- !identical(
-          class(
-            try({
-              dir.create(file.path(local_conn, dirname(file)), recursive = TRUE, showWarnings = FALSE)
-              readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),
-                              show_col_types = FALSE, progress = FALSE) |>
-                readr::write_csv(file.path(local_conn, file))
-            })
-          ),
-          "try-error"
-        )
+    if (on_cran && skip_on_cran) {
+
+      remote_data_available <- FALSE
+
+    } else {
+
+      for (file in data_files) {
+        remote_url <- source_conn_helper(remote_conn, file)
+
+        # If we have the file locally, do not re-download but check it exists
+        if (checkmate::test_file_exists(file.path(local_conn, file))) {
+          remote_data_available <- !identical(
+            class(try(readr::read_csv(remote_url, n_max = 1, show_col_types = FALSE, progress = FALSE))),
+            "try-error"
+          )
+        } else { # If we don't have the file locally, copy it down
+          remote_data_available <- !identical(
+            class(
+              try({
+                dir.create(file.path(local_conn, dirname(file)), recursive = TRUE, showWarnings = FALSE)
+                readr::read_csv(remote_url, n_max = diseasyoption("n_max", diseasystore_class, .default = 1000),
+                                show_col_types = FALSE, progress = FALSE) |>
+                  readr::write_csv(file.path(local_conn, file))
+              })
+            ),
+            "try-error"
+          )
+        }
       }
     }
   }
 
 
   # Throw warning if data unavailable
-  if (!is.null(remote_conn) && curl::has_internet() && !remote_data_available) {
+  if (!on_cran && !is.null(remote_conn) && curl::has_internet() && !remote_data_available) {
     warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
   }
 
@@ -136,6 +147,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -167,6 +179,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     # Ensure source is set as the remote
     withr::local_options(
@@ -195,6 +208,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(local)
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -213,6 +227,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -264,6 +279,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
     testthat::skip_if_not(local)
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -329,6 +345,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -398,6 +415,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
+    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 

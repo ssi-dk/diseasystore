@@ -3,6 +3,7 @@ withr::local_options("diseasystore.target_schema" = target_schema_1)
 withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
 
 test_that("DiseasystoreBase works", {
+  skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
   # Test different initialization of the base module
 
@@ -105,6 +106,7 @@ test_that("DiseasystoreBase works", {
 
 test_that("$get_feature verbosity works", {
   skip_if_not_installed("RSQLite")
+  skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
   # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
   DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
@@ -149,6 +151,7 @@ test_that("$get_feature verbosity works", {
 
 test_that("DiseasystoreBase$determine_new_ranges works", {
   skip_if_not_installed("RSQLite")
+  skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
   start_date <- as.Date("2020-01-01")
   end_date   <- as.Date("2020-03-01")
@@ -218,6 +221,8 @@ test_that("DiseasystoreBase$determine_new_ranges works", {
 
 
 test_that("active binding: ds_map works", {
+  skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
+
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the ds_map
@@ -232,6 +237,8 @@ test_that("active binding: ds_map works", {
 
 
 test_that("active binding: available_features works", {
+  skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
+
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the available_features
@@ -247,6 +254,8 @@ test_that("active binding: available_features works", {
 
 
 test_that("active binding: label works", {
+  skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
+
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
   # Retrieve the label

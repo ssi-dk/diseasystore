@@ -33,7 +33,7 @@ if (rlang::is_installed("withr")) {
 
 # We have a "hard" dependency for RSQLite to render parts of this vignette
 suggests_available <- rlang::is_installed("RSQLite")
-not_on_cran <- interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "false")) || as.logical(Sys.getenv("CI", unset = "false"))
+not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") || identical(Sys.getenv("CI"), "true")
 ```
 
 The Respiratory viruses weekly repository contains weekly summaries of the [erviss](https://erviss.org/) data for
@@ -156,8 +156,8 @@ options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
 ```{r using_diseasystore_example_3, eval = not_on_cran && suggests_available && data_available}
 # And then retrieve a feature from the feature store
 ds$get_feature(feature = "iliari_rates",
-               start_date = as.Date("2024-01-01"),
-               end_date = as.Date("2024-03-01"))
+               start_date = as.Date("2023-01-01"),
+               end_date = as.Date("2023-03-01"))
 ```
 
 
