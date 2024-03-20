@@ -12,7 +12,7 @@ They define the three methods associated with features (compute, get and key_joi
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,7 +29,11 @@ They define the three methods associated with features (compute, get and key_joi
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Package usage</h6>
+    <a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a>
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Developer guides</h6>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
   </div>
 </li>
@@ -170,7 +174,7 @@ dplyr::across(.cols = tidyselect::all_of(feature),
 <span class="r-in"><span>  <span class="co"># Most often, we need only specify `compute` and `key_join` to get a functioning FeatureHandler</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># In this example we use mtcars as the basis for our features</span></span></span>
-<span class="r-in"><span>  <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_connection.html" class="external-link">get_connection</a></span><span class="op">(</span>drv <span class="op">=</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_connection.html" class="external-link">get_connection</a></span><span class="op">(</span>drv <span class="op">=</span> <span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># We use mtcars as our basis. First we add the rownames as an actual column</span></span></span>
 <span class="r-in"><span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">mtcars</span>, key_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>, .before <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -189,7 +193,7 @@ dplyr::across(.cols = tidyselect::all_of(feature),
 <span class="r-in"><span>  <span class="co"># We first write a compute function for the mpg in our modified mtcars data set</span></span></span>
 <span class="r-in"><span>  <span class="co"># Our goal is to get the mpg of all cars that were in production at the between start/end_date</span></span></span>
 <span class="r-in"><span>  <span class="va">compute_mpg</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">start_date</span>, <span class="va">end_date</span>, <span class="va">slice_ts</span>, <span class="va">source_conn</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_table.html" class="external-link">get_table</a></span><span class="op">(</span><span class="va">source_conn</span>, <span class="st">"mtcars"</span>, slice_ts <span class="op">=</span> <span class="va">slice_ts</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_table.html" class="external-link">get_table</a></span><span class="op">(</span><span class="va">source_conn</span>, <span class="st">"mtcars"</span>, slice_ts <span class="op">=</span> <span class="va">slice_ts</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">{</span><span class="op">{</span> <span class="va">start_date</span> <span class="op">}</span><span class="op">}</span> <span class="op">&lt;=</span> <span class="va">.data</span><span class="op">$</span><span class="va">production_end</span>,</span></span>
 <span class="r-in"><span>                    <span class="va">.data</span><span class="op">$</span><span class="va">production_start</span> <span class="op">&lt;=</span> <span class="op">{</span><span class="op">{</span> <span class="va">end_date</span> <span class="op">}</span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span><span class="st">"key_name"</span>, <span class="st">"mpg"</span>,</span></span>

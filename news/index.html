@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +27,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Package usage</h6>
+    <a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a>
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Developer guides</h6>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
   </div>
 </li>
@@ -55,7 +59,27 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.1" id="diseasystore-011">diseasystore 0.1.1<a class="anchor" aria-label="anchor" href="#diseasystore-011"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="diseasystore-020">diseasystore 0.2.0<a class="anchor" aria-label="anchor" href="#diseasystore-020"></a></h2><p class="text-muted">CRAN release: 2024-03-20</p>
+<div class="section level3">
+<h3 id="new-features-0-2-0">New Features:<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
+<ul><li><p><code>DiseasystoreEcdcRespiratoryViruses</code>: A feature store that uses the ECDC Respiratory viruses weekly repository (<a href="https://github.com/ssi-dk/diseasystore/issues/124" class="external-link">#124</a>).</p></li>
+<li>
+<p>With the release of <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> v0.4, we now support more database backends:</p>
+<ul><li><p>SQLite with attached schemas (<a href="https://github.com/ssi-dk/diseasystore/issues/121" class="external-link">#121</a>).</p></li>
+<li><p>Microsoft SQL Server (<a href="https://github.com/ssi-dk/diseasystore/issues/128" class="external-link">#128</a>).</p></li>
+<li><p>PostgreSQL (<a href="https://github.com/ssi-dk/diseasystore/issues/128" class="external-link">#128</a>).</p></li>
+<li><p>DuckDB (<a href="https://github.com/ssi-dk/diseasystore/issues/127" class="external-link">#127</a>).</p></li>
+</ul></li>
+<li><p><code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> is added to provide a standardised method for testing new diseasystores (<a href="https://github.com/ssi-dk/diseasystore/issues/123" class="external-link">#123</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-fixes-0-2-0">Minor Improvements and Fixes:<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/diseasyoption.html">diseasyoption()</a></code> now allows a default option to be set with the <code>.default</code> argument (<a href="https://github.com/ssi-dk/diseasystore/issues/122" class="external-link">#122</a>).</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="diseasystore-011">diseasystore 0.1.1<a class="anchor" aria-label="anchor" href="#diseasystore-011"></a></h2><p class="text-muted">CRAN release: 2024-01-18</p>
 <div class="section level3">
 <h3 id="fixes-0-1-1">Fixes:<a class="anchor" aria-label="anchor" href="#fixes-0-1-1"></a></h3>
 <ul><li><p>Improved the stability of internal functions.</p></li>

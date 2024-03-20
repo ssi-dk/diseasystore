@@ -41,7 +41,7 @@
     
     <a class="navbar-brand me-2" href="index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Package usage</h6>
+    <a class="dropdown-item" href="articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a>
     <a class="dropdown-item" href="articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Developer guides</h6>
     <a class="dropdown-item" href="articles/extending-diseasystore.html">Extending diseasystore</a>
   </div>
 </li>
@@ -98,15 +102,15 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>The <code>diseasystore</code> package provides feature stores implemented in R specifically designed for serve disease data for epidemic preparedness.</p>
-<p>What makes a <code>diseasystore</code> special, is that features can be automatically coupled and stratified within the <code>diseasystore</code> package. Consult the Quick start vignette to see it in action (<code><a href="https://ssi-dk.github.io/diseasystore/articles/quick-start.html">vignette("quick-start", package = "diseasystore")</a></code>).</p>
-<p>The package forms the data-backbone of the <code>{diseasy}</code> package.</p>
+<p>What makes a <code>diseasystore</code> special, is that features can be automatically coupled and stratified within the <code>diseasystore</code> package. Consult the Quick start vignette to see it in action (<code>vignette("quick-start", package = "diseasystore")</code>).</p>
+<p>The package forms the data-backbone of the <a href="https://github.com/ssi-dk/diseasy" class="external-link">diseasy</a> package.</p>
 </div>
 <div class="section level2">
 <h2 id="handling-of-diverse-data-sources">Handling of diverse data sources<a class="anchor" aria-label="anchor" href="#handling-of-diverse-data-sources"></a>
 </h2>
 <p>Different data sources are handled by individual <code>diseasystores</code> which each facilitate access to the relevant disease data for the given data source.</p>
-<p>Data for different diseases will typically be structured in different ways. The <code>diseasystore</code> package currently implements the Google Health COVID-19 Open Repository with more one <code>diseasystores</code> the way.</p>
-<p>The <code>diseasystore</code> package is designed to handled both individual-level data (examples to come) and semi-aggregated (typically publicly available) data.</p>
+<p>Data for different diseases will typically be structured in different ways. The <code>diseasystore</code> package currently implements the Google Health COVID-19 Open Repository with more <code>diseasystores</code> on the way.</p>
+<p>The <code>diseasystore</code> package is designed to handle both individual-level data (examples to come) and semi-aggregated (typically publicly available) data.</p>
 <p>If the data is at the individual-level, the feature store is fully dynamic and can adapt to (virtually) any stratification that the user specifies. If the data conversely is semi-aggregated, the data can only be stratified at the levels of the semi-aggregation (or at higher levels).</p>
 </div>
 <div class="section level2">

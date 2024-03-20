@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Package usage</h6>
+    <a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a>
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Developer guides</h6>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
   </div>
 </li>
@@ -100,7 +104,7 @@
 can use the <code><a href="../reference/available_diseasystores.html">available_diseasystores()</a></code> function.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/available_diseasystores.html">available_diseasystores</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "DiseasystoreGoogleCovid19"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "DiseasystoreEcdcRespiratoryViruses" "DiseasystoreGoogleCovid19"</span></span></code></pre></div>
 <p>This function looks for <code>diseasystores</code> on the current
 search path. By default, this will show the <code>diseasystores</code>
 bundled with the base package. If you have <a href="extending-diseasystore.html">extended</a>
@@ -152,8 +156,8 @@ interval simpler.</p>
 creation of <code>ds</code>):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span><span class="st">"n_hospital"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_006&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.44.2 []</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_004&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.0 []</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>322       <span style="text-decoration: underline;">18</span>323</span></span>
@@ -171,8 +175,8 @@ columns. These are used for one of the primary selling points of
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span><span class="st">"n_hospital"</span>,</span>
 <span>               start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span>,</span>
 <span>               end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-02"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_007&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.44.2 []</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_005&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.0 []</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>322       <span style="text-decoration: underline;">18</span>323</span></span>
@@ -287,19 +291,76 @@ to delete from<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data
 instead prepend the schema specification to the pattern before matching
 (e.g. “ds\..*“).&lt;/p&gt;"><sup>1</sup></a>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   schema                        table</span></span>
-<span><span class="co">#&gt; 1   &lt;NA&gt; ds.google_covid_19_age_group</span></span>
-<span><span class="co">#&gt; 2   &lt;NA&gt;     ds.google_covid_19_index</span></span>
-<span><span class="co">#&gt; 3   &lt;NA&gt;  ds.google_covid_19_hospital</span></span>
-<span><span class="co">#&gt; 4   &lt;NA&gt;                     ds.locks</span></span>
-<span><span class="co">#&gt; 5   &lt;NA&gt;                      ds.logs</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    schema                             table</span></span>
+<span><span class="co">#&gt; 1    main      ds.google_covid_19_age_group</span></span>
+<span><span class="co">#&gt; 2    main          ds.google_covid_19_index</span></span>
+<span><span class="co">#&gt; 3    main       ds.google_covid_19_hospital</span></span>
+<span><span class="co">#&gt; 4    main                          ds.locks</span></span>
+<span><span class="co">#&gt; 5    main                           ds.logs</span></span>
+<span><span class="co">#&gt; 6    temp                        dbplyr_026</span></span>
+<span><span class="co">#&gt; 7    temp                ds_validities_8008</span></span>
+<span><span class="co">#&gt; 8    temp                        dbplyr_031</span></span>
+<span><span class="co">#&gt; 9    temp                     SCDB_8008_024</span></span>
+<span><span class="co">#&gt; 10   temp                     SCDB_8008_020</span></span>
+<span><span class="co">#&gt; 11   temp                        dbplyr_030</span></span>
+<span><span class="co">#&gt; 12   temp ds_google_covid_19_age_group_8008</span></span>
+<span><span class="co">#&gt; 13   temp                        dbplyr_021</span></span>
+<span><span class="co">#&gt; 14   temp                     SCDB_8008_025</span></span>
+<span><span class="co">#&gt; 15   temp                        dbplyr_010</span></span>
+<span><span class="co">#&gt; 16   temp                        dbplyr_014</span></span>
+<span><span class="co">#&gt; 17   temp                     SCDB_8008_016</span></span>
+<span><span class="co">#&gt; 18   temp                     SCDB_8008_012</span></span>
+<span><span class="co">#&gt; 19   temp                        dbplyr_025</span></span>
+<span><span class="co">#&gt; 20   temp          ds_all_combinations_8008</span></span>
+<span><span class="co">#&gt; 21   temp                     SCDB_8008_009</span></span>
+<span><span class="co">#&gt; 22   temp                        dbplyr_005</span></span>
+<span><span class="co">#&gt; 23   temp                        dbplyr_004</span></span>
+<span><span class="co">#&gt; 24   temp                     SCDB_8008_017</span></span>
+<span><span class="co">#&gt; 25   temp                     SCDB_8008_008</span></span>
+<span><span class="co">#&gt; 26   temp                     SCDB_8008_001</span></span>
+<span><span class="co">#&gt; 27   temp               ds_study_dates_8008</span></span>
+<span><span class="co">#&gt; 28   temp                        dbplyr_015</span></span>
+<span><span class="co">#&gt; 29   temp                        dbplyr_006</span></span>
+<span><span class="co">#&gt; 30   temp                        dbplyr_019</span></span>
+<span><span class="co">#&gt; 31   temp     ds_google_covid_19_index_8008</span></span>
+<span><span class="co">#&gt; 32   temp  ds_google_covid_19_hospital_8008</span></span>
+<span><span class="co">#&gt; 33   temp                        dbplyr_020</span></span>
+<span><span class="co">#&gt; 34   temp                     SCDB_8008_004</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/drop_diseasystore.html">drop_diseasystore</a></span><span class="op">(</span>conn <span class="op">=</span> <span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SCDB/man/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] schema table </span></span>
-<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
+<span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    schema                             table</span></span>
+<span><span class="co">#&gt; 1    temp                        dbplyr_026</span></span>
+<span><span class="co">#&gt; 2    temp                ds_validities_8008</span></span>
+<span><span class="co">#&gt; 3    temp                        dbplyr_031</span></span>
+<span><span class="co">#&gt; 4    temp                     SCDB_8008_024</span></span>
+<span><span class="co">#&gt; 5    temp                     SCDB_8008_020</span></span>
+<span><span class="co">#&gt; 6    temp                        dbplyr_030</span></span>
+<span><span class="co">#&gt; 7    temp ds_google_covid_19_age_group_8008</span></span>
+<span><span class="co">#&gt; 8    temp                        dbplyr_021</span></span>
+<span><span class="co">#&gt; 9    temp                     SCDB_8008_025</span></span>
+<span><span class="co">#&gt; 10   temp                        dbplyr_010</span></span>
+<span><span class="co">#&gt; 11   temp                        dbplyr_014</span></span>
+<span><span class="co">#&gt; 12   temp                     SCDB_8008_016</span></span>
+<span><span class="co">#&gt; 13   temp                     SCDB_8008_012</span></span>
+<span><span class="co">#&gt; 14   temp                        dbplyr_025</span></span>
+<span><span class="co">#&gt; 15   temp          ds_all_combinations_8008</span></span>
+<span><span class="co">#&gt; 16   temp                     SCDB_8008_009</span></span>
+<span><span class="co">#&gt; 17   temp                        dbplyr_005</span></span>
+<span><span class="co">#&gt; 18   temp                        dbplyr_004</span></span>
+<span><span class="co">#&gt; 19   temp                     SCDB_8008_017</span></span>
+<span><span class="co">#&gt; 20   temp                     SCDB_8008_008</span></span>
+<span><span class="co">#&gt; 21   temp                     SCDB_8008_001</span></span>
+<span><span class="co">#&gt; 22   temp               ds_study_dates_8008</span></span>
+<span><span class="co">#&gt; 23   temp                        dbplyr_015</span></span>
+<span><span class="co">#&gt; 24   temp                        dbplyr_006</span></span>
+<span><span class="co">#&gt; 25   temp                        dbplyr_019</span></span>
+<span><span class="co">#&gt; 26   temp     ds_google_covid_19_index_8008</span></span>
+<span><span class="co">#&gt; 27   temp  ds_google_covid_19_hospital_8008</span></span>
+<span><span class="co">#&gt; 28   temp                        dbplyr_020</span></span>
+<span><span class="co">#&gt; 29   temp                     SCDB_8008_004</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="diseasystore-options">diseasystore options<a class="anchor" aria-label="anchor" href="#diseasystore-options"></a>
@@ -308,6 +369,21 @@ instead prepend the schema specification to the pattern before matching
 configuration easier. These options all start with “diseasystore.”.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="va">.</span>, <span class="st">"diseasystore"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; $diseasystore.DiseasystoreEcdcRespiratoryViruses.pull</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diseasystore.DiseasystoreEcdcRespiratoryViruses.remote_conn</span></span>
+<span><span class="co">#&gt; [1] "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn</span></span>
+<span><span class="co">#&gt; [1] "https://api.github.com/repos/EU-ECDC/Respiratory_viruses_weekly_data"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn</span></span>
+<span><span class="co">#&gt; [1] ""</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $diseasystore.DiseasystoreEcdcRespiratoryViruses.target_schema</span></span>
+<span><span class="co">#&gt; [1] ""</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $diseasystore.DiseasystoreGoogleCovid19.n_max</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -372,6 +448,12 @@ retry, we see that we get the fallback value.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"diseasystore.source_conn"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"local"</span>, <span class="st">"path"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"source_conn"</span>, class <span class="op">=</span> <span class="st">"DiseasystoreDiseaseY"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "local/path"</span></span></code></pre></div>
+<p>Finally, we can use the <code>.default</code> argument as a final
+fallback value in case no option is set for either general or specific
+case.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"non_existent"</span>, class <span class="op">=</span> <span class="st">"DiseasystoreDiseaseY"</span>, .default <span class="op">=</span> <span class="st">"final fallback"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "final fallback"</span></span></code></pre></div>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

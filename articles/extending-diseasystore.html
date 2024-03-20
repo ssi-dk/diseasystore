@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,11 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Package usage</h6>
+    <a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a>
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Developer guides</h6>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
   </div>
 </li>
@@ -97,7 +101,7 @@
 <h2 id="the-diseasy-data-model">The diseasy data model<a class="anchor" aria-label="anchor" href="#the-diseasy-data-model"></a>
 </h2>
 <p>To begin, we go through the data model used within the
-<code>diseasystores</code>. It is this data models that enables the
+<code>diseasystores</code>. It is this data model that enables the
 automatic coupling of features and powers the package.</p>
 <div class="section level3">
 <h3 id="a-bitemporal-data-model">A bitemporal data model<a class="anchor" aria-label="anchor" href="#a-bitemporal-data-model"></a>
@@ -138,9 +142,9 @@ temporal dimension which indicates when a record was present in the
 data. This information is encoded in the columns <code>from_ts</code>
 and <code>until_ts</code>. Normally, you don’t see these columns when
 working with <code>diseasystore</code> since they are masked by
-<code>SCDB</code>. However, if you inspect the tables crated in the data
-base by <code>diseasystore</code>, you will find they are present. For
-our purposes, it is sufficient to know that these column gives a
+<code>SCDB</code>. However, if you inspect the tables created in the
+database by diseasystore, you will find they are present. For our
+purposes, it is sufficient to know that these column gives a
 time-versioned data base where we can extract previous versions through
 the <code>slice_ts</code> argument. By supplying any time <code>τ</code>
 as <code>slice_ts</code>, we get the data as they were available on that
@@ -222,10 +226,9 @@ indicated by <code>start_date</code> and <code>end_date</code>.</p>
 E.g. if <code>slice_ts</code> is the current date, the current features
 should be computed. Conversely, if <code>slice_ts</code> is some past
 date, features corresponding to this date should be computed.</p>
-<p>Lastly, the <code>source_conn</code> is a flexible argument passed to
-the <code>FeatureHandler</code> indicating where the source data needed
-to compute the features are stored (e.g. a data base connection or
-directory).</p>
+<p>Lastly, the source_conn is a flexible argument passed to the
+FeatureHandler indicating where the source data needed to compute the
+features is stored (e.g. a database connection or directory).</p>
 <p>Note that multiple features can be computed by a single
 <code>FeatureHandler</code>. For example, you may decide that it is more
 convenient for compute multiple different features simultaneously
@@ -235,15 +238,15 @@ or a test and the associated test result).</p>
 <div class="section level3">
 <h3 id="retrieving-features">Retrieving features<a class="anchor" aria-label="anchor" href="#retrieving-features"></a>
 </h3>
-<p>The <code>FeatureHandler</code> defines a <code>get</code> function
-which must be on the form:</p>
+<p>The <code>FeatureHandler</code> defines a <code>$get()</code>
+function which must be in the form:</p>
 <pre><code>get = function(target_table, slice_ts, target_conn)</code></pre>
 <p>Typically, you do not need to specify this function since the default
-(a variant of <code><a href="https://rdrr.io/pkg/SCDB/man/get_table.html" class="external-link">SCDB::get_table()</a></code>) always works.</p>
+(a variant of <code><a href="https://ssi-dk.github.io/SCDB/reference/get_table.html" class="external-link">SCDB::get_table()</a></code>) always works.</p>
 <p>However, in the case that you do need to specify it, the
 <code>target_table</code> argument will be a <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">DBI::Id</a></code>
 specifying the location of the data base table where the features are
-stored. <code>target_conn</code> is connection to the data base. And as
+stored. <code>target_conn</code> is connection to the database. And as
 above, <code>slice_ts</code> is the time-keeping variable.</p>
 </div>
 <div class="section level3">
@@ -266,7 +269,7 @@ aggregation</a>).</p></li>
 aggregate.</p></li>
 </ul>
 <p>Your aggregator should return a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">dplyr::summarise()</a></code> call
-which operates on all columns specified in the <code>feature</code>
+that operates on all columns specified in the <code>feature</code>
 argument.</p>
 </div>
 <div class="section level3">
@@ -306,14 +309,14 @@ elsewhere<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-c
 </h3>
 <p>The <code>ds_map</code> field of the <code>diseasystore</code> tells
 the <code>diseasystore</code> which <code>FeatureHandler</code> is
-responsible for each feature and thus allows the
+responsible for each feature, thus allowing the
 <code>diseasystore</code> to retrieve the features specified in the
 <code>observable</code> and <code>stratification</code> arguments of
 calls to <code>$get_feature()</code>.</p>
 <p>In other words, it maps the names of features to their corresponding
 <code>FeatureHandlers</code>.</p>
 <p>As we saw above, a <code>FeatureHandler</code> may compute more than
-single feature. Each feature should be mapped to the
+a single feature. Each feature should be mapped to the
 <code>FeatureHandler</code> here or else the <code>diseasystore</code>
 will not be able to automatically interact with it.</p>
 <p>By convention, the name of the <code>FeatureHandler</code> should be
@@ -321,7 +324,7 @@ snake_case and contain a <code>diseasystore</code> specific prefix
 (e.g. for <code>DiseasystoreGoogleCovid19</code>, all
 <code>FeatureHandlers</code> are named “google_covid_19_<feature>”).</feature></p>
 <p>These names are used as the table names when storing the features in
-the data base, and the prefix helps structure the data base
+the database, and the prefix helps structure the database
 accordingly.</p>
 <p>This latter part becomes important when <a href="diseasystore.html#dropping-computed-features">clean up</a> for the
 data base needs to be performed.</p>
@@ -332,13 +335,13 @@ data base needs to be performed.</p>
 <p>The <code>diseasystore</code> are made to be as flexible as possible
 which means that it can incorporate both individual level data and
 semi-aggregated data. For semi-aggregated data, it is often the case
-that the data includes aggregations at different levels nested within
+that the data includes aggregations at different levels, nested within
 the data.</p>
 <p>For example, the Google COVID-19 data repository contains information
 on both country-level and region-level in the same data files. When the
 user of <code>DiseasystoreGoogleCovid19</code> asks to get a feature
-stratified by, for example, “country_id”, then we need to filter out the
-data aggregated at the region-level.</p>
+stratified by, for example, “country_id”, we need to filter out the data
+aggregated at the region level.</p>
 <p>This is the purpose of <code>$key_join_filter()</code>. It takes as
 input the requested stratifications and filters the data accordingly
 after the features have been joined inside the
@@ -349,10 +352,10 @@ key_join_filter</a></p>
 <div class="section level3">
 <h3 id="testing-your-diseasystore">Testing your <code>diseasystore</code><a class="anchor" aria-label="anchor" href="#testing-your-diseasystore"></a>
 </h3>
-<p>The <code>diseasystore</code> package includes a large set of tests
-for <code>DiseasystoreGoogleCovid19</code> that you can adapt to your
-custom <code>diseasystore</code>. The latest version of these tests are
-available <a href="https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R" class="external-link">here</a>.</p>
+<p>The <code>diseasystore</code> package includes the function
+<code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> to test the <code>diseasystores</code>.
+You can see how to call the testing suite in action with
+<code>DiseasystoreGoogleCovid19</code> as an example <a href="https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R" class="external-link">here</a>.</p>
 </div>
 </div>
 

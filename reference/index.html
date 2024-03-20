@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +27,11 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <h6 class="dropdown-header" data-toc-skip>Package usage</h6>
+    <a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a>
     <a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Developer guides</h6>
     <a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a>
   </div>
 </li>
@@ -54,9 +58,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="diseasystores">Diseasystores<a class="anchor" aria-label="anchor" href="#diseasystores"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Feature stores that provide disease outbreak data.</p>
 
       
     </div><div id="" class="section level2">
@@ -71,24 +75,30 @@
         <dd>diseasystore base handler</dd>
       </dl><dl><dt>
           
+          <code><a href="DiseasystoreEcdcRespiratoryViruses.html">DiseasystoreEcdcRespiratoryViruses</a></code> 
+        </dt>
+        <dd>feature store handler of EU-ECDC Respiratory viruses features</dd>
+      </dl><dl><dt>
+          
           <code><a href="DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> 
         </dt>
         <dd>feature store handler of Google Health COVID-19 Open Data features</dd>
-      </dl><dl><dt>
-          
-          <code><a href="FeatureHandler.html">FeatureHandler</a></code> 
-        </dt>
-        <dd>FeatureHandler</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="helper-functions">Helper functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Tools to interact with Diseasystores.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="age_labels.html">age_labels()</a></code> 
         </dt>
         <dd>Provides age_labels that follows the mg standard</dd>
-      </dl><dl><dt>
-          
-          <code><a href="aggregators.html">key_join_sum()</a></code> <code><a href="aggregators.html">key_join_max()</a></code> <code><a href="aggregators.html">key_join_min()</a></code> <code><a href="aggregators.html">key_join_count()</a></code> 
-        </dt>
-        <dd>Feature aggregators</dd>
       </dl><dl><dt>
           
           <code><a href="available_diseasystores.html">available_diseasystores()</a></code> 
@@ -98,12 +108,7 @@
           
           <code><a href="diseasyoption.html">diseasyoption()</a></code> 
         </dt>
-        <dd>Helper function to get option</dd>
-      </dl><dl><dt>
-          
-          <code><a href="diseasystore_exists.html">diseasystore_exists()</a></code> 
-        </dt>
-        <dd>Check for the existence of a <code>diseasystore</code> for the case definition</dd>
+        <dd>Helper function to get options related to diseasy</dd>
       </dl><dl><dt>
           
           <code><a href="drop_diseasystore.html">drop_diseasystore()</a></code> 
@@ -116,16 +121,58 @@
         <dd>Get the <code>diseasystore</code> for the case definition</dd>
       </dl><dl><dt>
           
-          <code><a href="grapes-.-grapes.html">`%.%`</a></code> 
+          <code><a href="diseasystore_exists.html">diseasystore_exists()</a></code> 
         </dt>
-        <dd>Existence aware pick operator</dd>
+        <dd>Check for the existence of a <code>diseasystore</code> for the case definition</dd>
       </dl><dl><dt>
           
           <code><a href="to_diseasystore_case.html">to_diseasystore_case()</a></code> 
         </dt>
         <dd>Transform case definition to PascalCase</dd>
+      </dl></div><div class="section level2">
+      <h2 id="developer-functions">Developer functions<a class="anchor" aria-label="anchor" href="#developer-functions"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions to create and manage Diseasystores.</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="DiseasystoreBase.html">DiseasystoreBase</a></code> 
+        </dt>
+        <dd>diseasystore base handler</dd>
+      </dl><dl><dt>
+          
+          <code><a href="FeatureHandler.html">FeatureHandler</a></code> 
+        </dt>
+        <dd>FeatureHandler</dd>
+      </dl><dl><dt>
+          
+          <code><a href="aggregators.html">key_join_sum()</a></code> <code><a href="aggregators.html">key_join_max()</a></code> <code><a href="aggregators.html">key_join_min()</a></code> <code><a href="aggregators.html">key_join_count()</a></code> 
+        </dt>
+        <dd>Feature aggregators</dd>
+      </dl><dl><dt>
+          
+          <code><a href="test_diseasystore.html">test_diseasystore()</a></code> 
+        </dt>
+        <dd>Test a given diseasy store</dd>
+      </dl><dl><dt>
+          
+          <code><a href="source_conn_helpers.html">source_conn_path()</a></code> <code><a href="source_conn_helpers.html">source_conn_github()</a></code> 
+        </dt>
+        <dd>File path helper for different source_conn</dd>
+      </dl><dl><dt>
+          
+          <code><a href="grapes-.-grapes.html">`%.%`</a></code> 
+        </dt>
+        <dd>Existence aware pick operator</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

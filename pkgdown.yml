@@ -1,11 +1,12 @@
-pandoc: 2.19.2
+pandoc: 3.1.12.1
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
+  diseasystore-ecdc-respiratory-viruses: diseasystore-ecdc-respiratory-viruses.html
   diseasystore-google-covid-19: diseasystore-google-covid-19.html
   diseasystore: diseasystore.html
   extending-diseasystore: extending-diseasystore.html
-last_built: 2024-01-18T13:37Z
+last_built: 2024-03-20T13:17Z
 urls:
   reference: https://ssi-dk.github.io/diseasystore/reference
   article: https://ssi-dk.github.io/diseasystore/articles
