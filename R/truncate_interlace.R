@@ -112,12 +112,7 @@ truncate_interlace <- function(primary, secondary = NULL) {
     })
 
   # With the secondary data truncated, we can interlace and return
-  if (packageVersion("SCDB") <= "0.3") {
-    interlace <- SCDB::interlace_sql
-  } else {
-    interlace <- utils::getFromNamespace("interlace", "SCDB")
-  }
-  out <- interlace(secondary_truncated, by = purrr::pluck(primary_keys, 1))
+  out <- SCDB::interlace(secondary_truncated, by = purrr::pluck(primary_keys, 1))
 
   return(out)
 }
