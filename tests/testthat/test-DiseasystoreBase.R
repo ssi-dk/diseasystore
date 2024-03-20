@@ -104,6 +104,7 @@ test_that("DiseasystoreBase works", {
 
 
 test_that("$get_feature verbosity works", {
+  skip_if_not_installed("RSQLite")
 
   # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
   DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
@@ -147,6 +148,7 @@ test_that("$get_feature verbosity works", {
 
 
 test_that("DiseasystoreBase$determine_new_ranges works", {
+  skip_if_not_installed("RSQLite")
 
   start_date <- as.Date("2020-01-01")
   end_date   <- as.Date("2020-03-01")

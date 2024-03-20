@@ -1,4 +1,3 @@
-
 #' File path helper for different source_conn
 #'
 #' @name source_conn_helpers
@@ -23,7 +22,7 @@
 #'   source_conn_path(source_conn, "mtcars.csv")
 #'
 #'   # Clean up
-#'   unlink(source_conn)
+#'   unlink(source_conn, recursive = TRUE)
 #' @export
 source_conn_path <- function(source_conn, file) {
   url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
@@ -98,6 +97,9 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
 
     # Update the local repo -- give warning if we cannot
     if (pull) {
+      if (!checkmate::test_directory_exists(file.path(source_conn, ".git"))) {
+        stop("The directory ", source_conn, " does not appear to be a git repository. Cannot pull.")
+      }
       tryCatch(
         msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),                               # nolint: implicit_assignment_linter
         warning = function(w) {

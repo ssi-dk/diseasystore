@@ -21,14 +21,17 @@
 #' @param ...
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #' \donttest{
+#'   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
+#'
 #'   test_diseasystore(
-#'     DiseasystoreGoogleCovid19,
+#'     DiseasystoreEcdcRespiratoryViruses,
 #'     \() list(DBI::dbConnect(RSQLite::SQLite())),
-#'     data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
+#'     data_files = "data/snapshots/2023-11-24_ILIARIRates.csv",
 #'     target_schema = "test_ds",
-#'     test_start_date = as.Date("2020-03-01")
+#'     test_start_date = as.Date("2022-06-20"),
+#'     slice_ts = "2023-11-24"
 #'   )
 #' }
 #' @export
@@ -54,7 +57,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   remote_conn <- diseasyoption("remote_conn", diseasystore_class)
 
   # Check file availability
-  # In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
+  # In practice, it is best to make a local copy of the data which is stored in the "test_data" folder
   # This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
   local_conn <- purrr::detect("test_data", checkmate::test_directory_exists, .default = tempdir())
 
@@ -132,6 +135,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   #        ##    ########  ######     ##     ######     ########  ########  ######   #### ##    ##  ######
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
+    testthat::skip_if_not_installed("RSQLite")
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -160,6 +164,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
+    testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
 
@@ -221,7 +226,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         end_date   <- test_start_date + lubridate::days(4)
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -236,7 +240,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           source_conn = ds %.% source_conn
         ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -274,7 +277,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         end_date   <- test_start_date + lubridate::days(9)
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -289,7 +291,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           source_conn = ds %.% source_conn
         ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
-          dplyr::collect() |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()

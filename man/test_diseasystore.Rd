@@ -44,13 +44,18 @@ The location of the local data should be configured in the options for "source_c
 diseasystore before calling test_diseasystore.
 }
 \examples{
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
+  withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
+
   test_diseasystore(
-    DiseasystoreGoogleCovid19,
+    DiseasystoreEcdcRespiratoryViruses,
     \() list(DBI::dbConnect(RSQLite::SQLite())),
-    data_files = c("by-age.csv", "demographics.csv", "index.csv", "weather.csv"),
+    data_files = "data/snapshots/2023-11-24_ILIARIRates.csv",
     target_schema = "test_ds",
-    test_start_date = as.Date("2020-03-01")
+    test_start_date = as.Date("2022-06-20"),
+    slice_ts = "2023-11-24"
   )
 }
+\dontshow{\}) # examplesIf}
 }

@@ -71,12 +71,20 @@ test_that("diseasyoption works", {
   expect_identical(diseasyoption("target_schema"), target_schema_1)
 
   # Check that it works for child classes
-  ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite()))
-  expect_identical(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_1)
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+    classname = "DiseasystoreDummy",
+    inherit = DiseasystoreBase,
+    public = list(initialize = function(...) {})
+  )
+
+
+  ds <- DiseasystoreDummy$new()
+  withr::local_options("diseasystore.DiseasystoreDummy.target_schema" = target_schema_1)
+  expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_1)
   expect_identical(diseasyoption("target_schema", ds), target_schema_1)
 
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_schema" = target_schema_2)
-  expect_identical(diseasyoption("target_schema", "DiseasystoreGoogleCovid19"), target_schema_2)
+  withr::local_options("diseasystore.DiseasystoreDummy.target_schema" = target_schema_2)
+  expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_2)
   expect_identical(diseasyoption("target_schema", ds), target_schema_2)
 
   rm(ds)
@@ -85,6 +93,7 @@ test_that("diseasyoption works", {
 
 
 test_that("parse_diseasyconn works", {
+  skip_if_not_installed("RSQLite")
 
   # Define different types of conn
   valid_function_conn <- \() DBI::dbConnect(RSQLite::SQLite())

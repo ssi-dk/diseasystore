@@ -14,7 +14,7 @@
 #'   A specification of 'schema.table'.
 #' @param schema `r rd_schema()`
 #' @return Most return `r rd_side_effects`. `is_lock_owner` returns the TRUE if the process can modify the table.
-#' @examples
+#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
 #' conn <- DBI::dbConnect(RSQLite::SQLite())
 #'
 #' is_lock_owner(conn, "test_table") # NULL
