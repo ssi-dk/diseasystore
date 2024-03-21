@@ -81,7 +81,7 @@ drop_diseasystore <- function(pattern = NULL,
         SCDB::filter_keys(tables_to_delete, by = colnames(tables_to_delete), copy = TRUE)
 
       dplyr::rows_delete(
-        dplyr::tbl(conn, logs_table_id, check_from = FALSE),
+        dplyr::tbl(conn, logs_table_id),
         log_records_to_delete,
         by = colnames(log_records_to_delete),
         in_place = TRUE,
