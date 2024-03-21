@@ -188,7 +188,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Add the existing computed data for given slice_ts
           if (SCDB::table_exists(self %.% target_conn, target_table)) {
-            ds_existing <- dplyr::tbl(self %.% target_conn, target_table, check_from = FALSE)
+            ds_existing <- dplyr::tbl(self %.% target_conn, target_table)
 
             if (SCDB::is.historical(ds_existing)) {
               ds_existing <- ds_existing |>
@@ -594,9 +594,10 @@ DiseasystoreBase <- R6::R6Class(                                                
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Get a list of the logs for the target_table on the slice_ts
-      logs <- dplyr::tbl(self %.% target_conn,
-                         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn),
-                         check_from = FALSE) |>
+      logs <- dplyr::tbl(
+        self %.% target_conn,
+        SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
+      ) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
         dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)

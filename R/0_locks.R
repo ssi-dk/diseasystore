@@ -54,7 +54,7 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
+  lock_table <- dplyr::tbl(conn, lock_table_id)
 
   # We first delete old locks.
   remove_expired_locks(conn, schema)
@@ -104,7 +104,7 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
+  lock_table <- dplyr::tbl(conn, lock_table_id)
 
   # Delete locks matching  our process ID (pid) and the given db_table
   tryCatch(
@@ -150,7 +150,7 @@ is_lock_owner <- function(conn, db_table, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_owner <- dplyr::tbl(conn, lock_table_id, check_from = FALSE) |>
+  lock_owner <- dplyr::tbl(conn, lock_table_id) |>
     dplyr::filter(.data$db_table == !!as.character(db_table)) |>
     dplyr::pull("pid") |>
     as.integer()
@@ -173,7 +173,7 @@ remove_expired_locks <- function(conn, schema = NULL) {
   }
 
   # Get a reference to the table
-  lock_table <- dplyr::tbl(conn, lock_table_id, check_from = FALSE)
+  lock_table <- dplyr::tbl(conn, lock_table_id)
 
   # Detect and delete old locks
   old_locks <- lock_table |>
