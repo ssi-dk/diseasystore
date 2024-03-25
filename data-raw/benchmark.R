@@ -82,7 +82,11 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
     conn <- conns[[1]]
 
     # Copy data to the conns
-    benchmark_data <- data_generator(6)
+    n <- 6
+    slow_backends <- c("DuckDB", "MSSQL")
+
+    n <- ifelse(names(conns)[1] %in% slow_backends, ceiling(n / 2), n)
+    benchmark_data <- data_generator(n)
 
     # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
     DiseasystoreDummy <- R6::R6Class(                                                                                   # nolint: object_name_linter
@@ -157,7 +161,8 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
       dplyr::mutate(
         "benchmark_function" = "key_join_features()",
         "database" = names(conns)[[1]],
-        "version" = !!ifelse(diseasystore_version == "branch", branch, diseasystore_version)
+        "version" = !!ifelse(diseasystore_version == "branch", branch, diseasystore_version),
+        "n" = n
       )
 
     dir.create("data", showWarnings = FALSE)
