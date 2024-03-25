@@ -140,7 +140,7 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
     # Construct the list of benchmarks
 
     ## get_feature
-    get_feature_benchmark <- microbenchmark::microbenchmark(diseasytore_get_feature(ds), times = 25) |>
+    get_feature_benchmark <- microbenchmark::microbenchmark(diseasytore_get_feature(ds), times = 10) |>
       dplyr::mutate(
         "benchmark_function" = "get_feature()",
         "database" = names(conns)[[1]],
@@ -157,7 +157,7 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
     ds$get_feature("n_cyl") # Pre-compute the features
     ds$get_feature("vs")
 
-    key_join_benchmark <- microbenchmark::microbenchmark(diseasytore_key_join_features(ds), times = 25) |>
+    key_join_benchmark <- microbenchmark::microbenchmark(diseasytore_key_join_features(ds), times = 10) |>
       dplyr::mutate(
         "benchmark_function" = "key_join_features()",
         "database" = names(conns)[[1]],
