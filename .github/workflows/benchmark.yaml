@@ -38,6 +38,27 @@ jobs:
           set -o xtrace
           sqlcmd -V 10 -S localhost -U SA -P dbatools.I0 -Q "ALTER LOGIN SA WITH DEFAULT_DATABASE = master;"
 
+      - name: Get SQLite version
+        run: |
+          version=$(Rscript -e "library(RSQLite); con <- dbConnect(SQLite()); print(dbGetQuery(con, 'SELECT sqlite_version();'))")
+          echo "SQLITE_VERSION=SQLite $version" >> $GITHUB_ENV
+
+      - name: Get DuckDB version
+        run: |
+          version=$(Rscript -e "library(duckdb); db <- dbConnect(duckdb::duckdb()); print(dbGetQuery(db, 'SELECT duckdb_version();'))")
+          echo "DUCKDB_VERSION=DuckDB $version" >> $GITHUB_ENV
+
+      - name: Get PostgreSQL version
+        run: |
+          version=$(psql --version | awk '{print $3}')
+          echo "POSTGRES_VERSION=PostgreSQL $version" >> $GITHUB_ENV
+
+     - name: Get SQL Server version
+        run: |
+          version=$(sqlcmd -S localhost -U SA -P dbatools.I0 -Q "SELECT SERVERPROPERTY('productversion') AS version" -h -1)
+          echo "SQL_SERVER_VERSION=SQL Server $version" >> $GITHUB_ENV
+
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -49,6 +70,7 @@ jobs:
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git switch ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
 
+
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
@@ -57,44 +79,46 @@ jobs:
         with:
           extra-packages: any::devtools
 
+
       - name: Delete previous benchmark files
         if: always()
         run: rm -rf inst/extdata/benchmark-*.rds
 
-      - name: Run benchmark (SQLite)
+
+      - name: Run benchmark (${{ env.SQLITE_VERSION }})
         if: always()
         env:
-          BACKEND: SQLite
+          BACKEND: ${{ env.SQLITE_VERSION }}
           BACKEND_DRV: RSQLite::SQLite
           BACKEND_ARGS: 'list(dbname = file.path(tempdir(), "SQLite.SQLite"))'
         run: source("./data-raw/benchmark.R", echo=TRUE)
         shell: Rscript {0}
 
-      - name: Run benchmark (DuckDB)
+      - name: Run benchmark (${{ env.DUCKDB_VERSION }})
         if: always()
         env:
-          BACKEND: DuckDB
+          BACKEND: ${{ env.DUCKDB_VERSION }}
           BACKEND_DRV: duckdb::duckdb
           BACKEND_ARGS: 'list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))'
         run: source("./data-raw/benchmark.R", echo=TRUE)
         shell: Rscript {0}
 
-      - name: Run benchmark (PostgreSQL)
+      - name: Run benchmark (${{ env.POSTGRES_VERSION }})
         if: always()
         env:
-          BACKEND: PostgreSQL
+          BACKEND: ${{ env.POSTGRES_VERSION }}
           BACKEND_DRV: RPostgres::Postgres
         run: source("./data-raw/benchmark.R", echo=TRUE)
         shell: Rscript {0}
 
-      - name: Run benchmark (MSSQL)
+      - name: Run benchmark (${{ env.SQL_SERVER_VERSION }})
         if: always()
         env:
-          BACKEND: MSSQL
+          BACKEND: ${{ env.SQL_SERVER_VERSION }}
           BACKEND_DRV: odbc::odbc
           CONN_ARGS_JSON: >
             {
-              "MSSQL": {
+              "${{ env.SQL_SERVER_VERSION }}": {
                 "driver": "ODBC Driver 17 for SQL Server",
                 "server": "localhost",
                 "database": "master",
@@ -104,6 +128,7 @@ jobs:
             }
         run: source("./data-raw/benchmark.R", echo=TRUE)
         shell: Rscript {0}
+
 
       - name: Display structure of benchmark files
         if: always()
