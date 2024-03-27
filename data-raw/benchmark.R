@@ -82,7 +82,7 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
     conn <- conns[[1]]
 
     # Copy data to the conns
-    n <- 6
+    n <- 4
     slow_backends <- c("DuckDB", "MSSQL")
 
     n <- ifelse(names(conns)[1] %in% slow_backends, ceiling(n / 2), n)
