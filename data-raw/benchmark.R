@@ -37,7 +37,7 @@ versions |>
     )
 
     pak::pkg_install(
-      c(source, "jsonlite"),
+      source,
       lib = lib_path,
       dependencies = TRUE
     )
@@ -64,7 +64,7 @@ versions |>
     )
 
     pak::pkg_install(
-      c(source, "microbenchmark", "jsonlite"),
+      c(source, "microbenchmark"),
       lib = lib_path,
       dependencies = TRUE
     )
@@ -121,7 +121,8 @@ if (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))
 
     # Load the packages / set the package paths
     .libPaths(scdb_lib_path)
-    library("jsonlite")
+    install.packages("jsonlite", lib = diseasystore_lib_path)
+    library("jsonlite", lib.loc = diseasystore_lib_path)
     library("diseasystore", lib.loc = diseasystore_lib_path)
 
 
