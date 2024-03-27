@@ -158,7 +158,12 @@ jobs:
 
           benchmarks <- benchmark_files |>
             purrr::map(readRDS) |>
-            purrr::map(tibble::as_tibble) |>
+            purrr::map(tibble::as_tibble)
+
+          purrr::map(benchmarks, colnames) |>
+            purrr::walk(print)
+
+          benchmarks <- benchmarks |>
             purrr::reduce(rbind)
 
           benchmarks <- benchmarks |>
