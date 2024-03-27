@@ -1,4 +1,5 @@
 pak::cache_clean()
+install.package("jsonlite")
 withr::local_options("odbc.batch_rows" = 1000)
 
 # Load the connection helper
