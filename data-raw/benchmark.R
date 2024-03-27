@@ -37,7 +37,7 @@ versions |>
     )
 
     pak::pkg_install(
-      source,
+      c(source, "jsonlite"),
       lib = lib_path,
       dependencies = TRUE
     )
