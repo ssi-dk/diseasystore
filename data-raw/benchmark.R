@@ -86,6 +86,13 @@ if (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))
       return(NULL)
     }
 
+    print("###################")
+    print("diseasystore_version")
+    print(diseasystore_version)
+
+    print("scdb_version")
+    print(scdb_version)
+
     diseasystore_source <- dplyr::case_when(
       diseasystore_version == "CRAN" ~ "diseasystore",
       diseasystore_version == "main" ~ "ssi-dk/diseasystore",
