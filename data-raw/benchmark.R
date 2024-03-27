@@ -7,8 +7,8 @@ source("tests/testthat/helper-setup.R")
 
 # Compute the version matrix
 versions <- expand.grid(
-  diseasystore_version = c("CRAN", "main", "branch"),
-  scdb_version = c("CRAN", "main", "branch")
+  diseasystore_version = c("branch"), #"CRAN", "main", "branch"),
+  scdb_version = c("CRAN")#, "main", "branch")
 )
 
 # Install all needed package versions
