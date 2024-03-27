@@ -1,5 +1,4 @@
 pak::cache_clean()
-install.packages("jsonlite")
 withr::local_options("odbc.batch_rows" = 1000)
 
 # Load the connection helper
@@ -121,8 +120,9 @@ if (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))
 
 
     # Load the packages / set the package paths
-    library("diseasystore", lib.loc = diseasystore_lib_path)
     .libPaths(scdb_lib_path)
+    library("jsonlite")
+    library("diseasystore", lib.loc = diseasystore_lib_path)
 
 
     try({
