@@ -7,13 +7,14 @@ source("tests/testthat/helper-setup.R")
 # Compute the version matrix
 versions <- expand.grid(
   diseasystore_version = c("CRAN", "main", "branch"),
-  scdb_version = c("CRAN", "main")
+  scdb_version = c("CRAN", "main", "branch")
 )
 
 # Install all needed package versions
 purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 
   branch <- system("git symbolic-ref --short HEAD", intern = TRUE)
+  sha <- system("git rev-parse HEAD", intern = TRUE)
   if (diseasystore_version == "branch" && branch == "main") {
     return(NULL)
   }
@@ -22,22 +23,38 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
   diseasystore_source <- dplyr::case_when(
     diseasystore_version == "CRAN" ~ "diseasystore",
     diseasystore_version == "main" ~ "ssi-dk/diseasystore",
-    diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{branch}")
+    diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
   )
+
+  diseasystore_lib_path <- dplyr::case_when(
+    diseasystore_version == "CRAN" ~ "diseasystore",
+    diseasystore_version == "main" ~ "ssi-dk-diseasystore",
+    diseasystore_version == "branch" ~ glue::glue("ssi-dk-diseasystore-{sha}")
+  )
+
 
   scdb_source <- dplyr::case_when(
     scdb_version == "CRAN" ~ "SCDB",
-    scdb_version == "main" ~ "ssi-dk/SCDB"
+    scdb_version == "main" ~ "ssi-dk/SCDB",
+    scdb_version == "branch" ~ "ssi-dk/SCDB@feature/simplify_update_snapshot"
   )
+
+  scdb_lib_path <- dplyr::case_when(
+    scdb_version == "CRAN" ~ "scdb",
+    scdb_version == "main" ~ "ssi-dk-scdb",
+    scdb_version == "branch" ~ "ssi-dk-scdb-branch"
+  )
+
 
   pak::pkg_install(
     diseasystore_source,
-    lib = glue::glue("installations/diseasystore_{diseasystore_version}"),
+    lib = diseasystore_lib_path,
     dependencies = TRUE
   )
+
   pak::pkg_install(
     c(scdb_source, "microbenchmark"),
-    lib = glue::glue("installations/SCDB_{scdb_version}"),
+    lib = scdb_lib_path,
     dependencies = TRUE
   )
 })
@@ -54,6 +71,7 @@ if (identical(Sys.getenv("BACKEND"), "")) {
 purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 
   branch <- system("git symbolic-ref --short HEAD", intern = TRUE)
+  sha <- system("git rev-parse HEAD", intern = TRUE)
   if (diseasystore_version == "branch" && branch == "main") {
     return(NULL)
   }
@@ -61,18 +79,33 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
   diseasystore_source <- dplyr::case_when(
     diseasystore_version == "CRAN" ~ "diseasystore",
     diseasystore_version == "main" ~ "ssi-dk/diseasystore",
-    diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{branch}")
+    diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
   )
+
+  diseasystore_lib_path <- dplyr::case_when(
+    diseasystore_version == "CRAN" ~ "diseasystore",
+    diseasystore_version == "main" ~ "ssi-dk-diseasystore",
+    diseasystore_version == "branch" ~ glue::glue("ssi-dk-diseasystore-{sha}")
+  )
+
 
   scdb_source <- dplyr::case_when(
     scdb_version == "CRAN" ~ "SCDB",
-    scdb_version == "main" ~ "ssi-dk/SCDB"
+    scdb_version == "main" ~ "ssi-dk/SCDB",
+    scdb_version == "branch" ~ "ssi-dk/SCDB@feature/simplify_update_snapshot"
+  )
+
+  scdb_lib_path <- dplyr::case_when(
+    scdb_version == "CRAN" ~ "SCDB",
+    scdb_version == "main" ~ "ssi-dk-SCDB",
+    scdb_version == "branch" ~ "ssi-dk-SCDB-branch"
   )
 
 
   # Load the packages / set the package paths
-  library("diseasystore", lib.loc = glue::glue("installations/diseasystore_{diseasystore_version}"))
-  .libPaths(glue::glue("installations/SCDB_{scdb_version}"))
+  library("diseasystore", lib.loc = diseasystore_lib_path)
+  .libPaths(scdb_lib_path)
+
 
   try({
     # Our benchmark data is the mtcars data set but repeated to increase the data size
@@ -151,13 +184,15 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
       dplyr::mutate(
         "benchmark_function" = "get_feature()",
         "database" = names(conns)[[1]],
-        "version" = !!ifelse(diseasystore_version == "branch", branch, diseasystore_version)
+        "version" = !!ifelse(diseasystore_version == "branch", substr(sha, 1, 10), diseasystore_version),
+        "SCDB" = scdb_version,
+        "n" = n
       )
 
-    dir.create("data", showWarnings = FALSE)
+    dir.create("inst/extdata", showWarnings = FALSE)
     saveRDS(
       get_feature_benchmark,
-      glue::glue("data/benchmark-get_feature_{names(conns)[[1]]}_{diseasystore_version}.rds")
+      glue::glue("inst/extdata/benchmark-get_feature_{names(conns)[[1]]}_{diseasystore_version}_{scdb_version}.rds")
     )
 
     ## key_join_features
@@ -168,14 +203,17 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
       dplyr::mutate(
         "benchmark_function" = "key_join_features()",
         "database" = names(conns)[[1]],
-        "version" = !!ifelse(diseasystore_version == "branch", branch, diseasystore_version),
+        "version" = !!ifelse(diseasystore_version == "branch", substr(sha, 1, 10), diseasystore_version),
+        "SCDB" = scdb_version,
         "n" = n
       )
 
-    dir.create("data", showWarnings = FALSE)
+    dir.create("inst/extdata", showWarnings = FALSE)
     saveRDS(
       key_join_benchmark,
-      glue::glue("data/benchmark-key_join_features_{names(conns)[[1]]}_{diseasystore_version}.rds")
+      glue::glue(
+        "inst/extdata/benchmark-key_join_features_{names(conns)[[1]]}_{diseasystore_version}_{scdb_version}.rds"
+      )
     )
 
     # Clean up
