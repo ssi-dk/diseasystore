@@ -123,8 +123,13 @@ if (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))
     .libPaths(scdb_lib_path)
     install.packages("jsonlite", lib = diseasystore_lib_path)
     library("jsonlite", lib.loc = diseasystore_lib_path)
+
+    install.packages("backports", lib = diseasystore_lib_path)
+    library("backports", lib.loc = diseasystore_lib_path)
+
     install.packages("checkmate", lib = diseasystore_lib_path)
     library("checkmate", lib.loc = diseasystore_lib_path)
+
     library("diseasystore", lib.loc = diseasystore_lib_path)
 
 
