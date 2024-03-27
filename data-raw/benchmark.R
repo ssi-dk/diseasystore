@@ -43,6 +43,13 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 })
 
 
+# Return early if no backend is defined
+if (identical(Sys.getenv("BACKEND"), "")) {
+  message("No backend defined, skipping benchmark!")
+  return(NULL)
+}
+
+
 # Then loop over each and benchmark the update_snapshot function
 purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 
