@@ -144,7 +144,7 @@ jobs:
 
       - name: Display structure of benchmark files
         if: always()
-        run: ls -R data
+        run: ls -R inst/extdata
 
       - name: Combine benchmark results
         if: always()
