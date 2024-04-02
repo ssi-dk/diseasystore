@@ -1,0 +1,147 @@
+---
+title: "diseasystore: Benchmarks"
+output: rmarkdown::html_vignette
+bibliography: "references.bib"
+vignette: >
+  %\VignetteIndexEntry{diseasystore: Benchmarks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises a simple
+benchmark:
+A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 10 times and given a unique ID
+(the row number of the data).
+
+A simple `diseasystore` is built around this data, with two `FeatureHandler`s, one each for the `cyl` and `vs` variables.
+```{r, eval = FALSE}
+DiseasystoreMtcars <- R6::R6Class(
+  classname = "DiseasystoreBase",
+  inherit = DiseasystoreBase,
+  private = list(
+    .ds_map = list("n_cyl" = "mtcars_cyl", "vs" = "mtcars_vs"),
+    mtcars_cyl = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn) {
+        out <- benchmark_data |>
+          dplyr::transmute(
+            "key_car" = .data$car, "n_cyl" = .data$cyl,
+            "valid_from" = Sys.Date() - lubridate::days(2 * .data$r - 1),
+            "valid_until" = .data$valid_from + lubridate::days(2)
+          )
+        return(out)
+      },
+      key_join = key_join_sum
+    ),
+    mtcars_vs = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn) {
+        out <- benchmark_data |>
+          dplyr::transmute(
+            "key_car" = .data$car, .data$vs,
+            "valid_from" = Sys.Date() - lubridate::days(2 * .data$r),
+            "valid_until" = .data$valid_from + lubridate::days(2)
+          )
+        return(out)
+      },
+      key_join = key_join_sum
+    )
+  )
+)
+```
+
+Two seperate benchmark functions are created.
+The first benchmarking function tests the computation time of `$get_feature()` by computing first the `n_cyl` feature
+then computing the `vs` feature, before finally deleting the computations from the database.
+
+The second benchmarking function tests the computation time of `$key_join_features()` by joining the `vs` feature to the
+`n_cyl` observation. Note that the `n_cyl` and `vs` are re-computed before the benchmarks are started and are not
+deleted by the benchmarking function as was the case for the benchmark of `$get_feature()`.
+
+The performance of these benchmark functions are timed with the `microbenchmark` package using 10 replicates.
+All benchmarks are run on the same machine.
+
+The results of the benchmark are shown graphically below (mean and standard deviation), where we compare the current
+development version of `diseasystore` with the current CRAN version. In addition, we run the benchmarks with the
+current development version of `SCDB` versus the current CRAN version since `SCDB` is used internally in `diseasystore`.
+
+```{r, echo = FALSE, eval = requireNamespace("here")}
+benchmark_location <- c(
+  system.file("extdata", "benchmarks.rds", package = "diseasystore"),
+  here::here("inst", "extdata", "benchmarks.rds")
+) |>
+  purrr::discard(~ identical(., "")) |>
+  purrr::pluck(1)
+
+benchmarks <- readRDS(benchmark_location)
+
+# Determine if the SHA is on main
+sha <- benchmarks |>
+  dplyr::distinct(version) |>
+  dplyr::filter(!(version %in% c("CRAN", "main"))) |>
+  dplyr::pull("version")
+
+# Check local git history
+on_main <- tryCatch({
+  system(glue::glue("git branch main --contains {sha}"), intern = TRUE) |>
+    stringr::str_detect(stringr::fixed("main")) |>
+    isTRUE()
+}, warning = function(w) {
+  # If on GitHub, git is not installed and we assume TRUE.
+  # This will render the vignette as it will look once merged onto main.
+  return(identical(Sys.getenv("CI"), "true"))
+})
+
+# If the SHA has been merged, use as the "main" version and remove the other, older, main version
+if (on_main) {
+  benchmarks <- benchmarks |>
+    dplyr::filter(version != "main") |>
+    dplyr::mutate(version = dplyr::if_else(.data$version == "CRAN", "CRAN", "development"))
+}
+
+# Add note slow backends
+slow_backends <- benchmarks |>
+  dplyr::distinct(.data$database, .data$n) |>
+  dplyr::filter(.data$n < max(.data$n)) |>
+  dplyr::pull("database")
+
+benchmarks <- benchmarks |>
+  dplyr::mutate("database" = paste0(database, ifelse(database %in% slow_backends, "*", "")))
+
+
+# Mean and standard deviation (see ggplot2::mean_se())
+mean_sd <- function(x) {
+  mu <- mean(x)
+  sd <- sd(x)
+  data.frame(y = mu, ymin = mu - sd, ymax = mu + sd)
+}
+
+# Determine subgroups
+groups <- setdiff(colnames(benchmarks), c("expr", "time", "benchmark_function", "database", "version", "n"))
+
+# Apply "dodging" to sub-groups to show graphically
+dodge <- ggplot2::position_dodge(width = 0.6)
+
+g <- ggplot2::ggplot(
+  benchmarks,
+  ggplot2::aes(
+    x = version,
+    y = time / 1e9,
+    group = !!switch(length(groups) > 0, as.symbol(groups)),
+    color = !!switch(length(groups) > 0, as.symbol(groups)))
+) +
+  ggplot2::stat_summary(fun.data = mean_sd, geom = "pointrange", size = 0.5, linewidth = 1, position = dodge) +
+  ggplot2::facet_grid(rows = ggplot2::vars(benchmark_function), cols = ggplot2::vars(database)) +
+  ggplot2::labs(x = "Codebase version", y = "Time (s)")
+
+if (length(slow_backends) > 1) {
+  g <- g + ggplot2::labs(caption = "* IMPORTANT: Benchmark data halved for this backend!")
+}
+
+g
+```
