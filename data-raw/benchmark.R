@@ -58,8 +58,8 @@ common_diseasystore_packages <- purrr::map(unique(versions$diseasystore_version)
 }) |>
   purrr::reduce(dplyr::intersect)
 
- # Determine the already installed packages (from setup-r-dependecies workflow)
-pak::lockfile_create()
+# Determine the already installed packages (from setup-r-dependecies workflow)
+pak::lockfile_create(dependencies = TRUE)
 preinstalled_packages <- jsonlite::fromJSON("pkg.lock")$packages
 
 
@@ -70,6 +70,9 @@ lockfile$packages <- common_packages
 writeLines(jsonlite::toJSON(lockfile, pretty = TRUE), "common.lock")
 pak::lockfile_install("common.lock", lib = lib_dir_common)
 .libPaths(lib_dir_common)
+
+# Store all installed packages at this point
+preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)
 
 
 # Pre-install the remaining packages
@@ -100,11 +103,11 @@ purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
   pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
 
   scdb_lockfile <- jsonlite::fromJSON("SCDB.lock")
-  scdb_lockfile$packages <- dplyr::setdiff(scdb_lockfile$packages, common_packages)
+  scdb_lockfile$packages <- dplyr::setdiff(scdb_lockfile$packages, preinstalled_and_common_packages)
   writeLines(jsonlite::toJSON(scdb_lockfile, pretty = TRUE), "SCDB.lock")
 
   diseasystore_lockfile <- jsonlite::fromJSON("diseasystore.lock")
-  diseasystore_lockfile$packages <- dplyr::setdiff(diseasystore_lockfile$packages, common_packages)
+  diseasystore_lockfile$packages <- dplyr::setdiff(diseasystore_lockfile$packages, preinstalled_and_common_packages)
   writeLines(jsonlite::toJSON(diseasystore_lockfile, pretty = TRUE), "diseasystore.lock")
 
   tryCatch({
