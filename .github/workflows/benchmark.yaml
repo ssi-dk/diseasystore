@@ -8,6 +8,10 @@ jobs:
   benchmark:
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: benchmark-${{ github.ref }}
+      cancel-in-progress: true
+
     services:
       postgres:
         image: postgres:latest
