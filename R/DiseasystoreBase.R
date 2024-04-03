@@ -230,6 +230,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
           # Commit to DB
+
+          # If the table does not exists, we add a index after creation
+          needs_index <- !SCDB::table_exists(self %.% target_conn, target_table)
+
+          # Use update_snapshot to add the data
           SCDB::update_snapshot(
             .data = ds_updated_feature,
             conn = self %.% target_conn,
@@ -239,6 +244,14 @@ DiseasystoreBase <- R6::R6Class(                                                
             logger = logger,
             enforce_chronological_order = FALSE
           )
+
+          if (needs_index && packageVersion("SCDB") > "0.4.1") {
+            SCDB::create_index(
+              conn = self %.% target_conn,
+              db_table = target_table,
+              columns = purrr::keep(colnames(ds_feature), ~ stringr::str_starts(., "key_|valid_|checksum|from_ts"))
+            )
+          }
         })
 
         # Release the lock on the table
