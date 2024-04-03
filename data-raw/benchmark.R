@@ -6,7 +6,7 @@ source("tests/testthat/helper-setup.R")
 # Compute the version matrix
 versions <- expand.grid(
   diseasystore_version = c("CRAN", "main", "branch"),
-  scdb_version = c("CRAN", "main")
+  scdb_version = c("CRAN", "main", "branch")
 )
 
 # Determine branch status
@@ -37,7 +37,8 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
 
     scdb_source <- dplyr::case_when(
       scdb_version == "CRAN" ~ "SCDB",
-      scdb_version == "main" ~ "ssi-dk/SCDB"
+      scdb_version == "main" ~ "ssi-dk/SCDB",
+      scdb_version == "branch" ~ "ssi-dk/SCDB@feature/simplify_update_snapshot"
     )
 
     pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
@@ -103,7 +104,8 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
 
     scdb_source <- dplyr::case_when(
       scdb_version == "CRAN" ~ "SCDB",
-      scdb_version == "main" ~ "ssi-dk/SCDB"
+      scdb_version == "main" ~ "ssi-dk/SCDB",
+      scdb_version == "branch" ~ "ssi-dk/SCDB@feature/simplify_update_snapshot"
     )
 
     lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
@@ -235,7 +237,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
           "benchmark_function" = "get_feature()",
           "database" = names(conns)[[1]],
           "version" = !!ifelse(diseasystore_version == "branch", substr(sha, 1, 10), diseasystore_version),
-          "SCDB" = factor(scdb_version, levels = c("CRAN", "main")),
+          "SCDB" = factor(scdb_version, levels = c("CRAN", "main", "branch")),
           "n" = n
         )
 
@@ -254,7 +256,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
           "benchmark_function" = "key_join_features()",
           "database" = names(conns)[[1]],
           "version" = !!ifelse(diseasystore_version == "branch", substr(sha, 1, 10), diseasystore_version),
-          "SCDB" = factor(scdb_version, levels = c("CRAN", "main")),
+          "SCDB" = factor(scdb_version, levels = c("CRAN", "main", "branch")),
           "n" = n
         )
 
