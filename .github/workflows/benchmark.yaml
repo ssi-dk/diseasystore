@@ -1,5 +1,6 @@
 on:
-  workflow_dispatch
+  - workflow_dispatch
+  - push
 
 
 name: "⏱️ Benchmark"
@@ -143,13 +144,13 @@ jobs:
 
       - name: Display structure of benchmark files
         if: always()
-        run: ls -R data
+        run: ls -R inst/extdata
 
       - name: Combine benchmark results
         if: always()
         run: |
           benchmark_files <- list.files(
-            "data",
+            "inst/extdata",
             pattern = "^benchmark-",
             full.names = TRUE,
             recursive = TRUE
@@ -191,11 +192,21 @@ jobs:
             data.frame(y = mu, ymin = mu - sd, ymax = mu + sd)
           }
 
+          # Determine subgroups
+          groups <- setdiff(colnames(benchmarks), c("expr", "time", "benchmark_function", "database", "version", "n"))
+
+          # Allow subgroups
+          dodge <- ggplot2::position_dodge(width = 0.6)
+
           g <- ggplot2::ggplot(
             benchmarks,
-            ggplot2::aes(x = version, y = time / 1e9)
+            ggplot2::aes(
+              x = version,
+              y = time / 1e9,
+              group = !!switch(length(groups) > 0, as.symbol(groups)),
+              color = !!switch(length(groups) > 0, as.symbol(groups)))
           ) +
-            ggplot2::stat_summary(fun.data = mean_sd, geom = "pointrange", size = 0.5, linewidth = 1) +
+            ggplot2::stat_summary(fun.data = mean_sd, geom = "pointrange", size = 0.5, linewidth = 1, position = dodge) +
             ggplot2::facet_grid(rows = ggplot2::vars(benchmark_function), cols = ggplot2::vars(database)) +
             ggplot2::labs(x = "Codebase version", y = "Time (s)")
 
