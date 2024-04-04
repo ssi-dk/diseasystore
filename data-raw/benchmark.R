@@ -9,13 +9,6 @@ versions <- expand.grid(
   scdb_version = c("CRAN", "main")
 )
 
-# Install extra dependencies
-pak::pkg_install("jsonlite")
-pak::pkg_install("microbenchmark")
-library("jsonlite")
-library("microbenchmark")
-
-
 # Determine branch status
 branch <- system("git symbolic-ref --short HEAD", intern = TRUE)
 sha <- system("git rev-parse HEAD", intern = TRUE)
@@ -25,10 +18,21 @@ dir.create("installations", showWarnings = FALSE)
 
 lib_dir_common <- file.path("installations", "common")
 dir.create(lib_dir_common, showWarnings = FALSE)
+lib_paths_common <- c(lib_dir_common, .libPaths()[1])
+
+# The dependencies of the current repo state are already installed:
+pak::lockfile_create(dependencies = TRUE)
+
+# Install extra dependencies
+pak::pkg_install("jsonlite")
+pak::pkg_install("microbenchmark")
+library("jsonlite")
+library("microbenchmark")
 
 
-# Install the packages
+# Install the remaining packages
 if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))) {
+
 
   # Determine common packages
   common_scdb_packages <- purrr::map(unique(versions$scdb_version), \(scdb_version) {
@@ -62,8 +66,9 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
   }) |>
     purrr::reduce(dplyr::intersect)
 
+
+
   # Determine the already installed packages (from setup-r-dependecies workflow)
-  pak::lockfile_create(dependencies = TRUE)
   preinstalled_packages <- jsonlite::fromJSON("pkg.lock")$packages
 
 
@@ -73,13 +78,15 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
   lockfile$packages <- common_packages
   writeLines(jsonlite::toJSON(lockfile, pretty = TRUE), "common.lock")
   pak::lockfile_install("common.lock", lib = lib_dir_common)
-  .libPaths(lib_dir_common)
+  .libPaths(lib_paths_common)
 
   # Store all installed packages at this point
   preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)
 
 
-  # Pre-install the remaining packages
+
+
+  # Pre-install the version specific packages
   purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 
     if (diseasystore_version == "branch" && branch == "main") {
@@ -101,7 +108,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
     lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
 
     dir.create(lib_dir, showWarnings = FALSE)
-    .libPaths(c(lib_dir, lib_dir_common))
+    .libPaths(c(lib_dir, lib_paths_common))
 
     pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
     pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
@@ -126,7 +133,6 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
       pak::pkg_install(diseasystore_source, lib = lib_dir, dependencies = TRUE)
     })
   })
-
 }
 
 
@@ -141,7 +147,8 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
     # Use the pre-installed packages
     lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
-    .libPaths(c(lib_dir, lib_dir_common))
+    .libPaths(c(lib_dir, lib_paths_common))
+
     library("diseasystore")
 
 
@@ -150,7 +157,9 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
       data_generator <- function(repeats) {
         purrr::map(
           seq(repeats),
-          \(i) dplyr::mutate(mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r))
+          \(i) dplyr::mutate(
+            mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r)
+          )
         ) |>
           purrr::reduce(rbind) |>
           dplyr::rename_with(~ tolower(gsub(".", "_", .x, fixed = TRUE)))
@@ -167,7 +176,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
       benchmark_data <- data_generator(n)
 
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-      DiseasystoreDummy <- R6::R6Class(                                                                                   # nolint: object_name_linter
+      DiseasystoreDummy <- R6::R6Class(                                                                               # nolint: object_name_linter
         classname = "DiseasystoreBase",
         inherit = DiseasystoreBase,
         private = list(
@@ -256,6 +265,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
       # Clean up
       purrr::walk(conns, ~ DBI::dbDisconnect(., shutdown = TRUE))
+
     })
 
 
