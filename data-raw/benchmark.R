@@ -256,5 +256,7 @@ if (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))
     })
 
 
+    detach("package:diseasystore", unload = TRUE)
+
   })
 }
