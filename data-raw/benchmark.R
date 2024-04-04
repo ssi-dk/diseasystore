@@ -26,110 +26,113 @@ dir.create("installations", showWarnings = FALSE)
 lib_dir_common <- file.path("installations", "common")
 dir.create(lib_dir_common, showWarnings = FALSE)
 
-# Determine common packages
-common_scdb_packages <- purrr::map(unique(versions$scdb_version), \(scdb_version) {
 
-  scdb_source <- dplyr::case_when(
-    scdb_version == "CRAN" ~ "SCDB",
-    scdb_version == "main" ~ "ssi-dk/SCDB"
-  )
+# Install the packages
+if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))) {
 
-  pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
+  # Determine common packages
+  common_scdb_packages <- purrr::map(unique(versions$scdb_version), \(scdb_version) {
 
-  return(jsonlite::fromJSON("SCDB.lock")$packages)
-}) |>
-  purrr::reduce(dplyr::intersect)
+    scdb_source <- dplyr::case_when(
+      scdb_version == "CRAN" ~ "SCDB",
+      scdb_version == "main" ~ "ssi-dk/SCDB"
+    )
 
-common_diseasystore_packages <- purrr::map(unique(versions$diseasystore_version), \(diseasystore_version) {
+    pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
 
-  if (diseasystore_version == "branch" && branch == "main") {
-    return(NULL)
-  }
+    return(jsonlite::fromJSON("SCDB.lock")$packages)
+  }) |>
+    purrr::reduce(dplyr::intersect)
 
-  diseasystore_source <- dplyr::case_when(
-    diseasystore_version == "CRAN" ~ "diseasystore",
-    diseasystore_version == "main" ~ "ssi-dk/diseasystore",
-    diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
-  )
+  common_diseasystore_packages <- purrr::map(unique(versions$diseasystore_version), \(diseasystore_version) {
 
-  pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
+    if (diseasystore_version == "branch" && branch == "main") {
+      return(NULL)
+    }
 
-  return(jsonlite::fromJSON("diseasystore.lock")$packages)
-}) |>
-  purrr::reduce(dplyr::intersect)
+    diseasystore_source <- dplyr::case_when(
+      diseasystore_version == "CRAN" ~ "diseasystore",
+      diseasystore_version == "main" ~ "ssi-dk/diseasystore",
+      diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
+    )
 
-# Determine the already installed packages (from setup-r-dependecies workflow)
-pak::lockfile_create(dependencies = TRUE)
-preinstalled_packages <- jsonlite::fromJSON("pkg.lock")$packages
+    pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
 
+    return(jsonlite::fromJSON("diseasystore.lock")$packages)
+  }) |>
+    purrr::reduce(dplyr::intersect)
 
-# Create lockfile with intersection of packages and install
-common_packages <- dplyr::setdiff(dplyr::union(common_scdb_packages, common_diseasystore_packages), preinstalled_packages)
-lockfile <- jsonlite::fromJSON("SCDB.lock")
-lockfile$packages <- common_packages
-writeLines(jsonlite::toJSON(lockfile, pretty = TRUE), "common.lock")
-pak::lockfile_install("common.lock", lib = lib_dir_common)
-.libPaths(lib_dir_common)
-
-# Store all installed packages at this point
-preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)
+  # Determine the already installed packages (from setup-r-dependecies workflow)
+  pak::lockfile_create(dependencies = TRUE)
+  preinstalled_packages <- jsonlite::fromJSON("pkg.lock")$packages
 
 
-# Pre-install the remaining packages
-purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
+  # Create lockfile with intersection of packages and install
+  common_packages <- dplyr::setdiff(dplyr::union(common_scdb_packages, common_diseasystore_packages), preinstalled_packages)
+  lockfile <- jsonlite::fromJSON("SCDB.lock")
+  lockfile$packages <- common_packages
+  writeLines(jsonlite::toJSON(lockfile, pretty = TRUE), "common.lock")
+  pak::lockfile_install("common.lock", lib = lib_dir_common)
+  .libPaths(lib_dir_common)
 
-  if (diseasystore_version == "branch" && branch == "main") {
-    return(NULL)
-  }
-
-  diseasystore_source <- dplyr::case_when(
-    diseasystore_version == "CRAN" ~ "diseasystore",
-    diseasystore_version == "main" ~ "ssi-dk/diseasystore",
-    diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
-  )
+  # Store all installed packages at this point
+  preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)
 
 
-  scdb_source <- dplyr::case_when(
-    scdb_version == "CRAN" ~ "SCDB",
-    scdb_version == "main" ~ "ssi-dk/SCDB"
-  )
+  # Pre-install the remaining packages
+  purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 
-  lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
+    if (diseasystore_version == "branch" && branch == "main") {
+      return(NULL)
+    }
 
-  dir.create(lib_dir, showWarnings = FALSE)
-  .libPaths(c(lib_dir, lib_dir_common))
+    diseasystore_source <- dplyr::case_when(
+      diseasystore_version == "CRAN" ~ "diseasystore",
+      diseasystore_version == "main" ~ "ssi-dk/diseasystore",
+      diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
+    )
 
-  pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
-  pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
 
-  scdb_lockfile <- jsonlite::fromJSON("SCDB.lock")
-  scdb_lockfile$packages <- dplyr::setdiff(scdb_lockfile$packages, preinstalled_and_common_packages)
-  writeLines(jsonlite::toJSON(scdb_lockfile, pretty = TRUE), "SCDB.lock")
+    scdb_source <- dplyr::case_when(
+      scdb_version == "CRAN" ~ "SCDB",
+      scdb_version == "main" ~ "ssi-dk/SCDB"
+    )
 
-  diseasystore_lockfile <- jsonlite::fromJSON("diseasystore.lock")
-  diseasystore_lockfile$packages <- dplyr::setdiff(diseasystore_lockfile$packages, preinstalled_and_common_packages)
-  writeLines(jsonlite::toJSON(diseasystore_lockfile, pretty = TRUE), "diseasystore.lock")
+    lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
 
-  tryCatch({
-    pak::lockfile_install("SCDB.lock", lib = lib_dir)
-  }, error = function(e) {
-    pak::pkg_install(scdb_source, lib = lib_dir, dependencies = TRUE)
+    dir.create(lib_dir, showWarnings = FALSE)
+    .libPaths(c(lib_dir, lib_dir_common))
+
+    pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
+    pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
+
+    scdb_lockfile <- jsonlite::fromJSON("SCDB.lock")
+    scdb_lockfile$packages <- dplyr::setdiff(scdb_lockfile$packages, preinstalled_and_common_packages)
+    writeLines(jsonlite::toJSON(scdb_lockfile, pretty = TRUE), "SCDB.lock")
+
+    diseasystore_lockfile <- jsonlite::fromJSON("diseasystore.lock")
+    diseasystore_lockfile$packages <- dplyr::setdiff(diseasystore_lockfile$packages, preinstalled_and_common_packages)
+    writeLines(jsonlite::toJSON(diseasystore_lockfile, pretty = TRUE), "diseasystore.lock")
+
+    tryCatch({
+      pak::lockfile_install("SCDB.lock", lib = lib_dir)
+    }, error = function(e) {
+      pak::pkg_install(scdb_source, lib = lib_dir, dependencies = TRUE)
+    })
+
+    tryCatch({
+      pak::lockfile_install("diseasystore.lock", lib = lib_dir)
+    }, error = function(e) {
+      pak::pkg_install(diseasystore_source, lib = lib_dir, dependencies = TRUE)
+    })
   })
 
-  tryCatch({
-    pak::lockfile_install("diseasystore.lock", lib = lib_dir)
-  }, error = function(e) {
-    pak::pkg_install(diseasystore_source, lib = lib_dir, dependencies = TRUE)
-  })
-})
+}
 
 
-# Return early if no backend is defined
-if (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), "")) {
-  message("No backend defined, skipping benchmark!")
-} else {
 
-  # Then loop over each and benchmark the update_snapshot function
+# Then loop over each and run the benchmarks
+if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.getenv("BACKEND"), ""))) {
   purrr::pwalk(versions, \(diseasystore_version, scdb_version) {
 
     # R does not like to make sense, so we need to ensure that we don't have factors
