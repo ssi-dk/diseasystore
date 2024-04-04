@@ -79,7 +79,7 @@ jobs:
 
       - name: Get DuckDB version
         run: |
-          version=$(Rscript -e "cat(DBI::dbGetQuery(DBI::dbConnect(duckdb::duckdb()), 'SELECT version();')[[1]])")
+          version=$(Rscript -e "conn <- DBI::dbConnect(duckdb::duckdb()); cat(DBI::dbGetQuery(conn, 'SELECT version();')[[1]]); DBI::dbDisconnect(conn, shutdown = TRUE)")
           echo "DUCKDB_VERSION=DuckDB $version" >> $GITHUB_ENV
 
       - name: Get PostgreSQL version
