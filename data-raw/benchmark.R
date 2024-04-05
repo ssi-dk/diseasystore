@@ -73,7 +73,10 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
 
 
   # Create lockfile with intersection of packages and install
-  common_packages <- dplyr::setdiff(dplyr::union(common_scdb_packages, common_diseasystore_packages), preinstalled_packages)
+  common_packages <- dplyr::setdiff(
+    dplyr::union(common_scdb_packages, common_diseasystore_packages),
+    preinstalled_packages
+  )
   lockfile <- jsonlite::fromJSON("SCDB.lock")
   lockfile$packages <- common_packages
   writeLines(jsonlite::toJSON(lockfile, pretty = TRUE), "common.lock")
@@ -81,7 +84,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
   .libPaths(lib_paths_common)
 
   # Store all installed packages at this point
-  preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)
+  preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)                              # nolint: object_length_linter
 
 
 
@@ -149,7 +152,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
     lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
     .libPaths(c(lib_dir, lib_paths_common))
 
-    library("diseasystore")
+    library("diseasystore")                                                                                             # nolint: library_call_linter
 
 
     try({
@@ -157,9 +160,11 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
       data_generator <- function(repeats) {
         purrr::map(
           seq(repeats),
-          \(i) dplyr::mutate(
-            mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r)
-          )
+          \(i) {
+            dplyr::mutate(
+              mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r)
+            )
+          }
         ) |>
           purrr::reduce(rbind) |>
           dplyr::rename_with(~ tolower(gsub(".", "_", .x, fixed = TRUE)))
@@ -176,7 +181,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
       benchmark_data <- data_generator(n)
 
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-      DiseasystoreDummy <- R6::R6Class(                                                                               # nolint: object_name_linter
+      DiseasystoreDummy <- R6::R6Class(                                                                                 # nolint: object_name_linter
         classname = "DiseasystoreBase",
         inherit = DiseasystoreBase,
         private = list(
