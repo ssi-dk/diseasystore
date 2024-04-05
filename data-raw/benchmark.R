@@ -26,8 +26,6 @@ pak::lockfile_create(dependencies = TRUE)
 # Install extra dependencies
 pak::pkg_install("jsonlite")
 pak::pkg_install("microbenchmark")
-library("jsonlite")
-library("microbenchmark")
 
 
 # Install the remaining packages
