@@ -175,9 +175,6 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
       # Copy data to the conns
       n <- 10
-      slow_backends <- c("DuckDB", "MSSQL")
-
-      n <- ifelse(any(stringr::str_starts(names(conns)[1], slow_backends)), ceiling(n / 2), n)
       benchmark_data <- data_generator(n)
 
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
