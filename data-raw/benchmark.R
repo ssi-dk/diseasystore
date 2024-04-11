@@ -156,29 +156,8 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
 
     try({
-      # Our benchmark data is the mtcars data set but repeated to increase the data size
-      data_generator <- function(repeats) {
-        purrr::map(
-          seq(repeats),
-          \(i) {
-            dplyr::mutate(
-              mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r)
-            )
-          }
-        ) |>
-          purrr::reduce(rbind) |>
-          dplyr::rename_with(~ tolower(gsub(".", "_", .x, fixed = TRUE)))
-      }
-
-      conns <- get_test_conns()
-      conn <- conns[[1]]
-
-      # Copy data to the conns
-      n <- 10
-      benchmark_data <- data_generator(n)
-
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-      DiseasystoreDummy <- R6::R6Class(                                                                                 # nolint: object_name_linter
+      diseasystore_generator <- \(benchmark_data) R6::R6Class(                                                          # nolint: object_name_linter
         classname = "DiseasystoreBase",
         inherit = DiseasystoreBase,
         private = list(
@@ -210,25 +189,46 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
         )
       )
 
-      # Create new instance for the benchmarks
-      start_date <- Sys.Date() - 2 * SCDB::nrow(benchmark_data) - 1
-      end_date <- Sys.Date()
-      ds <- DiseasystoreDummy$new(target_conn = conn, start_date = start_date, end_date = end_date, verbose = FALSE)
 
-      # Define the benchmark functions
+      # Our benchmark data is the mtcars data set but repeated to increase the data size
+      data_generator <- function(repeats) {
+        purrr::map(
+          seq(repeats),
+          \(i) {
+            dplyr::mutate(
+              mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r)
+            )
+          }
+        ) |>
+          purrr::reduce(rbind) |>
+          dplyr::rename_with(~ tolower(gsub(".", "_", .x, fixed = TRUE)))
+      }
+
+
+
+
+      # Benchmark get_feature()
+      n <- 1000
+      conns <- get_test_conns()
+      conn <- conns[[1]]
+
+      # Create new instance for the benchmarks
+      ds <- diseasystore_generator(data_generator(n))
+      ds <- ds$new(
+        target_conn = conn,
+        start_date = Sys.Date() - 2 * n * SCDB::nrow(mtcars) - 1,
+        end_date = Sys.Date(),
+        verbose = FALSE
+      )
+
+      # Define the benchmark function
       diseasytore_get_feature <- function(ds) {
         ds$get_feature("n_cyl")
         ds$get_feature("vs")
         drop_diseasystore()
       }
 
-      diseasytore_key_join_features <- function(ds) {
-        ds$key_join_features("n_cyl", "vs")
-      }
-
-      # Construct the list of benchmarks
-
-      ## get_feature
+      # Run the benchmark
       get_feature_benchmark <- microbenchmark::microbenchmark(diseasytore_get_feature(ds), times = 10) |>
         dplyr::mutate(
           "benchmark_function" = "get_feature()",
@@ -244,10 +244,35 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
         glue::glue("inst/extdata/benchmark-get_feature_{names(conns)[[1]]}_{diseasystore_version}_{scdb_version}.rds")
       )
 
-      ## key_join_features
-      ds$get_feature("n_cyl") # Pre-compute the features
+      # Clean up
+      purrr::walk(conns, ~ DBI::dbDisconnect(., shutdown = TRUE))
+
+
+
+      # Benchmark key_join_features()
+      n <- 10
+      conns <- get_test_conns()
+      conn <- conns[[1]]
+
+      # Create new instance for the benchmarks
+      ds <- diseasystore_generator(data_generator(n))
+      ds <- ds$new(
+        target_conn = conn,
+        start_date = Sys.Date() - 2 * n * SCDB::nrow(mtcars) - 1,
+        end_date = Sys.Date(),
+        verbose = FALSE
+      )
+
+      # Pre-compute the features
+      ds$get_feature("n_cyl")
       ds$get_feature("vs")
 
+      # Define the benchmark function
+      diseasytore_key_join_features <- function(ds) {
+        ds$key_join_features("n_cyl", "vs")
+      }
+
+      # Run the benchmark
       key_join_benchmark <- microbenchmark::microbenchmark(diseasytore_key_join_features(ds), times = 10) |>
         dplyr::mutate(
           "benchmark_function" = "key_join_features()",

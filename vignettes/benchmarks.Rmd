@@ -126,7 +126,7 @@ groups <- setdiff(colnames(benchmarks), c("expr", "time", "benchmark_function", 
 
 
 # Add note on "bugged" backends:
-# For some backends, the first iteration is much slower. 
+# For some backends, the first iteration is much slower.
 # It seem the pre-computing did not work in these cases.
 # We remove these first iterations from the analysis
 bugged_timings <- benchmarks |>
@@ -135,7 +135,7 @@ bugged_timings <- benchmarks |>
   dplyr::filter(.data$bugged) |>
   dplyr::select(!"bugged")
 
-benchmarks <- benchmarks |> 
+benchmarks <- benchmarks |>
   dplyr::mutate(r = dplyr::row_number(), .by = colnames(bugged_timings)) |>
   dplyr::anti_join(dplyr::mutate(bugged_timings, r = 1), by = c(colnames(bugged_timings), "r")) |>
   dplyr::select(!"r")
