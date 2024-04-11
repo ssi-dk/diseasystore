@@ -206,7 +206,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
 
       # Benchmark get_feature()
-      n <- 1000
+      n <- 100
       conns <- get_test_conns()
       conn <- conns[[1]]
 
@@ -248,7 +248,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
 
       # Benchmark key_join_features()
-      n <- 10
+      n <- 100
       conns <- get_test_conns()
       conn <- conns[[1]]
 
