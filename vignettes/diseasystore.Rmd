@@ -151,7 +151,7 @@ We saw above that the features come with additional associated "key_*" and "vali
 This additional information is used to do automatic aggregation through the `$key_join_features()` method
 (see [extending-diseasystore](extending-diseasystore.html) for more details).
 
-To use this method, you need to provide the `observable` that you want to aggregate and the `stratification` you want
+To use this method, you need to provide the `observable` that you want to aggregate and the `stratification` you want 
 to apply to the aggregation.
 
 To see which features are considered "observables" and which are considered "stratifications" you can use the included methods:
