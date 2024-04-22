@@ -36,8 +36,9 @@ suggests_available <- rlang::is_installed("RSQLite")
 not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") || identical(Sys.getenv("CI"), "true")
 ```
 
-The Respiratory viruses weekly repository contains weekly summaries of the [erviss](https://erviss.org/) data for
-Influenza-Like Illness (ILI) and Acute Respiratory Infection (ARI).
+The Respiratory viruses weekly repository contains weekly summaries of the
+[erviss](https://www.ecdc.europa.eu/en/publications-data/european-respiratory-virus-surveillance-summary-erviss) data
+for Influenza-Like Illness (ILI) and Acute Respiratory Infection (ARI).
 
 This vignette shows how to use (some of) this data through the `diseasystore` package.
 
