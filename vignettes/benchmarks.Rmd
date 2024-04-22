@@ -1,7 +1,6 @@
 ---
 title: "diseasystore: Benchmarks"
 output: rmarkdown::html_vignette
-bibliography: "references.bib"
 vignette: >
   %\VignetteIndexEntry{diseasystore: Benchmarks}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,7 +19,7 @@ benchmark:
 A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 10 times and given a unique ID
 (the row number of the data).
 
-A simple `diseasystore` is built around this data, with two `FeatureHandler`s, one each for the `cyl` and `vs` variables.
+A simple `diseasystore` is built around this data, with two `FeatureHandlers`, one each for the `cyl` and `vs` variables.
 ```{r, eval = FALSE}
 DiseasystoreMtcars <- R6::R6Class(
   classname = "DiseasystoreBase",
@@ -70,8 +69,9 @@ The results of the benchmark are shown graphically below (mean and standard devi
 development version of `diseasystore` with the current CRAN version. In addition, we run the benchmarks with the
 current development version of `SCDB` versus the current CRAN version since `SCDB` is used internally in `diseasystore`.
 
-```{r, echo = FALSE, eval = requireNamespace("here")}
+```{r, echo = FALSE, eval = rlang::is_installed("here") && rlang::is_installed("RSQLite")}
 benchmark_location <- c(
+  devtools::package_file("inst", "extdata", "benchmarks.rds"),
   system.file("extdata", "benchmarks.rds", package = "diseasystore"),
   here::here("inst", "extdata", "benchmarks.rds")
 ) |>
