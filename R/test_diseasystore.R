@@ -147,7 +147,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -179,7 +178,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     # Ensure source is set as the remote
     withr::local_options(
@@ -208,7 +206,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
     testthat::skip_if_not(local)
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
       target_conn = DBI::dbConnect(RSQLite::SQLite()),
@@ -227,7 +224,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -262,13 +258,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
-        if (packageVersion("SCDB") <= "0.3") {
-          # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
-            dplyr::pull(table) |>
-            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
-        }
       })
 
       rm(ds)
@@ -279,7 +268,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
     testthat::skip_if_not(local)
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -314,13 +302,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
-        if (packageVersion("SCDB") <= "0.3") {
-          # Stop-gap measure to clear dbplyr_### tables
-          SCDB::get_tables(ds %.% target_conn, show_temp = TRUE) |>
-            dplyr::pull(table) |>
-            purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-            purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
-        }
       })
 
       rm(ds)
@@ -345,7 +326,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -398,13 +378,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             key_join_features_tester(dplyr::collect(output), start_date, end_date)
           }
 
-          if (packageVersion("SCDB") <= "0.3") {
-            # Stop-gap measure to clear dbplyr_### tables
-            SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
-              dplyr::pull(table) |>
-              purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-              purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
-          }
         })
 
       rm(ds)
@@ -415,7 +388,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
-    testthat::skip_if(packageVersion("SCDB") <= "0.3.0" && packageVersion("dbplyr") >= "2.5.0")
 
     for (conn in conn_generator()) {
 
@@ -457,13 +429,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             key_join_features_tester(dplyr::collect(output), start_date, end_date)
           }
 
-          if (packageVersion("SCDB") <= "0.3") {
-            # Stop-gap measure to clear dbplyr_### tables
-            SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
-              dplyr::pull(table) |>
-              purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-              purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
-          }
         })
 
 
@@ -493,13 +458,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             key_join_features_tester(dplyr::collect(output), start_date, end_date)
           }
 
-          if (packageVersion("SCDB") <= "0.3") {
-            # Stop-gap measure to clear dbplyr_### tables
-            SCDB::get_tables(ds$target_conn, show_temp = TRUE) |>
-              dplyr::pull(table) |>
-              purrr::keep(~ stringr::str_detect(., "#?dbplyr_")) |>
-              purrr::walk(~ DBI::dbRemoveTable(ds %.% target_conn, .))
-          }
         })
 
       # Clean up
