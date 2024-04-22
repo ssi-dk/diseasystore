@@ -2190,7 +2190,7 @@
     {
       "ref": "openssl",
       "package": "openssl",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2203,10 +2203,10 @@
         "RemoteRef": "openssl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.1.1"
+        "RemoteSha": "2.1.2"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/openssl_2.1.1.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.3/openssl_2.1.1.tar.gz",
+      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/openssl_2.1.2.tar.gz"],
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.3/openssl_2.1.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.3",
       "directpkg": false,
@@ -2352,7 +2352,7 @@
     {
       "ref": "pkgdown",
       "package": "pkgdown",
-      "version": "2.0.7",
+      "version": "2.0.9",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2365,10 +2365,10 @@
         "RemoteRef": "pkgdown",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.0.7"
+        "RemoteSha": "2.0.9"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pkgdown_2.0.7.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.3/pkgdown_2.0.7.tar.gz",
+      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pkgdown_2.0.9.tar.gz"],
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.3/pkgdown_2.0.9.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.3",
       "directpkg": false,
@@ -3386,7 +3386,7 @@
     {
       "ref": "testthat",
       "package": "testthat",
-      "version": "3.2.1",
+      "version": "3.2.1.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3399,10 +3399,10 @@
         "RemoteRef": "testthat",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.2.1"
+        "RemoteSha": "3.2.1.1"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/testthat_3.2.1.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.3/testthat_3.2.1.tar.gz",
+      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/testthat_3.2.1.1.tar.gz"],
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.3/testthat_3.2.1.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.3",
       "directpkg": false,
@@ -4173,7 +4173,7 @@
       "target": "src/contrib/codetools_0.2-19.tar.gz",
       "platform": "*",
       "rversion": "R 4.3.3",
-      "built": "R 4.3.3; ; 2024-03-04 23:50:18 UTC; unix",
+      "built": "R 4.3.3; ; 2024-04-18 18:39:42 UTC; unix",
       "directpkg": false,
       "license": "GPL",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -4202,7 +4202,7 @@
       "target": "src/contrib/lattice_0.22-5.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
       "rversion": "R 4.3.3",
-      "built": "R 4.3.3; x86_64-pc-linux-gnu; 2024-03-04 23:47:24 UTC; unix",
+      "built": "R 4.3.3; x86_64-pc-linux-gnu; 2024-04-18 18:36:56 UTC; unix",
       "directpkg": false,
       "license": "GPL (>= 2)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
