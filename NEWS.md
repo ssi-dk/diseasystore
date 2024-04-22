@@ -1,5 +1,9 @@
 # diseasystore (development version)
 
+# New features
+
+* Added the fields `$available_observables` and `$available_features` for easier overview (#139).
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
