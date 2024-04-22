@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## New Features:
+
+* The data availability period for each `diseasystore` is now exposed via the `$min_start_date` and `$max_end_date`
+fields (#138).
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
