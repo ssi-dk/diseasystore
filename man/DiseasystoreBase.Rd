@@ -31,6 +31,12 @@ that compute the features. Read only.}
 \item{\code{available_features}}{(\code{character})\cr
 A list of available features in the feature store. Read only.}
 
+\item{\code{available_observables}}{(\code{character})\cr
+A list of available observables in the feature store. Read only.}
+
+\item{\code{available_stratifications}}{(\code{character})\cr
+A list of available stratifications in the feature store. Read only.}
+
 \item{\code{label}}{(\code{character})\cr
 A human readable label of the feature store. Read only.}
 

@@ -277,14 +277,8 @@ DiseasystoreBase <- R6::R6Class(                                                
                                  start_date = self %.% start_date,
                                  end_date   = self %.% end_date) {
 
-      # Validate input
-      available_observables  <- self$available_features |>
-        purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-      available_stratifications <- self$available_features |>
-        purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
-
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(observable, available_observables, add = coll)
+      checkmate::assert_choice(observable, self$available_observables, add = coll)
       checkmate::assert(
         checkmate::check_list(stratification, types = "character", null.ok = TRUE),
         checkmate::check_multi_class(stratification, c("character", "quosure", "quosures"), null.ok = TRUE),
@@ -320,7 +314,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         if (is.null(stratification_features)) {
           err <- glue::glue("Stratification variable not found. ",
                             "Available stratification variables are: ",
-                            "{toString(available_stratifications)}")
+                            "{toString(self$available_stratifications)}")
           stop(err)
         }
 
@@ -332,7 +326,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
         # Check stratification features are not observables
         stopifnot("Stratification features cannot be observables" =
-                    purrr::none(stratification_names, ~ . %in% available_observables))
+                    purrr::none(stratification_names, ~ . %in% self$available_observables))
 
         # Fetch requested stratification features from the feature store
         stratification_data <- stratification_features |>
@@ -497,6 +491,24 @@ DiseasystoreBase <- R6::R6Class(                                                
     ),
 
 
+    #' @field available_observables (`character`)\cr
+    #'   A list of available observables in the feature store. Read only.
+    available_observables = purrr::partial(
+      .f = active_binding,
+      name = "available_observables",
+      expr = return(purrr::keep(self$available_features, ~ stringr::str_detect(., private$.observables_regex)))
+    ),
+
+
+    #' @field available_stratifications (`character`)\cr
+    #'   A list of available stratifications in the feature store. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "available_stratifications",
+      expr = return(purrr::discard(self$available_features, ~ stringr::str_detect(., private$.observables_regex)))
+    ),
+
+
     #' @field label (`character`)\cr
     #'   A human readable label of the feature store. Read only.
     label = purrr::partial(
@@ -574,7 +586,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     .ds_map     = NULL, # Must be implemented in child classes
     ds_key_map  = NULL, # Must be implemented in child classes
 
-
+    .observables_regex = r"{^n_(?=\w)}",
 
     verbose = TRUE,
 

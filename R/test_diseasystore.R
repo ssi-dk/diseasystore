@@ -332,16 +332,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-      # Attempt to perform the possible key_joins
-      available_observables  <- ds$available_features |>
-        purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-      available_stratifications <- ds$available_features |>
-        purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
-
-
-
       # First check we can aggregate without a stratification
-      for (observable in available_observables) {
+      for (observable in ds$available_observables) {
         testthat::expect_no_error(
           ds$key_join_features(observable = observable, stratification = NULL, start_date, end_date)
         )
@@ -350,8 +342,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
       # Then test combinations with non-NULL stratifications
-      expand.grid(observable     = available_observables,
-                  stratification = available_stratifications) |>
+      expand.grid(observable     = ds$available_observables,
+                  stratification = ds$available_stratifications) |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
           output <- tryCatch({
@@ -394,16 +386,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-
       # Attempt to perform the possible key_joins
-      available_observables  <- ds$available_features |>
-        purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-      available_stratifications <- ds$available_features |>
-        purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
-
 
       # Test key_join with malformed inputs
-      expand.grid(observable     = available_observables,
+      expand.grid(observable     = ds$available_observables,
                   stratification = "non_existent_stratification") |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
@@ -419,7 +405,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
               e$message,
               pattern = glue::glue("Stratification variable not found. ",
                                    "Available stratification variables are: ",
-                                   "{toString(available_stratifications)}")
+                                   "{toString(ds$available_stratifications)}")
             )
             return(NULL)
           })
@@ -432,7 +418,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         })
 
 
-      expand.grid(observable     = available_observables,
+      expand.grid(observable     = ds$available_observables,
                   stratification = "test = non_existent_stratification") |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
@@ -448,7 +434,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
               e$message,
               pattern = glue::glue("Stratification variable not found. ",
                                    "Available stratification variables are: ",
-                                   "{toString(available_stratifications)}")
+                                   "{toString(ds$available_stratifications)}")
             )
             return(NULL)
           })
