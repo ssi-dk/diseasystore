@@ -4,6 +4,12 @@
     <loc>https://ssi-dk.github.io/diseasystore/404.html</loc>
   </url>
   <url>
+    <loc>https://ssi-dk.github.io/diseasystore/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://ssi-dk.github.io/diseasystore/PULL_REQUEST_TEMPLATE.html</loc>
+  </url>
+  <url>
     <loc>https://ssi-dk.github.io/diseasystore/articles/diseasystore-ecdc-respiratory-viruses.html</loc>
   </url>
   <url>
@@ -25,13 +31,19 @@
     <loc>https://ssi-dk.github.io/diseasystore/index.html</loc>
   </url>
   <url>
-    <loc>https://ssi-dk.github.io/diseasystore/LICENSE.html</loc>
-  </url>
-  <url>
     <loc>https://ssi-dk.github.io/diseasystore/news/index.html</loc>
   </url>
   <url>
-    <loc>https://ssi-dk.github.io/diseasystore/PULL_REQUEST_TEMPLATE.html</loc>
+    <loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreBase.html</loc>
+  </url>
+  <url>
+    <loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreEcdcRespiratoryViruses.html</loc>
+  </url>
+  <url>
+    <loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreGoogleCovid19.html</loc>
+  </url>
+  <url>
+    <loc>https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.html</loc>
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/reference/age_labels.html</loc>
@@ -49,22 +61,10 @@
     <loc>https://ssi-dk.github.io/diseasystore/reference/diseasystore-package.html</loc>
   </url>
   <url>
-    <loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreBase.html</loc>
-  </url>
-  <url>
-    <loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreEcdcRespiratoryViruses.html</loc>
-  </url>
-  <url>
-    <loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreGoogleCovid19.html</loc>
-  </url>
-  <url>
     <loc>https://ssi-dk.github.io/diseasystore/reference/diseasystore_exists.html</loc>
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/reference/drop_diseasystore.html</loc>
-  </url>
-  <url>
-    <loc>https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.html</loc>
   </url>
   <url>
     <loc>https://ssi-dk.github.io/diseasystore/reference/get_diseasystore.html</loc>
