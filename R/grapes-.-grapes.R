@@ -16,7 +16,7 @@
 #' @export
 `%.%` <- function(env, field) {
   field_name <- as.character(substitute(field))
-  env_name <- as.character(substitute(env))
+  env_name <- as.character(match.call())[2]
 
   if (is.environment(env)) env <- as.list(env, all.names = TRUE)
   if (!(field_name %in% names(env))) {
