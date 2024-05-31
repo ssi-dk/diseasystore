@@ -324,10 +324,8 @@ DiseasystoreBase <- R6::R6Class(                                                
           stop(err)
         }
 
-        stratification_names <- purrr::map(stratification, rlang::as_label)
-        stratification_names <- purrr::map2_chr(stratification_names,
-                                                names(stratification_names),
-                                                ~ ifelse(.y == "", .x, .y)) |>
+        stratification_names <- purrr::map(stratification, rlang::as_label) |>
+          purrr::imap(~ ifelse(.y == "", .x, .y)) |>
           unname()
 
         # Check stratification features are not observables
