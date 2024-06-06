@@ -19,17 +19,24 @@ get_test_conns <- function() {
     # Define our local connection backends
     conn_list <- list(
       # Backend string = package::function
-      "SQLite" = "RSQLite::SQLite"
+      #"SQLite" = "RSQLite::SQLite"
+      "DuckDB" = "duckdb::duckdb"
     )
 
     # Define our local connection arguments
     conn_args <- list(
       # Backend string = list(named args)
-      "SQLite" = list(dbname = file.path(tempdir(), "SQLite.SQLite"))
+      #"SQLite" = list(dbname = file.path(tempdir(), "SQLite.SQLite"))
+      "DuckDB" = list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))
     )
 
     # Define post connection commands to run
-    conn_post_connect <- list()
+    conn_post_connect <- list(
+      "DuckDB" = list(
+        "CREATE SCHEMA IF NOT EXISTS 'test_ds';",
+        "CREATE SCHEMA IF NOT EXISTS 'not_test_ds';"
+      )
+    )
 
   } else {
 
