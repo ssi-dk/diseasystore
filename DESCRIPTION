@@ -44,8 +44,11 @@ Imports:
     tidyselect,
     zoo
 Suggests:
+    curl,
     devtools,
     duckdb,
+    ggplot2,
+    here,
     knitr,
     lintr,
     microbenchmark,
