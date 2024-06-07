@@ -157,37 +157,39 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
     try({
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-      diseasystore_generator <- \(benchmark_data) R6::R6Class(                                                          # nolint: object_name_linter
-        classname = "DiseasystoreBase",
-        inherit = DiseasystoreBase,
-        private = list(
-          .ds_map = list("n_cyl" = "dummy_cyl", "vs" = "dummy_vs"),
-          dummy_cyl = FeatureHandler$new(
-            compute = function(start_date, end_date, slice_ts, source_conn) {
-              out <- benchmark_data |>
-                dplyr::transmute(
-                  "key_car" = .data$car, "n_cyl" = .data$cyl,
-                  "valid_from" = Sys.Date() - lubridate::days(2 * .data$r - 1),
-                  "valid_until" = .data$valid_from + lubridate::days(2)
-                )
-              return(out)
-            },
-            key_join = key_join_sum
-          ),
-          dummy_vs = FeatureHandler$new(
-            compute = function(start_date, end_date, slice_ts, source_conn) {
-              out <- benchmark_data |>
-                dplyr::transmute(
-                  "key_car" = .data$car, .data$vs,
-                  "valid_from" = Sys.Date() - lubridate::days(2 * .data$r),
-                  "valid_until" = .data$valid_from + lubridate::days(2)
-                )
-              return(out)
-            },
-            key_join = key_join_sum
+      diseasystore_generator <- \(benchmark_data) {
+        R6::R6Class(
+          classname = "DiseasystoreBase",
+          inherit = DiseasystoreBase,
+          private = list(
+            .ds_map = list("n_cyl" = "dummy_cyl", "vs" = "dummy_vs"),
+            dummy_cyl = FeatureHandler$new(
+              compute = function(start_date, end_date, slice_ts, source_conn) {
+                out <- benchmark_data |>
+                  dplyr::transmute(
+                    "key_car" = .data$car, "n_cyl" = .data$cyl,
+                    "valid_from" = Sys.Date() - lubridate::days(2 * .data$r - 1),
+                    "valid_until" = .data$valid_from + lubridate::days(2)
+                  )
+                return(out)
+              },
+              key_join = key_join_sum
+            ),
+            dummy_vs = FeatureHandler$new(
+              compute = function(start_date, end_date, slice_ts, source_conn) {
+                out <- benchmark_data |>
+                  dplyr::transmute(
+                    "key_car" = .data$car, .data$vs,
+                    "valid_from" = Sys.Date() - lubridate::days(2 * .data$r),
+                    "valid_until" = .data$valid_from + lubridate::days(2)
+                  )
+                return(out)
+              },
+              key_join = key_join_sum
+            )
           )
         )
-      )
+      }
 
 
       # Our benchmark data is the mtcars data set but repeated to increase the data size
