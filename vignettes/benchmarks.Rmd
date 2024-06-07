@@ -14,14 +14,15 @@ knitr::opts_chunk$set(
 )
 ```
 
-To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises a simple
-benchmark:
-A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 10 times and given a unique ID
-(the row number of the data).
+To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
+a simple benchmark:
+A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 10 times and given a unique
+ID (the row number of the data).
 
-A simple `diseasystore` is built around this data, with two `FeatureHandlers`, one each for the `cyl` and `vs` variables.
+A simple `diseasystore` is built around this data, with two `FeatureHandlers`, one each for the `cyl` and `vs`
+variables.
 ```{r, eval = FALSE}
-DiseasystoreMtcars <- R6::R6Class(
+DiseasystoreMtcars <- R6::R6Class(                                                                                      # nolint: object_name_linter
   classname = "DiseasystoreBase",
   inherit = DiseasystoreBase,
   private = list(
@@ -54,7 +55,7 @@ DiseasystoreMtcars <- R6::R6Class(
 )
 ```
 
-Two seperate benchmark functions are created.
+Two separate benchmark functions are created.
 The first benchmarking function tests the computation time of `$get_feature()` by computing first the `n_cyl` feature
 then computing the `vs` feature, before finally deleting the computations from the database.
 
@@ -150,7 +151,8 @@ g <- ggplot2::ggplot(
     x = version,
     y = time / 1e9,
     group = !!switch(length(groups) > 0, as.symbol(groups)),
-    color = !!switch(length(groups) > 0, as.symbol(groups)))
+    color = !!switch(length(groups) > 0, as.symbol(groups))
+  )
 ) +
   ggplot2::stat_summary(fun.data = mean_sd, geom = "pointrange", size = 0.5, linewidth = 1, position = dodge) +
   ggplot2::facet_grid(rows = ggplot2::vars(benchmark_function), cols = ggplot2::vars(database)) +
