@@ -22,7 +22,7 @@ library(diseasystore)
 ```
 
 
-To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
+To showcase the performance of `diseasystore` on different database back-ends, we include this vignette that summarises
 a simple benchmark:
 A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 1000 times and given a unique
 ID (the row number of the data):
