@@ -602,7 +602,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
         dplyr::filter(
           .data$target_table == !!as.character(target_table),
-          as.POSIXct(.data$date) == as.POSIXct(!!slice_ts)
+          strftime(.data$date) == strftime(!!slice_ts)
         )
 
       # If no logs are found, we need to compute on the entire range
