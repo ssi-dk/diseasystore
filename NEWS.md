@@ -1,5 +1,9 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes:
+
+* The `%.%` operator is made more flexible to function as a drop-in replacement for `$` (#145).
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
