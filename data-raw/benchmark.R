@@ -192,7 +192,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
       diseasytore_get_feature <- function(ds) {
         ds$get_feature("n_cyl")
         ds$get_feature("vs")
-        drop_diseasystore()
+        drop_diseasystore(conn = conn)
       }
 
       # Run the benchmark
