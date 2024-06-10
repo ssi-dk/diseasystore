@@ -133,7 +133,7 @@ groups <- setdiff(colnames(benchmarks), c("expr", "time", "benchmark_function", 
 bugged_timings <- benchmarks |>
   dplyr::group_by(dplyr::across(c("benchmark_function", "database", "version", dplyr::all_of(groups)))) |>
   dplyr::mutate("rel_time" = 1) |> #abs(.data$time / median(.data$time))) |>
-  dplyr::summarize(bugged = any(.data$rel_time > 2 | .data$rel_time < .5), .groups = "drop") |>
+  dplyr::summarize(bugged = any(.data$rel_time > 2 | .data$rel_time < 0.5), .groups = "drop") |>
   dplyr::filter(.data$bugged) |>
   dplyr::select(!"bugged")
 
