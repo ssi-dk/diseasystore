@@ -192,7 +192,11 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
       diseasytore_get_feature <- function(ds) {
         ds$get_feature("n_cyl")
         ds$get_feature("vs")
-        drop_diseasystore(conn = conn)
+
+        SCDB::get_tables(conn, show_temporary = FALSE, "ds") |>
+          dplyr::group_by(dplyr::row_number()) |>
+          dplyr::group_map(SCDB::id) |>
+          purrr::walk(~ DBI::dbRemoveTable(conn, .))
       }
 
       # Run the benchmark
