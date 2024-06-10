@@ -42,6 +42,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
+        checkmate::check_posixct(slice_ts),
         checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
@@ -120,6 +121,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
+        checkmate::check_posixct(slice_ts),
         checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
@@ -600,7 +602,10 @@ DiseasystoreBase <- R6::R6Class(                                                
       ) |>
         dplyr::collect() |>
         tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
+        dplyr::filter(
+          .data$target_table == !!as.character(target_table),
+          strftime(.data$date) == strftime(!!slice_ts)
+        )
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
