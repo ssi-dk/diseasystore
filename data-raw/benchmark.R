@@ -1,5 +1,11 @@
 withr::local_options("odbc.batch_rows" = 1000)
 
+# Install extra dependencies
+pak::pkg_install("jsonlite")
+pak::pkg_install("microbenchmark")
+pak::pkg_install("here")
+
+
 # Load the connection helper
 source("tests/testthat/helper-setup.R")
 
@@ -16,23 +22,13 @@ sha <- system("git rev-parse HEAD", intern = TRUE)
 # Create folder to store the different configurations
 dir.create("installations", showWarnings = FALSE)
 
-lib_dir_common <- file.path("installations", "common")
+lib_dir_common <- here::here("installations", "common")
 dir.create(lib_dir_common, showWarnings = FALSE)
 lib_paths_common <- c(lib_dir_common, .libPaths()[1])
-
-# The dependencies of the current repo state are already installed:
-pak::lockfile_create(dependencies = TRUE)
-
-# Install extra dependencies
-pak::pkg_install("jsonlite")
-pak::pkg_install("microbenchmark")
-library("jsonlite")
-library("microbenchmark")
 
 
 # Install the remaining packages
 if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))) {
-
 
   # Determine common packages
   common_scdb_packages <- purrr::map(unique(versions$scdb_version), \(scdb_version) {
@@ -66,27 +62,11 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
   }) |>
     purrr::reduce(dplyr::intersect)
 
-
-
-  # Determine the already installed packages (from setup-r-dependecies workflow)
-  preinstalled_packages <- jsonlite::fromJSON("pkg.lock")$packages
-
-
-  # Create lockfile with intersection of packages and install
-  common_packages <- dplyr::setdiff(
-    dplyr::union(common_scdb_packages, common_diseasystore_packages),
-    preinstalled_packages
-  )
-  lockfile <- jsonlite::fromJSON("SCDB.lock")
-  lockfile$packages <- common_packages
-  writeLines(jsonlite::toJSON(lockfile, pretty = TRUE), "common.lock")
-  pak::lockfile_install("common.lock", lib = lib_dir_common)
-  .libPaths(lib_paths_common)
-
-  # Store all installed packages at this point
-  preinstalled_and_common_packages <- dplyr::union(common_packages, preinstalled_packages)                              # nolint: object_length_linter
-
-
+  # Install the missing packages
+  .libPaths(lib_dir_common)
+  dplyr::union(common_scdb_packages$ref, common_diseasystore_packages$ref) |>
+    purrr::discard(rlang::is_installed) |>
+    pak::pkg_install(lib = lib_dir_common, dependencies = FALSE)
 
 
   # Pre-install the version specific packages
@@ -102,39 +82,24 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
       diseasystore_version == "branch" ~ glue::glue("ssi-dk/diseasystore@{sha}")
     )
 
-
     scdb_source <- dplyr::case_when(
       scdb_version == "CRAN" ~ "SCDB",
       scdb_version == "main" ~ "ssi-dk/SCDB"
     )
 
-    lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
 
+    lib_dir <- here::here("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
     dir.create(lib_dir, showWarnings = FALSE)
     .libPaths(c(lib_dir, lib_paths_common))
+
 
     pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
     pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
 
-    scdb_lockfile <- jsonlite::fromJSON("SCDB.lock")
-    scdb_lockfile$packages <- dplyr::setdiff(scdb_lockfile$packages, preinstalled_and_common_packages)
-    writeLines(jsonlite::toJSON(scdb_lockfile, pretty = TRUE), "SCDB.lock")
+    union(jsonlite::fromJSON("SCDB.lock")$packages$ref, jsonlite::fromJSON("diseasystore.lock")$packages$ref) |>
+      purrr::discard(rlang::is_installed) |>
+      pak::pkg_install(lib = lib_dir, dependencies = FALSE)
 
-    diseasystore_lockfile <- jsonlite::fromJSON("diseasystore.lock")
-    diseasystore_lockfile$packages <- dplyr::setdiff(diseasystore_lockfile$packages, preinstalled_and_common_packages)
-    writeLines(jsonlite::toJSON(diseasystore_lockfile, pretty = TRUE), "diseasystore.lock")
-
-    tryCatch({
-      pak::lockfile_install("SCDB.lock", lib = lib_dir)
-    }, error = function(e) {
-      pak::pkg_install(scdb_source, lib = lib_dir, dependencies = TRUE)
-    })
-
-    tryCatch({
-      pak::lockfile_install("diseasystore.lock", lib = lib_dir)
-    }, error = function(e) {
-      pak::pkg_install(diseasystore_source, lib = lib_dir, dependencies = TRUE)
-    })
   })
 }
 
