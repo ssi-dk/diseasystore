@@ -199,6 +199,9 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
           purrr::walk(~ DBI::dbRemoveTable(conn, .))
       }
 
+      # Run single iteration to ensure no burn in issues
+      diseasytore_get_feature(ds)
+
       # Run the benchmark
       get_feature_benchmark <- microbenchmark::microbenchmark(diseasytore_get_feature(ds), times = 10) |>
         dplyr::mutate(
