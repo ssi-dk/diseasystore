@@ -1,5 +1,9 @@
 # diseasystore (development version)
 
+## Documentation:
+
+* Added benchmarking vignette `vignette("benchmarks")` (#144).
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
