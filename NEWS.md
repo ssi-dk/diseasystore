@@ -23,6 +23,10 @@ fields (#138).
   * Checks that data is only within the study period.
   * Checks that `valid_from` and `valid_until` has class `Date`.
 
+## Documentation:
+
+* Added benchmarking vignette `vignette("benchmarks")` (#144).
+
 
 # diseasystore 0.2.2
 
