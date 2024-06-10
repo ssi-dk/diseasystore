@@ -35,7 +35,7 @@
   if (field_call == "") {
     return(obj)
   } else {
-    return(eval(parse(text = paste0("obj", field_call))))
+    return(eval(parse(text = paste0(env_name, "$", field)), envir = rlang::caller_env()))
   }
 
 }
