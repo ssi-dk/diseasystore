@@ -215,19 +215,15 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
         verbose = FALSE
       )
 
-      # Pre-compute the features once to ensure no burn-in issues (e.g. log table creation)
-      ds$get_feature("n_cyl")
-      ds$get_feature("vs")
-
-      # Ensure we start from a clean state
-      drop_diseasystore(schema = ds %.% target_schema, conn = ds %.% target_conn)
-
       # Define the benchmark function
       diseasytore_get_feature <- function(ds) {
         ds$get_feature("n_cyl")
         ds$get_feature("vs")
         drop_diseasystore(schema = ds %.% target_schema, conn = ds %.% target_conn)
       }
+
+      # Run single iteration to ensure no burn in issues
+      diseasytore_get_feature(ds)
 
       # Run the benchmark
       get_feature_benchmark <- microbenchmark::microbenchmark(diseasytore_get_feature(ds), times = 10) |>
