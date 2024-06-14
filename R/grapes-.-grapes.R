@@ -20,9 +20,6 @@
   field_name <- stringr::str_extract(field, r"{^[a-zA-Z0-9\._]+}")
   field_call <- stringr::str_remove(field, paste0("^", field_name))
 
-  # Ensure env is environment
-  if (is.environment(env)) env <- as.list(env, all.names = TRUE)
-
   # Check for existence
   if (!(field_name %in% names(env))) {
     stop(field_name, " not found in ", env_name)
