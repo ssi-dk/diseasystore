@@ -15,12 +15,24 @@
 #'  try(t %.% c) # Gives error since "c" does not exist in "t"
 #' @export
 `%.%` <- function(env, field) {
-  field_name <- as.character(substitute(field))
   env_name <- as.character(match.call())[2]
+  field <- as.character(match.call())[3]
+  field_name <- stringr::str_extract(field, r"{^[a-zA-Z0-9\._]+}")
+  field_call <- stringr::str_remove(field, paste0("^", field_name))
 
-  if (is.environment(env)) env <- as.list(env, all.names = TRUE)
+  # Check for existence
   if (!(field_name %in% names(env))) {
     stop(field_name, " not found in ", env_name)
   }
-  return(purrr::pluck(env, field_name))
+
+  # Retrieve the object
+  obj <- purrr::pluck(env, field_name)
+
+  # Evoke the operation on the object
+  if (field_call == "") {
+    return(obj)
+  } else {
+    return(eval(parse(text = paste0(env_name, "$", field)), envir = rlang::caller_env()))
+  }
+
 }
