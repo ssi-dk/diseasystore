@@ -5,9 +5,9 @@ test_that("truncate_interlace works", {
     # Lets create some synthetic data
     data <- dplyr::mutate(mtcars, "key_name" = rownames(mtcars))
 
-    x <- dplyr::select(data, key_name, mpg, cyl)
-    y <- dplyr::select(data, key_name, wt, vs)
-    z <- dplyr::select(data, key_name, qsec)
+    x <- dplyr::select(data, "key_name", "mpg", "cyl")
+    y <- dplyr::select(data, "key_name", "wt", "vs")
+    z <- dplyr::select(data, "key_name", "qsec")
 
     # In x, the mpg was changed on 2000-01-01 for all but the first 10 cars
     x <- list(
@@ -52,11 +52,26 @@ test_that("truncate_interlace works", {
 
 
     # We choose a couple of primary interval to test with
-    p1 <- dplyr::transmute(data, key_name, valid_from = as.Date("1985-01-01"), valid_until = as.Date(NA)) |>
+    p1 <- data |>
+      dplyr::transmute(
+        .data$key_name,
+        "valid_from" = as.Date("1985-01-01"),
+        "valid_until" = as.Date(NA)
+      ) |>
       dplyr::copy_to(conn, df = _, name = "p1", overwrite = TRUE)
-    p2 <- dplyr::transmute(data, key_name, valid_from = as.Date("1995-01-01"), valid_until = as.Date("2005-01-01")) |>
+    p2 <- data |>
+      dplyr::transmute(
+        .data$key_name,
+        "valid_from" = as.Date("1995-01-01"),
+        "valid_until" = as.Date("2005-01-01")
+      ) |>
       dplyr::copy_to(conn, df = _, name = "p2", overwrite = TRUE)
-    p3 <- dplyr::transmute(data, key_name, valid_from = as.Date("2005-01-01"), valid_until = as.Date("2015-01-01")) |>
+    p3 <- data |>
+      dplyr::transmute(
+        .data$key_name,
+        "valid_from" = as.Date("2005-01-01"),
+        "valid_until" = as.Date("2015-01-01")
+      ) |>
       dplyr::copy_to(conn, df = _, name = "p3", overwrite = TRUE)
 
 
@@ -111,15 +126,23 @@ test_that("truncate_interlace works", {
 
     # Check other permutations
     expect_mapequal(
-      truncate_interlace(p3, list(x, y, z)) |> dplyr::collect(),
-      truncate_interlace(p3, list(y, x, z)) |> dplyr::collect()
+      truncate_interlace(p3, list(x, y, z)) |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until),
+      truncate_interlace(p3, list(y, x, z)) |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until)
     )
 
 
     # Check that list conversion works
     expect_identical(
-      truncate_interlace(x, y)       |> dplyr::collect(),
-      truncate_interlace(x, list(y)) |> dplyr::collect()
+      truncate_interlace(x, y)       |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until),
+      truncate_interlace(x, list(y)) |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until)
     )
 
     # Clean up
