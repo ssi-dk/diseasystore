@@ -1,4 +1,4 @@
-# diseasystore (development version)
+# diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
 
