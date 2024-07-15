@@ -7,7 +7,7 @@
     {
       "ref": "local::.",
       "package": "diseasystore",
-      "version": "0.2.1.9000",
+      "version": "0.2.2.9000",
       "type": "local",
       "direct": true,
       "binary": false,
@@ -18,7 +18,7 @@
         "RemoteType": "local"
       },
       "sources": ["file:///home/runner/work/diseasystore/diseasystore"],
-      "target": "src/contrib/diseasystore_0.2.1.9000.tar.gz",
+      "target": "src/contrib/diseasystore_0.2.2.9000.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": true,
@@ -4553,7 +4553,7 @@
       "sysreqs_packages": {}
     },
     {
-      "ref": "installed::/opt/R/4.4.0/lib/R/library/MASS",
+      "ref": "installed::/opt/R/4.4.1/lib/R/library/MASS",
       "package": "MASS",
       "version": "7.3-60.2",
       "type": "installed",
@@ -4564,24 +4564,25 @@
       "needscompilation": true,
       "metadata": {
         "RemoteType": "installed",
-        "RemotePkgRef": "installed::/opt/R/4.4.0/lib/R/library/MASS",
+        "RemotePkgRef": "installed::/opt/R/4.4.1/lib/R/library/MASS",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "7.3-60.2"
       },
       "sources": [],
       "target": "src/contrib/MASS_7.3-60.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.0",
-      "built": "R 4.4.0; x86_64-pc-linux-gnu; 2024-05-25 01:45:39 UTC; unix",
+      "rversion": "R 4.4.1",
+      "built": "R 4.4.1; x86_64-pc-linux-gnu; 2024-06-14 09:03:49 UTC; unix",
       "directpkg": false,
       "license": "GPL-2 | GPL-3",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
+      "repotype": "cran",
       "sysreqs_packages": {}
     },
     {
-      "ref": "installed::/opt/R/4.4.0/lib/R/library/Matrix",
+      "ref": "installed::/opt/R/4.4.1/lib/R/library/Matrix",
       "package": "Matrix",
       "version": "1.7-0",
       "type": "installed",
@@ -4592,15 +4593,15 @@
       "needscompilation": true,
       "metadata": {
         "RemoteType": "installed",
-        "RemotePkgRef": "installed::/opt/R/4.4.0/lib/R/library/Matrix",
+        "RemotePkgRef": "installed::/opt/R/4.4.1/lib/R/library/Matrix",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "1.7-0"
       },
       "sources": [],
       "target": "src/contrib/Matrix_1.7-0.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.0",
-      "built": "R 4.4.0; x86_64-pc-linux-gnu; 2024-05-25 01:45:54 UTC; unix",
+      "rversion": "R 4.4.1",
+      "built": "R 4.4.1; x86_64-pc-linux-gnu; 2024-06-14 09:04:04 UTC; unix",
       "directpkg": false,
       "license": "GPL (>= 2) | file LICENCE",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -4610,7 +4611,7 @@
       "sysreqs_packages": {}
     },
     {
-      "ref": "installed::/opt/R/4.4.0/lib/R/library/mgcv",
+      "ref": "installed::/opt/R/4.4.1/lib/R/library/mgcv",
       "package": "mgcv",
       "version": "1.9-1",
       "type": "installed",
@@ -4621,15 +4622,15 @@
       "needscompilation": true,
       "metadata": {
         "RemoteType": "installed",
-        "RemotePkgRef": "installed::/opt/R/4.4.0/lib/R/library/mgcv",
+        "RemotePkgRef": "installed::/opt/R/4.4.1/lib/R/library/mgcv",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "1.9-1"
       },
       "sources": [],
       "target": "src/contrib/mgcv_1.9-1.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.0",
-      "built": "R 4.4.0; x86_64-pc-linux-gnu; 2024-05-25 01:49:20 UTC; unix",
+      "rversion": "R 4.4.1",
+      "built": "R 4.4.1; x86_64-pc-linux-gnu; 2024-06-14 09:07:41 UTC; unix",
       "directpkg": false,
       "license": "GPL (>= 2)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -4639,7 +4640,7 @@
       "sysreqs_packages": {}
     },
     {
-      "ref": "installed::/opt/R/4.4.0/lib/R/library/nlme",
+      "ref": "installed::/opt/R/4.4.1/lib/R/library/nlme",
       "package": "nlme",
       "version": "3.1-164",
       "type": "installed",
@@ -4650,15 +4651,15 @@
       "needscompilation": true,
       "metadata": {
         "RemoteType": "installed",
-        "RemotePkgRef": "installed::/opt/R/4.4.0/lib/R/library/nlme",
+        "RemotePkgRef": "installed::/opt/R/4.4.1/lib/R/library/nlme",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "3.1-164"
       },
       "sources": [],
       "target": "src/contrib/nlme_3.1-164.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.0",
-      "built": "R 4.4.0; x86_64-pc-linux-gnu; 2024-05-25 01:48:13 UTC; unix",
+      "rversion": "R 4.4.1",
+      "built": "R 4.4.1; x86_64-pc-linux-gnu; 2024-06-14 09:06:31 UTC; unix",
       "directpkg": false,
       "license": "GPL (>= 2)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
