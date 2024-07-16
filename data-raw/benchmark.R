@@ -31,7 +31,7 @@ lib_paths_common <- c(lib_dir_common, .libPaths()[1])
 if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.getenv("BACKEND"), ""))) {
 
   # Determine common packages
-  common_scdb_packages <- purrr::map(unique(versions$scdb_version), \(scdb_version) {
+  scdb_packages <- purrr::map(unique(versions$scdb_version), \(scdb_version) {
 
     scdb_source <- dplyr::case_when(
       scdb_version == "CRAN" ~ "SCDB",
@@ -41,10 +41,17 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
     pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
 
     return(jsonlite::fromJSON("SCDB.lock")$packages)
-  }) |>
+  })
+
+  lockfile_signature <- scdb_packages |>
+    purrr::map(~ head(.x, 0)) |>
+    purrr::reduce(dplyr::bind_rows)
+
+  common_scdb_packages <- scdb_packages |>
+    purrr::map(~ dplyr::bind_rows(.x, lockfile_signature)) |>
     purrr::reduce(dplyr::intersect)
 
-  common_diseasystore_packages <- purrr::map(unique(versions$diseasystore_version), \(diseasystore_version) {
+  diseasystore_packages <- purrr::map(unique(versions$diseasystore_version), \(diseasystore_version) {
 
     if (diseasystore_version == "branch" && branch == "main") {
       return(NULL)
@@ -59,7 +66,14 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
     pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
 
     return(jsonlite::fromJSON("diseasystore.lock")$packages)
-  }) |>
+  })
+
+  lockfile_signature <- diseasystore_packages |>
+    purrr::map(~ head(.x, 0)) |>
+    purrr::reduce(dplyr::bind_rows)
+
+  common_diseasystore_packages <- diseasystore_packages |>
+    purrr::map(~ dplyr::bind_rows(.x, lockfile_signature)) |>
     purrr::reduce(dplyr::intersect)
 
   # Install the missing packages
