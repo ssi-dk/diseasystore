@@ -185,13 +185,13 @@ By default, this deletes all stored features in the default `diseasystore` schem
 A `pattern` argument to match tables by and a `schema` argument to specify the schema to delete from[^1].
 
 ```{r drop_diseasystore_example_1, eval = not_on_cran && suggests_available && data_available}
-SCDB::get_tables(ds$target_conn)
+SCDB::get_tables(ds$target_conn, show_temporary = FALSE)
 ```
 
 ```{r drop_diseasystore_example_2, eval = not_on_cran && suggests_available && data_available}
 drop_diseasystore(conn = ds$target_conn)
 
-SCDB::get_tables(ds$target_conn)
+SCDB::get_tables(ds$target_conn, show_temporary = FALSE)
 ```
 
 # diseasystore options
