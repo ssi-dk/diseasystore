@@ -13,8 +13,12 @@
 #' @noRd
 google_covid_19_metric <- function(google_pattern, out_name) {                                                          # nocov start
   FeatureHandler$new(
-    compute = function(start_date, end_date, slice_ts, source_conn) {
-      checkmate::assert_character(source_conn, len = 1)
+    compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_date(start_date, lower = as.Date("2020-01-01"), add = coll)
+      checkmate::assert_date(end_date,   upper = as.Date("2022-09-15"), add = coll)
+      checkmate::assert_character(source_conn, len = 1, add = coll)
+      checkmate::reportAssertions(coll)
 
       # Load and parse
       data <- source_conn_path(source_conn, "by-age.csv") |>
@@ -83,7 +87,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     .max_end_date = as.Date("2022-09-15"), # Data source is no longer actively updated
 
     google_covid_19_population = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -108,7 +112,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     ),
 
     google_covid_19_index = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -144,7 +148,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     google_covid_19_ventilator = google_covid_19_metric("ventilator_patients", "n_ventilator"),
 
     google_covid_19_age_group = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -193,7 +197,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
 
     google_covid_19_min_temperature  = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -213,7 +217,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     ),
 
     google_covid_19_max_temperature  = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
