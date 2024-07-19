@@ -257,7 +257,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           start_date  = start_date,
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
-          source_conn = ds %.% source_conn
+          source_conn = ds %.% source_conn,
+          ds = ds
         )
 
         # Check that reference data is limited to the study period (start_date and end_date)
@@ -338,7 +339,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           start_date  = start_date,
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
-          source_conn = ds %.% source_conn
+          source_conn = ds %.% source_conn,
+          ds = ds
         ) |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
         SCDB::defer_db_cleanup(reference)
