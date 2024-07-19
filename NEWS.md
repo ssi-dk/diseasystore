@@ -9,6 +9,10 @@
 * The data availability period for each `diseasystore` is now exposed via the `$min_start_date` and `$max_end_date`
 fields (#138).
 
+* Additional arguments (`...`) can now be passed to the `compute()` and `get()` functions in `FeatureHandler`s.
+  Furthermore, a reference to the `diseasystore` is now passed to `compute()` to give the `Featurehandler` access
+  to other features via `ds$get_feature()` (#162).
+
 ## Minor Improvements and Fixes:
 
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
@@ -22,7 +26,6 @@ fields (#138).
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
   * Checks that data is only within the study period.
   * Checks that `valid_from` and `valid_until` has class `Date`.
-
 
 # diseasystore 0.2.2
 
