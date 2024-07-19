@@ -316,7 +316,8 @@ test_diseasystore <- function(
               start_date  = test_start_date,
               end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
-              source_conn = ds %.% source_conn
+              source_conn = ds %.% source_conn,
+              ds = ds
             )
           }
         )
@@ -424,7 +425,8 @@ test_diseasystore <- function(
               start_date  = test_start_date,
               end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
-              source_conn = ds %.% source_conn
+              source_conn = ds %.% source_conn,
+              ds = ds
             )
           }
         )

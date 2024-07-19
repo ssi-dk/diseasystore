@@ -93,7 +93,7 @@ Each feature[^3] in the `diseasystore` has an associated `FeatureHandler` which 
 and aggregation of the feature.
 
 ## Computing features
-The `FeatureHandler` defines a `compute` function which must be on the form:
+The `FeatureHandler` defines a `$compute()` function which must be on the form:
 ```
 compute = function(start_date, end_date, slice_ts, source_conn, ...)
 ```
@@ -111,6 +111,15 @@ compute the features is stored (e.g. a database connection or directory).
 Note that multiple features can be computed by a single `FeatureHandler`.
 For example, you may decide that it is more convenient for compute multiple different features simultaneously
 (e.g. a hospitalisation and the classification of said hospitalisation or a test and the associated test result).
+
+When `$compute()` is called by the `diseasystore`, it also passes a reference to itself as `ds` via the `...` argument.
+This means that if the implementation of `$compute()` needs access to other features to compute the given feature,
+the compute function can pick up the `ds` reference adding it to the function signature:
+```
+compute = function(start_date, end_date, slice_ts, source_conn, ds, ...)
+```
+And then use `ds$get_feature(<feature>, start_date = start_date, end_date = end_date, slice_ts = slice_ts)` to retrieve
+the necessary features for the computation.
 
 ## Retrieving features
 The `FeatureHandler` defines a `$get()` function which must be in the form:
