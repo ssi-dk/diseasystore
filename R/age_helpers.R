@@ -127,13 +127,13 @@ add_years.SQLiteConnection <- function(reference_date, years, conn) {
 
 #' @export
 add_years.PqConnection <- function(reference_date, years, conn) {
-  if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'")
+  if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'::date")
   return(dplyr::sql(glue::glue("({reference_date} + {years} * INTERVAL '1 year')::date")))
 }
 
 #' @export
 `add_years.Microsoft SQL Server` <- function(reference_date, years, conn) {
-  if (inherits(reference_date, "Date")) reference_date <- glue::glue("'{reference_date}'")
+  if (inherits(reference_date, "Date")) reference_date <- glue::glue("CAST('{reference_date}' AS DATE)")
   return(dplyr::sql(glue::glue("DATEADD(year, {years}, {reference_date})")))
 }
 
