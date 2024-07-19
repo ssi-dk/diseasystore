@@ -13,6 +13,10 @@ fields (#138).
   This solves an issue where a bug in `SCDB` prevented `drop_diseasystore()` from deleting tables in some cases on
   DuckDB back ends.
 
+* Additional arguments (`...`) can now be passed to the `compute()` and `get()` functions in `FeatureHandler`s.
+  Furthermore, a reference to the `diseasystore` is now passed to `compute()` to give the `Featurehandler` access
+  to other features via `ds$get_feature()` (#???).
+
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected (#158):
   * when the data base data-type for timestamp / date differs from the class of `slice_ts`.
   * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
@@ -24,7 +28,6 @@ fields (#138).
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
   * Checks that data is only within the study period
   * Checks that `valid_from` and `valid_until` has class `Date`.
-
 
 # diseasystore 0.2.2
 
