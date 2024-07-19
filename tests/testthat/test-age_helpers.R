@@ -138,7 +138,7 @@ test_data <- c(
   seq.Date(from = as.Date("1940-01-01"), to = as.Date("1940-12-31"), by = "1 day")
 ) |>
   tibble::tibble(birth_date = _) |>
-  dplyr::mutate(years = 1)
+  dplyr::mutate(years_to_add = 1)
 
 
 test_that("add_years() works for positive input", {
@@ -280,11 +280,11 @@ test_that("add_years() works for reference input", {
 
       # Capture and check warning
       test_ages <- tryCatch(
-        dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years", conn)),
+        dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years_to_add", conn)),
         warning = function(w) {
           expect_match(w$message, "Time computation on SQLite is not precise")
           return(
-            suppressWarnings(dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years", conn)))
+            suppressWarnings(dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years_to_add", conn)))
           )
         }
       )
@@ -308,13 +308,80 @@ test_that("add_years() works for reference input", {
     } else {
 
       # Compute the date using the add_years function
-      test_ages <- dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years", conn))
+      test_ages <- dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years_to_add", conn))
 
     }
 
     expect_equal(
       dplyr::pull(test_ages,      "first_birthday"),
       dplyr::pull(reference_ages, "first_birthday")
+    )
+
+    DBI::dbDisconnect(conn, shutdown = TRUE)
+  }
+})
+
+
+# Create a test data set that contains different number of years to add to a fixed reference date
+test_data <- tibble::tibble(years_to_add = seq_len(50) - 1)
+
+test_that("add_years() works for date input", {
+
+  for (conn in get_test_conns()) {
+
+    # Copy to the remote
+    test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    SCDB::defer_db_cleanup(test_ages)
+
+
+    # Set the reference date for test
+    reference_date <- as.Date("1970-01-01")
+
+    # Compute the reference date using lubridate
+    reference_ages <- test_data |>
+      dplyr::mutate("future_date" = lubridate::`%m+%`(reference_date, lubridate::years(years_to_add)))
+
+    # SQLite does not have a precise way to estimate time, so the time computation helper will throw a warning
+    # We here test that the warning is thrown, and filter out the known offending dates from the test
+    if (inherits(conn, "SQLiteConnection")) {
+
+      # Capture and check warning
+      test_ages <- tryCatch(
+        dplyr::mutate(test_ages, "future_date" = !!add_years(reference_date, "years_to_add", conn)),
+        warning = function(w) {
+          expect_match(w$message, "Time computation on SQLite is not precise")
+          return(
+            suppressWarnings(
+              dplyr::mutate(test_ages, "future_date" = !!add_years(reference_date, "years_to_add", conn))
+            )
+          )
+        }
+      )
+
+      # 2000 is not a leap year, so for SQLite, everything after this date will fail
+      max_interval_to_add <- reference_ages |>
+        dplyr::filter(future_date < "2000-01-01") |>
+        dplyr::pull("years_to_add") |>
+        max()
+
+
+      test_ages <- test_ages |>
+        dplyr::filter(.data$years_to_add <= max_interval_to_add)
+
+      reference_ages <- reference_ages |>
+        dplyr::filter(.data$years_to_add <= max_interval_to_add) |>
+        dplyr::mutate("future_date" = as.numeric(.data$future_date))
+
+    } else {
+
+      # Compute the date using the add_years function
+      test_ages <- dplyr::mutate(test_ages, "future_date" = !!add_years(reference_date, "years_to_add", conn))
+
+    }
+
+    expect_equal(
+      dplyr::pull(test_ages,      "future_date"),
+      dplyr::pull(reference_ages, "future_date")
     )
 
     DBI::dbDisconnect(conn, shutdown = TRUE)
