@@ -284,7 +284,9 @@ test_that("add_years() works for reference input", {
         warning = function(w) {
           expect_match(w$message, "Time computation on SQLite is not precise")
           return(
-            suppressWarnings(dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years_to_add", conn)))
+            suppressWarnings(
+              dplyr::mutate(test_ages, "first_birthday" = !!add_years("birth_date", "years_to_add", conn))
+            )
           )
         }
       )
