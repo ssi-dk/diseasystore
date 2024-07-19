@@ -11,7 +11,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["checkmate", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
+      "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
