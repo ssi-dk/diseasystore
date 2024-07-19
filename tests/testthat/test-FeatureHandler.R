@@ -11,8 +11,8 @@ test_that("FeatureHandler initializes with correctly formed arguments", {
   rm(fh)
 
   # 2) Correctly formed compute function
-  fh <- expect_no_error(FeatureHandler$new(compute = \(start_date, end_date, slice_ts, source_conn) 1))
-  checkmate::assert_function(fh$compute,  args = c("start_date", "end_date", "slice_ts", "source_conn"))
+  fh <- expect_no_error(FeatureHandler$new(compute = \(start_date, end_date, slice_ts, source_conn, ...) 1))
+  checkmate::assert_function(fh$compute,  args = c("start_date", "end_date", "slice_ts", "source_conn", "..."))
   checkmate::assert_function(fh$get,      args = c("target_table", "slice_ts", "target_conn"))
   checkmate::assert_function(fh$key_join, args = "...")
   rm(fh)

@@ -46,7 +46,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
 
 
     ecdc_respitory_viruses_iliari_rates = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse

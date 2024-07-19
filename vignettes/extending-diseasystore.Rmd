@@ -95,7 +95,7 @@ and aggregation of the feature.
 ## Computing features
 The `FeatureHandler` defines a `compute` function which must be on the form:
 ```
-compute = function(start_date, end_date, slice_ts, source_conn)
+compute = function(start_date, end_date, slice_ts, source_conn, ...)
 ```
 The arguments `start_date` and `end_date` indicates the period for which features should be computed.
 The `diseasystores` are [dynamically expanded](diseasystore.html#dynamically-expanded), so feature computation is often
