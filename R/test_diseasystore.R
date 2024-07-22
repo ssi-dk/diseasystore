@@ -320,7 +320,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           sort()
 
 
-        testthat::expect_identical(feature_checksums, reference_checksums)
+        testthat::expect_identical(
+          feature_checksums,
+          reference_checksums,
+          info = glue::glue("Feature `{.x}` has a mismatch between `$get_feature()` and `$compute()`.")
+        )
 
       })
 
