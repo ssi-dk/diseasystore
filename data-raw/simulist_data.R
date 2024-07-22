@@ -1,4 +1,4 @@
-if (requireNamespace("epiparameter") && requireNamespace("simulist") && requireNamespace("usethis")) {
+if (rlang::is_installed("epiparameter") && rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
 
   # Configure `simulist` using their quick-start configuration.
 
