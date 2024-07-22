@@ -265,6 +265,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     }
   })
 
+  # Set a test_end_date for the rest of the tests
+  test_end_date <- test_start_date + lubridate::days(9)
+
 
   testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
     testthat::skip_if_not(local)
@@ -278,7 +281,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
         start_date <- test_start_date
-        end_date   <- test_start_date + lubridate::days(9)
+        end_date   <- test_end_date
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           SCDB::digest_to_checksum() |>
@@ -311,17 +314,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Helper function that checks the output of key_joins
-  key_join_features_tester <- function(output, start_date, end_date) {                                                  # nolint: object_usage_linter
+  key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
     testthat::expect_equal(min(output$date), start_date)
     testthat::expect_equal(max(output$date), end_date)
   }
-
-
-  # Set start and end dates for the rest of the tests
-  start_date <- test_start_date                                                                                         # nolint: object_usage_linter
-  end_date   <- test_start_date + lubridate::days(9)                                                                    # nolint: object_usage_linter
-
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
@@ -343,7 +340,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # First check we can aggregate without a stratification
       for (observable in available_observables) {
         testthat::expect_no_error(
-          ds$key_join_features(observable = observable, stratification = NULL, start_date, end_date)
+          ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date)
         )
       }
 
@@ -358,7 +355,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             ds$key_join_features(
               observable = as.character(observable),
               stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
-              start_date, end_date
+              test_start_date, test_end_date
             )
           },
           error = function(e) {
@@ -375,7 +372,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
           # If the code does not fail, we test the output
           if (!is.null(output)) {
-            key_join_features_tester(dplyr::collect(output), start_date, end_date)
+            key_join_features_tester(dplyr::collect(output), test_start_date, test_end_date)
           }
 
         })
@@ -411,8 +408,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             ds$key_join_features(
               observable = as.character(observable),
               stratification = as.character(stratification), # Output of expand.grid is a factor.
-              start_date = start_date,
-              end_date = end_date
+              start_date = test_start_date,
+              end_date = test_end_date
             )
           }, error = function(e) {
             checkmate::expect_character(
@@ -426,7 +423,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
           # If the code does not fail, we test the output
           if (!is.null(output)) {
-            key_join_features_tester(dplyr::collect(output), start_date, end_date)
+            key_join_features_tester(dplyr::collect(output), test_start_date, test_end_date)
           }
 
         })
@@ -440,8 +437,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             ds$key_join_features(
               observable = as.character(observable),
               stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
-              start_date = start_date,
-              end_date = end_date
+              start_date = test_start_date,
+              end_date = test_end_date
             )
           }, error = function(e) {
             checkmate::expect_character(
@@ -455,7 +452,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
           # If the code does not fail, we test the output
           if (!is.null(output)) {
-            key_join_features_tester(dplyr::collect(output), start_date, end_date)
+            key_join_features_tester(dplyr::collect(output), test_start_date, test_end_date)
           }
 
         })
