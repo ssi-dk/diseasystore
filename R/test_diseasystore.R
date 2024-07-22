@@ -265,24 +265,26 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           info = glue::glue("Feature `{.x}` returns data outside the study period.")
         )
 
-        # Check that valid_from / valid_until are dates
+        # Check that valid_from / valid_until are date (or stored in the date-like class on the remote)
         validity_period_data_types <- reference |>
           utils::head(0) |>
           dplyr::select("valid_from", "valid_until") |>
-          purrr::map_chr(class)
+          dplyr::collect() |>
+          purrr::map(~ DBI::dbDataType(dbObj = conn, obj = .))
 
         testthat::expect_equal(
           purrr::pluck(validity_period_data_types, "valid_from"),
-          "Date",
+          DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
           info = glue::glue("Feature `{.x}` has a non-Date `valid_from` column.")
         )
         testthat::expect_equal(
           purrr::pluck(validity_period_data_types, "valid_until"),
-          "Date",
+          DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
         )
 
-        # Copy to remote and compute checksums
+
+        # Copy to remote and continue checks
         reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
         SCDB::defer_db_cleanup(reference)
 
