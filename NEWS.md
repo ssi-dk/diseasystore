@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Testing:
+
+* `test_diseasystore()` now also checks that the `FeatureHandler`s return data only within the study period (#154).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
