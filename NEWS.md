@@ -2,7 +2,9 @@
 
 ## Testing:
 
-* `test_diseasystore()` now also checks that the `FeatureHandler`s return data only within the study period (#154).
+* `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
+  * Checks that data is only within the study period
+  * Checks that `valid_from` and `valid_until` has class `Date`.
 
 
 # diseasystore 0.2.2
