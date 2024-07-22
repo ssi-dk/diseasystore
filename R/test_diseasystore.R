@@ -222,6 +222,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
+  # Set a test_end_date for the test
+  test_end_date <- test_start_date + lubridate::days(4)
+
+
   testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
 
@@ -234,7 +238,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
         start_date <- test_start_date
-        end_date   <- test_start_date + lubridate::days(4)
+        end_date   <- test_end_date
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           SCDB::digest_to_checksum() |>
@@ -249,8 +253,20 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
-        ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
+        )
+
+        # Check that reference data is limited to the study period (start_date and end_date)
+        reference_out_of_bounds <- reference |>
+          dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
+
+        testthat::expect_equal(
+          SCDB::nrow(reference_out_of_bounds),
+          0,
+          info = glue::glue("Feature `{.x}` returns data outside the study period.")
+        )
+
+        # Copy to remote and compute checksums
+        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
         SCDB::defer_db_cleanup(reference)
 
         reference_checksums <- reference |>
@@ -299,20 +315,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
-        )
-
-        # Check that reference data is limited to the study period (start_date and end_date)
-        reference_out_of_bounds <- reference |>
-          dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
-
-        testthat::expect_equal(
-          SCDB::nrow(reference_out_of_bounds),
-          0,
-          info = glue::glue("Feature `{.x}` returns data outside the study period.")
-        )
-
-        # Copy to remote and compute checksums
-        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+        ) |>
+          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
         SCDB::defer_db_cleanup(reference)
 
         reference_checksums <- reference |>
