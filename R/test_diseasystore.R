@@ -291,12 +291,25 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference_checksums <- reference_generator(
+        reference <- reference_generator(
           start_date  = start_date,
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
-        ) |>
+        )
+
+        # Check that reference data is limited to the study period (start_date and end_date)
+        reference_out_of_bounds <- reference |>
+          dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
+
+        testthat::expect_equal(
+          SCDB::nrow(reference_out_of_bounds),
+          0,
+          info = glue::glue("Feature `{.x}` returns data outside the study period.")
+        )
+
+        # Copy to remote and compute checksums
+        reference_checksums <- reference |>
           dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
