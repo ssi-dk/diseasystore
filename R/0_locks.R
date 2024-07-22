@@ -66,9 +66,9 @@ add_table_lock <- function(conn, db_table, schema = NULL) {
       lock <- dplyr::copy_to(
         conn,
         data.frame("db_table" = as.character(db_table), "pid" = Sys.getpid(), "lock_start" = as.numeric(Sys.time())),
-        name = paste0("ds_lock_", Sys.getpid()),
-        overwrite = TRUE
+        name = paste0("ds_lock_", Sys.getpid())
       )
+      SCDB::defer_db_cleanup(lock)
 
       dplyr::rows_insert(lock_table, lock, by = "db_table", conflict = "ignore", in_place = TRUE)
 
@@ -106,15 +106,15 @@ remove_table_lock <- function(conn, db_table, schema = NULL) {
   # Get a reference to the table
   lock_table <- dplyr::tbl(conn, lock_table_id)
 
-  # Delete locks matching  our process ID (pid) and the given db_table
+  # Delete locks matching our process ID (pid) and the given db_table
   tryCatch(
     {
       lock <- dplyr::copy_to(
         conn,
         data.frame("db_table" = as.character(db_table), "pid" = Sys.getpid()),
-        name = paste0("ds_lock_", Sys.getpid()),
-        overwrite = TRUE
+        name = paste0("ds_lock_", Sys.getpid())
       )
+      SCDB::defer_db_cleanup(lock)
 
       dplyr::rows_delete(lock_table, lock, by = c("db_table", "pid"), unmatched = "ignore", in_place = TRUE)
 
