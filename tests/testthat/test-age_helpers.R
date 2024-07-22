@@ -332,7 +332,7 @@ test_that("add_years() works for date input", {
   for (conn in get_test_conns()) {
 
     # Copy to the remote
-    test_ages <- dplyr::copy_to(conn, test_data, "test_age", overwrite = TRUE)
+    test_ages <- dplyr::copy_to(conn, test_data, "test_age")
     SCDB::defer_db_cleanup(test_ages)
 
 
