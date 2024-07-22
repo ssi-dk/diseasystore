@@ -115,8 +115,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   }
 
 
-  # Throw warning if data unavailable
-  if (!on_cran && !is.null(remote_conn) && curl::has_internet() && !remote_data_available) {
+  # Throw warning if remote data unavailable (only throw if we are working locally, don't run this check on CRAN)
+  if (!is.null(remote_conn) && curl::has_internet() && !on_cran && !remote_data_available) {
     warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
   }
 
