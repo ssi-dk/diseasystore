@@ -299,9 +299,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
-        ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+        )
 
         # Check that reference data is limited to the study period (start_date and end_date)
         reference_out_of_bounds <- reference |>
@@ -314,6 +312,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         )
 
         # Copy to remote and compute checksums
+        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+        SCDB::defer_db_cleanup(reference)
+
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
