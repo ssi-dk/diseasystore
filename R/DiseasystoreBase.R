@@ -183,7 +183,8 @@ DiseasystoreBase <- R6::R6Class(                                                
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
             ds_feature <- ds_feature |>
               dplyr::copy_to(self %.% target_conn, df = _,
-                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"), overwrite = TRUE)
+                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"))
+            SCDB::defer_db_cleanup(ds_feature)
           }
 
           # Add the existing computed data for given slice_ts
@@ -248,7 +249,8 @@ DiseasystoreBase <- R6::R6Class(                                                
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()), overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()))
+      SCDB::defer_db_cleanup(validities)
 
       out <- dplyr::inner_join(out, validities,
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
@@ -299,7 +301,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()), overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()))
+      SCDB::defer_db_cleanup(study_dates)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
@@ -435,7 +438,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         if (is.null(stratification)) {
           all_combinations <- all_combinations |>
             dplyr::copy_to(self %.% target_conn, df = _,
-                           name = paste0("ds_all_combinations_", Sys.getpid()), overwrite = TRUE)
+                           name = paste0("ds_all_combinations_", Sys.getpid()))
+          SCDB::defer_db_cleanup(all_combinations)
         }
       }
 
