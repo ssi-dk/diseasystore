@@ -139,7 +139,8 @@ ds <- DiseasystoreGoogleCovid19$new()
 dummy_table <- dplyr::copy_to(ds %.% target_conn, data.frame(a = 1, b = 2), name = SCDB::unique_table_name())
 tbl <- purrr::quietly(dplyr::tbl)
 t <- tbl(ds %.% target_conn, SCDB::id(dummy_table))
-stopifnot("DuckDB no longer has verbose messages"={!identical(t$messages, character(0))}) # If this fails, duckdb has removed the message and we can remove this section
+stopifnot("DuckDB no longer has verbose messages" = !identical(t$messages, character(0)))
+# If this fails, duckdb has removed the message and we can remove this section
 ```
 
 Once configured such, we can use the feature store directly to get data.
