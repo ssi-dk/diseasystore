@@ -1,5 +1,12 @@
 # diseasystore (development version)
 
+## Testing:
+
+* `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
+  * Checks that data is only within the study period
+  * Checks that `valid_from` and `valid_until` has class `Date`.
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
