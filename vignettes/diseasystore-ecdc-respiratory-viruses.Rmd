@@ -31,8 +31,8 @@ if (rlang::is_installed("withr")) {
   )
 }
 
-# We have a "hard" dependency for RSQLite to render parts of this vignette
-suggests_available <- rlang::is_installed("RSQLite")
+# We have a "hard" dependency for duckdb to render parts of this vignette
+suggests_available <- rlang::is_installed("duckdb")
 not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") || identical(Sys.getenv("CI"), "true")
 ```
 
@@ -110,7 +110,7 @@ The `diseasystores` require a database to store its features in.
 These should be configured before use and can be stored in the packages options.
 ```{r configure_diseasystore, eval = FALSE}
 # We define target_conn as a function that opens a DBIconnection to the DB
-target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
+target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 options(
   "diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn
 )
@@ -118,7 +118,7 @@ options(
 
 
 ```{r configure_diseasystore_hidden, include = FALSE, eval = not_on_cran && suggests_available && data_available}
-target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
+target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 if (rlang::is_installed("withr")) {
   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn)
 } else {
@@ -131,6 +131,15 @@ Once the files are downloaded and the target database is configured, we can init
 ECDC Respiratory Viruses Weekly data.
 ```{r initializing_diseasystore, eval = not_on_cran && suggests_available && data_available}
 ds <- DiseasystoreEcdcRespiratoryViruses$new()
+```
+
+```{r duckdb_suppress, include = FALSE, eval = not_on_cran && suggests_available && data_available}
+# duckdb has decided to be very verbose about accessing tables, at least the first time you call a table,
+# so we suppress the output here
+dummy_table <- dplyr::copy_to(ds %.% target_conn, data.frame(a = 1, b = 2), name = SCDB::unique_table_name())
+tbl <- purrr::quietly(dplyr::tbl)
+t <- tbl(ds %.% target_conn, SCDB::id(dummy_table))
+stopifnot("DuckDB no longer has verbose messages"={!identical(t$messages, character(0))}) # If this fails, duckdb has removed the message and we can remove this section
 ```
 
 Once configured such, we can use the feature store directly to get data.

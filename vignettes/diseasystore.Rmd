@@ -29,8 +29,8 @@ if (rlang::is_installed("withr")) {
                   "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
 }
 
-# We have a "hard" dependency for RSQLite to render parts of this vignette
-suggests_available <- rlang::is_installed("RSQLite")
+# We have a "hard" dependency for duckdb to render parts of this vignette
+suggests_available <- rlang::is_installed("duckdb")
 not_on_cran <- interactive() || as.logical(Sys.getenv("NOT_CRAN", unset = "false"))
 ```
 
@@ -55,7 +55,7 @@ To use a `diseasystore` we need to first do some configuration.
 The `diseasystores` are designed to work with data bases to store the computed features in.
 Each `diseasystore` may require individual configuration as listed in its documentation or accompanying vignette.
 
-For this Quick start, we will configure a `DiseasystoreGoogleCovid19` to use a local `SQLite` data base
+For this Quick start, we will configure a `DiseasystoreGoogleCovid19` to use a local `duckdb` data base
 Ideally, we want to use a faster, more capable, data base to store the features in.
 The `diseasystores` uses `SCDB` in the back end and can use any data base back end supported by `SCDB`.
 
@@ -85,7 +85,7 @@ if (purrr::some(google_files, ~ !checkmate::test_file_exists(file.path(local_con
   data_available <- TRUE
 }
 
-ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite()),
+ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(duckdb::duckdb()),
                                     source_conn = local_conn,
                                     start_date = as.Date("2020-03-01"),
                                     end_date = as.Date("2020-03-15"))
@@ -93,11 +93,21 @@ ds <- DiseasystoreGoogleCovid19$new(target_conn = DBI::dbConnect(RSQLite::SQLite
 
 ```{r google_setup, eval = FALSE, eval = not_on_cran && suggests_available && data_available}
 ds <- DiseasystoreGoogleCovid19$new(
-  target_conn = DBI::dbConnect(RSQLite::SQLite()),
+  target_conn = DBI::dbConnect(duckdb::duckdb()),
   start_date = as.Date("2020-03-01"),
   end_date = as.Date("2020-03-15")
 )
 ```
+
+```{r duckdb_suppress, include = FALSE, eval = not_on_cran && suggests_available && data_available}
+# duckdb has decided to be very verbose about accessing tables, at least the first time you call a table,
+# so we suppress the output here
+dummy_table <- dplyr::copy_to(ds %.% target_conn, data.frame(a = 1, b = 2), name = SCDB::unique_table_name())
+tbl <- purrr::quietly(dplyr::tbl)
+t <- tbl(ds %.% target_conn, SCDB::id(dummy_table))
+stopifnot("DuckDB no longer has verbose messages"={!identical(t$messages, character(0))}) # If this fails, duckdb has removed the message and we can remove this section
+```
+
 When we create our new `diseasystore` instance, we also supply `start_date` and `end_date` arguments.
 These are not strictly required, but make getting features for this time interval simpler.
 
