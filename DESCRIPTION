@@ -26,6 +26,7 @@ RoxygenNote: 7.3.2
 Language: en-GB
 Imports:
     checkmate,
+    curl,
     DBI,
     dbplyr,
     dplyr,
@@ -45,7 +46,6 @@ Imports:
 Suggests:
     devtools,
     duckdb,
-    curl,
     knitr,
     lintr,
     odbc,
