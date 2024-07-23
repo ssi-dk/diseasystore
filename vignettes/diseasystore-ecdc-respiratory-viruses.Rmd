@@ -133,16 +133,6 @@ ECDC Respiratory Viruses Weekly data.
 ds <- DiseasystoreEcdcRespiratoryViruses$new()
 ```
 
-```{r duckdb_suppress, include = FALSE, eval = not_on_cran && suggests_available && data_available}
-# duckdb has decided to be very verbose about accessing tables, at least the first time you call a table,
-# so we suppress the output here
-dummy_table <- dplyr::copy_to(ds %.% target_conn, data.frame(a = 1, b = 2), name = SCDB::unique_table_name())
-tbl <- purrr::quietly(dplyr::tbl)
-t <- tbl(ds %.% target_conn, SCDB::id(dummy_table))
-stopifnot("DuckDB no longer has verbose messages" = !identical(t$messages, character(0)))
-# If this fails, duckdb has removed the message and we can remove this section
-```
-
 Once configured such, we can use the feature store directly to get data.
 ```{r using_diseasystore_example_1, eval = not_on_cran && suggests_available && data_available}
 # We can see all the available features in the feature store
