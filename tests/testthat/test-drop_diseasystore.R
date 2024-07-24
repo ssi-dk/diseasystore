@@ -1,24 +1,40 @@
 withr::local_options("diseasystore.target_schema" = target_schema_1)
+withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 10)
 
 test_that("drop_diseasystore can delete entire default schema", {
   for (conn in get_test_conns()) {
 
-    # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
+    # Create a diseasystore to generate some data
+    ds <- DiseasystoreGoogleCovid19$new(
+      target_conn = conn,
+      start_date = as.Date("2020-01-01"),
+      end_date = as.Date("2020-06-01"),
+      verbose = FALSE
+    )
+
+    # Compute each feature
+    ds$available_features |>
+      utils::head(3) |>
+      purrr::walk(~ ds$get_feature(.x))
+
+    # And store the ids
+    ds_ids <- ds$ds_map |>
+      purrr::map(~ SCDB::id(paste(target_schema_1, ., sep = "."), conn)) |>
+      purrr::keep(~ SCDB::table_exists(conn, .))
+    ds_ids <- ds_ids[!duplicated(ds_ids)]
+
+    # Get the id of the logs table
     logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_logs_if_missing(conn = conn, log_table = logs_id)
 
-
-    # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
-    # and in other places which should be untouched by our tests
-    ids <- c(
-      paste(target_schema_1, "mtcars_1", sep = "."),
-      paste(target_schema_1, "mtcars_2", sep = "."),
+    # Then we create tables containing mtcars in other schemas which should be untouched by our tests
+    non_ds_ids <- c(
       "mtcars_1",
       paste(target_schema_2, "mtcars_1", sep = ".")
     ) |>
       purrr::map(~ SCDB::id(., conn))
 
-    purrr::walk(ids, ~ SCDB::create_table(mtcars, conn, ., temporary = FALSE))
+    purrr::walk(non_ds_ids, ~ SCDB::create_table(mtcars, conn, ., temporary = FALSE))
+
 
     # Try to delete the entire `target_schema_1` store
     # But first, verify that the testing target_schema has been set
@@ -26,15 +42,12 @@ test_that("drop_diseasystore can delete entire default schema", {
     drop_diseasystore(conn = conn)
 
     expect_false(SCDB::table_exists(conn, logs_id))
-    expect_false(SCDB::table_exists(conn, ids[[1]]))
-    expect_false(SCDB::table_exists(conn, ids[[2]]))
-
-    expect_true(SCDB::table_exists(conn, ids[[3]]))
-    expect_true(SCDB::table_exists(conn, ids[[4]]))
+    purrr::walk(ds_ids,     ~ expect_false(SCDB::table_exists(conn, .)))
+    purrr::walk(non_ds_ids, ~ expect_true(SCDB::table_exists(conn, .)))
 
 
-    # Make sure all tables have been removed
-    c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
+    # Make sure all tables have been removed to not interfere with other tests
+    c(logs_id, ds_ids, non_ds_ids) |>
       purrr::walk(~ {
         if (SCDB::table_exists(conn, .)) {
           DBI::dbRemoveTable(conn, .)
@@ -51,48 +64,60 @@ test_that("drop_diseasystore can delete entire default schema", {
 test_that("drop_diseasystore can delete single table in default schema", {
   for (conn in get_test_conns()) {
 
-    # Create logs table in `target_schema_1` schema to simulate a diseasystore in the schema
-    logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
-    SCDB::create_logs_if_missing(conn = conn, log_table = logs_id)
+    # Create a diseasystore to generate some data
+    ds <- DiseasystoreGoogleCovid19$new(
+      target_conn = conn,
+      start_date = as.Date("2020-01-01"),
+      end_date = as.Date("2020-06-01"),
+      verbose = FALSE
+    )
 
-    # Then we create tables containing mtcars in both the schema we will drop (target_schema_1)
-    # and in other places which should be untouched by our tests
-    ids <- c(
-      paste(target_schema_1, "mtcars_1", sep = "."),
-      paste(target_schema_1, "mtcars_2", sep = "."),
+    # Compute each feature
+    ds$available_features |>
+      utils::head(3) |>
+      purrr::walk(~ ds$get_feature(.x))
+
+    # And store the ids
+    ds_ids <- ds$ds_map |>
+      purrr::map(~ SCDB::id(paste(target_schema_1, ., sep = "."), conn)) |>
+      purrr::keep(~ SCDB::table_exists(conn, .))
+    ds_ids <- ds_ids[!duplicated(ds_ids)]
+
+    # Get the id of the logs table
+    logs_id <- SCDB::id(paste(target_schema_1, "logs", sep = "."), conn)
+
+    # Then we create tables containing mtcars in other schemas which should be untouched by our tests
+    non_ds_ids <- c(
       "mtcars_1",
       paste(target_schema_2, "mtcars_1", sep = ".")
     ) |>
       purrr::map(~ SCDB::id(., conn))
 
-    purrr::walk(ids, ~ SCDB::create_table(mtcars, conn, ., temporary = FALSE))
+    purrr::walk(non_ds_ids, ~ SCDB::create_table(mtcars, conn, ., temporary = FALSE))
 
-    # Try to delete only mtcars_1 within the diseasystore
+
+    # Try to delete only the first feature within the diseasystore
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
-    drop_diseasystore(pattern = "mtcars_1", conn = conn)
+    drop_diseasystore(pattern = ds$ds_map[[names(ds_ids)[[1]]]], conn = conn)
 
     expect_true(SCDB::table_exists(conn, logs_id))
-    expect_false(SCDB::table_exists(conn, ids[[1]]))
-    expect_true(SCDB::table_exists(conn, ids[[2]]))
+    expect_false(SCDB::table_exists(conn, ds_ids[[1]]))
+    purrr::walk(utils::tail(ds_ids, -1), ~ expect_true(SCDB::table_exists(conn, .)))
+    purrr::walk(non_ds_ids,              ~ expect_true(SCDB::table_exists(conn, .)))
 
-    expect_true(SCDB::table_exists(conn, ids[[3]]))
-    expect_true(SCDB::table_exists(conn, ids[[4]]))
-
-    # Try to delete only mtcars_2 within the diseasystore
+    # Try to delete also the second feature within the diseasystore
     # But first, verify that the testing target_schema has been set
     expect_identical(diseasyoption("target_schema"), target_schema_1)
-    drop_diseasystore(pattern = "mtcars_2", conn = conn)
+    drop_diseasystore(pattern = ds$ds_map[[names(ds_ids)[[2]]]], conn = conn)
 
     expect_true(SCDB::table_exists(conn, logs_id))
-    expect_false(SCDB::table_exists(conn, ids[[1]]))
-    expect_false(SCDB::table_exists(conn, ids[[2]]))
+    purrr::walk(utils::head(ds_ids, 2),  ~ expect_false(SCDB::table_exists(conn, .)))
+    purrr::walk(utils::tail(ds_ids, -3), ~ expect_true(SCDB::table_exists(conn, .)))
+    purrr::walk(non_ds_ids,       ~ expect_true(SCDB::table_exists(conn, .)))
 
-    expect_true(SCDB::table_exists(conn, ids[[3]]))
-    expect_true(SCDB::table_exists(conn, ids[[4]]))
-
-    # Make sure all tables have been removed
-    c(SCDB::id(paste(target_schema_1, "logs", sep = "."), conn), ids) |>
+    # Make sure all tables have been removed to not interfere with other tests
+    c(logs_id, ds_ids, non_ds_ids) |>
       purrr::walk(~ {
         if (SCDB::table_exists(conn, .)) {
           DBI::dbRemoveTable(conn, .)
