@@ -91,6 +91,11 @@ test_that("diseasyoption works", {
   expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_2)
   expect_identical(diseasyoption("target_schema", ds), target_schema_2)
 
+  withr::local_options("diseasystore.target_schema" = target_schema_1)
+  withr::local_options("diseasystore.DiseasystoreDummy.target_schema" = "")
+  expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_1)
+  expect_identical(diseasyoption("target_schema", ds), target_schema_1)
+
   rm(ds)
   invisible(gc())
 })
