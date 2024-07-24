@@ -96,6 +96,12 @@ test_that("diseasyoption works", {
   expect_identical(diseasyoption("target_schema", "DiseasystoreDummy"), target_schema_1)
   expect_identical(diseasyoption("target_schema", ds), target_schema_1)
 
+  withr::local_options("diseasy.target_schema" = target_schema_1)
+  expect_error(
+    diseasyoption("target_schema"),
+    regex = r"{Multiple options found \(diseasy.target_schema, diseasystore.target_schema\)!}"
+  )
+
   rm(ds)
   invisible(gc())
 })
