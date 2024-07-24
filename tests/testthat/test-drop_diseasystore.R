@@ -1,11 +1,63 @@
 withr::local_options("diseasystore.target_schema" = target_schema_1)
-withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 10)
+
+# Create a dummy DiseasystoreBase with a mtcars FeatureHandler
+DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+  classname = "DiseasystoreBase",
+  inherit = DiseasystoreBase,
+  private = list(
+    .ds_map = list(
+      "cyl" = "dummy_cyl",
+      "vs" = "dummy_vs",
+      "am" = "dummy_am"
+    ),
+    dummy_cyl = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn) {
+        return(
+          dplyr::select(mtcars, "cyl") |>
+            dplyr::transmute(
+            "key_car" = rownames(mtcars),
+            .data$cyl,
+            valid_from = Sys.Date(),
+            valid_until = as.Date(NA)
+          )
+        )
+      }
+    ),
+    dummy_vs = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn) {
+        return(
+          dplyr::select(mtcars, "vs") |>
+            dplyr::transmute(
+            "key_car" = rownames(mtcars),
+            .data$vs,
+            valid_from = Sys.Date(),
+            valid_until = as.Date(NA)
+          )
+        )
+      }
+    ),
+    dummy_am = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn) {
+        return(
+          dplyr::select(mtcars, "am") |>
+            dplyr::transmute(
+            "key_car" = rownames(mtcars),
+            .data$am,
+            valid_from = Sys.Date(),
+            valid_until = as.Date(NA)
+          )
+        )
+      }
+    )
+  )
+)
+
 
 test_that("drop_diseasystore can delete entire default schema", {
   for (conn in get_test_conns()) {
 
     # Create a diseasystore to generate some data
-    ds <- DiseasystoreGoogleCovid19$new(
+    ds <- DiseasystoreDummy$new(
       target_conn = conn,
       start_date = as.Date("2020-01-01"),
       end_date = as.Date("2020-06-01"),
@@ -65,7 +117,7 @@ test_that("drop_diseasystore can delete single table in default schema", {
   for (conn in get_test_conns()) {
 
     # Create a diseasystore to generate some data
-    ds <- DiseasystoreGoogleCovid19$new(
+    ds <- DiseasystoreDummy$new(
       target_conn = conn,
       start_date = as.Date("2020-01-01"),
       end_date = as.Date("2020-06-01"),
