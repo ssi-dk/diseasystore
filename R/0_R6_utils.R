@@ -54,6 +54,8 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'   Name of the option to get.
 #' @param class (`character(1)` or `R6::R6class Diseasy* instance`)\cr
 #'   Either the classname or the object the option applies to.
+#' @param namespace (`character(1)`)\cr
+#'   The namespace of the option (e.g. "diseasy" or "diseasystore").
 #' @param .default (`any`)\cr
 #'   The default value to return if no option is set.
 #' @return The most specific option within the diseasy framework for the given option and class
@@ -70,24 +72,57 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'   # Try to retrieve specific non-existent option
 #'   diseasyoption("non_existent", "DiseasystoreGoogleCovid19", .default = "Use this")
 #' @export
-diseasyoption <- function(option, class = "DiseasystoreBase", .default = NULL) {
+diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NULL) {
 
-  if (!is.character(class)) {
+  # Only class OR namespace can be given, not both
+  if (!is.null(namespace) && !is.null(class)) {
+    stop("Only one of `namespace` or `class` can be given!")
+  }
+
+  # Ensure class is character if given
+  if (!is.null(class) && !is.character(class)) {
     class <- base::class(class)[1]
   }
 
-  base_class <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>                                                     # nolint: object_usage_linter
-    stringr::str_to_lower()
+  # If no class or namespace is given, use default
+  if (is.null(namespace) && is.null(class)) {
+    namespace <- "diseasy(?:store)?"
+  }
 
-  option <- list(class, NULL) |>
-    purrr::map(~ paste(c(base_class, .x, option), collapse = ".")) |>
-    purrr::map(getOption) |>
-    purrr::map(unlist) |>
-    purrr::discard(is.null) |>
-    purrr::discard(~ identical(., "")) |>
-    purrr::pluck(1, .default = .default)
+  # If class is given, extract namespace from class
+  if (!is.null(class)) {
+    namespace <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>
+      stringr::str_to_lower()
+  }
 
-  return(option)
+  if (missing(option)) {
+
+    options <- options() |>
+      purrr::keep_at(~ stringr::str_detect(., paste0("^", namespace, "."))) |>
+      purrr::keep_at(
+        ~ stringr::str_detect(., r"{^\w+\.\w+$}") | stringr::str_detect(., paste0("^", namespace, ".", class, "."))
+      )
+
+  } else {
+
+    options <- list(class, NULL) |>
+      purrr::map_chr(~ paste(c(namespace, .x, option), collapse = ".")) |>
+      purrr::map(\(opt_regex) purrr::keep_at(options(), ~ stringr::str_detect(., opt_regex))) |>
+      purrr::map(unlist) |>
+      purrr::discard(is.null) |>
+      purrr::discard(~ identical(., "")) |>
+      purrr::pluck(1, .default = .default)
+
+    # Check options are non-ambiguous
+    if (length(options) > 1) {
+      stop(glue::glue("Multiple options found ({names(options)})!"))
+    } else {
+      return(purrr::pluck(options, 1))
+    }
+
+  }
+
+  return(options)
 }
 
 
