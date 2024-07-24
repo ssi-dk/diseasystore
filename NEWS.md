@@ -6,6 +6,13 @@
 fields (#138).
 
 
+## Minor Improvements and Fixes:
+
+* `diseasyoption()` can now be called without the `option` argument to return all `diseasy/diseasytsore` options (#159).
+
+  In addition, a new `namespace` argument can restrict the option look-up to a specific package (e.g. `diseasystore`).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
