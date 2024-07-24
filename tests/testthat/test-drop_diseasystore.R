@@ -1,7 +1,7 @@
 withr::local_options("diseasystore.target_schema" = target_schema_1)
 
 # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+DiseasystoreDummy <- R6::R6Class(                                                                                       # nolint: object_name_linter
   classname = "DiseasystoreBase",
   inherit = DiseasystoreBase,
   private = list(
@@ -15,11 +15,11 @@ DiseasystoreDummy <- R6::R6Class(                                               
         return(
           dplyr::select(mtcars, "cyl") |>
             dplyr::transmute(
-            "key_car" = rownames(mtcars),
-            .data$cyl,
-            valid_from = Sys.Date(),
-            valid_until = as.Date(NA)
-          )
+              "key_car" = rownames(mtcars),
+              .data$cyl,
+              valid_from = Sys.Date(),
+              valid_until = as.Date(NA)
+            )
         )
       }
     ),
@@ -28,11 +28,11 @@ DiseasystoreDummy <- R6::R6Class(                                               
         return(
           dplyr::select(mtcars, "vs") |>
             dplyr::transmute(
-            "key_car" = rownames(mtcars),
-            .data$vs,
-            valid_from = Sys.Date(),
-            valid_until = as.Date(NA)
-          )
+              "key_car" = rownames(mtcars),
+              .data$vs,
+              valid_from = Sys.Date(),
+              valid_until = as.Date(NA)
+            )
         )
       }
     ),
@@ -41,11 +41,11 @@ DiseasystoreDummy <- R6::R6Class(                                               
         return(
           dplyr::select(mtcars, "am") |>
             dplyr::transmute(
-            "key_car" = rownames(mtcars),
-            .data$am,
-            valid_from = Sys.Date(),
-            valid_until = as.Date(NA)
-          )
+              "key_car" = rownames(mtcars),
+              .data$am,
+              valid_from = Sys.Date(),
+              valid_until = as.Date(NA)
+            )
         )
       }
     )
