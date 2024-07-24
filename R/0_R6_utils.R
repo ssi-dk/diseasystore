@@ -127,14 +127,8 @@ parse_diseasyconn <- function(conn, type = "source_conn") {
 
   # From here, we need to consider the type of connection
   # "target_conn" must be a valid DBI conn while source_conn can be whatever
-  if (type == "target_conn") {
-    if (inherits(conn, "DBIConnection")) {
-      return(conn)
-    } else if (identical(unname(conn), "")) {
-      stop(glue::glue("Empty string received for `{type}`, did you forget to set an option?"))
-    } else {
-      stop(glue::glue("`{type}` could not be parsed!"))
-    }
+  if (type == "target_conn" && inherits(conn, "DBIConnection")) {
+    return(conn)
   } else if (type == "source_conn") {
     return(conn)
   }
