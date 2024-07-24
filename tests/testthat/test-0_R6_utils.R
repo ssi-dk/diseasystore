@@ -63,6 +63,10 @@ test_that("printr: printing to console works with max_width", {
 
 test_that("diseasyoption works", {
 
+  # Check that diseasy options are returned if no option is given
+  checkmate::expect_list(diseasyoption())
+  checkmate::expect_character(names(diseasyoption()), pattern = r"{^diseasy(?:store)?\..*}")
+
   # Check that diseasyoption works for default values
   expect_null(diseasyoption("non_existent_option"))
   expect_true(diseasyoption("non_existent_option", .default = TRUE))
