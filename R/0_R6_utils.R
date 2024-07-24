@@ -108,6 +108,7 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
     options <- list(class, NULL) |>
       purrr::map_chr(~ paste(c(namespace, .x, option), collapse = ".")) |>
       purrr::map(\(opt_regex) purrr::keep_at(options(), ~ stringr::str_detect(., opt_regex))) |>
+      purrr::reduce(c) |>
       purrr::map(unlist) |>
       purrr::discard(is.null) |>
       purrr::discard(~ identical(., "")) |>
