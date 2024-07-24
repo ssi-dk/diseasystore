@@ -3,59 +3,43 @@ withr::local_options("diseasystore.target_schema" = target_schema_1)
 withr::local_options("diseasystore.lock_wait_max" = 1 * 60) # 1 minute during tests
 
 test_that("DiseasystoreBase works", {
-  skip_if_not_installed("RSQLite")
 
   # Test different initialization of the base module
 
   # 1)
-  expect_error(DiseasystoreBase$new(), regexp = "Empty string received for `target_conn`, did you forget to set")
-
-
-  # Set the target conn for the remaining tests
-  target_conn <- DBI::dbConnect(RSQLite::SQLite())
-  withr::local_options("diseasystore.target_conn" = target_conn)
+  expect_error(DiseasystoreBase$new(), regexp = "source_conn option not defined")
 
   # 2)
-  expect_no_error(DiseasystoreBase$new())
+  expect_error(DiseasystoreBase$new(source_conn = file.path("some", "path")), regexp = "target_conn option not defined")
 
   # 3)
-  expect_no_error(ds <- DiseasystoreBase$new(source_conn = file.path("some", "path")))                                  # nolint: implicit_assignment_linter
-  expect_equal(ds$source_conn, file.path("some", "path"))
-
-  # 4)
-  withr::local_options("diseasystore.source_conn" = file.path("some", "other", "path"))
-  expect_no_error(ds <- DiseasystoreBase$new())                                                                         # nolint: implicit_assignment_linter
-  expect_equal(ds$source_conn, file.path("some", "other", "path"))
+  withr::local_options("diseasystore.source_conn" = file.path("some", "path"))
+  expect_error(DiseasystoreBase$new(), regexp = "target_conn option not defined")
   withr::local_options("diseasystore.source_conn" = NULL)
 
-  # 5)
-  source_conn <- DBI::dbConnect(RSQLite::SQLite())
-  expect_no_error(ds <- DiseasystoreBase$new(source_conn = source_conn))                                                # nolint: implicit_assignment_linter
-  expect_identical(ds$source_conn, source_conn)
-
-  # 6)
+  # 4)
   ds <- DiseasystoreBase$new(
     source_conn = file.path("some", "path"),
-    target_conn = target_conn
+    target_conn = dbplyr::simulate_dbi()
   )
   expect_null(ds %.% start_date)
   expect_null(ds %.% end_date)
   rm(ds)
 
-  # 7)
+  # 5)
   ds <- DiseasystoreBase$new(
     source_conn = file.path("some", "path"),
-    target_conn = target_conn,
+    target_conn = dbplyr::simulate_dbi(),
     start_date = as.Date("2020-03-01")
   )
   expect_identical(ds %.% start_date, as.Date("2020-03-01"))
   expect_null(ds %.% end_date)
   rm(ds)
 
-  # 8)
+  # 6)
   ds <- DiseasystoreBase$new(
     source_conn = file.path("some", "path"),
-    target_conn = target_conn,
+    target_conn = dbplyr::simulate_dbi(),
     start_date = as.Date("2020-03-01"),
     end_date   = as.Date("2020-06-01")
   )
@@ -63,10 +47,10 @@ test_that("DiseasystoreBase works", {
   expect_identical(ds %.% end_date,   as.Date("2020-06-01"))
   rm(ds)
 
-  # 9)
+  # 7)
   ds <- DiseasystoreBase$new(
     source_conn = file.path("some", "path"),
-    target_conn = target_conn,
+    target_conn = dbplyr::simulate_dbi(),
     start_date = as.Date("2020-03-01"),
     end_date   = as.Date("2020-06-01"),
     slice_ts   = "2021-01-01 09:00:00"
@@ -76,43 +60,43 @@ test_that("DiseasystoreBase works", {
   expect_identical(ds %.% slice_ts,   "2021-01-01 09:00:00")
   rm(ds)
 
-  # 10)
+  # 8)
   ds <- DiseasystoreBase$new(
     source_conn = file.path("some", "path"),
-    target_conn = target_conn
+    target_conn = dbplyr::simulate_dbi()
   )
   expect_identical(ds %.% target_schema, getOption("diseasystore.target_schema"))
+  rm(ds)
+
+  # 9)
+  ds <- DiseasystoreBase$new(
+    source_conn = file.path("some", "path"),
+    target_conn = dbplyr::simulate_dbi(),
+    target_schema = "test_ds"
+  )
+  expect_identical(ds %.% target_schema, "test_ds")
+  rm(ds)
+
+  # 10)
+  withr::local_options("diseasystore.target_schema" = "test_ds")
+  ds <- DiseasystoreBase$new(
+    source_conn = file.path("some", "path"),
+    target_conn = dbplyr::simulate_dbi()
+  )
+  expect_identical(ds %.% target_schema, "test_ds")
   rm(ds)
 
   # 11)
   ds <- DiseasystoreBase$new(
     source_conn = file.path("some", "path"),
-    target_conn = target_conn,
+    target_conn = dbplyr::simulate_dbi(),
     target_schema = "test_ds"
   )
   expect_identical(ds %.% target_schema, "test_ds")
   rm(ds)
 
   # 12)
-  withr::local_options("diseasystore.target_schema" = "test_ds")
-  ds <- DiseasystoreBase$new(
-    source_conn = file.path("some", "path"),
-    target_conn = target_conn
-  )
-  expect_identical(ds %.% target_schema, "test_ds")
-  rm(ds)
-
-  # 13)
-  ds <- DiseasystoreBase$new(
-    source_conn = file.path("some", "path"),
-    target_conn = target_conn,
-    target_schema = "test_ds"
-  )
-  expect_identical(ds %.% target_schema, "test_ds")
-  rm(ds)
-
-  # 14)
-  ds <- DiseasystoreBase$new(target_conn = target_conn)
+  ds <- DiseasystoreBase$new(target_conn = dbplyr::simulate_dbi())
   expect_identical(ds %.% target_conn, ds %.% source_conn)
   rm(ds)
 
