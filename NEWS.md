@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes:
+
+* A bug was fixed in `$determine_new_ranges()` when using `POSIX` `slice_ts` (#158).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
