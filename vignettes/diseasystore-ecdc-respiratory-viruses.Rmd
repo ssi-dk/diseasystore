@@ -31,8 +31,8 @@ if (rlang::is_installed("withr")) {
   )
 }
 
-# We have a "hard" dependency for RSQLite to render parts of this vignette
-suggests_available <- rlang::is_installed("RSQLite")
+# We have a "hard" dependency for duckdb to render parts of this vignette
+suggests_available <- rlang::is_installed("duckdb")
 not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") || identical(Sys.getenv("CI"), "true")
 ```
 
@@ -110,7 +110,7 @@ The `diseasystores` require a database to store its features in.
 These should be configured before use and can be stored in the packages options.
 ```{r configure_diseasystore, eval = FALSE}
 # We define target_conn as a function that opens a DBIconnection to the DB
-target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
+target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 options(
   "diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn
 )
@@ -118,7 +118,7 @@ options(
 
 
 ```{r configure_diseasystore_hidden, include = FALSE, eval = not_on_cran && suggests_available && data_available}
-target_conn <- \() DBI::dbConnect(RSQLite::SQLite())
+target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 if (rlang::is_installed("withr")) {
   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn)
 } else {
