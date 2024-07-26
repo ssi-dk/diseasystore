@@ -451,7 +451,9 @@ data1 <- ds$key_join_features(
 )
 
 print(data1)
+```
 
+```{r stratifications_positive_sex_age_plot, eval = suggests_available && rlang::is_installed("ggplot2")}
 ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive, color = age_group)) +
   ggplot2::geom_line() +
   ggplot2::facet_wrap(~ sex)
@@ -476,6 +478,11 @@ data2 <- ds$key_join_features(
 
 print(data2)
 
+ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_admission, color = generation)) +
+  ggplot2::geom_line()
+```
+
+```{r stratifications_admission_generation_plot, eval = suggests_available && rlang::is_installed("ggplot2")}
 ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_admission, color = generation)) +
   ggplot2::geom_line()
 ```
