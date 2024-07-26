@@ -36,7 +36,7 @@ If you haven't already, please consult the `vignette("extending-diseasystore")` 
 
 In this example, we go through how to create a `diseasystore` that implements individual level data.
 For this purpose, we use a synthetic data set that we have generated using the `{simulist}` package.
-This data set is a synthetic linelist from a disease outbreak.
+This data set is a synthetic line list from a disease outbreak.
 
 ```{r simulist_data}
 simulist_data
@@ -49,7 +49,7 @@ Given such a data set, the aim is to create a `diseasystore` that can be used to
 
 To do this, we need to identify the "features" that we want to store in the `diseasystore`.
 In the data, there are some demographic features such as "sex" and "age" and there are disease specific features such
-as "date_onset", "date_admission", etc.
+as "date_onset", "date_admission", et cetera.
 
 In this example we will implement the following features:
 
@@ -411,7 +411,7 @@ We can see that the features we implemented are available:
 ds$available_features
 ```
 
-And we can retreive the individual features
+And we can retrieve the individual features
 ```{r get_feature_sex, eval = suggests_available}
 ds$get_feature(
   feature = "sex",
