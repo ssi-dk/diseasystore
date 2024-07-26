@@ -158,7 +158,9 @@ argument.
 ## Putting it all together
 By now, you should know the basics of creating your own `FeatureHandlers`.
 
-To see some `FeatureHandlers` in action, you can consult a few of those bundled with the `diseasystore` package.
+For a detailed walkthrough on creating a `diseasystore`, see the `vignette("extending-diseasystore-example")`.
+
+To see some other `FeatureHandlers` in action, you can consult a few of those bundled with the `diseasystore` package.
 
 For example:
 
