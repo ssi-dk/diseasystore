@@ -59,7 +59,6 @@ In this example we will implement the following features:
   * `sex` - The sex of the individuals
 
 * Disease features
-  * `n_test` - The tests performed on the individuals
   * `n_positive` - The positive tests performed on the individuals
   * `n_admission` - The time of admission among the individuals
   * `n_hospital` - The time of hospitalisation among the individuals
@@ -85,7 +84,6 @@ DiseasystoreSimulist <- R6::R6Class(
       "birth"       = "simulist_birth",
       "sex"         = "simulist_sex",
       "age"         = "simulist_age",
-      "n_test"      = "simulist_test",
       "n_positive"  = "simulist_positive",
       "n_admission" = "simulist_admission",
       "n_hospital"  = "simulist_hospital"
@@ -298,34 +296,6 @@ birth day to the next birth day. Notice that we sometimes compute birth days tha
 which we filter out before combining to a single data set with `dplyr::union_all`.
 
 In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
-
-
-## The `n_test` `FeatureHandler`
-
-```{r feature_handler_n_test, eval = FALSE}
-  private = list(
-    ...
-
-    # The "n_test" feature contains the tests taken by the individuals
-    simulist_test = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-
-        out <- simulist_data |>
-          dplyr::filter(.data$case_type != "suspected") |>
-          dplyr::transmute(
-            "key_pnr" = .data$id,
-            "valid_from" = .data$date_onset,
-            "valid_until" = .data$valid_from + lubridate::days(1)
-          ) |>
-          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
-
-        return(out)
-      },
-      key_join = key_join_count
-    ),
-
-    ...
-```
 
 ## The `n_positive` `FeatureHandler`
 
