@@ -77,9 +77,9 @@ the feature names and the responsible `FeatureHandlers`:
 DiseasystoreSimulist <- R6::R6Class(
   classname = "DiseasystoreSimulist",
   inherit = DiseasystoreBase,
-  
+
   ...
-  
+
   private = list(
     .ds_map = list(
       "birth"       = "simulist_birth",
@@ -157,7 +157,7 @@ we could use the date of death, if the individual has died.
 In this implementation we use the latter, since this allows for an easier implementation of the age of the individuals
 later on.
 
-Notice that `valid_until` is set as the date after death. The validity period of the features in `diseasystore` is 
+Notice that `valid_until` is set as the date after death. The validity period of the features in `diseasystore` is
 the interval $t \in \left[\textrm{valid_from}, \textrm{valid_until}\right)$.
 
 After computing the feature, we filter to ensure that the data is returned only for the requested time period.
