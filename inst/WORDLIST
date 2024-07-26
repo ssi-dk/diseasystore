@@ -8,6 +8,7 @@ backends
 bitemporal
 
 catalog
+cetera
 cdot
 classname
 cloneable
@@ -102,10 +103,12 @@ pcbi
 pid
 Plesner
 PLoS
+pnr
 POSIXct
 PostgreSQL
 
 quos
+quosures
 
 R's
 Randl
@@ -119,6 +122,7 @@ Rmd
 SCDB
 Schou
 SEIR
+simulist
 Skytte
 SSI
 Statens
@@ -127,6 +131,7 @@ SQLite
 
 tbl
 Telkamp
+textrm
 tibble
 tidyselect
 TODOs
@@ -134,6 +139,7 @@ ts
 
 u
 
+walkthrough
 www
 
 Zandvoort
