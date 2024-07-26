@@ -4,6 +4,12 @@
 
 * New age helpers `add_years()` and `age_on_date()` has been added to help compute features for individual data (#125).
 
+## Minor Improvements and Fixes:
+
+* Improved detection of partial deletion of diseasystores in `drop_diseasystore()` (#160).
+  This solves an issue where a bug in `SCDB` prevented `drop_diseasystore()` from deleting tables in some cases on
+  DuckDB back ends.
+
 
 # diseasystore 0.2.2
 
