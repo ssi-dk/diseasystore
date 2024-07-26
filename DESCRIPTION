@@ -47,6 +47,7 @@ Suggests:
     devtools,
     duckdb,
     epiparameter,
+    ggplot2,
     knitr,
     lintr,
     odbc,
