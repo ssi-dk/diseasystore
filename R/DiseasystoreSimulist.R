@@ -75,8 +75,8 @@ DiseasystoreSimulist <- R6::R6Class(                                            
           dplyr::mutate(age_at_start = as.integer(!!age_on_date("birth", start_date, conn = ds %.% target_conn))) |>
           dplyr::compute()
 
-        # Now, compute the next birthdates of the individual (as many as we need to cover the study period)
-        # and compute the age of the individuals throughout the study period with their birthdates denoting the starts
+        # Now, compute the next birth dates of the individual (as many as we need to cover the study period)
+        # and compute the age of the individuals throughout the study period with their birth dates denoting the starts
         # and ends of the validity periods.
         out <- purrr::map(
           seq.int(from = 0, to = ceiling(lubridate::interval(start_date, end_date) / lubridate::years(1))),
@@ -94,7 +94,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
               .data$birthday <= !!end_date,
               .data$birthday < .data$valid_until | is.na(.data$valid_until)
             ) |>
-            dplyr::transmute( # We assign the birthdates as the validity periods
+            dplyr::transmute( # We assign the birth dates as the validity periods
               "key_pnr" = .data$key_pnr,
               "age" = .data$age,
               "valid_from" = as.Date(.data$birthday),
