@@ -17,6 +17,17 @@ DiseasystoreSimulist <- R6::R6Class(                                            
   classname = "DiseasystoreSimulist",
   inherit = DiseasystoreBase,
 
+  public = list(
+    initialize = function(...) {
+      super$initialize(...)
+
+      private$.max_end_date <- simulist_data |>
+        dplyr::select(dplyr::starts_with("date_")) |>
+        purrr::reduce(c) |>
+        max(na.rm = TRUE)
+    }
+  ),
+
   private = list(
     .ds_map = list(
       "birth"       = "simulist_birth",
@@ -29,14 +40,15 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     ),
     .label = "Simulist Synthetic Data",
 
+    .min_start_date = as.Date("2019-12-01"),
+    .max_end_date = NULL,
+
+
+
     # The "birth" feature contains the birth dates of the individuals and is used later to compute the age
     # of the individuals at any given time.
     simulist_birth = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         # The simulist data does not generate a birth date, so we generate a synthetic birth date for each individual
         out <- simulist_data |>
@@ -57,10 +69,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     # The "age" feature computes the age of the individuals throughout the study period
     simulist_age = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         # Using birth date, compute the age at the start of the study period
         age <- ds$get_feature("birth", start_date, end_date, slice_ts) |>
@@ -127,10 +135,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     # The "n_test" feature contains the tests taken by the individuals
     simulist_test = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         out <- simulist_data |>
           dplyr::filter(.data$case_type != "suspected") |>
@@ -150,10 +154,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     # The "n_positive" feature contains the positive tests taken by the individuals
     simulist_positive = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         out <- simulist_data |>
           dplyr::filter(.data$case_type == "confirmed") |>
@@ -174,10 +174,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     # The "n_hospital" feature contains the hospitalizations of the individuals
     simulist_hospital = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         out <- simulist_data |>
           dplyr::filter(.data$case_type == "confirmed", !is.na(.data$date_admission)) |>
@@ -199,10 +195,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     # first date of hospitalisation
     simulist_admission = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         out <- ds$get_feature("n_hospital", start_date, end_date, slice_ts) |>
           dplyr::mutate("valid_until" = .data$valid_from + 1L) |>
