@@ -1,5 +1,12 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes:
+
+* Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected (#158):
+  * when using `POSIX` `slice_ts`.
+  * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
