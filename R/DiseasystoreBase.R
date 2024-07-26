@@ -596,7 +596,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
       ) |>
         dplyr::collect() |>
-        tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
+        tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
         dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!as.POSIXct(slice_ts))
 
       # If no logs are found, we need to compute on the entire range
