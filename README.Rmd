@@ -22,8 +22,8 @@ ways. The `diseasystore` package currently implements the Google Health
 COVID-19 Open Repository with more `diseasystores` on the way.
 
 The `diseasystore` package is designed to handle both individual-level
-data (examples to come) and semi-aggregated (typically publicly
-available) data.
+data (typically protected) and semi-aggregated data (typically publicly
+available).
 
 If the data is at the individual-level, the feature store is fully
 dynamic and can adapt to (virtually) any stratification that the user

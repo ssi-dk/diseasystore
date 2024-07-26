@@ -48,3 +48,4 @@ articles:
   navbar: Developer guides
   contents:
   - extending-diseasystore
+  - extending-diseasystore-example
