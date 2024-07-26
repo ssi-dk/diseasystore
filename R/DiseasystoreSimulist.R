@@ -33,7 +33,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
       "birth"       = "simulist_birth",
       "age"         = "simulist_age",
       "sex"         = "simulist_sex",
-      "n_test"      = "simulist_test",
       "n_positive"  = "simulist_positive",
       "n_admission" = "simulist_admission",
       "n_hospital"  = "simulist_hospital"
@@ -123,25 +122,6 @@ DiseasystoreSimulist <- R6::R6Class(                                            
             "key_pnr" = .data$id,
             "sex" = dplyr::if_else(.data$sex == "m", "Male", "Female"),
             .data$valid_from, .data$valid_until # Use values from birth feature
-          ) |>
-          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
-
-        return(out)
-      },
-      key_join = key_join_count
-    ),
-
-
-    # The "n_test" feature contains the tests taken by the individuals
-    simulist_test = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-
-        out <- simulist_data |>
-          dplyr::filter(.data$case_type != "suspected") |>
-          dplyr::transmute(
-            "key_pnr" = .data$id,
-            "valid_from" = .data$date_onset,
-            "valid_until" = .data$valid_from + lubridate::days(1)
           ) |>
           dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
 
