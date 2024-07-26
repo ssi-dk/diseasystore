@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## New Features:
+
+* New age helpers `add_years()` and `age_on_date()` has been added to help compute features for individual data (#125).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
