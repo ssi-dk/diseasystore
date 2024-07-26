@@ -378,14 +378,16 @@ In all, we end with a data set containing the time-dependent age of the individu
 
 
 # The final product
+We are finally ready to see the `diseasystore` in action.
 
-The `diseasystores` require a database to store its features in.
-These should be configured before use and can be stored in the packages options.
+## Configuring the `diseasystore`
+All `diseasystores` require a database to store its features in. For convenience, we here set the `target_conn` option,
+for all `diseasystores`[^3].
 ```{r configure_diseasystore, eval = FALSE}
 # We define target_conn as a function that opens a DBIconnection to the DB
 target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 options(
-  "diseasystore.DiseasystoreSimulist.target_conn" = target_conn
+  "diseasystore.target_conn" = target_conn
 )
 ```
 
@@ -398,25 +400,85 @@ if (rlang::is_installed("withr")) {
 }
 ```
 
-
-We can initialize the `diseasystore`
+With the `target_conn` option set, we can easily create a new instance of the `diseasystore`[^4].
 ```{r initializing_diseasystore, eval = suggests_available}
 ds <- diseasystore:::DiseasystoreSimulist$new()
 ```
 
-Once configured such, we can use the feature store directly to get data.
-```{r using_diseasystore_example_1, eval = suggests_available}
-# We can see all the available features in the feature store
+## Retrieving features
+We can see that the features we implemented are available:
+```{r ds_available_features, eval = suggests_available}
 ds$available_features
 ```
 
-```{r using_diseasystore_example_2, eval = suggests_available}
-# And then retrieve a feature from the feature store
-ds$get_feature(feature = "n_hospital",
-               start_date = as.Date("2019-12-01"),
-               end_date = as.Date("2020-01-13"))
+And we can retreive the individual features
+```{r get_feature_sex, eval = suggests_available}
+ds$get_feature(
+  feature = "sex",
+  start_date = ds$min_start_date,
+  end_date = ds$max_end_date
+)
 ```
 
+```{r get_feature_n_positive, eval = suggests_available}
+ds$get_feature(
+  feature = "n_positive",
+  start_date = ds$min_start_date,
+  end_date = ds$max_end_date
+)
+```
+
+## Combining features
+Since we have individual level data, we can combine the features arbitrarily using any stratification that we want.
+This stratification can by any expression using the features in the `diseasystore`. Since we are working expressions,
+we need to pass the expressions as "quosures" using `rlang::quos()`.
+
+```{r stratifications_positive_sex_age, eval = suggests_available}
+# Get the number of positive tests by age group and sex
+data1 <- ds$key_join_features(
+  observable = "n_positive",
+  stratification = rlang::quos(
+    age_group = cut(
+      age,
+      breaks = c(0, 15, 30, Inf),
+      labels = !!age_labels(c(0, 15, 30)),
+      include.lowest = TRUE
+    ),
+    sex
+  ),
+  start_date = ds$min_start_date,
+  end_date = ds$max_end_date
+)
+
+print(data1)
+
+ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive, color = age_group)) +
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~ sex)
+```
+
+```{r stratifications_admission_generation, eval = suggests_available}
+# Get the number of admissions by generation
+data2 <- ds$key_join_features(
+  observable = "n_admission",
+  stratification = rlang::quos(
+    generation = dplyr::case_when(
+      lubridate::year(birth) < 1946 ~ "Silent",
+      lubridate::year(birth) < 1965 ~ "Boomer",
+      lubridate::year(birth) < 1981 ~ "GenX",
+      lubridate::year(birth) < 1997 ~ "Millenial",
+      TRUE ~ "GenZ"
+    )
+  ),
+  start_date = ds$min_start_date,
+  end_date = ds$max_end_date
+)
+
+print(data2)
+
+ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_admission, color = generation)) +
+  ggplot2::geom_line()
+```
 
 ```{r cleanup, include = FALSE}
 if (exists("ds")) rm(ds)
@@ -438,3 +500,8 @@ by `diseasystore`.
 "normal" `dplyr` behaviour. Normally in `dplyr`, the variable created earlier in one `dplyr::mutate()` call is available
 immediately after, but this is not the case in SQL syntax. Therefore, we split the `dplyr::mutate()` calls which
 generates nested sub-queries which makes the variables available in subsequent calls.
+
+[^3]: `vignette("diseasystore")` explains the options system in more detail.
+
+[^4]: The `DiseasystoreSimulist` is bundled with the package, but not exported. Therefore, we use the `:::` operator to
+retrieve the class.
