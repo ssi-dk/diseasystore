@@ -72,7 +72,7 @@ However, there are no differences in the mechanical implementation of the featur
 With the features identified, we begin by assigning a `FeatureHandler` to each feature, and design the map between
 the feature names and the responsible `FeatureHandlers`:
 
-```{r ds_map, eval = FALSE}
+```{r ds_map, eval = FALSE}                                                                                             # nolint start: object_name_linter, indentation_linter
 DiseasystoreSimulist <- R6::R6Class(
   classname = "DiseasystoreSimulist",
   inherit = DiseasystoreBase,
@@ -92,7 +92,7 @@ DiseasystoreSimulist <- R6::R6Class(
 
   ...
 )
-```
+```                                                                                                                     # nolint end
 Notice that we add the prefix `simulist_` to the feature names to avoid any potential conflicts with other features in
 the database.
 
@@ -105,7 +105,7 @@ That is, we need to construct the `FeatureHandlers` for each feature.
 We start by implementing the `birth` feature.
 
 For this example, we will show first the code that implements the `FeatureHandler` and then describe the code in detail.
-```{r feature_handler_birth, eval = FALSE}
+```{r feature_handler_birth, eval = FALSE}                                                                              # nolint start: indentation_linter
   private = list(
     ...
 
@@ -129,7 +129,7 @@ For this example, we will show first the code that implements the `FeatureHandle
     ),
 
     ...
-```
+```                                                                                                                     # nolint end
 
 Notice that we create a new instance of `FeatureHandler` and assign it to the `simulist_birth` field in the private
 list.
@@ -180,7 +180,7 @@ We continue by implementing the `sex` feature.
 
 Like the `birth` feature, this is a simple feature that we can mostly extract directly from the data set:
 
-```{r feature_handler_sex, eval = FALSE}
+```{r feature_handler_sex, eval = FALSE}                                                                                # nolint start: indentation_linter
   private = list(
     ...
 
@@ -207,7 +207,7 @@ Like the `birth` feature, this is a simple feature that we can mostly extract di
     ),
 
     ...
-```
+```                                                                                                                     # nolint end
 
 Notice that we again create a new instance of `FeatureHandler` and assign it to the `simulist_sex` field in the
 private list.
@@ -232,7 +232,7 @@ The `age` feature is a bit more complex than the previous features, as it is a t
 
 Lets first look at the code:
 
-```{r feature_handler_age, eval = FALSE}
+```{r feature_handler_age, eval = FALSE}                                                                                # nolint start: indentation_linter
   private = list(
     ...
 
@@ -279,7 +279,7 @@ Lets first look at the code:
     ),
 
     ...
-```
+```                                                                                                                     # nolint end
 
 As with the `sex` feature, this feature also depends on the `birth` feature, so we include the `ds` argument in the
 function signature of `compute()`.
@@ -299,7 +299,7 @@ In all, we end with a data set containing the time-dependent age of the individu
 
 ## The `n_positive` `FeatureHandler`
 
-```{r feature_handler_n_positive, eval = FALSE}
+```{r feature_handler_n_positive, eval = FALSE}                                                                         # nolint start: indentation_linter
   private = list(
     ...
 
@@ -323,11 +323,11 @@ In all, we end with a data set containing the time-dependent age of the individu
     ),
 
     ...
-```
+```                                                                                                                     # nolint end
 
 ## The `n_hospital` `FeatureHandler`
 
-```{r feature_handler_n_hospital, eval = FALSE}
+```{r feature_handler_n_hospital, eval = FALSE}                                                                         # nolint start: indentation_linter
   private = list(
     ...
 
@@ -350,11 +350,11 @@ In all, we end with a data set containing the time-dependent age of the individu
     ),
 
     ...
-```
+```                                                                                                                     # nolint end
 
 ## The `n_admission` `FeatureHandler`
 
-```{r feature_handler_n_admission, eval = FALSE}
+```{r feature_handler_n_admission, eval = FALSE}                                                                        # nolint start: indentation_linter
   private = list(
     ...
 
@@ -374,7 +374,7 @@ In all, we end with a data set containing the time-dependent age of the individu
     )
 
     ...
-```
+```                                                                                                                     # nolint end
 
 
 # The final product
@@ -401,9 +401,9 @@ if (rlang::is_installed("withr")) {
 ```
 
 With the `target_conn` option set, we can easily create a new instance of the `diseasystore`[^4].
-```{r initializing_diseasystore, eval = suggests_available}
+```{r initializing_diseasystore, eval = suggests_available}                                                             # nolint start: undesirable_operator_linter
 ds <- diseasystore:::DiseasystoreSimulist$new()
-```
+```                                                                                                                     # nolint end
 
 ## Retrieving features
 We can see that the features we implemented are available:
