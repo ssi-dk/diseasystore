@@ -308,7 +308,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         ds_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
 
         # Perform detection of features in the stratification
-        stratification_features <- purrr::map(stratification, rlang::as_label) |>
+        stratification_features <- stratification |>
+          purrr::map(~ rlang::quo_text(., width = 500L)) |> # Convert expr to string we can parse
           purrr::map(\(label) {
             purrr::map(ds_map_regex, ~ stringr::str_extract(label, .x)) |>
               purrr::discard(is.na)
