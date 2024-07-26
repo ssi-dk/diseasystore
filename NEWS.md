@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+# Minor Improvements and Fixes:
+
+* Long stratification expression are now properly parsed in `$key_join_features()` (#161).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
