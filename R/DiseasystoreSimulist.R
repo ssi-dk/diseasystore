@@ -21,7 +21,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     .ds_map = list(
       "birth"       = "simulist_birth",
       "age"         = "simulist_age",
-      "gender"      = "simulist_gender",
+      "sex"         = "simulist_sex",
       "n_test"      = "simulist_test",
       "n_positive"  = "simulist_positive",
       "n_admission" = "simulist_admission",
@@ -42,9 +42,9 @@ DiseasystoreSimulist <- R6::R6Class(                                            
         out <- simulist_data |>
           dplyr::transmute(
             "key_pnr" = .data$id,
-            "birth" = .data$date_onset - .data$id %% 365 - .data$age * 365, # Generate a "random" birth date
+            "birth" = .data$birth,
             "valid_from" = .data$birth,
-            "valid_until" = .data$date_death
+            "valid_until" = .data$date_death + lubridate::days(1)
           ) |>
           dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
 
@@ -101,13 +101,9 @@ DiseasystoreSimulist <- R6::R6Class(                                            
     ),
 
 
-    # The "gender" feature simply stores the gender from the simulist data
-    simulist_gender = FeatureHandler$new(
+    # The "sex" feature simply stores the sex from the simulist data
+    simulist_sex = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2019-12-01"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date("2020-01-13"), add = coll)
-        checkmate::reportAssertions(coll)
 
         out <- simulist_data |>
           dplyr::left_join(
@@ -117,7 +113,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
           ) |>
           dplyr::transmute(
             "key_pnr" = .data$id,
-            "gender" = dplyr::if_else(.data$gender == "m", "Male", "Female"),
+            "sex" = dplyr::if_else(.data$sex == "m", "Male", "Female"),
             .data$valid_from, .data$valid_until # Use values from birth feature
           ) |>
           dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
@@ -188,7 +184,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
           dplyr::transmute(
             "key_pnr" = .data$id,
             "valid_from" = .data$date_admission,
-            "valid_until" = pmax(.data$valid_from, .data$date_last_contact)
+            "valid_until" = .data$date_discharge + lubridate::days(1)
           ) |>
           dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
 
