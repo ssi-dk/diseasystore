@@ -1,0 +1,470 @@
+---
+title: "Extending diseasystore - simulist example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extending diseasystore - simulist example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(diseasystore)
+```
+
+```{r hidden_options, include = FALSE}
+if (rlang::is_installed("withr")) {
+  withr::local_options("tibble.print_min" = 5)
+  withr::local_options("diseasystore.verbose" = FALSE)
+} else {
+  opts <- options("tibble.print_min" = 5, "diseasystore.verbose" = FALSE)
+}
+
+# We have a "hard" dependency for DuckDB to render parts of this vignette
+suggests_available <- rlang::is_installed("duckdb")
+```
+
+# Introduction
+If you haven't already, please consult the `vignette("extending-diseasystore")` which explains the concepts of the
+`diseasystore`s in detail.
+
+In this example, we go through how to create a `diseasystore` that implements individual level data.
+For this purpose, we use a synthetic data set that we have generated using the `{simulist}` package.
+This data set is a synthetic linelist from a disease outbreak.
+
+```{r simulist_data}
+simulist_data
+```
+
+Given such a data set, the aim is to create a `diseasystore` that can be used to retrieve features from this data set.
+
+
+# Feature identification
+
+To do this, we need to identify the "features" that we want to store in the `diseasystore`.
+In the data, there are some demographic features such as "sex" and "age" and there are disease specific features such
+as "date_onset", "date_admission", etc.
+
+In this example we will implement the following features:
+
+* Demographic features
+  * `birth`: The birth date of the individuals
+  * `age`: The (time-dependent) age of the individuals
+  * `sex` - The sex of the individuals
+
+* Disease features
+  * `n_test` - The tests performed on the individuals
+  * `n_positive` - The positive tests performed on the individuals
+  * `n_admission` - The time of admission among the individuals
+  * `n_hospital` - The time of hospitalisation among the individuals
+
+Notice that the naming of the features differ by the prefix `n_` versus no prefix.
+This dichotomy separates "stratifications" from "observables". Either is considered a "feature" in the diseasystore,
+but the type of data (stratification vs. observable) is used when we join the data in `$key_join_features()`.
+However, there are no differences in the mechanical implementation of the features --- only in the naming.
+
+
+With the features identified, we begin by assigning a `FeatureHandler` to each feature, and design the map between
+the feature names and the responsible `FeatureHandlers`:
+
+```{r ds_map, eval = FALSE}
+DiseasystoreSimulist <- R6::R6Class(
+  classname = "DiseasystoreSimulist",
+  inherit = DiseasystoreBase,
+  
+  ...
+  
+  private = list(
+    .ds_map = list(
+      "birth"       = "simulist_birth",
+      "sex"         = "simulist_sex",
+      "age"         = "simulist_age",
+      "n_test"      = "simulist_test",
+      "n_positive"  = "simulist_positive",
+      "n_admission" = "simulist_admission",
+      "n_hospital"  = "simulist_hospital"
+    ),
+    .label = "Simulist Synthetic Data",
+
+  ...
+)
+```
+Notice that we add the prefix `simulist_` to the feature names to avoid any potential conflicts with other features in
+the database.
+
+# Feature implementation
+With the features identified, it is time to implement them in the `diseasystore`.
+
+That is, we need to construct the `FeatureHandlers` for each feature.
+
+## The `birth` `FeatureHandler`
+We start by implementing the `birth` feature.
+
+For this example, we will show first the code that implements the `FeatureHandler` and then describe the code in detail.
+```{r feature_handler_birth, eval = FALSE}
+  private = list(
+    ...
+
+    # The "birth" feature contains the birth dates of the individuals and is used later to compute
+    # the age of the individuals at any given time.
+    simulist_birth = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+
+        out <- simulist_data |>
+          dplyr::transmute(
+            "key_pnr" = .data$id,
+            "birth" = .data$birth,
+            "valid_from" = .data$birth,
+            "valid_until" = .data$date_death + lubridate::days(1)
+          ) |>
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+
+        return(out)
+      },
+      key_join = key_join_count
+    ),
+
+    ...
+```
+
+Notice that we create a new instance of `FeatureHandler` and assign it to the `simulist_birth` field in the private
+list.
+
+Lets focus on the `FeatureHandler` we create:
+Here, we need to define how the feature is computed (that is, we implement the `compute()` function).
+
+The signature of this function is fixed, and must take the arguments `start_date`, `end_date`, `slice_ts`,
+`source_conn`, but can then take additional arguments in `...`.
+
+The `birth` feature is a simple feature that we can extract directly from the data set.
+
+In addition to the feature  values themselves (the values stored in the `birth` column) we need to include keying data
+that tells `diseasystore` what other features this feature can be joined to.
+Since we are working with individual level data, we can use a personal identification number, "pnr", as the key.
+The simulist data already contains a unique ID for each individual, so we use this as the personal identification
+number.
+
+In addition, we need to specify the time period that the feature covers.
+In this case, a birth date is assigned at birth, so we use this as the `valid_from` date.
+For the expiration date of the information, we could either use `NA`, since the birth date is always valid, or
+we could use the date of death, if the individual has died.
+In this implementation we use the latter, since this allows for an easier implementation of the age of the individuals
+later on.
+
+Notice that `valid_until` is set as the date after death. The validity period of the features in `diseasystore` is 
+the interval $t \in \left[\textrm{valid_from}, \textrm{valid_until}\right)$.
+
+After computing the feature, we filter to ensure that the data is returned only for the requested time period.
+
+Finally, we also how the feature can be summarised. That is, we need to specify the type of `key_join` the feature
+should use.
+
+To illustrate how to determine the type of `key_join`, we imagine that we want to determine the number of people who
+are born on each date. Given our data set, we could perform the following operations to summarize the data:
+
+```{r key_join_birth}
+simulist_data |>
+  dplyr::count(lubridate::year(.data$birth))
+```
+
+That is, our feature has a record for each individual, and to summarise the feature, we need to `count` the individuals
+within each group. This is different from semi-aggregated data where we would `sum` the values within each group.
+
+
+## The `sex` `FeatureHandler`
+We continue by implementing the `sex` feature.
+
+Like the `birth` feature, this is a simple feature that we can mostly extract directly from the data set:
+
+```{r feature_handler_sex, eval = FALSE}
+  private = list(
+    ...
+
+    # The "sex" feature simply stores the sex from the simulist data
+    simulist_sex = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
+
+        out <- simulist_data |>
+          dplyr::left_join(
+            ds$get_feature("birth", start_date, end_date, slice_ts),
+            by = c("id" = "key_pnr"),
+            copy = TRUE
+          ) |>
+          dplyr::transmute(
+            "key_pnr" = .data$id,
+            "sex" = dplyr::if_else(.data$sex == "m", "Male", "Female"),
+            .data$valid_from, .data$valid_until # Use values from birth feature
+          ) |>
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+
+        return(out)
+      },
+      key_join = key_join_count
+    ),
+
+    ...
+```
+
+Notice that we again create a new instance of `FeatureHandler` and assign it to the `simulist_sex` field in the
+private list.
+
+The computation of the feature is mostly straight forward, but we would like to use the validity period computed
+in the `birth` feature (the same logic applies for the validity period of the "sex" information as the "birth"
+information)
+
+Therefore, we immediately see a difference in the function signature of the `compute()` function, where we no include
+the `ds` argument which, like the others, are passed to the feature handler by `diseasystore` when we compute features.
+This argument holds a reference to the `diseasystore` we are building, so we can use it to retrieve other features
+(in this case, the `birth` feature).
+
+Once we have the `birth` feature, we combine it with the `simulist_data` and extract a human-readable label for the
+`sex`.
+
+Finally, we filter the data like before to ensure that the data is returned only for the requested time period.
+
+
+## The `age` `FeatureHandler`
+The `age` feature is a bit more complex than the previous features, as it is a time-dependent feature.
+
+Lets first look at the code:
+
+```{r feature_handler_age, eval = FALSE}
+  private = list(
+    ...
+
+    # The "age" feature computes the age of the individuals throughout the study period
+    simulist_age = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
+
+        # Using birth date, compute the age at the start of the study period
+        age <- ds$get_feature("birth", start_date, end_date, slice_ts) |>
+          dplyr::mutate(age_at_start = as.integer(!!age_on_date("birth", start_date, conn = ds %.% target_conn))) |>
+          dplyr::compute()
+
+        # Now, compute the next birth dates of the individual (as many as we need to cover the study period)
+        # and compute the age of the individuals throughout the study period with their birth dates denoting the starts
+        # and ends of the validity periods.
+        out <- purrr::map(
+          seq.int(from = 0, to = ceiling(lubridate::interval(start_date, end_date) / lubridate::years(1))),
+          ~ age |>
+            dplyr::mutate(
+              "age" = .data$age_at_start + .x # The age for this iteration of the age computation loop
+            ) |>
+            dplyr::mutate( # We need to split the mutates to make the "age" column available for the next mutate
+              "birthday" = !!add_years("birth", "age", conn = ds %.% target_conn) # Compute the birthday for the age
+            ) |>
+            dplyr::mutate( # Again, we need the split to make "birthday" available for the next mutate
+              "next_birthday" = !!add_years("birthday", 1,  conn = ds %.% target_conn) # And when that age is not valid
+            ) |>
+            dplyr::filter( # Now we remove the birthdays that fall outside of the study period
+              .data$birthday <= !!end_date,
+              .data$birthday < .data$valid_until | is.na(.data$valid_until)
+            ) |>
+            dplyr::transmute( # We assign the birth dates as the validity periods
+              "key_pnr" = .data$key_pnr,
+              "age" = .data$age,
+              "valid_from" = as.Date(.data$birthday),
+              "valid_until" = pmin(.data$valid_until, as.Date(.data$next_birthday), na.rm = TRUE)
+            )
+        ) |>
+          purrr::reduce(dplyr::union_all) # And we combine each age computation to a single age dataset
+
+        return(out)
+      },
+      key_join = key_join_count
+    ),
+
+    ...
+```
+
+As with the `sex` feature, this feature also depends on the `birth` feature, so we include the `ds` argument in the
+function signature of `compute()`.
+
+Since the age is time-dependent, we need to compute the age of the individuals at the start of the study period (i.e.
+the period requested by the user), and compute their age throughout the study period.
+
+The age at the start of the study period is computed directly by from the birth date of the individuals using the
+age helper function `age_on_date()`[^1].
+
+Once the age at start is known, we determine the length of the study period (in years) and compute the birth days of
+the individuals throughout the period[^2]. Each birth day has an associated age and a validity period which runs from the
+birth day to the next birth day. Notice that we sometimes compute birth days that fall outside of the study period,
+which we filter out before combining to a single data set with `dplyr::union_all`.
+
+In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
+
+
+## The `n_test` `FeatureHandler`
+
+```{r feature_handler_n_test, eval = FALSE}
+  private = list(
+    ...
+
+    # The "n_test" feature contains the tests taken by the individuals
+    simulist_test = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+
+        out <- simulist_data |>
+          dplyr::filter(.data$case_type != "suspected") |>
+          dplyr::transmute(
+            "key_pnr" = .data$id,
+            "valid_from" = .data$date_onset,
+            "valid_until" = .data$valid_from + lubridate::days(1)
+          ) |>
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+
+        return(out)
+      },
+      key_join = key_join_count
+    ),
+
+    ...
+```
+
+## The `n_positive` `FeatureHandler`
+
+```{r feature_handler_n_positive, eval = FALSE}
+  private = list(
+    ...
+
+    # The "n_positive" feature contains the positive tests taken by the individuals
+    simulist_positive = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+
+        out <- simulist_data |>
+          dplyr::filter(.data$case_type == "confirmed") |>
+          dplyr::transmute(
+            "key_pnr" = .data$id,
+            "valid_from" = .data$date_onset,
+            "valid_until" = .data$valid_from + lubridate::days(1)
+          ) |>
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+
+
+        return(out)
+      },
+      key_join = key_join_count
+    ),
+
+    ...
+```
+
+## The `n_hospital` `FeatureHandler`
+
+```{r feature_handler_n_hospital, eval = FALSE}
+  private = list(
+    ...
+
+    # The "n_hospital" feature contains the hospitalizations of the individuals
+    simulist_hospital = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
+
+        out <- simulist_data |>
+          dplyr::filter(.data$case_type == "confirmed", !is.na(.data$date_admission)) |>
+          dplyr::transmute(
+            "key_pnr" = .data$id,
+            "valid_from" = .data$date_admission,
+            "valid_until" = .data$date_discharge + lubridate::days(1)
+          ) |>
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+
+        return(out)
+      },
+      key_join = key_join_count
+    ),
+
+    ...
+```
+
+## The `n_admission` `FeatureHandler`
+
+```{r feature_handler_n_admission, eval = FALSE}
+  private = list(
+    ...
+
+    # The "n_admission" feature contains the admissions of the individuals
+    # We here use the "n_hospital" feature to compute the admissions since the admission is an entry for the
+    # first date of hospitalisation
+    simulist_admission = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
+
+        out <- ds$get_feature("n_hospital", start_date, end_date, slice_ts) |>
+          dplyr::mutate("valid_until" = .data$valid_from + 1L) |>
+          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+
+        return(out)
+      },
+      key_join = key_join_count
+    )
+
+    ...
+```
+
+
+# The final product
+
+The `diseasystores` require a database to store its features in.
+These should be configured before use and can be stored in the packages options.
+```{r configure_diseasystore, eval = FALSE}
+# We define target_conn as a function that opens a DBIconnection to the DB
+target_conn <- \() DBI::dbConnect(duckdb::duckdb())
+options(
+  "diseasystore.DiseasystoreSimulist.target_conn" = target_conn
+)
+```
+
+```{r configure_diseasystore_hidden, include = FALSE, eval = suggests_available}
+target_conn <- \() DBI::dbConnect(duckdb::duckdb())
+if (rlang::is_installed("withr")) {
+  withr::local_options("diseasystore.DiseasystoreSimulist.target_conn" = target_conn)
+} else {
+  opts <- c(opts, options("diseasystore.DiseasystoreSimulist.target_conn" = target_conn))
+}
+```
+
+
+We can initialize the `diseasystore`
+```{r initializing_diseasystore, eval = suggests_available}
+ds <- diseasystore:::DiseasystoreSimulist$new()
+```
+
+Once configured such, we can use the feature store directly to get data.
+```{r using_diseasystore_example_1, eval = suggests_available}
+# We can see all the available features in the feature store
+ds$available_features
+```
+
+```{r using_diseasystore_example_2, eval = suggests_available}
+# And then retrieve a feature from the feature store
+ds$get_feature(feature = "n_hospital",
+               start_date = as.Date("2019-12-01"),
+               end_date = as.Date("2020-01-13"))
+```
+
+
+```{r cleanup, include = FALSE}
+if (exists("ds")) rm(ds)
+gc()
+if (!rlang::is_installed("withr")) {
+  options(opts)
+}
+```
+
+
+[^1]: Notice that we don't use `{lubridate}` or syntax such as `birth_date + 365`.
+As you may recall from the primer `vignette("extending-diseasystore")`, features are stored in data bases, not as R
+objects. Therefore, the operations we perform must be translatable to SQL via `{dbplyr}` and date arithmetic are not
+currently translatable consistently. `diseasystore` therefore provides some helper functions for the type of
+date-related arithmetic that is common in feature computation. These are available for the data base back ends supported
+by `diseasystore`.
+
+[^2]: Notice that we split the `dplyr::mutate()` calls into several calls since SQL translation works differently from
+"normal" `dplyr` behaviour. Normally in `dplyr`, the variable created earlier in one `dplyr::mutate()` call is available
+immediately after, but this is not the case in SQL syntax. Therefore, we split the `dplyr::mutate()` calls which
+generates nested sub-queries which makes the variables available in subsequent calls.
