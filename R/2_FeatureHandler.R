@@ -53,7 +53,8 @@ FeatureHandler <- R6::R6Class(                                                  
     #' @description
     #'   Creates a new instance of the `FeatureHandler` [R6][R6::R6Class] class.
     #' @param compute (`function`)\cr
-    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn, ...)".
+    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
+    #'
     #'   This function should return a `data.frame` with the computed feature (computed from the source connection).
     #'   The `data.frame` should contain the following columns:
     #'    * key_*: One (or more) columns containing keys to link this feature with other features
@@ -111,7 +112,7 @@ FeatureHandler <- R6::R6Class(                                                  
   active = list(
 
     #' @field compute (`function`)\cr
-    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn)".
+    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
     #'   This function should compute the feature from the source connection.
     compute = function() private$.compute,
 
