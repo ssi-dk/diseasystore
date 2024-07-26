@@ -11,7 +11,7 @@ DiseasystoreDummy <- R6::R6Class(                                               
       "am" = "dummy_am"
     ),
     dummy_cyl = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         return(
           dplyr::select(mtcars, "cyl") |>
             dplyr::transmute(
@@ -24,7 +24,7 @@ DiseasystoreDummy <- R6::R6Class(                                               
       }
     ),
     dummy_vs = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         return(
           dplyr::select(mtcars, "vs") |>
             dplyr::transmute(
@@ -37,7 +37,7 @@ DiseasystoreDummy <- R6::R6Class(                                               
       }
     ),
     dummy_am = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         return(
           dplyr::select(mtcars, "am") |>
             dplyr::transmute(
