@@ -14,7 +14,7 @@ fields (#138).
   DuckDB back ends.
 
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected (#158):
-  * when using `POSIX` `slice_ts`.
+  * when the data base data-type for timestamp / date differs from the class of `slice_ts`.
   * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
