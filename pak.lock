@@ -909,7 +909,6 @@
       "rversion": "*",
       "directpkg": false,
       "license": "MIT + file LICENSE",
-      "filesize": 4147117,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
