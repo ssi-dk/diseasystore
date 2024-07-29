@@ -7,7 +7,7 @@ if (rlang::is_installed("epiparameter") && rlang::is_installed("simulist") && rl
     disease = "COVID-19",
     epi_dist = "contact distribution",
     prob_distribution = "pois",
-    prob_distribution_params = c(mean = 2)
+    prob_distribution_params = c(mean = 5)
   )
 
   # Create COVID-19 infectious period
@@ -37,13 +37,13 @@ if (rlang::is_installed("epiparameter") && rlang::is_installed("simulist") && rl
   simulist_data <- simulist::sim_linelist(
     contact_distribution = contact_distribution,
     infectious_period = infectious_period,
-    prob_infect = 0.5,
+    prob_infect = 0.205,
     onset_to_hosp = onset_to_hosp,
     onset_to_death = onset_to_death,
     onset_to_recovery = function(x) stats::rnorm(n = x, mean = 2.5, sd = 0.5),
     hosp_risk = 0.2,
     outbreak_start_date = as.Date("2019-12-01"),
-    outbreak_size = c(1000, 1e9),
+    outbreak_size = c(1e3, 1e4),
     anonymise = TRUE
   )
 
