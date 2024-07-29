@@ -26,6 +26,7 @@ RoxygenNote: 7.3.2
 Language: en-GB
 Imports:
     checkmate,
+    curl,
     DBI,
     dbplyr,
     dplyr,
@@ -45,7 +46,8 @@ Imports:
 Suggests:
     devtools,
     duckdb,
-    curl,
+    epiparameter,
+    ggplot2,
     knitr,
     lintr,
     odbc,
@@ -54,9 +56,17 @@ Suggests:
     RPostgres,
     testthat (>= 3.0.0),
     tibble,
+    simulist,
     spelling,
+    usethis,
     withr
 VignetteBuilder: knitr
+Remotes:
+    github::epiverse-trace/epiparameter,
+    github::epiverse-trace/simulist
 URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore/
 BugReports: https://github.com/ssi-dk/diseasystore/issues
 Config/testthat/edition: 3
+Depends:
+    R (>= 2.10)
+LazyData: true

@@ -18,6 +18,8 @@ reference:
     desc: Tools to interact with Diseasystores.
     contents:
     - age_labels
+    - age_on_date
+    - add_years
     - available_diseasystores
     - diseasyoption
     - drop_diseasystore
@@ -45,3 +47,4 @@ articles:
   navbar: Developer guides
   contents:
   - extending-diseasystore
+  - extending-diseasystore-example
