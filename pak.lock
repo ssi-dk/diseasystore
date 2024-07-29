@@ -441,7 +441,7 @@
     {
       "ref": "colorspace",
       "package": "colorspace",
-      "version": "2.1-0",
+      "version": "2.1-1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -453,10 +453,10 @@
         "RemoteRef": "colorspace",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.1-0"
+        "RemoteSha": "2.1-1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/colorspace_2.1-0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/colorspace_2.1-0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/colorspace_2.1-1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/colorspace_2.1-1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -991,7 +991,7 @@
       "version": "1.0.0-2",
       "type": "standard",
       "direct": false,
-      "binary": false,
+      "binary": true,
       "dependencies": "DBI",
       "vignettes": false,
       "metadata": {
@@ -999,13 +999,13 @@
         "RemoteType": "standard",
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-        "RemotePkgPlatform": "source",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
         "RemoteSha": "1.0.0-2"
       },
       "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.0.0-2.tar.gz",
-      "target": "src/contrib/duckdb_1.0.0-2.tar.gz",
-      "platform": "source",
-      "rversion": "*",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.0.0-2.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
       "directpkg": false,
       "license": "MIT + file LICENSE",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1013,9 +1013,8 @@
       "install_args": "",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "needscompilation": true,
-      "repotype": "cranlike",
-      "filesize": 4147117
+      "needscompilation": false,
+      "repotype": "cranlike"
     },
     {
       "ref": "ellipsis",
@@ -2621,7 +2620,7 @@
     {
       "ref": "parallelly",
       "package": "parallelly",
-      "version": "1.37.1",
+      "version": "1.38.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2633,10 +2632,10 @@
         "RemoteRef": "parallelly",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.37.1"
+        "RemoteSha": "1.38.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.37.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.37.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.38.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.38.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4773,7 +4772,7 @@
     {
       "ref": "yaml",
       "package": "yaml",
-      "version": "2.3.9",
+      "version": "2.3.10",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4785,10 +4784,10 @@
         "RemoteRef": "yaml",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.3.9"
+        "RemoteSha": "2.3.10"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/yaml_2.3.9.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/yaml_2.3.9.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/yaml_2.3.10.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/yaml_2.3.10.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
