@@ -5,9 +5,18 @@
 * The data availability period for each `diseasystore` is now exposed via the `$min_start_date` and `$max_end_date`
 fields (#138).
 
+
+# diseasystore 0.2.2
+
+## Minor Improvements and Fixes:
+
+* The `%.%` operator is made more flexible to function as a drop-in replacement for `$` (#145).
+
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
+
 
 # diseasystore 0.2.0
 
@@ -31,6 +40,7 @@ fields (#138).
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
 
+
 # diseasystore 0.1.1
 
 ## Fixes:
@@ -48,6 +58,7 @@ fields (#138).
 * Improved test stability when internet is unavailable.
 
 * Reduced the data footprint during tests.
+
 
 # diseasystore 0.1
 
