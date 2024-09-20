@@ -20,6 +20,13 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
   classname = "DiseasystoreEcdcRespiratoryViruses",
   inherit = DiseasystoreBase,
 
+  public = list(
+    initialize = function(...) {
+      private$.max_end_date <- lubridate::today() # Data source is still actively updated
+      super$initialize(...)
+    }
+  ),
+
   private = list(
     .ds_map = list(
       "iliari_rates"   = "ecdc_respitory_viruses_iliari_rates",
@@ -29,7 +36,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
     .label = "ECDC Respitory Viruses",
 
     .min_start_date = as.Date("2014-09-29"),
-    .max_end_date = lubridate::today(), # Data source is still actively updated
+    .max_end_date = NULL, # Data source is still actively updated
 
 
     ecdc_respitory_viruses_iliari_rates = FeatureHandler$new(
