@@ -21,6 +21,12 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
   inherit = DiseasystoreBase,
 
   public = list(
+    #' @description
+    #'   Creates a new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
+    #' @param ...
+    #'   Arguments passed to the `DiseasystoreBase` constructor.
+    #' @return
+    #'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
     initialize = function(...) {
       private$.max_end_date <- lubridate::today() # Data source is still actively updated
       super$initialize(...)
