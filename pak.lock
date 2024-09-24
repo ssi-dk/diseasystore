@@ -1851,9 +1851,7 @@
       "params": [],
       "install_args": "",
       "sysreqs": "",
-      "sysreqs_packages": {},
-      "needscompilation": false,
-      "repotype": "cranlike"
+      "sysreqs_packages": {}
     },
     {
       "ref": "lubridate",
