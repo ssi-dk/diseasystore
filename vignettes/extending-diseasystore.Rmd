@@ -201,6 +201,10 @@ For an example, you can consult [DiseasystoreGoogleCovid19: key_join_filter](htt
 The `diseasystore` package includes the function `test_diseasystore()` to test the `diseasystores`.
 You can see how to call the testing suite in action with `DiseasystoreGoogleCovid19` as an example [here](https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R).
 
+## Exposing the period of data availability
+To allow the `diseasystores` to be used programmatically, we expose the period of data availability for each
+`diseasystore`. These are defined in the `$.min_start_date` and `$.max_end_date` private fields of the `diseasystore`.
+
 [^1]: The `SCDB` package places `checksum`, `from_ts`, and `until_ts` as the last columns. But `valid_from` and
       `valid_until` should be the last columns in the output passed to `SCDB`.
 [^2]: In practice, this means that the names of features should be in `snake_case`.

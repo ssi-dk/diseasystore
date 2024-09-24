@@ -169,6 +169,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       checkmate::expect_function(.x %.% key_join)
     })
 
+    # Check that the min and max dates have been set
+    checkmate::expect_date(ds$min_start_date, upper = lubridate::today())
+    checkmate::expect_date(ds$max_end_date,   upper = lubridate::today())
+
     rm(ds)
     invisible(gc())
   })
