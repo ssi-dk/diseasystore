@@ -110,6 +110,12 @@ DiseasystoreBase <- R6::R6Class(                                                
                            end_date   = self %.% end_date,
                            slice_ts   = self %.% slice_ts) {
 
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_date(start_date, lower = self$min_start_date, add = coll)
+      checkmate::assert_date(end_date,   upper = self$max_end_date, add = coll)
+      checkmate::reportAssertions(coll)
+
+
       # Load the available features
       ds_map <- self %.% ds_map
 
@@ -549,6 +555,22 @@ DiseasystoreBase <- R6::R6Class(                                                
     ),
 
 
+    #' @field min_start_date `r rd_start_date("field", minimum = TRUE)`
+    min_start_date = purrr::partial(
+      .f = active_binding,
+      name = "min_start_date",
+      expr = return(private$.min_start_date)
+    ),
+
+
+    #' @field max_end_date `r rd_end_date("field", maximum = TRUE)`
+    max_end_date = purrr::partial(
+      .f = active_binding,
+      name = "max_end_date",
+      expr = return(private$.max_end_date)
+    ),
+
+
     #' @field slice_ts `r rd_slice_ts("field")`
     slice_ts = purrr::partial(
       .f = active_binding,
@@ -566,6 +588,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
     .start_date = NULL,
     .end_date   = NULL,
+    .min_start_date = NULL,
+    .max_end_date   = NULL,
     .slice_ts   = lubridate::today(),
 
     .ds_map     = NULL, # Must be implemented in child classes
@@ -596,8 +620,11 @@ DiseasystoreBase <- R6::R6Class(                                                
         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
       ) |>
         dplyr::collect() |>
-        tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
+        tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
+        dplyr::filter(
+          .data$target_table == !!as.character(target_table),
+          strftime(.data$date) == !!strftime(slice_ts) # timezone-independent, data-type independent comparison
+        )
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
