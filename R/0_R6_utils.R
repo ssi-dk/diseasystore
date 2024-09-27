@@ -84,12 +84,14 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
     class <- base::class(class)[1]
   }
 
-  # If no class or namespace is given, use default
+  # If no class or namespace is given, use default which matches all "diseasyverse" options
   if (is.null(namespace) && is.null(class)) {
     namespace <- "diseasy(?:store)?"
   }
 
   # If class is given, extract namespace from class
+  # The class will have a name like "DiseasystoreGoogleCovid19" or "DiseasyModel".
+  # We extract the first word as the namespace.
   if (!is.null(class)) {
     namespace <- stringr::str_extract(class, r"{^([A-Z][a-z]*)}") |>
       stringr::str_to_lower()
@@ -98,13 +100,22 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
   if (missing(option)) {
 
     options <- options() |>
-      purrr::keep_at(~ stringr::str_detect(., paste0("^", namespace, "."))) |>
-      purrr::keep_at(
-        ~ stringr::str_detect(., r"{^\w+\.\w+$}") | stringr::str_detect(., paste0("^", namespace, ".", class, "."))
-      )
+      purrr::keep_at(~ stringr::str_detect(., paste0("^", namespace, "."))) # Restrict the options to the namespace
+
+    # When class is given, we need to keep only the general or the class specific options
+    if (!is.null(class)) {
+      options <- options |>
+        purrr::keep_at(
+          ~ stringr::str_detect(., r"{^\w+\.\w+$}") | stringr::str_detect(., paste0("^", namespace, ".", class, "."))
+        )
+    }
 
   } else {
 
+    # Try to match both the specific and the general case for the given option
+    # That is, the option that matches e.g.
+    # "diseasystore.DiseasystoreGoogleCovid19.<option>" and "diseasystore.<option>"
+    # Then try to extract these options, keeping the first non-empty one (i.e. the most specific option)
     options <- list(class, NULL) |>
       purrr::map_chr(~ paste(c(namespace, .x, option), collapse = ".")) |>
       purrr::map(\(opt_regex) purrr::keep_at(options(), ~ stringr::str_detect(., opt_regex))) |>
