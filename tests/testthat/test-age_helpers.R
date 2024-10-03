@@ -42,7 +42,7 @@ test_that("age_on_date() works for date input", {
 
     # Compute the reference age using lubridate
     reference_ages <- test_data |>
-      dplyr::mutate(age = floor(lubridate::interval(.data$birth_date, test_date) / lubridate::years(1)))
+      dplyr::mutate(age = lubridate::year(lubridate::as.period(lubridate::interval(.data$birth_date, test_date))))
 
 
     # SQLite does not have a precise way to estimate age, so the age computation helper will throw a warning
