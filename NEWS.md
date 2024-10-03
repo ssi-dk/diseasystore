@@ -2,6 +2,8 @@
 
 ## New Features:
 
+* New age helpers `add_years()` and `age_on_date()` has been added to help compute features for individual data (#125).
+
 * The data availability period for each `diseasystore` is now exposed via the `$min_start_date` and `$max_end_date`
 fields (#138).
 
