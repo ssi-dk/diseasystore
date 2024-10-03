@@ -868,24 +868,22 @@
       "type": "standard",
       "direct": false,
       "binary": true,
-      "dependencies": ["DBI"],
+      "dependencies": "DBI",
       "vignettes": false,
-      "needscompilation": false,
       "metadata": {
         "RemotePkgRef": "duckdb",
         "RemoteType": "standard",
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.0.0-1"
+        "RemoteSha": "1.1.0"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.0.0-1.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.0.0-1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.1.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.1.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
       "license": "MIT + file LICENSE",
-      "filesize": 4147117,
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
@@ -1121,7 +1119,7 @@
     {
       "ref": "gert",
       "package": "gert",
-      "version": "2.0.1",
+      "version": "2.1.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1133,10 +1131,10 @@
         "RemoteRef": "gert",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.0.1"
+        "RemoteSha": "2.1.2"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/gert_2.0.1.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/gert_2.0.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/gert_2.1.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/gert_2.1.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3620,7 +3618,7 @@
     {
       "ref": "tinytex",
       "package": "tinytex",
-      "version": "0.51",
+      "version": "0.53",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3632,10 +3630,10 @@
         "RemoteRef": "tinytex",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.51"
+        "RemoteSha": "0.53"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/tinytex_0.51.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/tinytex_0.51.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/tinytex_0.53.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/tinytex_0.53.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3930,7 +3928,7 @@
     {
       "ref": "xfun",
       "package": "xfun",
-      "version": "0.45",
+      "version": "0.47",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3942,10 +3940,10 @@
         "RemoteRef": "xfun",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.45"
+        "RemoteSha": "0.47"
       },
-      "sources": ["https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/xfun_0.45.tar.gz"],
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/xfun_0.45.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/xfun_0.47.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/xfun_0.47.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
