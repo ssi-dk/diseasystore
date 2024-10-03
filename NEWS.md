@@ -1,14 +1,30 @@
 # diseasystore (development version)
 
+## New Features:
+
+* New age helpers `add_years()` and `age_on_date()` has been added to help compute features for individual data (#125).
+
+* The data availability period for each `diseasystore` is now exposed via the `$min_start_date` and `$max_end_date`
+fields (#138).
+
+## Minor Improvements and Fixes:
+
+* Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected (#158):
+  * when using `POSIX` `slice_ts`.
+  * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
+
+
 # diseasystore 0.2.2
 
 ## Minor Improvements and Fixes:
 
 * The `%.%` operator is made more flexible to function as a drop-in replacement for `$` (#145).
 
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
+
 
 # diseasystore 0.2.0
 
@@ -32,6 +48,7 @@
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
 
+
 # diseasystore 0.1.1
 
 ## Fixes:
@@ -49,6 +66,7 @@
 * Improved test stability when internet is unavailable.
 
 * Reduced the data footprint during tests.
+
 
 # diseasystore 0.1
 
