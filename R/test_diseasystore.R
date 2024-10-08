@@ -34,6 +34,7 @@
 #'     slice_ts = "2023-11-24"
 #'   )
 #' }
+#' @importFrom curl has_internet
 #' @export
 test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
                               data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
@@ -168,6 +169,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       checkmate::expect_function(.x %.% get)
       checkmate::expect_function(.x %.% key_join)
     })
+
+    # Check that the min and max dates have been set
+    checkmate::expect_date(ds$min_start_date, upper = lubridate::today())
+    checkmate::expect_date(ds$max_end_date,   upper = lubridate::today())
 
     rm(ds)
     invisible(gc())
