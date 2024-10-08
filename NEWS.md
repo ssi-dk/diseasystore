@@ -13,6 +13,8 @@ fields (#138).
   * when using `POSIX` `slice_ts`.
   * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
 
+* Long stratification expression are now properly parsed in `$key_join_features()` (#161).
+
 
 # diseasystore 0.2.2
 
