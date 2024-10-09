@@ -77,6 +77,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
       "min_temperature" = "google_covid_19_min_temperature",
       "max_temperature" = "google_covid_19_max_temperature"
     ),
+    .observables_regex = r"{^n_(?=\w)|(?<=\w)_temperature$}",
     .label = "Google COVID-19",
 
     .min_start_date = as.Date("2020-01-01"),
