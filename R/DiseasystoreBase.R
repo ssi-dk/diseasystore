@@ -110,6 +110,12 @@ DiseasystoreBase <- R6::R6Class(                                                
                            end_date   = self %.% end_date,
                            slice_ts   = self %.% slice_ts) {
 
+      coll <- checkmate::makeAssertCollection()
+      checkmate::assert_date(start_date, lower = self$min_start_date, add = coll)
+      checkmate::assert_date(end_date,   upper = self$max_end_date, add = coll)
+      checkmate::reportAssertions(coll)
+
+
       # Load the available features
       ds_map <- self %.% ds_map
 
@@ -183,7 +189,8 @@ DiseasystoreBase <- R6::R6Class(                                                
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
             ds_feature <- ds_feature |>
               dplyr::copy_to(self %.% target_conn, df = _,
-                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"), overwrite = TRUE)
+                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"))
+            SCDB::defer_db_cleanup(ds_feature)
           }
 
           # Add the existing computed data for given slice_ts
@@ -248,7 +255,8 @@ DiseasystoreBase <- R6::R6Class(                                                
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()), overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()))
+      SCDB::defer_db_cleanup(validities)
 
       out <- dplyr::inner_join(out, validities,
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
@@ -293,7 +301,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()), overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()))
+      SCDB::defer_db_cleanup(study_dates)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
@@ -302,7 +311,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         ds_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
 
         # Perform detection of features in the stratification
-        stratification_features <- purrr::map(stratification, rlang::as_label) |>
+        stratification_features <- stratification |>
+          purrr::map(~ rlang::quo_text(., width = 500L)) |> # Convert expr to string we can parse
           purrr::map(\(label) {
             purrr::map(ds_map_regex, ~ stringr::str_extract(label, .x)) |>
               purrr::discard(is.na)
@@ -319,10 +329,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         }
 
         stratification_names <- purrr::map(stratification, rlang::as_label)
-        stratification_names <- purrr::map2_chr(stratification_names,
-                                                names(stratification_names),
-                                                ~ ifelse(.y == "", .x, .y)) |>
-          unname()
+        stratification_names <- purrr::imap_chr(stratification_names, ~ ifelse(.y == "", .x, .y)) |> unname()
 
         # Check stratification features are not observables
         stopifnot("Stratification features cannot be observables" =
@@ -432,7 +439,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         if (is.null(stratification)) {
           all_combinations <- all_combinations |>
             dplyr::copy_to(self %.% target_conn, df = _,
-                           name = paste0("ds_all_combinations_", Sys.getpid()), overwrite = TRUE)
+                           name = paste0("ds_all_combinations_", Sys.getpid()))
+          SCDB::defer_db_cleanup(all_combinations)
         }
       }
 
@@ -564,6 +572,22 @@ DiseasystoreBase <- R6::R6Class(                                                
     ),
 
 
+    #' @field min_start_date `r rd_start_date("field", minimum = TRUE)`
+    min_start_date = purrr::partial(
+      .f = active_binding,
+      name = "min_start_date",
+      expr = return(private$.min_start_date)
+    ),
+
+
+    #' @field max_end_date `r rd_end_date("field", maximum = TRUE)`
+    max_end_date = purrr::partial(
+      .f = active_binding,
+      name = "max_end_date",
+      expr = return(private$.max_end_date)
+    ),
+
+
     #' @field slice_ts `r rd_slice_ts("field")`
     slice_ts = purrr::partial(
       .f = active_binding,
@@ -581,6 +605,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
     .start_date = NULL,
     .end_date   = NULL,
+    .min_start_date = NULL,
+    .max_end_date   = NULL,
     .slice_ts   = lubridate::today(),
 
     .ds_map     = NULL, # Must be implemented in child classes
@@ -611,8 +637,11 @@ DiseasystoreBase <- R6::R6Class(                                                
         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
       ) |>
         dplyr::collect() |>
-        tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
+        tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
+        dplyr::filter(
+          .data$target_table == !!as.character(target_table),
+          strftime(.data$date) == !!strftime(slice_ts) # timezone-independent, data-type independent comparison
+        )
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {

@@ -5,9 +5,9 @@ test_that("truncate_interlace works", {
     # Lets create some synthetic data
     data <- dplyr::mutate(mtcars, "key_name" = rownames(mtcars))
 
-    x <- dplyr::select(data, key_name, mpg, cyl)
-    y <- dplyr::select(data, key_name, wt, vs)
-    z <- dplyr::select(data, key_name, qsec)
+    x <- dplyr::select(data, "key_name", "mpg", "cyl")
+    y <- dplyr::select(data, "key_name", "wt", "vs")
+    z <- dplyr::select(data, "key_name", "qsec")
 
     # In x, the mpg was changed on 2000-01-01 for all but the first 10 cars
     x <- list(
@@ -19,7 +19,8 @@ test_that("truncate_interlace works", {
         dplyr::mutate("mpg" = 0.9 * mpg, "valid_from" = as.Date("2000-01-01"), "valid_until" = as.Date(NA))
     ) |>
       purrr::reduce(dplyr::union_all) |>
-      dplyr::copy_to(conn, df = _, name = "x", overwrite = TRUE)
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(x)
 
     # In y, the wt was changed on 2010-01-01 for all but the last 10 cars
     y <- list(
@@ -31,7 +32,8 @@ test_that("truncate_interlace works", {
         dplyr::mutate(wt = 1.1 * wt, "valid_from" = as.Date("2010-01-01"), "valid_until" = as.Date(NA))
     ) |>
       purrr::reduce(dplyr::union_all) |>
-      dplyr::copy_to(conn, df = _, name = "y", overwrite = TRUE)
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(y)
 
 
     # In z, the qsec was changed on 2020-01-01 for all but the last and first 10 cars
@@ -48,16 +50,37 @@ test_that("truncate_interlace works", {
         dplyr::mutate(qsec = 1.1 * qsec, "valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
     ) |>
       purrr::reduce(dplyr::union_all) |>
-      dplyr::copy_to(conn, df = _, name = "z", overwrite = TRUE)
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(z)
 
 
     # We choose a couple of primary interval to test with
-    p1 <- dplyr::transmute(data, key_name, valid_from = as.Date("1985-01-01"), valid_until = as.Date(NA)) |>
-      dplyr::copy_to(conn, df = _, name = "p1", overwrite = TRUE)
-    p2 <- dplyr::transmute(data, key_name, valid_from = as.Date("1995-01-01"), valid_until = as.Date("2005-01-01")) |>
-      dplyr::copy_to(conn, df = _, name = "p2", overwrite = TRUE)
-    p3 <- dplyr::transmute(data, key_name, valid_from = as.Date("2005-01-01"), valid_until = as.Date("2015-01-01")) |>
-      dplyr::copy_to(conn, df = _, name = "p3", overwrite = TRUE)
+    p1 <- data |>
+      dplyr::transmute(
+        .data$key_name,
+        "valid_from" = as.Date("1985-01-01"),
+        "valid_until" = as.Date(NA)
+      ) |>
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(p1)
+
+    p2 <- data |>
+      dplyr::transmute(
+        .data$key_name,
+        "valid_from" = as.Date("1995-01-01"),
+        "valid_until" = as.Date("2005-01-01")
+      ) |>
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(p2)
+
+    p3 <- data |>
+      dplyr::transmute(
+        .data$key_name,
+        "valid_from" = as.Date("2005-01-01"),
+        "valid_until" = as.Date("2015-01-01")
+      ) |>
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(p3)
 
 
     # We define a small helper function to test the interlace outputs
@@ -111,15 +134,23 @@ test_that("truncate_interlace works", {
 
     # Check other permutations
     expect_mapequal(
-      truncate_interlace(p3, list(x, y, z)) |> dplyr::collect(),
-      truncate_interlace(p3, list(y, x, z)) |> dplyr::collect()
+      truncate_interlace(p3, list(x, y, z)) |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until),
+      truncate_interlace(p3, list(y, x, z)) |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until)
     )
 
 
     # Check that list conversion works
     expect_identical(
-      truncate_interlace(x, y)       |> dplyr::collect(),
-      truncate_interlace(x, list(y)) |> dplyr::collect()
+      truncate_interlace(x, y)       |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until),
+      truncate_interlace(x, list(y)) |>
+        dplyr::collect() |>
+        dplyr::arrange(.data$key_name, .data$valid_from, .data$valid_until)
     )
 
     # Clean up
