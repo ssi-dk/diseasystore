@@ -156,10 +156,10 @@ DiseasystoreBase <- R6::R6Class(                                                
         # Add a LOCK to the diseasystore
         wait_time <- 0 # seconds
         while (!isTRUE(SCDB::lock_table(self %.% target_conn, target_table, self %.% target_schema))) {
-          Sys.sleep(diseasyoption("lock_wait_increment"))
-          wait_time <- wait_time + diseasyoption("lock_wait_increment")
-          if (wait_time > diseasyoption("lock_wait_max")) {
-            stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max')/60} minutes. Giving up."))
+          Sys.sleep(diseasyoption("lock_wait_increment", self))
+          wait_time <- wait_time + diseasyoption("lock_wait_increment", self)
+          if (wait_time > diseasyoption("lock_wait_max", self)) {
+            stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max', self)/60} minutes. Giving up."))
           }
         }
 
