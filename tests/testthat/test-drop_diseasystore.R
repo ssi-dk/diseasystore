@@ -2,7 +2,7 @@ withr::local_options("diseasystore.target_schema" = target_schema_1)
 
 # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
 DiseasystoreDummy <- R6::R6Class(                                                                                       # nolint: object_name_linter
-  classname = "DiseasystoreBase",
+  classname = "DiseasystoreDummy",
   inherit = DiseasystoreBase,
   private = list(
     .ds_map = list(
