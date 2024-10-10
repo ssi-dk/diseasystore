@@ -125,7 +125,6 @@ test_that("drop_diseasystore can delete single table in default schema", {
 
     # Compute each feature
     ds$available_features |>
-      utils::head(3) |>
       purrr::walk(~ ds$get_feature(.x))
 
     # And store the ids
