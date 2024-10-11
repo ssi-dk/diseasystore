@@ -3,7 +3,7 @@
 ## Testing:
 
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
-  * Checks that data is only within the study period
+  * Checks that data is only within the study period.
   * Checks that `valid_from` and `valid_until` has class `Date`.
 
 
@@ -13,9 +13,11 @@
 
 * The `%.%` operator is made more flexible to function as a drop-in replacement for `$` (#145).
 
+
 # diseasystore 0.2.1
 
 * Support for `{SCDB}` v0.3 is removed.
+
 
 # diseasystore 0.2.0
 
@@ -39,6 +41,7 @@
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
 
+
 # diseasystore 0.1.1
 
 ## Fixes:
@@ -56,6 +59,7 @@
 * Improved test stability when internet is unavailable.
 
 * Reduced the data footprint during tests.
+
 
 # diseasystore 0.1
 
