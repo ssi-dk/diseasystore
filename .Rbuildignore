@@ -9,6 +9,7 @@ man-roxygen
 ^LICENSE\.md$
 ^cran-comments\.md$
 ^README\.Rmd$
+^data-raw$
 ^\.vscode$
 ^doc$
 ^Meta$
