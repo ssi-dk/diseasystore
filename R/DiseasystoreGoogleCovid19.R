@@ -255,19 +255,19 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # If no spatial stratification is requested, use the largest available per country
         filter_level <- self$get_feature("country_id", start_date, end_date) |>
-          dplyr::group_by(country_id) |>
-          dplyr::slice_min(aggregation_level) |>
+          dplyr::group_by(.data$country_id) |>
+          dplyr::slice_min(.data$aggregation_level) |>
           dplyr::ungroup() |>
-          dplyr::select(key_location)
+          dplyr::select("key_location")
 
         return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
 
       } else if (purrr::some(stratification_features, ~ . %in% c("country_id", "country"))) {
-        return(.data |> dplyr::filter(key_location == country_id))
+        return(.data |> dplyr::filter(.data$key_location == .data$country_id))
       } else if (purrr::some(stratification_features, ~ . %in% c("region_id", "region"))) {
-        return(.data |> dplyr::filter(key_location == region_id))
+        return(.data |> dplyr::filter(.data$key_location == .data$region_id))
       } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
-        return(.data |> dplyr::filter(key_location == subregion_id))
+        return(.data |> dplyr::filter(.data$key_location == .data$subregion_id))
       } else {
         stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
       }
