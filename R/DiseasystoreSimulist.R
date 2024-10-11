@@ -102,6 +102,23 @@ DiseasystoreSimulist <- R6::R6Class(                                            
         ) |>
           purrr::reduce(dplyr::union_all) # And we combine each age computation to a single age dataset
 
+        # We need ensure the computed ages are only computed in the requested study period.
+        # Unfortunately, we cannot just filter the data directly as the `out` object already exists on the remote.
+        # Dependent on the remote, the `valid_from` and `valid_until` columns may not be properly converted to dates
+        # if we to filter directly. To ensure proper conversion of variables, we first copy the limits over and then do
+        # an inner_join to perform the filtering.
+        validities <- data.frame("valid_from" = start_date, "valid_until" = end_date) |>
+          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+        SCDB::defer_db_cleanup(validities) # Mark the table to be deleted when the feature is computed
+
+        out <- dplyr::inner_join(
+          out,
+          validities,
+          sql_on = '"LHS"."valid_until" > "RHS"."valid_from" AND "LHS"."valid_from" <= "RHS"."valid_until"',
+          suffix = c("", ".p")) |>
+          dplyr::select(!c("valid_from.p", "valid_until.p")) |>
+          dplyr::compute()
+
         return(out)
       },
       key_join = key_join_count
