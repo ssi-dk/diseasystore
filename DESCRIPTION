@@ -47,7 +47,6 @@ Imports:
 Suggests:
     devtools,
     duckdb,
-    epiparameter,
     ggplot2,
     here,
     knitr,
@@ -65,7 +64,6 @@ Suggests:
     withr
 VignetteBuilder: knitr
 Remotes:
-    github::epiverse-trace/epiparameter,
     github::epiverse-trace/simulist
 URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasystore/
 BugReports: https://github.com/ssi-dk/diseasystore/issues

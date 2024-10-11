@@ -1,50 +1,27 @@
-if (rlang::is_installed("epiparameter") && rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
+if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
 
-  # Configure `simulist` using their quick-start configuration.
-
-  # Create COVID-19 contact distribution
-  contact_distribution <- epiparameter::epidist(
-    disease = "COVID-19",
-    epi_dist = "contact distribution",
-    prob_distribution = "pois",
-    prob_distribution_params = c(mean = 5)
-  )
-
-  # Create COVID-19 infectious period
-  infectious_period <- epiparameter::epidist(
-    disease = "COVID-19",
-    epi_dist = "contact interval",
-    prob_distribution = "gamma",
-    prob_distribution_params = c(shape = 1, scale = 1)
-  )
-
-  # Get onset to hospital admission from {epiparameter} database
-  onset_to_hosp <- epiparameter::epidist_db(
-    disease = "COVID-19",
-    epi_dist = "onset to hospitalisation",
-    single_epidist = TRUE
-  )
-
-  # Get onset to death from {epiparameter} database
-  onset_to_death <- epiparameter::epidist_db(
-    disease = "COVID-19",
-    epi_dist = "onset to death",
-    single_epidist = TRUE
-  )
+  # Configure `simulist` using their example configuration.
+  # The Get Started configuration does not work with the current versions of epiparameter and simulist.
 
   # Generate the full simulist
   set.seed(1)
-  simulist_data <- simulist::sim_linelist(
-    contact_distribution = contact_distribution,
-    infectious_period = infectious_period,
-    prob_infect = 0.205,
-    onset_to_hosp = onset_to_hosp,
-    onset_to_death = onset_to_death,
-    onset_to_recovery = function(x) stats::rnorm(n = x, mean = 2.5, sd = 0.5),
+
+  simulist_data <- sim_linelist(
+    contact_distribution = function(x) stats::dpois(x = x, lambda = 2),
+    infectious_period = function(x) stats::rlnorm(n = x, meanlog = 2, sdlog = 0.5),
+    prob_infection = 0.505,
+    onset_to_hosp = function(x) stats::rlnorm(n = x, meanlog = 1.5, sdlog = 0.5),
+    onset_to_death = function(x) stats::rlnorm(n = x, meanlog = 2.5, sdlog = 0.5),
+    onset_to_recovery = NULL,
     hosp_risk = 0.2,
+    hosp_death_risk = 0.5,
+    non_hosp_death_risk = 0.05,
     outbreak_start_date = as.Date("2019-12-01"),
     outbreak_size = c(1e3, 1e4),
-    anonymise = TRUE
+    anonymise = TRUE,
+    population_age = c(1, 90),
+    case_type_probs = c(suspected = 0.2, probable = 0.3, confirmed = 0.5),
+    config = create_config()
   )
 
   # Convert to tibble
