@@ -17,6 +17,12 @@ fields (#138).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
 
+## Testing:
+
+* `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
+  * Checks that data is only within the study period.
+  * Checks that `valid_from` and `valid_until` has class `Date`.
+
 
 # diseasystore 0.2.2
 

@@ -116,8 +116,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   }
 
 
-  # Throw warning if data unavailable
-  if (!on_cran && !is.null(remote_conn) && curl::has_internet() && !remote_data_available) {
+  # Throw warning if remote data unavailable (only throw if we are working locally, don't run this check on CRAN)
+  if (!is.null(remote_conn) && curl::has_internet() && !on_cran && !remote_data_available) {
     warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
   }
 
@@ -227,6 +227,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
+  # Set a test_end_date for the test
+  test_end_date <- test_start_date + lubridate::days(4)
+
+
   testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
 
@@ -239,7 +243,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
         start_date <- test_start_date
-        end_date   <- test_start_date + lubridate::days(4)
+        end_date   <- test_end_date
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           SCDB::digest_to_checksum() |>
@@ -249,13 +253,47 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference_checksums <- reference_generator(
+        reference <- reference_generator(
           start_date  = start_date,
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
-        ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
+        )
+
+        # Check that reference data is limited to the study period (start_date and end_date)
+        reference_out_of_bounds <- reference |>
+          dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
+
+        testthat::expect_equal(
+          SCDB::nrow(reference_out_of_bounds),
+          0,
+          info = glue::glue("Feature `{.x}` returns data outside the study period.")
+        )
+
+        # Check that valid_from / valid_until are date (or stored in the date-like class on the remote)
+        validity_period_data_types <- reference |>
+          utils::head(0) |>
+          dplyr::select("valid_from", "valid_until") |>
+          dplyr::collect() |>
+          purrr::map(~ DBI::dbDataType(dbObj = conn, obj = .))
+
+        testthat::expect_equal(
+          purrr::pluck(validity_period_data_types, "valid_from"),
+          DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
+          info = glue::glue("Feature `{.x}` has a non-Date `valid_from` column.")
+        )
+        testthat::expect_equal(
+          purrr::pluck(validity_period_data_types, "valid_until"),
+          DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
+          info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
+        )
+
+
+        # Copy to remote and continue checks
+        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+        SCDB::defer_db_cleanup(reference)
+
+        reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -269,6 +307,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       invisible(gc())
     }
   })
+
+  # Set a test_end_date for the rest of the tests
+  test_end_date <- test_start_date + lubridate::days(9)
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
@@ -283,7 +324,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
         start_date <- test_start_date
-        end_date   <- test_start_date + lubridate::days(9)
+        end_date   <- test_end_date
 
         feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
           SCDB::digest_to_checksum() |>
@@ -293,19 +334,26 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference_checksums <- reference_generator(
+        reference <- reference_generator(
           start_date  = start_date,
           end_date    = end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
         ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = "ds_tmp", overwrite = TRUE) |>
+          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
+        SCDB::defer_db_cleanup(reference)
+
+        reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
 
 
-        testthat::expect_identical(feature_checksums, reference_checksums)
+        testthat::expect_identical(
+          feature_checksums,
+          reference_checksums,
+          info = glue::glue("Feature `{.x}` has a mismatch between `$get_feature()` and `$compute()`.")
+        )
 
       })
 
@@ -316,17 +364,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
   # Helper function that checks the output of key_joins
-  key_join_features_tester <- function(output, start_date, end_date) {                                                  # nolint: object_usage_linter
+  key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
     testthat::expect_equal(min(output$date), start_date)
     testthat::expect_equal(max(output$date), end_date)
   }
-
-
-  # Set start and end dates for the rest of the tests
-  start_date <- test_start_date                                                                                         # nolint: object_usage_linter
-  end_date   <- test_start_date + lubridate::days(9)                                                                    # nolint: object_usage_linter
-
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
@@ -340,7 +382,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # First check we can aggregate without a stratification
       for (observable in ds$available_observables) {
         testthat::expect_no_error(
-          ds$key_join_features(observable = observable, stratification = NULL, start_date, end_date)
+          ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date)
         )
       }
 
@@ -355,7 +397,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             ds$key_join_features(
               observable = as.character(observable),
               stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
-              start_date, end_date
+              test_start_date, test_end_date
             )
           },
           error = function(e) {
@@ -372,7 +414,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
           # If the code does not fail, we test the output
           if (!is.null(output)) {
-            key_join_features_tester(dplyr::collect(output), start_date, end_date)
+            key_join_features_tester(dplyr::collect(output), test_start_date, test_end_date)
           }
 
         })
@@ -402,8 +444,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             ds$key_join_features(
               observable = as.character(observable),
               stratification = as.character(stratification), # Output of expand.grid is a factor.
-              start_date = start_date,
-              end_date = end_date
+              start_date = test_start_date,
+              end_date = test_end_date
             )
           }, error = function(e) {
             checkmate::expect_character(
@@ -417,7 +459,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
           # If the code does not fail, we test the output
           if (!is.null(output)) {
-            key_join_features_tester(dplyr::collect(output), start_date, end_date)
+            key_join_features_tester(dplyr::collect(output), test_start_date, test_end_date)
           }
 
         })
@@ -431,8 +473,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             ds$key_join_features(
               observable = as.character(observable),
               stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
-              start_date = start_date,
-              end_date = end_date
+              start_date = test_start_date,
+              end_date = test_end_date
             )
           }, error = function(e) {
             checkmate::expect_character(
@@ -446,7 +488,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
           # If the code does not fail, we test the output
           if (!is.null(output)) {
-            key_join_features_tester(dplyr::collect(output), start_date, end_date)
+            key_join_features_tester(dplyr::collect(output), test_start_date, test_end_date)
           }
 
         })
