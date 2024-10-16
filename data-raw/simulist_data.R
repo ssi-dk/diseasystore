@@ -6,7 +6,7 @@ if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
   # Generate the full simulist
   set.seed(1)
 
-  simulist_data <- sim_linelist(
+  simulist_data <- simulist::sim_linelist(
     contact_distribution = function(x) stats::dpois(x = x, lambda = 2),
     infectious_period = function(x) stats::rlnorm(n = x, meanlog = 2, sdlog = 0.5),
     prob_infection = 0.505,
@@ -21,7 +21,7 @@ if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
     anonymise = TRUE,
     population_age = c(1, 90),
     case_type_probs = c(suspected = 0.2, probable = 0.3, confirmed = 0.5),
-    config = create_config()
+    config = simulist::create_config()
   )
 
   # Convert to tibble
