@@ -115,7 +115,8 @@ DiseasystoreSimulist <- R6::R6Class(                                            
           out,
           validities,
           sql_on = '"LHS"."valid_until" > "RHS"."valid_from" AND "LHS"."valid_from" <= "RHS"."valid_until"',
-          suffix = c("", ".p")) |>
+          suffix = c("", ".p")
+        ) |>
           dplyr::select(!c("valid_from.p", "valid_until.p")) |>
           dplyr::compute()
 
