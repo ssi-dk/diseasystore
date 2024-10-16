@@ -9,11 +9,11 @@ if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
   simulist_data <- simulist::sim_linelist(
     contact_distribution = function(x) stats::dpois(x = x, lambda = 2),
     infectious_period = function(x) stats::rlnorm(n = x, meanlog = 2, sdlog = 0.5),
-    prob_infection = 0.505,
+    prob_infection = 0.75,
     onset_to_hosp = function(x) stats::rlnorm(n = x, meanlog = 1.5, sdlog = 0.5),
     onset_to_death = function(x) stats::rlnorm(n = x, meanlog = 2.5, sdlog = 0.5),
     onset_to_recovery = NULL,
-    hosp_risk = 0.2,
+    hosp_risk = 0.5,
     hosp_death_risk = 0.5,
     non_hosp_death_risk = 0.05,
     outbreak_start_date = as.Date("2019-12-01"),
