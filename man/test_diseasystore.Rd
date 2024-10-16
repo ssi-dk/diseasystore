@@ -10,6 +10,7 @@ test_diseasystore(
   data_files = NULL,
   target_schema = "test_ds",
   test_start_date = NULL,
+  skip_feature_tests_on = NULL,
   ...
 )
 }
@@ -28,6 +29,9 @@ The data base schema where the tests should be run.}
 
 \item{test_start_date}{(\code{Date})\cr
 The earliest date to retrieve data from during tests.}
+
+\item{skip_feature_tests_on}{(\code{character()})\cr
+List of connection types to skip feature computation tests due to missing functionality.}
 
 \item{...}{Other parameters passed to the diseasystore generator.}
 }
