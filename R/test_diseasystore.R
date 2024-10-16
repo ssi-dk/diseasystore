@@ -240,6 +240,35 @@ test_diseasystore <- function(
   })
 
 
+  testthat::test_that(glue::glue("Skipped test connection are also disallowed in {diseasystore_class} constructor "), {
+    testthat::skip_if(is.null(skip_backends))
+
+    # Check that the constructor throws an error if the connection is skipped in the tests
+    for (conn in conn_generator()) {
+      if (!checkmate::test_class(conn, skip_backends)) {
+        next
+      }
+
+      # Check that an error is thrown when attempting to use the connection
+      # This error is a checkmate assertion, so we remove newlines and `*` from the formatted error message
+      testthat::expect_error(
+        tryCatch(
+          DiseasystoreSimulist$new(verbose = FALSE, target_conn = conn),
+          error = \(e) {
+            e$message |>
+              stringr::str_remove_all(stringr::fixed("\n *")) |>
+              stringr::str_remove_all(stringr::fixed("* ")) |>
+              simpleError(message = _) |>
+              stop()
+          }
+        ),
+        paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
+      )
+
+    }
+  })
+
+
   # Set a test_end_date for the test
   test_end_date <- test_start_date + lubridate::days(4)
 
