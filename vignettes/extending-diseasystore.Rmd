@@ -231,6 +231,8 @@ To allow the `diseasystores` to be used programmatically, we expose the period o
 
 ## Limiting support for some database backends
 In some cases, the `diseasystores` may not be compatible with all database backends.
+For example, the bundled [`DiseasystoreSimulist`](vignette("extending-diseasystore-example")) is not compatible with
+SQLite due to lack of date support.
 
 In this case, we add a check to the `initialize` method of the `diseasystore` to ensure that the database backend is
 compatible with the `diseasystore`.
