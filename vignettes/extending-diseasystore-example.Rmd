@@ -287,11 +287,11 @@ private = list(
             "key_pnr" = .data$key_pnr,
             "age" = .data$age,
             "valid_from" = as.Date(.data$birthday),
-            "valid_until" = pmin(
+            "valid_until" = as.Date(pmin(
               .data$valid_until,
               as.Date(.data$next_birthday),
               na.rm = TRUE
-            )
+            ))
           )
       ) |>
         purrr::reduce(dplyr::union_all) # Collapse to a single dataset
