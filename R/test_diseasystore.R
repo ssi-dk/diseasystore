@@ -18,8 +18,8 @@
 #'   The data base schema where the tests should be run.
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
-#' @param skip_feature_tests_on (`character()`)\cr
-#'   List of connection types to skip feature computation tests due to missing functionality.
+#' @param skip_backends (`character()`)\cr
+#'   List of connection types to skip tests for due to missing functionality.
 #' @param ...
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
@@ -44,7 +44,7 @@ test_diseasystore <- function(
   data_files = NULL,
   target_schema = "test_ds",
   test_start_date = NULL,
-  skip_feature_tests_on = NULL,
+  skip_backends = NULL,
   ...
 ) {
 
@@ -59,7 +59,7 @@ test_diseasystore <- function(
   checkmate::assert_character(data_files, null.ok = TRUE, add = coll)
   checkmate::assert_character(target_schema, add = coll)
   checkmate::assert_date(test_start_date, add = coll)
-  checkmate::assert_character(skip_feature_tests_on, null.ok = TRUE, add = coll)
+  checkmate::assert_character(skip_backends, null.ok = TRUE, add = coll)
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
@@ -158,6 +158,7 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -191,6 +192,7 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
 
@@ -220,6 +222,7 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
     testthat::skip_if_not(local)
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -246,7 +249,7 @@ test_diseasystore <- function(
 
     for (conn in conn_generator()) {
 
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
         next
       }
 
@@ -342,7 +345,7 @@ test_diseasystore <- function(
 
     for (conn in conn_generator()) {
 
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
         next
       }
 
@@ -418,7 +421,7 @@ test_diseasystore <- function(
 
     for (conn in conn_generator()) {
 
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
         next
       }
 
@@ -476,7 +479,7 @@ test_diseasystore <- function(
 
     for (conn in conn_generator()) {
 
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
         next
       }
 
