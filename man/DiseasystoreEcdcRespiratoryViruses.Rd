@@ -27,6 +27,7 @@ See the vignette("diseasystore-ecdc-respiratory-viruses") for details on how to 
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-DiseasystoreEcdcRespiratoryViruses-new}{\code{DiseasystoreEcdcRespiratoryViruses$new()}}
 \item \href{#method-DiseasystoreEcdcRespiratoryViruses-clone}{\code{DiseasystoreEcdcRespiratoryViruses$clone()}}
 }
 }
@@ -35,11 +36,30 @@ See the vignette("diseasystore-ecdc-respiratory-viruses") for details on how to 
 <ul>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="finalize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-finalize'><code>diseasystore::DiseasystoreBase$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasystoreEcdcRespiratoryViruses-new"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreEcdcRespiratoryViruses-new}{}}}
+\subsection{Method \code{new()}}{
+Creates a new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6:R6Class]{R6} class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreEcdcRespiratoryViruses$new(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{Arguments passed to the \code{DiseasystoreBase} constructor.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6:R6Class]{R6} class.
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreEcdcRespiratoryViruses-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreEcdcRespiratoryViruses-clone}{}}}

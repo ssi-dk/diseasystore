@@ -31,6 +31,12 @@ that compute the features. Read only.}
 \item{\code{available_features}}{(\code{character})\cr
 A list of available features in the feature store. Read only.}
 
+\item{\code{available_observables}}{(\code{character})\cr
+A list of available observables in the feature store. Read only.}
+
+\item{\code{available_stratifications}}{(\code{character})\cr
+A list of available stratifications in the feature store. Read only.}
+
 \item{\code{label}}{(\code{character})\cr
 A human readable label of the feature store. Read only.}
 
@@ -43,6 +49,10 @@ A human readable label of the feature store. Read only.}
 \item{\code{start_date}}{(\code{Date})\cr Study period start.  Read only.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.  Read only.}
+
+\item{\code{min_start_date}}{(\code{Date})\cr (Minimum)Study period start.  Read only.}
+
+\item{\code{max_end_date}}{(\code{Date})\cr (Maximum)Study period end.  Read only.}
 
 \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).  Read only.}
 }

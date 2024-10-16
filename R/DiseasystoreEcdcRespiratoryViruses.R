@@ -20,6 +20,19 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
   classname = "DiseasystoreEcdcRespiratoryViruses",
   inherit = DiseasystoreBase,
 
+  public = list(
+    #' @description
+    #'   Creates a new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
+    #' @param ...
+    #'   Arguments passed to the `DiseasystoreBase` constructor.
+    #' @return
+    #'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
+    initialize = function(...) {
+      private$.max_end_date <- lubridate::today() # Data source is still actively updated
+      super$initialize(...)
+    }
+  ),
+
   private = list(
     .ds_map = list(
       "iliari_rates"   = "ecdc_respitory_viruses_iliari_rates",
@@ -28,14 +41,13 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
     ),
     .label = "ECDC Respitory Viruses",
 
+    .min_start_date = as.Date("2014-09-29"),
+    .max_end_date = NULL, # Data source is still actively updated
+
 
     ecdc_respitory_viruses_iliari_rates = FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn) {
-        coll <- checkmate::makeAssertCollection()
-        checkmate::assert_date(start_date, lower = as.Date("2014-09-29"), add = coll)
-        checkmate::assert_date(end_date,   upper = as.Date(slice_ts), add = coll)
-        checkmate::assert_character(source_conn, len = 1, add = coll)
-        checkmate::reportAssertions(coll)
+        checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
         out <- source_conn_github(
