@@ -18,6 +18,8 @@
 #'   The data base schema where the tests should be run.
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
+#' @param skip_feature_tests_on (`character()`)\cr
+#'   List of connection types to skip feature computation tests due to missing functionality.
 #' @param ...
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
@@ -36,8 +38,15 @@
 #' }
 #' @importFrom curl has_internet
 #' @export
-test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
-                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
+test_diseasystore <- function(
+  diseasystore_generator = NULL,
+  conn_generator = NULL,
+  data_files = NULL,
+  target_schema = "test_ds",
+  test_start_date = NULL,
+  skip_feature_tests_on = NULL,
+  ...
+) {
 
   # Determine the class of the diseasystore being tested
   diseasystore_class <- diseasystore_generator$classname
@@ -50,6 +59,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   checkmate::assert_character(data_files, null.ok = TRUE, add = coll)
   checkmate::assert_character(target_schema, add = coll)
   checkmate::assert_date(test_start_date, add = coll)
+  checkmate::assert_character(skip_feature_tests_on, null.ok = TRUE, add = coll)
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
@@ -236,6 +246,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
@@ -328,6 +342,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
@@ -400,6 +418,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
@@ -453,6 +475,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
+
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_feature_tests_on, .default = ""))) {
+        next
+      }
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
