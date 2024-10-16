@@ -97,7 +97,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
               "key_pnr" = .data$key_pnr,
               "age" = .data$age,
               "valid_from" = as.Date(.data$birthday),
-              "valid_until" = pmin(.data$valid_until, as.Date(.data$next_birthday), na.rm = TRUE)
+              "valid_until" = as.Date(pmin(.data$valid_until, as.Date(.data$next_birthday), na.rm = TRUE))
             )
         ) |>
           purrr::reduce(dplyr::union_all) # And we combine each age computation to a single age dataset
