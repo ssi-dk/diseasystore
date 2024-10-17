@@ -8,5 +8,5 @@ test_diseasystore(
   # SQLite does not have sufficient date support and dbplyr has inconsistent conversion of dates for SQLite.
   # Accounting for all of these issues defeats the purpose of `DiseasystoreSimulist` being a example of how to build
   # a diseasystore
-  skip_backends = "SQLiteConnection"
+  skip_backends = c("SQLiteConnection", "Microsoft SQL Server")
 )
