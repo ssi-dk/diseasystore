@@ -465,7 +465,14 @@
       "params": [],
       "install_args": "",
       "sysreqs": "xclip (https://github.com/astrand/xclip) or xsel\n        (http://www.vergenet.net/~conrad/software/xsel/) for accessing\n        the X11 clipboard, or wl-clipboard\n        (https://github.com/bugaevc/wl-clipboard) for systems using\n        Wayland.",
-      "sysreqs_packages": {},
+      "sysreqs_packages": [
+        {
+          "sysreq": "x11",
+          "packages": "libx11-dev",
+          "pre_install": {},
+          "post_install": {}
+        }
+      ],
       "needscompilation": false,
       "repotype": "cranlike"
     },
@@ -4931,8 +4938,8 @@
     "version": "22.04",
     "url": {},
     "pre_install": "apt-get -y update",
-    "install_scripts": "apt-get -y install git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc unixodbc-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libpq-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
+    "install_scripts": "apt-get -y install libx11-dev git libcurl4-openssl-dev libssl-dev make libgit2-dev zlib1g-dev pandoc unixodbc-dev libfreetype6-dev libjpeg-dev libpng-dev libtiff-dev libpq-dev libicu-dev libfontconfig1-dev libfribidi-dev libharfbuzz-dev libxml2-dev",
     "post_install": {},
-    "packages": ["git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "unixodbc-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libpq-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
+    "packages": ["libx11-dev", "git", "libcurl4-openssl-dev", "libssl-dev", "make", "libgit2-dev", "zlib1g-dev", "pandoc", "unixodbc-dev", "libfreetype6-dev", "libjpeg-dev", "libpng-dev", "libtiff-dev", "libpq-dev", "libicu-dev", "libfontconfig1-dev", "libfribidi-dev", "libharfbuzz-dev", "libxml2-dev"]
   }
 }
