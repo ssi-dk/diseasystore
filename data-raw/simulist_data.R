@@ -51,6 +51,13 @@ if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
     ) |>
     dplyr::select(!dplyr::any_of(c("outcome", "date_outcome")))
 
+  # Some dates are out of possible chronological order
+  simulist_data <- simulist_data |>
+    dplyr::mutate(
+      "date_discharge" = pmax(.data$date_discharge, .data$date_admission),
+      "date_death"     = pmax(.data$date_death, .data$date_admission)
+    )
+
   # Remove surplus information
   simulist_data <- simulist_data |>
     dplyr::select(!dplyr::any_of(c("case_name", "date_first_contact", "date_last_contact", "ct_value")))
