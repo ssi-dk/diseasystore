@@ -28,7 +28,7 @@ The data set consists of a \code{tibble} with columns:
 }
 }
 \seealso{
-\link{simulist}
+\code{\link[simulist:simulist-package]{simulist::simulist()}}
 }
 \author{
 Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
