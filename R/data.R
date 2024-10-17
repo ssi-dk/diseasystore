@@ -22,5 +22,5 @@
 #'   *simulist: Simulate Disease Outbreak Line List and Contacts Data*.
 #'   \doi{10.5281/zenodo.10471458}, https://epiverse-trace.github.io/simulist/.
 #' @keywords data internal
-#' @seealso [simulist]
+#' @seealso [simulist::simulist()]
 NULL
