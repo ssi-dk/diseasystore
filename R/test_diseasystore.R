@@ -55,7 +55,9 @@ test_diseasystore <- function(
   checkmate::assert_class(diseasystore_generator, "R6ClassGenerator", add = coll)
   checkmate::assert_choice(as.character(diseasystore_generator$inherit), "DiseasystoreBase", add = coll)
   checkmate::assert_function(conn_generator, add = coll)
-  purrr::walk(conn_generator(), ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  conns <- conn_generator()
+  purrr::walk(conns, ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  purrr::walk(conns, DBI::dbDisconnect)
   checkmate::assert_character(data_files, null.ok = TRUE, add = coll)
   checkmate::assert_character(target_schema, add = coll)
   checkmate::assert_date(test_start_date, add = coll)
@@ -246,6 +248,7 @@ test_diseasystore <- function(
     # Check that the constructor throws an error if the connection is skipped in the tests
     for (conn in conn_generator()) {
       if (!checkmate::test_class(conn, skip_backends)) {
+        DBI::dbDisconnect(conn)
         next
       }
 
@@ -279,6 +282,7 @@ test_diseasystore <- function(
     for (conn in conn_generator()) {
 
       if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
         next
       }
 
@@ -375,6 +379,7 @@ test_diseasystore <- function(
     for (conn in conn_generator()) {
 
       if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
         next
       }
 
@@ -451,6 +456,7 @@ test_diseasystore <- function(
     for (conn in conn_generator()) {
 
       if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
         next
       }
 
@@ -509,6 +515,7 @@ test_diseasystore <- function(
     for (conn in conn_generator()) {
 
       if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
         next
       }
 
