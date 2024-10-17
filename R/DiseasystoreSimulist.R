@@ -22,7 +22,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
       super$initialize(...)
 
       # We do not support SQLite for this diseasystore since it has poor support for date operations
-      checkmate::assert_disjunct(class(self$target_conn), "SQLiteConnection")
+      checkmate::assert_disjunct(class(self$target_conn), c("SQLiteConnection", "Microsoft SQL Server"))
 
       private$.max_end_date <- simulist_data |>
         dplyr::select(dplyr::starts_with("date_")) |>
