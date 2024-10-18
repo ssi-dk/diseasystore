@@ -132,7 +132,7 @@ test_that("$get_feature verbosity works", {
       invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
       type = "message"
     )
-    checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date inter.")
+    checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date int.")
     checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
 
     # Second identical call should give no messages
