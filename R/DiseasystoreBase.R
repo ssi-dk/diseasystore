@@ -640,7 +640,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
         dplyr::filter(
           .data$target_table == !!as.character(target_table),
-          strftime(.data$date) == !!strftime(slice_ts) # timezone-independent, data-type independent comparison
+          strftime(.data$date, tz = "UTC") == !!strftime(slice_ts, tz = "UTC")
         )
 
       # If no logs are found, we need to compute on the entire range
