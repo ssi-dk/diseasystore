@@ -160,7 +160,7 @@ that contains keys to witch the secondary features (defined by \code{stratificat
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(
   observable,
-  stratification,
+  stratification = NULL,
   start_date = self \%.\% start_date,
   end_date = self \%.\% end_date
 )}\if{html}{\out{</div>}}
@@ -172,9 +172,11 @@ that contains keys to witch the secondary features (defined by \code{stratificat
 \item{\code{observable}}{(\code{character})\cr
 The name of a feature defined in the feature store}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr
 Expressions in \code{stratification} are evaluated to find appropriate features.
-These are then joined to the observable feature before \code{stratification} is performed.}
+These are then joined to the observable feature before \code{stratification} is performed.
+
+If \code{NULL} (default) no stratification is performed.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
