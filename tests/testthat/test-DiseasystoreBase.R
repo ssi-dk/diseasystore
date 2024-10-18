@@ -132,6 +132,11 @@ test_that("$get_feature verbosity works", {
       invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
       type = "message"
     )
+
+    # We keep messages from `get_feature` which starts with "feature:".
+    # Messages from other sources (duckdb or odbc) are not captured.
+    messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
+
     checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date int.")
     checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
 
@@ -140,6 +145,7 @@ test_that("$get_feature verbosity works", {
       invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
       type = "message"
     )
+    messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
     expect_equal(messages, character(0))
 
     rm(ds)
