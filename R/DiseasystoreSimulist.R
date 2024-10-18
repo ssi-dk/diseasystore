@@ -90,10 +90,10 @@ DiseasystoreSimulist <- R6::R6Class(                                            
               "birthday" = !!add_years("birth", "age", conn = ds %.% target_conn) # Compute the birthday for the age
             ) |>
             dplyr::mutate( # NOTE: Again, we need the split to make "birthday" available for the next mutate
-              "next_birthday" = !!add_years("birthday", 1,  conn = ds %.% target_conn) # And when that age is not valid
+              "next_birthday" = !!add_years("birthday", 1, conn = ds %.% target_conn) # And when that age is not valid
             ) |>
             dplyr::filter( # Now we remove the birthdays that fall outside of the study period
-              .data$birthday <= !!end_date,
+              .data$birthday <= {{ end_date }},
               .data$birthday < .data$valid_until | is.na(.data$valid_until)
             ) |>
             dplyr::transmute( # We assign the birth dates as the validity periods
@@ -103,8 +103,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
               "valid_until" = pmin(.data$valid_until, .data$next_birthday, na.rm = TRUE)
             )
         ) |>
-          purrr::reduce(dplyr::union_all) |> # And we combine each age computation to a single age dataset
-          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+          purrr::reduce(dplyr::union_all) # And we combine each age computation to a single age dataset
 
         return(out)
       },
@@ -117,7 +116,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
       compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
 
         out <- simulist_data |>
-          dplyr::left_join(
+          dplyr::right_join( # Join with birth data to validity period
             ds$get_feature("birth", start_date, end_date, slice_ts),
             by = c("id" = "key_pnr"),
             copy = TRUE
@@ -126,8 +125,10 @@ DiseasystoreSimulist <- R6::R6Class(                                            
             "key_pnr" = .data$id,
             "sex" = dplyr::if_else(.data$sex == "m", "Male", "Female"),
             .data$valid_from, .data$valid_until # Use values from birth feature
-          ) |>
-          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+          )
+
+        # No need to filter to ensure the data is only for the requested time period.
+        # Since we right join with the birth feature, the validity period is already filtered.
 
         return(out)
       },
@@ -182,7 +183,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
 
         out <- ds$get_feature("n_hospital", start_date, end_date, slice_ts) |>
           dplyr::mutate("valid_until" = .data$valid_from + 1L) |>
-          dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
+          dplyr::filter({{ start_date }} < .data$valid_until) # valid_from filtered in n_hospital
 
         return(out)
       },

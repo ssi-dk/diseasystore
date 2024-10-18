@@ -54,8 +54,8 @@ as "date_onset", "date_admission", et cetera.
 In this example we will implement the following features:
 
 * Demographic features
-  * `birth`: The birth date of the individuals
-  * `age`: The (time-dependent) age of the individuals
+  * `birth` - The birth date of the individuals
+  * `age` - The (time-dependent) age of the individuals
   * `sex` - The sex of the individuals
 
 * Disease features
@@ -66,7 +66,7 @@ In this example we will implement the following features:
 Notice that the naming of the features differ by the prefix `n_` versus no prefix.
 This dichotomy separates "stratifications" from "observables". Either is considered a "feature" in the diseasystore,
 but the type of data (stratification vs. observable) is used when we join the data in `$key_join_features()`.
-However, there are no differences in the mechanical implementation of the features --- only in the naming.
+However, there are no differences in the implementation of the features --- only in the naming.
 
 
 With the features identified, we begin by assigning a `FeatureHandler` to each feature, and design the map between
@@ -93,8 +93,11 @@ DiseasystoreSimulist <- R6::R6Class(
   ...
 )
 ```
-Notice that we add the prefix `simulist_` to the feature names to avoid any potential conflicts with other features in
-the database.
+Notice that the names for the `FeatureHandlers` have the prefix "simulist_". The features are stored in the data base
+using these names, so we include the prefix to avoid any potential conflicts with other features in the database.
+For example, the hospitalisation in `DiseasystoreGoogleCovid19` are stored in a table called "google_covid_19_hospital".
+Had both `diseasystores` omitted the prefixes, they would both attempt to write to the same "hospital" table in the
+database.
 
 # Feature implementation
 With the features identified, it is time to implement them in the `diseasystore`.
@@ -144,9 +147,9 @@ Here, we need to define how the feature is computed (that is, we implement the `
 The signature of this function is fixed, and must take the arguments `start_date`, `end_date`, `slice_ts`,
 `source_conn`, but can then take additional arguments in `...`.
 
-The `birth` feature is a simple feature that we can extract directly from the data set.
+The `birth` feature is a simple feature that we can extract directly from the underlying data set: `simulist_data`.
 
-In addition to the feature  values themselves (the values stored in the `birth` column) we need to include keying data
+In addition to the feature values themselves (the values stored in the `birth` column) we need to include keying data
 that tells `diseasystore` what other features this feature can be joined to.
 Since we are working with individual level data, we can use a personal identification number, "pnr", as the key.
 The simulist data already contains a unique ID for each individual, so we use this as the personal identification
@@ -193,7 +196,7 @@ private = list(
     compute = function(start_date, end_date, slice_ts, source_conn, ds, ...) {
 
       out <- simulist_data |>
-        dplyr::left_join(
+        dplyr::right_join( # Join with birth data to validity period
           ds$get_feature("birth", start_date, end_date, slice_ts),
           by = c("id" = "key_pnr"),
           copy = TRUE
@@ -202,11 +205,10 @@ private = list(
           "key_pnr" = .data$id,
           "sex" = dplyr::if_else(.data$sex == "m", "Male", "Female"),
           .data$valid_from, .data$valid_until # Use values from birth feature
-        ) |>
-        dplyr::filter(
-          {{ start_date }} < .data$valid_until,
-          .data$valid_from <= {{ end_date }}
         )
+
+      # No need to filter to ensure the data is only for the requested time period.
+      # Since we right join with the birth feature, the validity period is already filtered.
 
       return(out)
     },
@@ -231,8 +233,6 @@ This argument holds a reference to the `diseasystore` we are building, so we can
 
 Once we have the `birth` feature, we combine it with the `simulist_data` and extract a human-readable label for the
 `sex`.
-
-Finally, we filter the data like before to ensure that the data is returned only for the requested time period.
 
 
 ## The `age` `FeatureHandler`
@@ -260,7 +260,7 @@ private = list(
       # Now, compute the next birth dates of the individual
       # (as many as we need to cover the study period)
       # and compute the age of the individuals throughout the study period with their
-      #  birth dates denoting the starts and ends of the validity periods.
+      # birth dates denoting the starts and ends of the validity periods.
       out <- purrr::map(
         seq.int(
           from = 0,
@@ -277,10 +277,10 @@ private = list(
           ) |>
           dplyr::mutate( # Again, split to make "birthday" available for the next mutate
             # And when that age is not valid
-            "next_birthday" = !!add_years("birthday", 1,  conn = ds %.% target_conn)
+            "next_birthday" = !!add_years("birthday", 1, conn = ds %.% target_conn)
           ) |>
           dplyr::filter( # Remove the birthdays that fall outside of the study period
-            .data$birthday <= !!end_date,
+            .data$birthday <= {{ end_date }},
             .data$birthday < .data$valid_until | is.na(.data$valid_until)
           ) |>
           dplyr::transmute( # We assign the birth dates as the validity periods
@@ -295,23 +295,6 @@ private = list(
           )
       ) |>
         purrr::reduce(dplyr::union_all) # Collapse to a single dataset
-
-      # We need ensure the computed ages are only computed in the requested study period.
-      # Unfortunately, we cannot just filter the data directly as the `out` object already exists on the remote.
-      # Dependent on the remote, the `valid_from` and `valid_until` columns may not be properly converted to dates
-      # if we to filter directly. To ensure proper conversion of variables, we first copy the limits over and then do
-      # an inner_join to perform the filtering.
-      validities <- data.frame("valid_from" = start_date, "valid_until" = end_date) |>
-        dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("diseasystore"))
-      SCDB::defer_db_cleanup(validities) # Mark the table to be deleted when the feature is computed
-
-      out <- dplyr::inner_join(
-        out,
-        validities,
-        sql_on = '"LHS"."valid_until" > "RHS"."valid_from" AND "LHS"."valid_from" <= "RHS"."valid_until"',
-        suffix = c("", ".p")) |>
-        dplyr::select(!c("valid_from.p", "valid_until.p")) |>
-        dplyr::compute()
 
       return(out)
     },
@@ -332,13 +315,14 @@ The age at the start of the study period is computed directly by from the birth 
 age helper function `age_on_date()`[^1].
 
 Once the age at start is known, we determine the length of the study period (in years) and compute the birth days of
-the individuals throughout the period[^2]. Each birth day has an associated age and a validity period which runs from the
-birth day to the next birth day. Notice that we sometimes compute birth days that fall outside of the study period,
+the individuals throughout the period[^2]. Each birth day has an associated age and a validity period which runs from
+the birth day to the next birth day. Notice that we sometimes compute birth days that fall outside of the study period,
 which we filter out before combining to a single data set with `dplyr::union_all`.
 
 In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
 
 ## The `n_positive` `FeatureHandler`
+The `n_positive` feature is a simple feature that we can extract directly from the data set with a little filtering:
 
 ```{r feature_handler_n_positive, eval = FALSE}
 private = list(
@@ -370,7 +354,7 @@ private = list(
 ```
 
 ## The `n_hospital` `FeatureHandler`
-
+Like the `n_positive` feature, the `n_hospital` is straightforward to implement:
 ```{r feature_handler_n_hospital, eval = FALSE}
 private = list(
   ...
@@ -404,6 +388,12 @@ private = list(
 ```
 
 ## The `n_admission` `FeatureHandler`
+For the `n_admission` feature, we use the already computed `n_hospital` feature to compute the admissions.
+We could have computed directly from the simulist data, but since this features is really just a transformation of
+the `n_hospital` feature, we use the `n_hospital` feature to compute the admissions.
+
+Since we modify the `valid_until` field, we need to filter again to ensure that the data is only for the requested
+time period.
 
 ```{r feature_handler_n_admission, eval = FALSE}
 private = list(
@@ -417,10 +407,7 @@ private = list(
 
       out <- ds$get_feature("n_hospital", start_date, end_date, slice_ts) |>
         dplyr::mutate("valid_until" = .data$valid_from + 1L) |>
-        dplyr::filter(
-          {{ start_date }} < .data$valid_until,
-          .data$valid_from <= {{ end_date }}
-        )
+        dplyr::filter({{ start_date }} < .data$valid_until) # valid_from filtered in n_hospital
 
       return(out)
     },
@@ -436,8 +423,8 @@ private = list(
 We are finally ready to see the `diseasystore` in action.
 
 ## Configuring the `diseasystore`
-All `diseasystores` require a database to store its features in. For convenience, we here set the `target_conn` option,
-for all `diseasystores`[^3].
+All `diseasystores` require a database to store its features in.
+For convenience, we here set the `target_conn` option for all `diseasystores`[^3].
 ```{r configure_diseasystore, eval = FALSE}
 # We define target_conn as a function that opens a DBIconnection to the DB
 target_conn <- \() DBI::dbConnect(duckdb::duckdb())
@@ -488,6 +475,11 @@ Since we have individual level data, we can combine the features arbitrarily usi
 This stratification can by any expression using the features in the `diseasystore`. Since we are working expressions,
 we need to pass the expressions as "quosures" using `rlang::quos()`.
 
+These expressions have very few limits. As long as they are translatable by `dbplyr` to SQL, they can be used.
+
+Lets look at some examples:
+
+### Stratifying by a custom age group
 ```{r stratifications_positive_sex_age, eval = suggests_available}
 # Get the number of positive tests by age group and sex
 data1 <- ds$key_join_features(
@@ -514,13 +506,14 @@ ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive, color = age_group)
   ggplot2::facet_wrap(~ sex)
 ```
 
+### Stratifing by generation
 ```{r stratifications_admission_generation, eval = suggests_available}
 # Get the number of admissions by generation
 data2 <- ds$key_join_features(
   observable = "n_admission",
   stratification = rlang::quos(
     generation = dplyr::case_when(
-      lubridate::year(birth) < 1946 ~ "Silent",
+      lubridate::year(birth) < 1946 ~ "Silent or older",
       lubridate::year(birth) < 1965 ~ "Boomer",
       lubridate::year(birth) < 1981 ~ "GenX",
       lubridate::year(birth) < 1997 ~ "Millenial",
