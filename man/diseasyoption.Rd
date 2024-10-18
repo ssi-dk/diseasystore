@@ -20,7 +20,10 @@ The namespace of the option (e.g. "diseasy" or "diseasystore").}
 The default value to return if no option is set.}
 }
 \value{
-The most specific option within the diseasy framework for the given option and class
+\itemize{
+\item If \code{option} is given, the most specific option within the \code{diseasy} framework for the given option and class.
+\item If \code{option} is missing, all options related to \code{diseasy} packages.
+}
 }
 \description{
 Helper function to get options related to diseasy

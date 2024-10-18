@@ -58,7 +58,10 @@ printr <- function(..., file = nullfile(), sep = "", max_width = NULL) {
 #'   The namespace of the option (e.g. "diseasy" or "diseasystore").
 #' @param .default (`any`)\cr
 #'   The default value to return if no option is set.
-#' @return The most specific option within the diseasy framework for the given option and class
+#' @return
+#'   * If `option` is given, the most specific option within the `diseasy` framework for the given option and class.
+#'   * If `option` is missing, all options related to `diseasy` packages.
+#'
 #' @examples
 #'   # Retrieve default option for source conn
 #'   diseasyoption("source_conn")
