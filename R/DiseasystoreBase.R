@@ -671,7 +671,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(ds_start_date <= end_date, start_date <= ds_end_date, success == TRUE)                            # nolint: redundant_equals_linter. required for dbplyr translations
+        dplyr::filter(
+          .data$ds_start_date <= {{ end_date }},
+          {{ start_date }} <= .data$ds_end_date,
+          .data$success == TRUE                                                                                         # nolint: redundant_equals_linter. Required for dbplyr translations
+        )
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
