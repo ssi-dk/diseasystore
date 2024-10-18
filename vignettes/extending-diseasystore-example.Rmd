@@ -479,10 +479,28 @@ These expressions have very few limits. As long as they are translatable by `dbp
 
 Lets look at some examples:
 
+### No stratification
+```{r no_stratifications, eval = suggests_available}
+# Get the number of positive tests by age group and sex
+data1 <- ds$key_join_features(
+  observable = "n_positive",
+  stratification = NULL,
+  start_date = ds$min_start_date,
+  end_date = ds$max_end_date
+)
+
+print(data1)
+```
+
+```{r no_stratifications_plot, eval = suggests_available && rlang::is_installed("ggplot2")}
+ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive)) +
+  ggplot2::geom_line()
+```
+
 ### Stratifying by a custom age group
 ```{r stratifications_positive_sex_age, eval = suggests_available}
 # Get the number of positive tests by age group and sex
-data1 <- ds$key_join_features(
+data2 <- ds$key_join_features(
   observable = "n_positive",
   stratification = rlang::quos(
     age_group = cut(
@@ -497,11 +515,11 @@ data1 <- ds$key_join_features(
   end_date = ds$max_end_date
 )
 
-print(data1)
+print(data2)
 ```
 
 ```{r stratifications_positive_sex_age_plot, eval = suggests_available && rlang::is_installed("ggplot2")}
-ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive, color = age_group)) +
+ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_positive, color = age_group)) +
   ggplot2::geom_line() +
   ggplot2::facet_wrap(~ sex)
 ```
@@ -509,7 +527,7 @@ ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive, color = age_group)
 ### Stratifing by generation
 ```{r stratifications_admission_generation, eval = suggests_available}
 # Get the number of admissions by generation
-data2 <- ds$key_join_features(
+data3 <- ds$key_join_features(
   observable = "n_admission",
   stratification = rlang::quos(
     generation = dplyr::case_when(
@@ -524,14 +542,11 @@ data2 <- ds$key_join_features(
   end_date = ds$max_end_date
 )
 
-print(data2)
-
-ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_admission, color = generation)) +
-  ggplot2::geom_line()
+print(data3)
 ```
 
 ```{r stratifications_admission_generation_plot, eval = suggests_available && rlang::is_installed("ggplot2")}
-ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_admission, color = generation)) +
+ggplot2::ggplot(data3, ggplot2::aes(x = date, y = n_admission, color = generation)) +
   ggplot2::geom_line()
 ```
 
