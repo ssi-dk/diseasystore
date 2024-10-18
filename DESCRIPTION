@@ -48,6 +48,7 @@ Suggests:
     duckdb,
     knitr,
     lintr,
+    microbenchmark,
     odbc,
     rmarkdown,
     RSQLite,
