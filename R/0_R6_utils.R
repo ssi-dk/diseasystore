@@ -97,17 +97,38 @@ diseasyoption <- function(option, class = NULL, namespace = NULL, .default = NUL
       stringr::str_to_lower()
   }
 
+  # If no option is given, return all options that matches the namespace / class
   if (missing(option)) {
 
+    # Find all options that match the namespace
     options <- options() |>
-      purrr::keep_at(~ stringr::str_detect(., paste0("^", namespace, "."))) # Restrict the options to the namespace
+      purrr::keep_at(~ stringr::str_detect(., paste0("^", namespace, "\\.")))
 
-    # When class is given, we need to keep only the general or the class specific options
+    # When class is given, we need to keep only the general and the class specific options
+    # with preference to the class specific options
     if (!is.null(class)) {
-      options <- options |>
+
+      # All options specific to the class
+      specific_options <- options |>                                                                                    # nolint: object_usage_linter
+        purrr::keep_at(~ stringr::str_detect(., paste0("^", namespace, "\\.", class, "\\."))) |>
+        names()
+
+      # Helper to find all general options within the namespace (namespace.option)
+      general_option <- \(option_name) stringr::str_detect(option_name, r"{^\w+\.\w+$}")                                # nolint: object_usage_linter
+
+
+      # Determine the general options that have a specific option that should be used as preference
+      overwritten_general_options <- options |>                                                                         # nolint: object_usage_linter
+        purrr::keep_at(~ general_option(.)) |>
         purrr::keep_at(
-          ~ stringr::str_detect(., r"{^\w+\.\w+$}") | stringr::str_detect(., paste0("^", namespace, ".", class, "."))
-        )
+          ~ stringr::str_extract(., r"{\w+$}") %in% stringr::str_extract(specific_options, r"{\w+$}")
+        ) |>
+        names()
+
+      # Combine to a single list with general options removed if specific options are present
+      options <- options |>
+        purrr::keep_at(~ general_option(.) | . %in% specific_options) |>
+        purrr::discard_at(~ . %in% overwritten_general_options)
     }
 
   } else {
