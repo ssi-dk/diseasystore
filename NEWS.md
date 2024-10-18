@@ -1,6 +1,6 @@
 # diseasystore (development version)
 
-## New Features:
+## New Features
 
 * New age helpers `add_years()` and `age_on_date()` has been added to help compute features for individual data (#125).
 
@@ -17,7 +17,7 @@ fields (#138).
   Furthermore, a reference to the `diseasystore` is now passed to `compute()` to give the `Featurehandler` access
   to other features via `ds$get_feature()` (#162).
 
-## Minor Improvements and Fixes:
+## Minor Improvements and Fixes
 
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
   * On backends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
@@ -25,7 +25,7 @@ fields (#138).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
 
-## Testing:
+## Testing
 
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly:
   * Checks that data is only within the study period (#154).
@@ -33,6 +33,9 @@ fields (#138).
   * Checks that the `valid_from` and `valid_until` columns are chronologically ordered (#176).
 
 ## Documentation:
+
+* An example has been added for building a `diseasystore` with individual level data (#162).
+  See `vignette("extending-diseasystore-example")`.
 
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
 
@@ -46,7 +49,7 @@ fields (#138).
 
 # diseasystore 0.2.2
 
-## Minor Improvements and Fixes:
+## Minor Improvements and Fixes
 
 * The `%.%` operator is made more flexible to function as a drop-in replacement for `$` (#145).
 
@@ -58,7 +61,7 @@ fields (#138).
 
 # diseasystore 0.2.0
 
-## New Features:
+## New Features
 
 * `DiseasystoreEcdcRespiratoryViruses`: A feature store that uses the ECDC Respiratory viruses weekly repository (#124).
 
@@ -74,24 +77,24 @@ fields (#138).
 
 * `test_diseasystore()` is added to provide a standardised method for testing new diseasystores (#123).
 
-## Minor Improvements and Fixes:
+## Minor Improvements and Fixes
 
 * `diseasyoption()` now allows a default option to be set with the `.default` argument (#122).
 
 
 # diseasystore 0.1.1
 
-## Fixes:
+## Fixes
 
 * Improved the stability of internal functions.
 
 * Adapted to release of SCDB v0.3.
 
-## Documentation:
+## Documentation
 
 * Improved documentation of functions.
 
-## Testing:
+## Testing
 
 * Improved test stability when internet is unavailable.
 
@@ -100,7 +103,7 @@ fields (#138).
 
 # diseasystore 0.1
 
-## Features:
+## Features
 
 * `DiseasystoreBase`: A base class for the diseasystores.
   * R6 class that defines the interface for the diseasystores.
@@ -120,11 +123,11 @@ fields (#138).
 
 * `age_labels()`: A function to generate human-readable and sortable age groupings.
 
-## Testing:
+## Testing
 
 * Most package functions are tested here.
 
-## Documentation:
+## Documentation
 
 * The functions are fully documented.
 
