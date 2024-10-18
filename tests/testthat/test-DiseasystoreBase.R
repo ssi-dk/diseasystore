@@ -157,29 +157,29 @@ test_that("DiseasystoreBase$determine_new_ranges() works", {
 
   for (conn in get_test_conns()) {
     ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
+    slice_ts <- ds %.% slice_ts
 
     logs <- SCDB::create_logs_if_missing(conn = conn, log_table = paste(target_schema_1, "logs", sep = "."))
 
-    dplyr::rows_append(
-      logs,
-      data.frame(date = ds %.% slice_ts,
-                 table = "table1",
-                 message = glue::glue("ds-range: {start_date} - {end_date}"),
-                 success = TRUE,
-                 log_file = "1"),
-      copy = TRUE, in_place = TRUE
-    )
+    # Add entry for a fictional table1
+    table1_entry <- data.frame(
+      date = NA,
+      table = "table1",
+      message = glue::glue("ds-range: {start_date} - {end_date}"),
+      success = TRUE,
+      log_file = "1"
+    ) |>
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(table1_entry)
 
     dplyr::rows_append(
       logs,
-      data.frame(date = ds %.% slice_ts,
-                 table = "table1",
-                 message = glue::glue("ds-range: {start_date} - {end_date}"),
-                 success = TRUE,
-                 log_file = "1"),
-      copy = TRUE, in_place = TRUE
+      dplyr::mutate(table1_entry, "date" = !!SCDB::db_timestamp(slice_ts, conn)),
+      in_place = TRUE
     )
 
+
+    # Start the tests
     determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 
     expect_identical(
