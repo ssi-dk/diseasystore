@@ -13,7 +13,7 @@
 #' @noRd
 google_covid_19_metric <- function(google_pattern, out_name) {                                                          # nocov start
   FeatureHandler$new(
-    compute = function(start_date, end_date, slice_ts, source_conn) {
+    compute = function(start_date, end_date, slice_ts, source_conn, ...) {
       checkmate::assert_character(source_conn, len = 1)
 
       # Load and parse
@@ -84,7 +84,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     .max_end_date = as.Date("2022-09-15"), # Data source is no longer actively updated
 
     google_covid_19_population = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -109,7 +109,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     ),
 
     google_covid_19_index = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -145,7 +145,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     google_covid_19_ventilator = google_covid_19_metric("ventilator_patients", "n_ventilator"),
 
     google_covid_19_age_group = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -185,7 +185,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
         # And finally copy to the DB
         out <- age_bin_map |>
           dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
+          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA)) |>
+          dplyr::ungroup()
 
         return(out)
       },
@@ -194,7 +195,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
 
     google_covid_19_min_temperature  = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -214,7 +215,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
     ),
 
     google_covid_19_max_temperature  = FeatureHandler$new(
-      compute = function(start_date, end_date, slice_ts, source_conn) {
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
         checkmate::assert_character(source_conn, len = 1)
 
         # Load and parse
@@ -254,19 +255,19 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
 
         # If no spatial stratification is requested, use the largest available per country
         filter_level <- self$get_feature("country_id", start_date, end_date) |>
-          dplyr::group_by(country_id) |>
-          dplyr::slice_min(aggregation_level) |>
+          dplyr::group_by(.data$country_id) |>
+          dplyr::slice_min(.data$aggregation_level) |>
           dplyr::ungroup() |>
-          dplyr::select(key_location)
+          dplyr::select("key_location")
 
         return(dplyr::inner_join(.data, filter_level, by = "key_location", copy = TRUE))
 
       } else if (purrr::some(stratification_features, ~ . %in% c("country_id", "country"))) {
-        return(.data |> dplyr::filter(key_location == country_id))
+        return(.data |> dplyr::filter(.data$key_location == .data$country_id))
       } else if (purrr::some(stratification_features, ~ . %in% c("region_id", "region"))) {
-        return(.data |> dplyr::filter(key_location == region_id))
+        return(.data |> dplyr::filter(.data$key_location == .data$region_id))
       } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
-        return(.data |> dplyr::filter(key_location == subregion_id))
+        return(.data |> dplyr::filter(.data$key_location == .data$subregion_id))
       } else {
         stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
       }
