@@ -11,9 +11,9 @@ fields (#138).
 
 ## Minor Improvements and Fixes:
 
-* Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected (#158):
-  * when using `POSIX` `slice_ts`.
-  * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
+* Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
+  * On back ends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
+  * Due to `slice_ts` not being correctly matched with existing data on some backends (#172).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
 
@@ -22,6 +22,10 @@ fields (#138).
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
   * Checks that data is only within the study period.
   * Checks that `valid_from` and `valid_until` has class `Date`.
+
+## Documentation:
+
+* Added benchmarking vignette `vignette("benchmarks")` (#144).
 
 
 # diseasystore 0.2.2

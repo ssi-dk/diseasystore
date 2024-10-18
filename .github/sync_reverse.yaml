@@ -6,6 +6,11 @@ ssi-dk/AEF-DDF:
     dest: testthat/spelling.R
 
 
+  # Workflows
+  - source: .github/workflows/benchmark.yaml
+    dest: workflows/benchmark.yaml
+
+
   # Lintr related files
   - source: .lintr
     dest: linting/.lintr

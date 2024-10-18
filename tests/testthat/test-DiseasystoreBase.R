@@ -104,111 +104,130 @@ test_that("DiseasystoreBase works", {
 
 
 test_that("$get_feature verbosity works", {
-  skip_if_not_installed("RSQLite")
+  for (conn in get_test_conns()) {
 
-  # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
-    classname = "DiseasystoreBase",
-    inherit = DiseasystoreBase,
-    private = list(
-      .ds_map = list("cyl" = "dummy_mtcars"),
-      dummy_mtcars = FeatureHandler$new(
-        compute = function(start_date, end_date, slice_ts, source_conn) {
-          return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
-        }
+    # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
+    DiseasystoreDummy <- R6::R6Class(                                                                                   # nolint: object_name_linter
+      classname = "DiseasystoreBase",
+      inherit = DiseasystoreBase,
+      private = list(
+        .ds_map = list("cyl" = "dummy_mtcars"),
+        dummy_mtcars = FeatureHandler$new(
+          compute = function(start_date, end_date, slice_ts, source_conn) {
+            return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
+          }
+        )
       )
     )
-  )
 
-  # Create an instance with verbose = TRUE
-  ds <- DiseasystoreDummy$new(
-    source_conn = file.path("some", "path"),
-    target_conn = DBI::dbConnect(RSQLite::SQLite()),
-    verbose = TRUE
-  )
+    # Create an instance with verbose = TRUE
+    ds <- DiseasystoreDummy$new(
+      source_conn = file.path("some", "path"),
+      target_conn = conn,
+      verbose = TRUE
+    )
 
-  # Capture the messages from a get_feature call and compare with expectation
-  messages <- capture.output(
-    invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
-    type = "message"
-  )
-  checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date inter.")
-  checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
+    # Capture the messages from a get_feature call and compare with expectation
+    messages <- capture.output(
+      invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
+      type = "message"
+    )
 
-  # Second identical call should give no messages
-  messages <- capture.output(
-    invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
-    type = "message"
-  )
-  expect_equal(messages, character(0))
+    # We keep messages from `get_feature` which starts with "feature:".
+    # Messages from other sources (duckdb or odbc) are not captured.
+    messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
 
-  rm(ds)
+    checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date int.")
+    checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
+
+    # Second identical call should give no messages
+    messages <- capture.output(
+      invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
+      type = "message"
+    )
+    messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
+    expect_equal(messages, character(0))
+
+    rm(ds)
+    DBI::dbDisconnect(conn)
+  }
+
   invisible(gc())
 })
 
 
-test_that("DiseasystoreBase$determine_new_ranges works", {
-  skip_if_not_installed("RSQLite")
+test_that("DiseasystoreBase$determine_new_ranges() works", {
 
   start_date <- as.Date("2020-01-01")
   end_date   <- as.Date("2020-03-01")
-  slice_ts <- glue::glue("{Sys.Date()} 09:00:00")
 
-  conn <- DBI::dbConnect(RSQLite::SQLite())
-  ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
+  for (conn in get_test_conns()) {
+    ds <- DiseasystoreBase$new(source_conn = "", target_conn = conn)
+    slice_ts <- ds %.% slice_ts
 
-  logs <- SCDB::create_logs_if_missing(conn = conn, log_table = paste(target_schema_1, "logs", sep = "."))
+    logs <- SCDB::create_logs_if_missing(conn = conn, log_table = paste(target_schema_1, "logs", sep = "."))
+
+    # Add entry for a fictional table1
+    table1_entry <- data.frame(
+      date = NA,
+      table = "table1",
+      message = glue::glue("ds-range: {start_date} - {end_date}"),
+      success = TRUE,
+      log_file = "1"
+    ) |>
+      dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
+    SCDB::defer_db_cleanup(table1_entry)
+
+    dplyr::rows_append(
+      logs,
+      dplyr::mutate(table1_entry, "date" = !!SCDB::db_timestamp(slice_ts, conn)),
+      in_place = TRUE
+    )
 
 
-  dplyr::rows_append(
-    logs,
-    data.frame(date = slice_ts,
-               table = "table1",
-               message = glue::glue("ds-range: {start_date} - {end_date}"),
-               success = TRUE,
-               log_file = "1"),
-    copy = TRUE, in_place = TRUE
-  )
+    # Start the tests
+    determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
 
-  determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
+    expect_identical(
+      determine_new_ranges("table1", start_date, end_date, ds %.% slice_ts),
+      tibble::tibble(start_date = as.Date(character(0)),
+                     end_date   = as.Date(character(0)))
+    )
 
-  expect_identical(
-    determine_new_ranges("table1", start_date, end_date, slice_ts),
-    tibble::tibble(start_date = as.Date(character(0)),
-                   end_date   = as.Date(character(0)))
-  )
+    expect_identical(
+      determine_new_ranges("table2", start_date, end_date, ds %.% slice_ts),
+      tibble::tibble(start_date = !!start_date,
+                     end_date   = !!end_date)
+    )
 
-  expect_identical(
-    determine_new_ranges("table2", start_date, end_date, slice_ts),
-    tibble::tibble(start_date = !!start_date,
-                   end_date   = !!end_date)
-  )
+    expect_identical(
+      determine_new_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
+      tibble::tibble(start_date = !!end_date + lubridate::days(1),
+                     end_date   = !!end_date + lubridate::days(5))
+    )
 
-  expect_identical(
-    determine_new_ranges("table1", start_date, end_date + lubridate::days(5), slice_ts),
-    tibble::tibble(start_date = !!end_date + lubridate::days(1),
-                   end_date   = !!end_date + lubridate::days(5))
-  )
+    expect_identical(
+      determine_new_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
+      tibble::tibble(start_date = !!start_date - lubridate::days(5),
+                     end_date   = !!start_date - lubridate::days(1))
+    )
 
-  expect_identical(
-    determine_new_ranges("table1", start_date - lubridate::days(5), end_date, slice_ts),
-    tibble::tibble(start_date = !!start_date - lubridate::days(5),
-                   end_date   = !!start_date - lubridate::days(1))
-  )
+    expect_identical(
+      determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), ds %.% slice_ts),
+      tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                     end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5)))
+    )
 
-  expect_identical(
-    determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), slice_ts),
-    tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
-                   end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5)))
-  )
+    expect_identical(
+      determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), ds %.% slice_ts),
+      tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+                     end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3)))
+    )
 
-  expect_identical(
-    determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), slice_ts),
-    tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
-                   end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3)))
-  )
+    rm(ds)
+    DBI::dbDisconnect(conn)
+  }
 
-  rm(ds)
   invisible(gc())
 })
 

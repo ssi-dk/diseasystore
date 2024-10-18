@@ -42,6 +42,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
+        checkmate::check_posixct(slice_ts),
         checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
@@ -126,6 +127,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
+        checkmate::check_posixct(slice_ts),
         checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
@@ -638,11 +640,11 @@ DiseasystoreBase <- R6::R6Class(                                                
         self %.% target_conn,
         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
       ) |>
+        dplyr::filter(.data$date == !!SCDB::db_timestamp(slice_ts, self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
         dplyr::filter(
-          .data$target_table == !!as.character(target_table),
-          strftime(.data$date) == !!strftime(slice_ts) # timezone-independent, data-type independent comparison
+          .data$target_table == !!as.character(target_table)
         )
 
       # If no logs are found, we need to compute on the entire range
