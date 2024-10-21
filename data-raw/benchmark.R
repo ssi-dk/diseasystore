@@ -202,6 +202,9 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
         verbose = FALSE
       )
 
+      # Ensure we start from a clean state
+      drop_diseasystore(schema = ds %.% target_schema, conn = ds %.% target_conn)
+
       # Define the benchmark function
       diseasytore_get_feature <- function(ds) {
         ds$get_feature("n_cyl")
