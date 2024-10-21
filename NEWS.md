@@ -11,9 +11,9 @@ fields (#138).
 
 ## Minor Improvements and Fixes:
 
-* Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected (#158):
-  * when using `POSIX` `slice_ts`.
-  * on back ends that use "catalog" to structure table (DuckDB and SQL Server) (also requires SCDB > v0.4).
+* Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
+  * On back ends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
+  * Due to `slice_ts` not being correctly matched with existing data on some backends (#172).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
 
