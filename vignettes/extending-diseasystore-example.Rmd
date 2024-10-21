@@ -524,7 +524,7 @@ ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_positive, color = age_group)
   ggplot2::facet_wrap(~ sex)
 ```
 
-### Stratifing by generation
+### Stratifying by generation
 ```{r stratifications_admission_generation, eval = suggests_available}
 # Get the number of admissions by generation
 data3 <- ds$key_join_features(
