@@ -273,15 +273,17 @@ DiseasystoreBase <- R6::R6Class(                                                
     #'   that contains keys to witch the secondary features (defined by `stratification`) can be joined.
     #' @param observable (`character`)\cr
     #'   The name of a feature defined in the feature store
-    #' @param stratification (`list`(`quosures`))\cr
+    #' @param stratification (`list`(`quosures`) or `NULL`)\cr
     #'   Expressions in `stratification` are evaluated to find appropriate features.
     #'   These are then joined to the observable feature before `stratification` is performed.
+    #'
+    #'   If `NULL` (default) no stratification is performed.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
     #' @importFrom dbplyr window_order
-    key_join_features = function(observable, stratification,
+    key_join_features = function(observable, stratification = NULL,
                                  start_date = self %.% start_date,
                                  end_date   = self %.% end_date) {
 
