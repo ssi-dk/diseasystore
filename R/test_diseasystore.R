@@ -18,6 +18,8 @@
 #'   The data base schema where the tests should be run.
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
+#' @param skip_backends (`character()`)\cr
+#'   List of connection types to skip tests for due to missing functionality.
 #' @param ...
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
@@ -36,8 +38,15 @@
 #' }
 #' @importFrom curl has_internet
 #' @export
-test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
-                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
+test_diseasystore <- function(
+  diseasystore_generator = NULL,
+  conn_generator = NULL,
+  data_files = NULL,
+  target_schema = "test_ds",
+  test_start_date = NULL,
+  skip_backends = NULL,
+  ...
+) {
 
   # Determine the class of the diseasystore being tested
   diseasystore_class <- diseasystore_generator$classname
@@ -46,10 +55,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   checkmate::assert_class(diseasystore_generator, "R6ClassGenerator", add = coll)
   checkmate::assert_choice(as.character(diseasystore_generator$inherit), "DiseasystoreBase", add = coll)
   checkmate::assert_function(conn_generator, add = coll)
-  purrr::walk(conn_generator(), ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  conns <- conn_generator()
+  purrr::walk(conns, ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  purrr::walk(conns, DBI::dbDisconnect)
   checkmate::assert_character(data_files, null.ok = TRUE, add = coll)
   checkmate::assert_character(target_schema, add = coll)
   checkmate::assert_date(test_start_date, add = coll)
+  checkmate::assert_character(skip_backends, null.ok = TRUE, add = coll)
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
@@ -148,6 +160,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -181,6 +194,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
 
@@ -210,6 +224,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
     testthat::skip_if_not(local)
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -227,6 +242,36 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
+  testthat::test_that(glue::glue("Skipped test connection are also disallowed in {diseasystore_class} constructor "), {
+    testthat::skip_if(is.null(skip_backends))
+
+    # Check that the constructor throws an error if the connection is skipped in the tests
+    for (conn in conn_generator()) {
+      if (!checkmate::test_class(conn, skip_backends)) {
+        DBI::dbDisconnect(conn)
+        next
+      }
+
+      # Check that an error is thrown when attempting to use the connection
+      # This error is a checkmate assertion, so we remove newlines and `*` from the formatted error message
+      testthat::expect_error(
+        tryCatch(
+          DiseasystoreSimulist$new(verbose = FALSE, target_conn = conn),
+          error = \(e) {
+            e$message |>
+              stringr::str_remove_all(stringr::fixed("\n *")) |>
+              stringr::str_remove_all(stringr::fixed("* ")) |>
+              simpleError(message = _) |>
+              stop()
+          }
+        ),
+        paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
+      )
+
+    }
+  })
+
+
   # Set a test_end_date for the test
   test_end_date <- test_start_date + lubridate::days(4)
 
@@ -236,32 +281,46 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- test_start_date
-        end_date   <- test_end_date
 
-        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          SCDB::digest_to_checksum() |>
-          dplyr::pull("checksum") |>
-          sort()
+        # Suppress our user facing, informative warnings
+        pkgcond::suppress_warnings(
+          class = c(
+            "diseasystore::age_on_date.SQLiteConnection-warning",
+            "diseasystore::add_years.SQLiteConnection-warning"
+          ),
+          expr = {
+            feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
+              SCDB::digest_to_checksum() |>
+              dplyr::pull("checksum") |>
+              sort()
 
 
-        reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
+            reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(
-          start_date  = start_date,
-          end_date    = end_date,
-          slice_ts    = ds %.% slice_ts,
-          source_conn = ds %.% source_conn
+            reference <- reference_generator(
+              start_date  = test_start_date,
+              end_date    = test_end_date,
+              slice_ts    = ds %.% slice_ts,
+              source_conn = ds %.% source_conn,
+              ds = ds
+            )
+          }
         )
 
         # Check that reference data is limited to the study period (start_date and end_date)
         reference_out_of_bounds <- reference |>
+          dplyr::collect() |>
           dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
 
         testthat::expect_equal(
@@ -288,10 +347,27 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
         )
 
+        # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
+        # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
+        testthat::expect_equal(
+          SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
+          0
+        )
+
+        testthat::expect_equal(
+          reference |>
+            dplyr::filter(.data$valid_from >= .data$valid_until) |>
+            SCDB::nrow(),
+          0,
+          info = glue::glue("Feature `{.x}` has some elements where `valid_from` >= `valid_until`.")
+        )
+
 
         # Copy to remote and continue checks
-        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+        if (!inherits(reference, "tbl_sql")) {
+          reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+          SCDB::defer_db_cleanup(reference)
+        }
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
@@ -317,31 +393,49 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- test_start_date
-        end_date   <- test_end_date
 
-        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          SCDB::digest_to_checksum() |>
-          dplyr::pull("checksum") |>
-          sort()
+        # Suppress our user facing, informative warnings
+        pkgcond::suppress_warnings(
+          class = c(
+            "diseasystore::age_on_date.SQLiteConnection-warning",
+            "diseasystore::add_years.SQLiteConnection-warning"
+          ),
+          expr = {
+
+            feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
+              SCDB::digest_to_checksum() |>
+              dplyr::pull("checksum") |>
+              sort()
 
 
-        reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
+            reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(
-          start_date  = start_date,
-          end_date    = end_date,
-          slice_ts    = ds %.% slice_ts,
-          source_conn = ds %.% source_conn
-        ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+            reference <- reference_generator(
+              start_date  = test_start_date,
+              end_date    = test_end_date,
+              slice_ts    = ds %.% slice_ts,
+              source_conn = ds %.% source_conn,
+              ds = ds
+            )
+
+            # Copy to remote and continue checks
+            if (!inherits(reference, "tbl_sql")) {
+              reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+              SCDB::defer_db_cleanup(reference)
+            }
+          }
+        )
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
@@ -375,6 +469,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
+
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
@@ -429,6 +528,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
+
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))

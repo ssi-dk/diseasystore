@@ -181,9 +181,11 @@ DiseasystoreBase <- R6::R6Class(                                                
         purrr::pwalk(ds_missing_ranges, \(start_date, end_date) {
 
           # Compute the feature for the date range
+          # Pass a reference to this diseasystore instance in case the `FeatureHandler` needs other features to compute
           ds_feature <- do.call(what = purrr::pluck(private, feature_loader) %.% compute,
                                 args = list(start_date = start_date, end_date = end_date,
-                                            slice_ts = slice_ts, source_conn = self %.% source_conn))
+                                            slice_ts = slice_ts, source_conn = self %.% source_conn,
+                                            ds = self))
 
           # Check it table is copied to target DB
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
@@ -330,8 +332,10 @@ DiseasystoreBase <- R6::R6Class(                                                
           stop(err)
         }
 
-        stratification_names <- purrr::map(stratification, rlang::as_label)
-        stratification_names <- purrr::imap_chr(stratification_names, ~ ifelse(.y == "", .x, .y)) |> unname()
+        stratification_names <- stratification |>
+          purrr::map(rlang::as_label) |>
+          purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
+          unname()
 
         # Check stratification features are not observables
         stopifnot("Stratification features cannot be observables" =
@@ -658,7 +662,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(ds_start_date <= end_date, start_date <= ds_end_date, success == TRUE)                            # nolint: redundant_equals_linter. required for dbplyr translations
+        dplyr::filter(
+          .data$ds_start_date <= {{ end_date }},
+          {{ start_date }} <= .data$ds_end_date,
+          .data$success == TRUE                                                                                         # nolint: redundant_equals_linter. Required for dbplyr translations
+        )
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
