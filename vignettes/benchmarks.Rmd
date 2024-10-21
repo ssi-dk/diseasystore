@@ -107,12 +107,15 @@ if (on_main) {
 
 # Add note slow backends
 slow_backends <- benchmarks |>
-  dplyr::distinct(.data$database, .data$n) |>
-  dplyr::filter(.data$n < max(.data$n)) |>
-  dplyr::pull("database")
+  dplyr::distinct(.data$database, .data$benchmark_function, .data$n) |>
+  dplyr::filter(.data$n < max(.data$n), .by = c("database", "benchmark_function")) |>
+  dplyr::select(!"n") |>
+  dplyr::mutate("slow_backend" = TRUE)
 
 benchmarks <- benchmarks |>
-  dplyr::mutate("database" = paste0(database, ifelse(database %in% slow_backends, "*", "")))
+  dplyr::left_join(slow_backends, by = c("database", "benchmark_function")) |>
+  dplyr::mutate("database" = paste0(.data$database, ifelse(isTRUE(.data$slow_backend), "*", ""))) |>
+  dplyr::select(!"slow_backend")
 
 
 # Mean and standard deviation (see ggplot2::mean_se())
@@ -159,7 +162,7 @@ g <- ggplot2::ggplot(
   ggplot2::facet_grid(rows = ggplot2::vars(benchmark_function), cols = ggplot2::vars(database)) +
   ggplot2::labs(x = "Codebase version", y = "Time (s)")
 
-if (length(slow_backends) > 1) {
+if (nrow(slow_backends) > 1) {
   g <- g + ggplot2::labs(caption = "* IMPORTANT: Benchmark data halved for this backend!")
 }
 
