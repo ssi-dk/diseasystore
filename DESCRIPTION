@@ -44,7 +44,6 @@ Imports:
     tidyselect,
     zoo
 Suggests:
-    curl,
     devtools,
     duckdb,
     ggplot2,
