@@ -250,7 +250,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
       # Define the benchmark function
       diseasytore_key_join_features <- function(ds) {
-        ds$key_join_features("n_cyl", "vs")
+        ds$key_join_features("n_cyl", rlang::quos(vs))
       }
 
       # Run the benchmark
