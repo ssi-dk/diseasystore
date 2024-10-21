@@ -22,7 +22,7 @@ ID (the row number of the data).
 A simple `diseasystore` is built around this data, with two `FeatureHandlers`, one each for the `cyl` and `vs`
 variables.
 ```{r, eval = FALSE}
-DiseasystoreMtcars <- R6::R6Class(                                                                                      # nolint: object_name_linter
+DiseasystoreMtcars <- R6::R6Class(
   classname = "DiseasystoreBase",
   inherit = DiseasystoreBase,
   private = list(
