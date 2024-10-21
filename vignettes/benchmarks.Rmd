@@ -131,6 +131,9 @@ groups <- setdiff(colnames(benchmarks), c("expr", "time", "benchmark_function", 
 # Apply "dodging" to sub-groups to show graphically
 dodge <- ggplot2::position_dodge(width = 0.6)
 
+# Insert newline into database name to improve rendering of figures
+labeller <- ggplot2::as_labeller(\(l) stringr::str_replace_all(l, stringr::fixed(" v"), "\nv"))
+
 g <- ggplot2::ggplot(
   benchmarks,
   ggplot2::aes(
@@ -141,7 +144,12 @@ g <- ggplot2::ggplot(
   )
 ) +
   ggplot2::stat_summary(fun.data = mean_sd, geom = "pointrange", size = 0.5, linewidth = 1, position = dodge) +
-  ggplot2::facet_grid(rows = ggplot2::vars(benchmark_function), cols = ggplot2::vars(database)) +
+  ggplot2::facet_grid(
+    rows = ggplot2::vars(benchmark_function),
+    cols = ggplot2::vars(database),
+    scales = "free_y",
+    labeller = labeller
+  ) +
   ggplot2::labs(x = "Codebase version", y = "Time (s)")
 
 if (nrow(slow_backends) > 1) {
