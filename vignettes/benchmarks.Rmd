@@ -150,7 +150,11 @@ g <- ggplot2::ggplot(
     scales = "free_y",
     labeller = labeller
   ) +
-  ggplot2::labs(x = "Codebase version", y = "Time (s)")
+  ggplot2::labs(x = "Codebase version", y = "Time (s)") +
+  ggplot2::theme(
+    legend.position = "bottom",
+    legend.justification = "left"
+  )
 
 if (nrow(slow_backends) > 1) {
   g <- g + ggplot2::labs(caption = "* IMPORTANT: Benchmark data halved for this backend!")
