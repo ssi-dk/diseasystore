@@ -17,5 +17,8 @@ exclude_linter: r"{^ *: *([\w, ]*)(.|$)}"
 exclusions: list(
     "R/0_linters.R" = list(
       "nolint_position_linter" = Inf
+    ),
+    "vignettes/benchmarks.Rmd" = list(
+      "object_name_linter" = Inf
     )
   )
