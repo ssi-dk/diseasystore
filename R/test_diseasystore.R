@@ -304,8 +304,10 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
         # Copy to remote and continue checks
-        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+        if (!inherits(reference, "tbl_sql")) {
+          reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+          SCDB::defer_db_cleanup(reference)
+        }
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
@@ -353,6 +355,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           source_conn = ds %.% source_conn
         )
 
+        # Copy to remote and continue checks
+        if (!inherits(reference, "tbl_sql")) {
+          reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+          SCDB::defer_db_cleanup(reference)
+        }
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
