@@ -19,9 +19,10 @@ fields (#138).
 
 ## Testing:
 
-* `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly: (#154)
-  * Checks that data is only within the study period.
-  * Checks that `valid_from` and `valid_until` has class `Date`.
+* `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly:
+  * Checks that data is only within the study period (#154).
+  * Checks that `valid_from` and `valid_until` has class `Date` (#154).
+  * Checks that the `valid_from` and `valid_until` columns are chronologically ordered (#176).
 
 
 # diseasystore 0.2.2
