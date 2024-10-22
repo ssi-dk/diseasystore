@@ -288,6 +288,21 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
         )
 
+        # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
+        # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
+        testthat::expect_equal(
+          SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
+          0
+        )
+
+        testthat::expect_equal(
+          reference |>
+            dplyr::filter(.data$valid_from >= .data$valid_until) |>
+            SCDB::nrow(),
+          0,
+          info = glue::glue("Feature `{.x}` has some elements where `valid_from` >= `valid_until`.")
+        )
+
 
         # Copy to remote and continue checks
         reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
