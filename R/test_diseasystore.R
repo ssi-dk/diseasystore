@@ -304,8 +304,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
 
         # Copy to remote and continue checks
-        if (!inherits(reference, "tbl_sql")) {
-          reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+        if (!inherits(reference, "tbl_sql") ||
+              (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
           SCDB::defer_db_cleanup(reference)
         }
 
@@ -356,8 +357,9 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         )
 
         # Copy to remote and continue checks
-        if (!inherits(reference, "tbl_sql")) {
-          reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
+        if (!inherits(reference, "tbl_sql") ||
+              (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
           SCDB::defer_db_cleanup(reference)
         }
 
