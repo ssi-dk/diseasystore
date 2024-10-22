@@ -202,6 +202,10 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
         verbose = FALSE
       )
 
+      # Pre-compute the features once to ensure no burn-in issues (e.g. log table creation)
+      ds$get_feature("n_cyl")
+      ds$get_feature("vs")
+
       # Ensure we start from a clean state
       drop_diseasystore(schema = ds %.% target_schema, conn = ds %.% target_conn)
 
