@@ -260,6 +260,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         # Check that reference data is limited to the study period (start_date and end_date)
         reference_out_of_bounds <- reference |>
+          dplyr::collect() |>
           dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
 
         testthat::expect_equal(
