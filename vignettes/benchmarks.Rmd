@@ -106,7 +106,7 @@ if (on_main) {
 }
 ```
 
-```{r Generate alt text for benchmarks, echo = FALSE, results = "hide"}
+```{r Generate alt text for benchmarks, echo = FALSE, results = "hide", eval = rlang::is_installed("here")}
 benchmark_alt_text <- benchmarks |>
   dplyr::filter(.data$version == "CRAN", .data$SCDB == "CRAN") |>
   dplyr::transmute(
