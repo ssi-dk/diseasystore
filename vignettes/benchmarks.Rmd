@@ -70,7 +70,7 @@ The results of the benchmark are shown graphically below (mean and standard devi
 development version of `diseasystore` with the current CRAN version. In addition, we run the benchmarks with the
 current development version of `SCDB` versus the current CRAN version since `SCDB` is used internally in `diseasystore`.
 
-```{r, echo = FALSE, eval = rlang::is_installed("here") && rlang::is_installed("RSQLite")}
+```{r, echo = FALSE, eval = rlang::is_installed("here")}
 benchmark_location <- c(
   devtools::package_file("inst", "extdata", "benchmarks.rds"),
   system.file("extdata", "benchmarks.rds", package = "diseasystore"),
@@ -104,6 +104,37 @@ if (on_main) {
     dplyr::filter(version != "main") |>
     dplyr::mutate(version = dplyr::if_else(.data$version == "CRAN", "CRAN", "development"))
 }
+```
+
+```{r Generate alt text for benchmarks, echo = FALSE, results = "hide"}
+benchmark_alt_text <- benchmarks |>
+  dplyr::filter(.data$version == "CRAN", .data$SCDB == "CRAN") |>
+  dplyr::transmute(
+    .data$benchmark_function,
+    .data$database,
+    "time_seconds" = .data$time / 1e9
+  ) |>
+  dplyr::mutate("backend" = stringr::str_remove(.data$database, r"{\sv[\w+\.]+$}")) |>
+  dplyr::summarise(
+    "mean_time_seconds" = round(mean(.data$time_seconds)),
+    .by = c("benchmark_function", "backend")
+  ) |>
+  dplyr::summarise(
+    "backends" = toString(.data$backend),
+    .by = c("benchmark_function", "mean_time_seconds")
+  ) |>
+  dplyr::arrange(.data$benchmark_function, .data$mean_time_seconds) |>
+  purrr::pmap_chr(
+    \(benchmark_function, mean_time_seconds, backends) {
+      glue::glue(
+        "The {benchmark_function} benchmark takes {mean_time_seconds} seconds to run on the {backends} backends."
+      )
+    }
+  ) |>
+  purrr::reduce(paste, .init = "The results for the benchmarks of the CRAN versions are as follows:")
+```
+
+```{r, echo = FALSE, fig.alt = benchmark_alt_text, eval = rlang::is_installed("here")}
 
 # Add note slow backends
 slow_backends <- benchmarks |>
