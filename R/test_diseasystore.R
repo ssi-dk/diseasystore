@@ -242,10 +242,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- test_start_date
-        end_date   <- test_end_date
 
-        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -254,8 +252,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
         reference <- reference_generator(
-          start_date  = start_date,
-          end_date    = end_date,
+          start_date  = test_start_date,
+          end_date    = test_end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
         )
@@ -338,10 +336,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- test_start_date
-        end_date   <- test_end_date
 
-        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+        feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
           SCDB::digest_to_checksum() |>
           dplyr::pull("checksum") |>
           sort()
@@ -350,13 +346,12 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
         reference <- reference_generator(
-          start_date  = start_date,
-          end_date    = end_date,
+          start_date  = test_start_date,
+          end_date    = test_end_date,
           slice_ts    = ds %.% slice_ts,
           source_conn = ds %.% source_conn
-        ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+        )
+
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
