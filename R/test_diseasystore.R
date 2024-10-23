@@ -312,7 +312,8 @@ test_diseasystore <- function(
               start_date  = test_start_date,
               end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
-              source_conn = ds %.% source_conn
+              source_conn = ds %.% source_conn,
+              ds = ds
             )
           }
         )
@@ -425,7 +426,8 @@ test_diseasystore <- function(
               start_date  = test_start_date,
               end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
-              source_conn = ds %.% source_conn
+              source_conn = ds %.% source_conn,
+              ds = ds
             )
           }
         )
@@ -433,8 +435,8 @@ test_diseasystore <- function(
         # Copy to remote and continue checks
         if (!inherits(reference, "tbl_sql") ||
               (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
-              reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
-              SCDB::defer_db_cleanup(reference)
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
+          SCDB::defer_db_cleanup(reference)
         }
 
         reference_checksums <- reference |>
