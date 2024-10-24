@@ -52,10 +52,11 @@ age_on_date <- function(birth, reference_date, conn) {
 
 #' @export
 age_on_date.SQLiteConnection <- function(birth, reference_date, conn) {
-  warning(
-    "Age computation on SQLite is not precise. For some edge-cases, age will be off by 1 year! ",
+  age_warning <- paste(
+    "Age computation on SQLite is not precise. For some edge-cases, age will be off by 1 year!",
     "Consider using DuckDB as a local database with precise age computation."
   )
+  pkgcond::pkg_warning(age_warning)
 
   if (inherits(reference_date, "Date")) reference_date <- as.numeric(reference_date)
   return(dplyr::sql(glue::glue("FLOOR(({reference_date} - {birth})/365.242374)")))
@@ -124,10 +125,12 @@ add_years <- function(reference_date, years, conn) {
 
 #' @export
 add_years.SQLiteConnection <- function(reference_date, years, conn) {
-  warning(
-    "Time computation on SQLite is not precise! For long time intervals, the result may be off by 1+ days. ",
+  time_warning <- paste(
+    "Time computation on SQLite is not precise! For long time intervals, the result may be off by 1+ days.",
     "Consider using DuckDB as a local database with precise age computation."
   )
+  pkgcond::pkg_warning(time_warning)
+
   if (inherits(reference_date, "Date")) reference_date <- as.numeric(reference_date)
   return(dplyr::sql(glue::glue("ROUND({reference_date} + {years} * 365.242374)")))
 }

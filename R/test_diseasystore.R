@@ -245,19 +245,28 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         start_date <- test_start_date
         end_date   <- test_end_date
 
-        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          SCDB::digest_to_checksum() |>
-          dplyr::pull("checksum") |>
-          sort()
+        # Suppress our user facing, informative warnings
+        pkgcond::suppress_warnings(
+          class = c(
+            "diseasystore::age_on_date.SQLiteConnection-warning",
+            "diseasystore::add_years.SQLiteConnection-warning"
+          ),
+          expr = {
+            feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+              SCDB::digest_to_checksum() |>
+              dplyr::pull("checksum") |>
+              sort()
 
 
-        reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
+            reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(
-          start_date  = start_date,
-          end_date    = end_date,
-          slice_ts    = ds %.% slice_ts,
-          source_conn = ds %.% source_conn
+            reference <- reference_generator(
+              start_date  = start_date,
+              end_date    = end_date,
+              slice_ts    = ds %.% slice_ts,
+              source_conn = ds %.% source_conn
+            )
+          }
         )
 
         # Check that reference data is limited to the study period (start_date and end_date)
@@ -326,22 +335,32 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
         start_date <- test_start_date
         end_date   <- test_end_date
 
-        feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
-          SCDB::digest_to_checksum() |>
-          dplyr::pull("checksum") |>
-          sort()
+        # Suppress our user facing, informative warnings
+        pkgcond::suppress_warnings(
+          class = c(
+            "diseasystore::age_on_date.SQLiteConnection-warning",
+            "diseasystore::add_years.SQLiteConnection-warning"
+          ),
+          expr = {
+
+            feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+              SCDB::digest_to_checksum() |>
+              dplyr::pull("checksum") |>
+              sort()
 
 
-        reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
+            reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
-        reference <- reference_generator(
-          start_date  = start_date,
-          end_date    = end_date,
-          slice_ts    = ds %.% slice_ts,
-          source_conn = ds %.% source_conn
-        ) |>
-          dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+            reference <- reference_generator(
+              start_date  = start_date,
+              end_date    = end_date,
+              slice_ts    = ds %.% slice_ts,
+              source_conn = ds %.% source_conn
+            ) |>
+              dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
+            SCDB::defer_db_cleanup(reference)
+          }
+        )
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
