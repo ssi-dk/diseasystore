@@ -242,8 +242,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- test_start_date
-        end_date   <- test_end_date
 
         # Suppress our user facing, informative warnings
         pkgcond::suppress_warnings(
@@ -252,7 +250,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             "diseasystore::add_years.SQLiteConnection-warning"
           ),
           expr = {
-            feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+            feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
               SCDB::digest_to_checksum() |>
               dplyr::pull("checksum") |>
               sort()
@@ -261,8 +259,8 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
             reference <- reference_generator(
-              start_date  = start_date,
-              end_date    = end_date,
+              start_date  = test_start_date,
+              end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
               source_conn = ds %.% source_conn
             )
@@ -271,6 +269,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
         # Check that reference data is limited to the study period (start_date and end_date)
         reference_out_of_bounds <- reference |>
+          dplyr::collect() |>
           dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
 
         testthat::expect_equal(
@@ -297,10 +296,28 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
         )
 
+        # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
+        # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
+        testthat::expect_equal(
+          SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
+          0
+        )
+
+        testthat::expect_equal(
+          reference |>
+            dplyr::filter(.data$valid_from >= .data$valid_until) |>
+            SCDB::nrow(),
+          0,
+          info = glue::glue("Feature `{.x}` has some elements where `valid_from` >= `valid_until`.")
+        )
+
 
         # Copy to remote and continue checks
-        reference <- dplyr::copy_to(ds %.% target_conn, df = reference, name = SCDB::unique_table_name("ds"))
-        SCDB::defer_db_cleanup(reference)
+        if (!inherits(reference, "tbl_sql") ||
+              (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
+          SCDB::defer_db_cleanup(reference)
+        }
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
@@ -332,8 +349,6 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-        start_date <- test_start_date
-        end_date   <- test_end_date
 
         # Suppress our user facing, informative warnings
         pkgcond::suppress_warnings(
@@ -343,7 +358,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
           ),
           expr = {
 
-            feature_checksums <- ds$get_feature(.x, start_date = start_date, end_date = end_date) |>
+            feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
               SCDB::digest_to_checksum() |>
               dplyr::pull("checksum") |>
               sort()
@@ -352,15 +367,20 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
             reference_generator <- purrr::pluck(ds, ".__enclos_env__", "private", .y, "compute")
 
             reference <- reference_generator(
-              start_date  = start_date,
-              end_date    = end_date,
+              start_date  = test_start_date,
+              end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
               source_conn = ds %.% source_conn
-            ) |>
-              dplyr::copy_to(ds %.% target_conn, df = _, name = SCDB::unique_table_name("ds"))
-            SCDB::defer_db_cleanup(reference)
+            )
           }
         )
+
+        # Copy to remote and continue checks
+        if (!inherits(reference, "tbl_sql") ||
+              (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
+            reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
+            SCDB::defer_db_cleanup(reference)
+        }
 
         reference_checksums <- reference |>
           SCDB::digest_to_checksum() |>
