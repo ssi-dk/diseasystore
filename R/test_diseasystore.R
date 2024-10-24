@@ -18,6 +18,8 @@
 #'   The data base schema where the tests should be run.
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
+#' @param skip_backends (`character()`)\cr
+#'   List of connection types to skip tests for due to missing functionality.
 #' @param ...
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
@@ -36,8 +38,15 @@
 #' }
 #' @importFrom curl has_internet
 #' @export
-test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NULL,
-                              data_files = NULL, target_schema = "test_ds", test_start_date = NULL, ...) {
+test_diseasystore <- function(
+  diseasystore_generator = NULL,
+  conn_generator = NULL,
+  data_files = NULL,
+  target_schema = "test_ds",
+  test_start_date = NULL,
+  skip_backends = NULL,
+  ...
+) {
 
   # Determine the class of the diseasystore being tested
   diseasystore_class <- diseasystore_generator$classname
@@ -46,10 +55,13 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   checkmate::assert_class(diseasystore_generator, "R6ClassGenerator", add = coll)
   checkmate::assert_choice(as.character(diseasystore_generator$inherit), "DiseasystoreBase", add = coll)
   checkmate::assert_function(conn_generator, add = coll)
-  purrr::walk(conn_generator(), ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  conns <- conn_generator()
+  purrr::walk(conns, ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
+  purrr::walk(conns, DBI::dbDisconnect)
   checkmate::assert_character(data_files, null.ok = TRUE, add = coll)
   checkmate::assert_character(target_schema, add = coll)
   checkmate::assert_date(test_start_date, add = coll)
+  checkmate::assert_character(skip_backends, null.ok = TRUE, add = coll)
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
@@ -148,6 +160,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} initialises correctly"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
 
     # Initialise without start_date and end_date
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -181,6 +194,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with remote source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
     testthat::skip_if_not(curl::has_internet())
     testthat::skip_if_not(remote_data_available)
 
@@ -210,6 +224,7 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
   testthat::test_that(glue::glue("{diseasystore_class} can initialise with default source_conn"), {
     testthat::skip_if_not_installed("RSQLite")
+    testthat::skip_if("SQLiteConnection" %in% skip_backends)
     testthat::skip_if_not(local)
 
     ds <- testthat::expect_no_error(diseasystore_generator$new(
@@ -227,6 +242,36 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
   })
 
 
+  testthat::test_that(glue::glue("Skipped test connection are also disallowed in {diseasystore_class} constructor "), {
+    testthat::skip_if(is.null(skip_backends))
+
+    # Check that the constructor throws an error if the connection is skipped in the tests
+    for (conn in conn_generator()) {
+      if (!checkmate::test_class(conn, skip_backends)) {
+        DBI::dbDisconnect(conn)
+        next
+      }
+
+      # Check that an error is thrown when attempting to use the connection
+      # This error is a checkmate assertion, so we remove newlines and `*` from the formatted error message
+      testthat::expect_error(
+        tryCatch(
+          diseasystore_generator$new(verbose = FALSE, target_conn = conn),
+          error = \(e) {
+            e$message |>
+              stringr::str_remove_all(stringr::fixed("\n *")) |>
+              stringr::str_remove_all(stringr::fixed("* ")) |>
+              simpleError(message = _) |>
+              stop()
+          }
+        ),
+        paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
+      )
+
+    }
+  })
+
+
   # Set a test_end_date for the test
   test_end_date <- test_start_date + lubridate::days(4)
 
@@ -235,6 +280,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
+
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
@@ -326,6 +376,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
@@ -395,6 +450,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
 
     for (conn in conn_generator()) {
 
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
+
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
@@ -448,6 +508,11 @@ test_diseasystore <- function(diseasystore_generator = NULL, conn_generator = NU
     testthat::skip_if_not(local)
 
     for (conn in conn_generator()) {
+
+      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
+        DBI::dbDisconnect(conn)
+        next
+      }
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))

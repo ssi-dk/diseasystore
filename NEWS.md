@@ -9,10 +9,14 @@
 * The data availability period for each `diseasystore` is now exposed via the `$min_start_date` and `$max_end_date`
 fields (#138).
 
+* `diseasystores` can now have variable backend support (#175).
+  In case a backend is insufficient to support the computations, the backend can be blocked for the `diseasystore`.
+  `test_diseasystore()` now have a `skip_backend` argument to skip tests for the disallowed backends.
+
 ## Minor Improvements and Fixes:
 
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
-  * On back ends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
+  * On backends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
   * Due to `slice_ts` not being correctly matched with existing data on some backends (#172).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
