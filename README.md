@@ -20,8 +20,6 @@ specifically designed for serve disease data for epidemic preparedness.
 
 What makes a `diseasystore` special, is that features can be
 automatically coupled and stratified within the `diseasystore` package.
-Consult the Quick start vignette to see it in action
-(`vignette("quick-start", package = "diseasystore")`).
 
 The package forms the data-backbone of the `{diseasy}` package.
 
