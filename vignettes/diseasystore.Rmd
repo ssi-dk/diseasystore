@@ -208,9 +208,14 @@ SCDB::get_tables(ds$target_conn, show_temporary = FALSE)
 `diseasystores` have a number of options available to make configuration easier.
 These options all start with "diseasystore.".
 
+To see all options related to `diseasystore`, we can use the `diseasyoption` function without arguments.
+
 ```{r diseasyoption_list}
-options()[purrr::keep(names(options()), ~ startsWith(., "diseasystore"))]
+diseasyoption()
 ```
+This returns all options related to `diseasystore` and its sister package `diseasy`.
+
+If you want the options for a specific `package`, you can use the `namespace` argument.
 Notice that several options are set as empty strings (""). These are treated as `NULL` by `diseasystore`[^2].
 
 Importantly, the options are _scoped_.
