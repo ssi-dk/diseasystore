@@ -13,9 +13,11 @@
 #'
 #'   DBI::dbDisconnect(conn)
 #' @export
-drop_diseasystore <- function(pattern = NULL,
-                              schema = diseasyoption("target_schema"),
-                              conn = SCDB::get_connection()) {
+drop_diseasystore <- function(
+  pattern = NULL,
+  schema = diseasyoption("target_schema", namespace = "diseasystore"),
+  conn = SCDB::get_connection()
+) {
 
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_character(pattern, null.ok = TRUE, add = coll)

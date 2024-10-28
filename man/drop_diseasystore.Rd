@@ -6,7 +6,7 @@
 \usage{
 drop_diseasystore(
   pattern = NULL,
-  schema = diseasyoption("target_schema"),
+  schema = diseasyoption("target_schema", namespace = "diseasystore"),
   conn = SCDB::get_connection()
 )
 }
