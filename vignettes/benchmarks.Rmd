@@ -198,7 +198,8 @@ g <- ggplot2::ggplot(
   ggplot2::theme(
     legend.position = "bottom",
     legend.justification = "left"
-  )
+  ) +
+  ggplot2::ylim(0, NA)
 
 g
 ```
