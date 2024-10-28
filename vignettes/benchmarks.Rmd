@@ -135,20 +135,6 @@ benchmark_alt_text <- benchmarks |>
 ```
 
 ```{r, echo = FALSE, fig.alt = benchmark_alt_text, eval = rlang::is_installed("here")}
-
-# Add note slow backends
-slow_backends <- benchmarks |>
-  dplyr::distinct(.data$database, .data$benchmark_function, .data$n) |>
-  dplyr::filter(.data$n < max(.data$n), .by = c("database", "benchmark_function")) |>
-  dplyr::select(!"n") |>
-  dplyr::mutate("slow_backend" = TRUE)
-
-benchmarks <- benchmarks |>
-  dplyr::left_join(slow_backends, by = c("database", "benchmark_function")) |>
-  dplyr::mutate("database" = paste0(.data$database, ifelse(isTRUE(.data$slow_backend), "*", ""))) |>
-  dplyr::select(!"slow_backend")
-
-
 # Mean and standard deviation (see ggplot2::mean_se())
 mean_sd <- function(x) {
   mu <- mean(x)
@@ -186,10 +172,6 @@ g <- ggplot2::ggplot(
     legend.position = "bottom",
     legend.justification = "left"
   )
-
-if (nrow(slow_backends) > 1) {
-  g <- g + ggplot2::labs(caption = "* IMPORTANT: Benchmark data halved for this backend!")
-}
 
 g
 ```
