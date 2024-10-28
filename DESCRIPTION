@@ -47,8 +47,11 @@ Imports:
 Suggests:
     devtools,
     duckdb,
+    ggplot2,
+    here,
     knitr,
     lintr,
+    microbenchmark,
     odbc,
     rmarkdown,
     RSQLite,
