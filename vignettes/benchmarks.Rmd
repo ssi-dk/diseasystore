@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
 a simple benchmark:
-A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 10 times and given a unique
+A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 1000 times and given a unique
 ID (the row number of the data):
 
 ```{r benchmark data, include = FALSE}
@@ -87,7 +87,8 @@ then computing the `vs` feature, before finally deleting the computations from t
 
 The second benchmarking function tests the computation time of `$key_join_features()` by joining the `vs` feature to the
 `n_cyl` observation. Note that the `n_cyl` and `vs` are re-computed before the benchmarks are started and are not
-deleted by the benchmarking function as was the case for the benchmark of `$get_feature()`.
+deleted by the benchmarking function as was the case for the benchmark of `$get_feature()`. In addition, we only use
+the first 100 rows of the `benchmark_data` for this test to reduce computation time.
 
 The performance of these benchmark functions are timed with the `microbenchmark` package using 10 replicates.
 All benchmarks are run on the same machine.
