@@ -147,7 +147,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
                 out <- benchmark_data |>
                   dplyr::transmute(
                     "key_car" = .data$car, "n_cyl" = .data$cyl,
-                    "valid_from" = Sys.Date() - lubridate::days(2 * .data$r - 1),
+                    "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id - 1),
                     "valid_until" = .data$valid_from + lubridate::days(2)
                   )
                 return(out)
@@ -159,7 +159,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
                 out <- benchmark_data |>
                   dplyr::transmute(
                     "key_car" = .data$car, .data$vs,
-                    "valid_from" = Sys.Date() - lubridate::days(2 * .data$r),
+                    "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id),
                     "valid_until" = .data$valid_from + lubridate::days(2)
                   )
                 return(out)
@@ -172,12 +172,15 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
 
       # Our benchmark data is the mtcars data set but repeated to increase the data size
+      # If updated, please also update the version in the vignettes/benchmark.Rmd
       data_generator <- function(repeats) {
         purrr::map(
           seq(repeats),
           \(i) {
             dplyr::mutate(
-              mtcars, r = dplyr::row_number() + (i - 1) * nrow(mtcars), "car" = paste(rownames(mtcars), r)
+              mtcars,
+              "row_id" = dplyr::row_number() + (i - 1) * nrow(mtcars),
+              "car" = paste(rownames(mtcars), .data$row_id)
             )
           }
         ) |>
