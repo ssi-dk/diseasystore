@@ -26,6 +26,7 @@ RoxygenNote: 7.3.2
 Language: en-GB
 Imports:
     checkmate,
+    curl,
     DBI,
     dbplyr,
     dplyr,
@@ -33,6 +34,7 @@ Imports:
     ISOweek,
     jsonlite,
     lubridate,
+    pkgcond,
     purrr,
     readr,
     rlang,
@@ -45,9 +47,11 @@ Imports:
 Suggests:
     devtools,
     duckdb,
-    curl,
+    ggplot2,
+    here,
     knitr,
     lintr,
+    microbenchmark,
     odbc,
     rmarkdown,
     RSQLite,

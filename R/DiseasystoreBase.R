@@ -42,6 +42,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date, null.ok = TRUE,   add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
+        checkmate::check_posixct(slice_ts),
         checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
@@ -126,6 +127,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       checkmate::assert_date(end_date,   any.missing = FALSE, add = coll)
       checkmate::assert(
         checkmate::check_date(slice_ts),
+        checkmate::check_posixct(slice_ts),
         checkmate::check_character(slice_ts, pattern = r"{^\d{4}-\d{2}-\d{2}(?: \d{2}:\d{2}:\d{2})?}", null.ok = TRUE),
         add = coll
       )
@@ -189,7 +191,8 @@ DiseasystoreBase <- R6::R6Class(                                                
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
             ds_feature <- ds_feature |>
               dplyr::copy_to(self %.% target_conn, df = _,
-                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"), overwrite = TRUE)
+                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"))
+            SCDB::defer_db_cleanup(ds_feature)
           }
 
           # Add the existing computed data for given slice_ts
@@ -254,7 +257,8 @@ DiseasystoreBase <- R6::R6Class(                                                
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
       validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()), overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()))
+      SCDB::defer_db_cleanup(validities)
 
       out <- dplyr::inner_join(out, validities,
                                sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
@@ -271,26 +275,22 @@ DiseasystoreBase <- R6::R6Class(                                                
     #'   that contains keys to witch the secondary features (defined by `stratification`) can be joined.
     #' @param observable (`character`)\cr
     #'   The name of a feature defined in the feature store
-    #' @param stratification (`list`(`quosures`))\cr
+    #' @param stratification (`list`(`quosures`) or `NULL`)\cr
     #'   Expressions in `stratification` are evaluated to find appropriate features.
     #'   These are then joined to the observable feature before `stratification` is performed.
+    #'
+    #'   If `NULL` (default) no stratification is performed.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
     #' @importFrom dbplyr window_order
-    key_join_features = function(observable, stratification,
+    key_join_features = function(observable, stratification = NULL,
                                  start_date = self %.% start_date,
                                  end_date   = self %.% end_date) {
 
-      # Validate input
-      available_observables  <- self$available_features |>
-        purrr::keep(~ startsWith(., "n_") | endsWith(., "_temperature"))
-      available_stratifications <- self$available_features |>
-        purrr::discard(~ startsWith(., "n_") | endsWith(., "_temperature"))
-
       coll <- checkmate::makeAssertCollection()
-      checkmate::assert_choice(observable, available_observables, add = coll)
+      checkmate::assert_choice(observable, self$available_observables, add = coll)
       checkmate::assert(
         checkmate::check_list(stratification, types = "character", null.ok = TRUE),
         checkmate::check_multi_class(stratification, c("character", "quosure", "quosures"), null.ok = TRUE),
@@ -305,7 +305,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()), overwrite = TRUE)
+        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()))
+      SCDB::defer_db_cleanup(study_dates)
 
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
@@ -314,7 +315,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         ds_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
 
         # Perform detection of features in the stratification
-        stratification_features <- purrr::map(stratification, rlang::as_label) |>
+        stratification_features <- stratification |>
+          purrr::map(~ rlang::quo_text(., width = 500L)) |> # Convert expr to string we can parse
           purrr::map(\(label) {
             purrr::map(ds_map_regex, ~ stringr::str_extract(label, .x)) |>
               purrr::discard(is.na)
@@ -326,7 +328,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         if (is.null(stratification_features)) {
           err <- glue::glue("Stratification variable not found. ",
                             "Available stratification variables are: ",
-                            "{toString(available_stratifications)}")
+                            "{toString(self$available_stratifications)}")
           stop(err)
         }
 
@@ -335,7 +337,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
         # Check stratification features are not observables
         stopifnot("Stratification features cannot be observables" =
-                    purrr::none(stratification_names, ~ . %in% available_observables))
+                    purrr::none(stratification_names, ~ . %in% self$available_observables))
 
         # Fetch requested stratification features from the feature store
         stratification_data <- stratification_features |>
@@ -441,7 +443,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         if (is.null(stratification)) {
           all_combinations <- all_combinations |>
             dplyr::copy_to(self %.% target_conn, df = _,
-                           name = paste0("ds_all_combinations_", Sys.getpid()), overwrite = TRUE)
+                           name = paste0("ds_all_combinations_", Sys.getpid()))
+          SCDB::defer_db_cleanup(all_combinations)
         }
       }
 
@@ -497,6 +500,24 @@ DiseasystoreBase <- R6::R6Class(                                                
       .f = active_binding,
       name = "available_features",
       expr = return(names(self$ds_map))
+    ),
+
+
+    #' @field available_observables (`character`)\cr
+    #'   A list of available observables in the feature store. Read only.
+    available_observables = purrr::partial(
+      .f = active_binding,
+      name = "available_observables",
+      expr = return(purrr::keep(self$available_features, ~ stringr::str_detect(., private$.observables_regex)))
+    ),
+
+
+    #' @field available_stratifications (`character`)\cr
+    #'   A list of available stratifications in the feature store. Read only.
+    available_stratifications = purrr::partial(
+      .f = active_binding,
+      name = "available_stratifications",
+      expr = return(purrr::discard(self$available_features, ~ stringr::str_detect(., private$.observables_regex)))
     ),
 
 
@@ -595,7 +616,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     .ds_map     = NULL, # Must be implemented in child classes
     ds_key_map  = NULL, # Must be implemented in child classes
 
-
+    .observables_regex = r"{^n_(?=\w)}",
 
     verbose = TRUE,
 
@@ -619,9 +640,12 @@ DiseasystoreBase <- R6::R6Class(                                                
         self %.% target_conn,
         SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
       ) |>
+        dplyr::filter(.data$date == !!SCDB::db_timestamp(slice_ts, self %.% target_conn)) |>
         dplyr::collect() |>
-        tidyr::unite("target_table", "schema", "table", sep = ".", na.rm = TRUE) |>
-        dplyr::filter(.data$target_table == !!as.character(target_table), .data$date == !!slice_ts)
+        tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
+        dplyr::filter(
+          .data$target_table == !!as.character(target_table)
+        )
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {

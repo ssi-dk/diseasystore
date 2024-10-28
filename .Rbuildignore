@@ -14,3 +14,4 @@ man-roxygen
 ^Meta$
 ^CRAN-SUBMISSION$
 ^pak.lock
+^data-raw$

@@ -77,6 +77,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
       "min_temperature" = "google_covid_19_min_temperature",
       "max_temperature" = "google_covid_19_max_temperature"
     ),
+    .observables_regex = r"{^n_(?=\w)|(?<=\w)_temperature$}",
     .label = "Google COVID-19",
 
     .min_start_date = as.Date("2020-01-01"),
@@ -184,7 +185,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
         # And finally copy to the DB
         out <- age_bin_map |>
           dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
+          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA)) |>
+          dplyr::ungroup()
 
         return(out)
       },

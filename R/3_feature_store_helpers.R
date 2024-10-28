@@ -71,24 +71,39 @@ get_diseasystore <- function(label) {
 }
 
 
-#' Provides age_labels that follows the mg standard
-#' @param age_cuts (`numeric()`)\cr
-#'   The lower bound of the groups (0 is implicitly included)
-#' @return A vector of labels with zero-padded numerics so they can be sorted easily
-#' @examples
-#'   age_labels(c(5, 12, 20, 30))
-#' @export
-age_labels <- function(age_cuts) {
-  checkmate::assert_numeric(age_cuts, any.missing = FALSE, lower = 0, unique = TRUE, sorted = TRUE)
-
-  age_cuts <- age_cuts[age_cuts > 0 & is.finite(age_cuts)]
-  width <- nchar(as.character(max(c(0, age_cuts))))
-
-  age_labels <- stringr::str_c(
-    stringr::str_pad(c(0, age_cuts), width, pad = "0"),
-    c(rep("-", length(age_cuts)), "+"),
-    c(stringr::str_pad(age_cuts - 1, width, pad = "0"), "")
+#' File path helper for source_conn
+#'
+#' @description
+#'   This helper determines whether source_conn is a file path or URL and creates the full path to the
+#'   the file as needed based on the type of source_conn
+#' @param source_conn (`character(1)`)\cr
+#'   File location (path or URL)
+#' @param file (`character(1)`)\cr
+#'   Name of the file at the location
+#' @noRd
+source_conn_path <- function(source_conn, file) {
+  url_regex <- r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}"
+  checkmate::assert(
+    checkmate::check_directory_exists(source_conn),
+    checkmate::check_character(source_conn, pattern = url_regex)
   )
 
-  return(age_labels)
+  # Determine the type of location
+  if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
+    # If source_conn is a directory, look for files in the folder and keep the ones that match the requested file
+    # This way, if the file exists in a zipped form, it is still retrieved
+    matching_file <- purrr::keep(dir(source_conn), ~ startsWith(., file)) |>
+      purrr::pluck(1) # Ensure we only have one match
+
+    if (is.null(matching_file)) stop(file, " could not be found in ", source_conn)
+
+    file_location <- file.path(source_conn, matching_file)
+
+  } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
+    file_location <- file.path(stringr::str_remove(source_conn, "/$"), file)
+  } else {
+    stop("source_conn could not be parsed to valid directory or URL\n")
+  }
+
+  return(file_location)
 }
