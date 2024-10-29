@@ -2588,7 +2588,7 @@
     {
       "ref": "pkgbuild",
       "package": "pkgbuild",
-      "version": "1.4.4",
+      "version": "1.4.5",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2600,10 +2600,10 @@
         "RemoteRef": "pkgbuild",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.4.4"
+        "RemoteSha": "1.4.5"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pkgbuild_1.4.4.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/pkgbuild_1.4.4.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pkgbuild_1.4.5.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/pkgbuild_1.4.5.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2905,7 +2905,7 @@
     {
       "ref": "ps",
       "package": "ps",
-      "version": "1.8.0",
+      "version": "1.8.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2917,10 +2917,10 @@
         "RemoteRef": "ps",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.8.0"
+        "RemoteSha": "1.8.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/ps_1.8.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/ps_1.8.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/ps_1.8.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/ps_1.8.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4454,7 +4454,7 @@
     {
       "ref": "withr",
       "package": "withr",
-      "version": "3.0.1",
+      "version": "3.0.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4466,10 +4466,10 @@
         "RemoteRef": "withr",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.0.1"
+        "RemoteSha": "3.0.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/withr_3.0.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/withr_3.0.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/withr_3.0.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/withr_3.0.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
