@@ -37,7 +37,7 @@ This vignette shows how to use (some of) this data through the `diseasystore` pa
 
 First, it is a good idea to copy the relevant Google COVID-19 data files locally and store that location as an option
 for the package.
-`DiseasystoreGoogleCovid19` uses only the age-stratified metrics for COVID-19, so only a subset of the repository is
+`?DiseasystoreGoogleCovid19` uses only the age-stratified metrics for COVID-19, so only a subset of the repository is
 needed to download.
 
 ```{r download_data, eval = FALSE}

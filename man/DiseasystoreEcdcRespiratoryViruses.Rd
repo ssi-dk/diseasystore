@@ -52,7 +52,7 @@ Creates a new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Arguments passed to the \code{DiseasystoreBase} constructor.}
+\item{\code{...}}{Arguments passed to the \code{?DiseasystoreBase} constructor.}
 }
 \if{html}{\out{</div>}}
 }

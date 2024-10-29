@@ -1,14 +1,14 @@
 #' `FeatureHandler` factory for Google COVID-19 epidemic metrics
 #'
 #' @description
-#'   This function implements a `FeatureHandler` factory for Google COVID-19 epidemic metrics.
+#'   This function implements a `?FeatureHandler` factory for Google COVID-19 epidemic metrics.
 #'   This factory is used when defining the `DiseasystoreGoogleCovid19` feature store.
 #' @param google_pattern (`character`)\cr
 #'   A regexp pattern that matches Google's naming of the metric in "by-age.csv.gz".
 #' @param out_name (`character`)\cr
 #'   A the name to store the metric in our our feature store.
 #' @return
-#'   A new instance of `FeatureHandler` [R6][R6::R6Class] class corresponding to the epidemic metric.
+#'   A new instance of `?FeatureHandler` [R6][R6::R6Class] class corresponding to the epidemic metric.
 #' @importFrom rlang .data
 #' @noRd
 google_covid_19_metric <- function(google_pattern, out_name) {                                                          # nocov start
