@@ -279,12 +279,7 @@ test_diseasystore <- function(
   testthat::test_that(glue::glue("{diseasystore_class} can retrieve features from a fresh state"), {
     testthat::skip_if_not(local)
 
-    for (conn in conn_generator()) {
-
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
-        DBI::dbDisconnect(conn)
-        next
-      }
+    for (conn in conn_generator(skip_backends)) {
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
@@ -365,12 +360,7 @@ test_diseasystore <- function(
   testthat::test_that(glue::glue("{diseasystore_class} can extend existing features"), {
     testthat::skip_if_not(local)
 
-    for (conn in conn_generator()) {
-
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
-        DBI::dbDisconnect(conn)
-        next
-      }
+    for (conn in conn_generator(skip_backends)) {
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
@@ -429,12 +419,7 @@ test_diseasystore <- function(
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
 
-    for (conn in conn_generator()) {
-
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
-        DBI::dbDisconnect(conn)
-        next
-      }
+    for (conn in conn_generator(skip_backends)) {
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
@@ -488,12 +473,7 @@ test_diseasystore <- function(
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
 
-    for (conn in conn_generator()) {
-
-      if (checkmate::test_multi_class(conn, purrr::pluck(skip_backends, .default = ""))) {
-        DBI::dbDisconnect(conn)
-        next
-      }
+    for (conn in conn_generator(skip_backends)) {
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
