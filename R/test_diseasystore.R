@@ -12,6 +12,7 @@
 #'   The diseasystore R6 class generator to test.
 #' @param conn_generator (`function`)\cr
 #'   Function that generates a `list`() of connections use as target_conn.
+#'   Should take a `skip_backend` that does not open connections for the given backends.
 #' @param data_files (`character()`)\cr
 #'   List of files that should be available when testing.
 #' @param target_schema (`character(1)`)\cr
@@ -27,9 +28,17 @@
 #' \donttest{
 #'   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
 #'
+#'   conn_generator <- function(skip_backends = NULL) {
+#'      switch(
+#'        ("SQLiteConnection" %in% skip_backends) + 1,
+#'        list(DBI::dbConnect(RSQLite::SQLite())), # SQLiteConnection not in skip_backends
+#'        list() # SQLiteConnection in skip_backends
+#'      )
+#'   }
+#'
 #'   test_diseasystore(
 #'     DiseasystoreEcdcRespiratoryViruses,
-#'     \() list(DBI::dbConnect(RSQLite::SQLite())),
+#'     conn_generator,
 #'     data_files = "data/snapshots/2023-11-24_ILIARIRates.csv",
 #'     target_schema = "test_ds",
 #'     test_start_date = as.Date("2022-06-20"),
@@ -54,7 +63,7 @@ test_diseasystore <- function(
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_class(diseasystore_generator, "R6ClassGenerator", add = coll)
   checkmate::assert_choice(as.character(diseasystore_generator$inherit), "DiseasystoreBase", add = coll)
-  checkmate::assert_function(conn_generator, add = coll)
+  checkmate::assert_function(conn_generator, args = "skip_backends", add = coll)
   conns <- conn_generator()
   purrr::walk(conns, ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))
   purrr::walk(conns, DBI::dbDisconnect)
