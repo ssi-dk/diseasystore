@@ -316,7 +316,7 @@ param_and_field_linter <- function() {
 #' @importFrom rlang .data
 #' @noRd
 documentation_template_linter <- function() {
-  general_msg <- paste("Documentation templates should used if available")
+  general_msg <- paste("Documentation templates should used if available!")
 
   lintr::Linter(
     function(source_expression) {
