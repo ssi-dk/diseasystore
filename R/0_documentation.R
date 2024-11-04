@@ -8,7 +8,7 @@ rd_activity_units <- function(type = "param") {
 
 rd_stratification <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`list`(`quosures`))\\cr",
+  paste("(`list`(`quosures`) or `NULL`)\\cr",
         "Use `rlang::quos(...)` to specify stratification.",
         "If given, expressions in stratification evaluated to give the stratification level.",
         ifelse(type == "field", "Read only.", ""))
