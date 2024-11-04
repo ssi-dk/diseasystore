@@ -8,8 +8,7 @@ rd_activity_units <- function(type = "param") {
 
 rd_stratification <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
-  paste("(`list`(`quosures`))\\cr",
-        "Default NULL.",
+  paste("(`list`(`quosures`) or `NULL`)\\cr",
         "Use `rlang::quos(...)` to specify stratification.",
         "If given, expressions in stratification evaluated to give the stratification level.",
         ifelse(type == "field", "Read only.", ""))
@@ -104,7 +103,7 @@ rd_target_conn <- function(type = "param") {
 rd_schema <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`character`)\\cr",
-        "A database schema",
+        "A database schema.",
         ifelse(type == "field", "Read only.", ""),
         "If the database backend does not support schema, the tables will be prefixed with <schema>.")
 }

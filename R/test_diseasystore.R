@@ -14,8 +14,7 @@
 #'   Function that generates a `list`() of connections use as target_conn.
 #' @param data_files (`character()`)\cr
 #'   List of files that should be available when testing.
-#' @param target_schema (`character(1)`)\cr
-#'   The data base schema where the tests should be run.
+#' @param target_schema `r rd_target_schema()`
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
 #' @param ...

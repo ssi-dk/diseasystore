@@ -40,21 +40,21 @@ A list of available stratifications in the feature store. Read only.}
 \item{\code{label}}{(\code{character})\cr
 A human readable label of the feature store. Read only.}
 
-\item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
+\item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located. Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
-\item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.  Read only.}
+\item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in. Read only.}
 
-\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  Read only. If the database backend does not support schema, the tables will be prefixed with <target_schema>.}
+\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in. Read only. If the database backend does not support schema, the tables will be prefixed with <target_schema>.}
 
-\item{\code{start_date}}{(\code{Date})\cr Study period start.  Read only.}
+\item{\code{start_date}}{(\code{Date})\cr Study period start. Read only.}
 
-\item{\code{end_date}}{(\code{Date})\cr Study period end.  Read only.}
+\item{\code{end_date}}{(\code{Date})\cr Study period end. Read only.}
 
-\item{\code{min_start_date}}{(\code{Date})\cr (Minimum)Study period start.  Read only.}
+\item{\code{min_start_date}}{(\code{Date})\cr (Minimum)Study period start. Read only.}
 
-\item{\code{max_end_date}}{(\code{Date})\cr (Maximum)Study period end.  Read only.}
+\item{\code{max_end_date}}{(\code{Date})\cr (Maximum)Study period end. Read only.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).  Read only.}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -92,7 +92,7 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 
 \item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
@@ -143,7 +143,7 @@ The name of a feature defined in the feature store.}
 
 \item{\code{end_date}}{(\code{Date})\cr Study period end.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the database on (used if source_conn is a database).}
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
 }
 \if{html}{\out{</div>}}
 }
@@ -155,8 +155,8 @@ A tbl_dbi with the requested feature for the study period.
 \if{html}{\out{<a id="method-DiseasystoreBase-key_join_features"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreBase-key_join_features}{}}}
 \subsection{Method \code{key_join_features()}}{
-Joins various features from feature store assuming a primary feature (observable)
-that contains keys to witch the secondary features (defined by \code{stratification}) can be joined.
+Joins various features from the feature store assuming a primary feature (observable)
+that contains keys to witch the secondary features (defined by \code{stratification}) are joined.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(
   observable,
@@ -169,14 +169,9 @@ that contains keys to witch the secondary features (defined by \code{stratificat
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr
-The name of a feature defined in the feature store}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr
-Expressions in \code{stratification} are evaluated to find appropriate features.
-These are then joined to the observable feature before \code{stratification} is performed.
-
-If \code{NULL} (default) no stratification is performed.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
