@@ -214,6 +214,22 @@ You can see how to call the testing suite in action with `DiseasystoreGoogleCovi
 To allow the `diseasystores` to be used programmatically, we expose the period of data availability for each
 `diseasystore`. These are defined in the `$.min_start_date` and `$.max_end_date` private fields of the `diseasystore`.
 
+## Limiting support for some database backends
+In some cases, the `diseasystores` may not be compatible with all database backends.
+
+In this case, we add a check to the `initialize` method of the `diseasystore` to ensure that the database backend is
+compatible with the `diseasystore`.
+```
+  initialize = function(...) {
+    super$initialize(...)
+
+    # We do not support SQLite for this diseasystore since it has poor support for date operations
+    checkmate::assert_disjunct(class(self$target_conn), "SQLiteConnection")
+
+    ...
+  }
+```
+
 [^1]: The `SCDB` package places `checksum`, `from_ts`, and `until_ts` as the last columns. But `valid_from` and
       `valid_until` should be the last columns in the output passed to `SCDB`.
 [^2]: In practice, this means that the names of features should be in `snake_case`.

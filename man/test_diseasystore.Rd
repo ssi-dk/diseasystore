@@ -10,6 +10,7 @@ test_diseasystore(
   data_files = NULL,
   target_schema = "test_ds",
   test_start_date = NULL,
+  skip_backends = NULL,
   ...
 )
 }
@@ -18,7 +19,8 @@ test_diseasystore(
 The diseasystore R6 class generator to test.}
 
 \item{conn_generator}{(\code{function})\cr
-Function that generates a \code{list}() of connections use as target_conn.}
+Function that generates a \code{list}() of connections use as target_conn.
+Should take a \code{skip_backend} that does not open connections for the given backends.}
 
 \item{data_files}{(\code{character()})\cr
 List of files that should be available when testing.}
@@ -28,6 +30,9 @@ The data base schema where the tests should be run.}
 
 \item{test_start_date}{(\code{Date})\cr
 The earliest date to retrieve data from during tests.}
+
+\item{skip_backends}{(\code{character()})\cr
+List of connection types to skip tests for due to missing functionality.}
 
 \item{...}{Other parameters passed to the diseasystore generator.}
 }
@@ -48,9 +53,17 @@ diseasystore before calling test_diseasystore.
 \donttest{
   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
 
+  conn_generator <- function(skip_backends = NULL) {
+     switch(
+       ("SQLiteConnection" \%in\% skip_backends) + 1,
+       list(DBI::dbConnect(RSQLite::SQLite())), # SQLiteConnection not in skip_backends
+       list() # SQLiteConnection in skip_backends
+     )
+  }
+
   test_diseasystore(
     DiseasystoreEcdcRespiratoryViruses,
-    \() list(DBI::dbConnect(RSQLite::SQLite())),
+    conn_generator,
     data_files = "data/snapshots/2023-11-24_ILIARIRates.csv",
     target_schema = "test_ds",
     test_start_date = as.Date("2022-06-20"),
