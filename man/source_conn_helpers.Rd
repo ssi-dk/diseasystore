@@ -11,7 +11,7 @@ source_conn_path(source_conn, file)
 source_conn_github(source_conn, file, pull = TRUE)
 }
 \arguments{
-\item{source_conn}{(\code{character(1)})\cr
+\item{source_conn}{(\code{character(1)})\cr                                                                               # nolint: documentation_template_linter
 File location (path or URL).}
 
 \item{file}{(\code{character(1)})\cr
