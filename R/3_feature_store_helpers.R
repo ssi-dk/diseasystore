@@ -76,7 +76,7 @@ get_diseasystore <- function(label) {
 #' @description
 #'   This helper determines whether source_conn is a file path or URL and creates the full path to the
 #'   the file as needed based on the type of source_conn
-#' @param source_conn (`character(1)`)\cr
+#' @param source_conn (`character(1)`)\cr                                                                               # nolint: documentation_template_linter
 #'   File location (path or URL)
 #' @param file (`character(1)`)\cr
 #'   Name of the file at the location

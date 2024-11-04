@@ -155,8 +155,8 @@ A tbl_dbi with the requested feature for the study period.
 \if{html}{\out{<a id="method-DiseasystoreBase-key_join_features"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreBase-key_join_features}{}}}
 \subsection{Method \code{key_join_features()}}{
-Joins various features from feature store assuming a primary feature (observable)
-that contains keys to witch the secondary features (defined by \code{stratification}) can be joined.
+Joins various features from the feature store assuming a primary feature (observable)
+that contains keys to witch the secondary features (defined by \code{stratification}) are joined.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(
   observable,
@@ -169,14 +169,9 @@ that contains keys to witch the secondary features (defined by \code{stratificat
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{observable}}{(\code{character})\cr
-The name of a feature defined in the feature store}
+\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
 
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr
-Expressions in \code{stratification} are evaluated to find appropriate features.
-These are then joined to the observable feature before \code{stratification} is performed.
-
-If \code{NULL} (default) no stratification is performed.}
+\item{\code{stratification}}{(\code{list}(\code{quosures}))\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
