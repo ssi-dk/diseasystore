@@ -32,7 +32,7 @@ fields (#138).
   * Checks that `valid_from` and `valid_until` has class `Date` (#154).
   * Checks that the `valid_from` and `valid_until` columns are chronologically ordered (#176).
 
-## Documentation:
+## Documentation
 
 * An example has been added for building a `diseasystore` with individual level data (#162).
   See `vignette("extending-diseasystore-example")`.
@@ -40,7 +40,7 @@ fields (#138).
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
 
 
-## Minor Improvements and Fixes:
+## Minor Improvements and Fixes
 
 * `diseasyoption()` can now be called without the `option` argument to return all `diseasy/diseasytsore` options (#159).
 
