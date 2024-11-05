@@ -236,11 +236,11 @@ private = list(
 Notice that we again create a new instance of `FeatureHandler` and assign it to the `simulist_sex` field in the
 private list.
 
-The computation of the feature is mostly straight forward, but we would like to use the validity period computed
+The computation of the feature is mostly straightforward, but we would like to use the validity period computed
 in the `birth` feature (the same logic applies for the validity period of the "sex" information as the "birth"
 information)
 
-Therefore, we immediately see a difference in the function signature of the `compute()` function, where we no include
+Therefore, we immediately see a difference in the function signature of the `compute()` function, where we include
 the `ds` argument which, like the others, are passed to the feature handler by `diseasystore` when we compute features.
 This argument holds a reference to the `diseasystore` we are building, so we can use it to retrieve other features
 (in this case, the `birth` feature).
@@ -271,10 +271,10 @@ private = list(
         ) |>
         dplyr::compute()
 
-      # Now, compute the next birth dates of the individual
+      # Now, compute the next birthdays of the individual
       # (as many as we need to cover the study period)
       # and compute the age of the individuals throughout the study period with their
-      # birth dates denoting the starts and ends of the validity periods.
+      # birthdays denoting the starts and ends of the validity periods.
       out <- purrr::map(
         seq.int(
           from = 0,
@@ -329,8 +329,8 @@ The age at the start of the study period is computed directly by from the birth 
 age helper function `age_on_date()`[^2].
 
 Once the age at start is known, we determine the length of the study period (in years) and compute the birth days of
-the individuals throughout the period[^3]. Each birth day has an associated age and a validity period which runs from
-the birth day to the next birth day. Notice that we sometimes compute birth days that fall outside of the study period,
+the individuals throughout the period[^3]. Each birthday has an associated age and a validity period which runs from
+the birthday to the next birthday. Notice that we sometimes compute birth days that fall outside of the study period,
 which we filter out before combining to a single data set with `dplyr::union_all`.
 
 In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
