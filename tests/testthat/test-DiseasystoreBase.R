@@ -113,7 +113,7 @@ test_that("$get_feature verbosity works", {
       private = list(
         .ds_map = list("cyl" = "dummy_mtcars"),
         dummy_mtcars = FeatureHandler$new(
-          compute = function(start_date, end_date, slice_ts, source_conn) {
+          compute = function(start_date, end_date, slice_ts, source_conn, ...) {
             return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
           }
         )

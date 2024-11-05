@@ -256,7 +256,7 @@ test_diseasystore <- function(
 
     # Check that the constructor throws an error if the connection is skipped in the tests
     for (conn in conn_generator()) {
-      if (!checkmate::test_class(conn, skip_backends)) {
+      if (!checkmate::test_multi_class(conn, skip_backends)) {
         DBI::dbDisconnect(conn)
         next
       }
@@ -316,7 +316,8 @@ test_diseasystore <- function(
               start_date  = test_start_date,
               end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
-              source_conn = ds %.% source_conn
+              source_conn = ds %.% source_conn,
+              ds = ds
             )
           }
         )
@@ -424,7 +425,8 @@ test_diseasystore <- function(
               start_date  = test_start_date,
               end_date    = test_end_date,
               slice_ts    = ds %.% slice_ts,
-              source_conn = ds %.% source_conn
+              source_conn = ds %.% source_conn,
+              ds = ds
             )
           }
         )
@@ -432,8 +434,8 @@ test_diseasystore <- function(
         # Copy to remote and continue checks
         if (!inherits(reference, "tbl_sql") ||
               (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
-            reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
-            SCDB::defer_db_cleanup(reference)
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
+          SCDB::defer_db_cleanup(reference)
         }
 
         reference_checksums <- reference |>

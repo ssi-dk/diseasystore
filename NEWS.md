@@ -13,6 +13,10 @@ fields (#138).
   In case a backend is insufficient to support the computations, the backend can be blocked for the `diseasystore`.
   `test_diseasystore()` now have a `skip_backend` argument to skip tests for the disallowed backends.
 
+* Additional arguments (`...`) can now be passed to the `compute()` and `get()` functions in `FeatureHandler`s.
+  Furthermore, a reference to the `diseasystore` is now passed to `compute()` to give the `Featurehandler` access
+  to other features via `ds$get_feature()` (#162).
+
 ## Minor Improvements and Fixes:
 
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
@@ -29,6 +33,9 @@ fields (#138).
   * Checks that the `valid_from` and `valid_until` columns are chronologically ordered (#176).
 
 ## Documentation:
+
+* An example has been added for building a `diseasystore` with individual level data (#162).
+  See `vignette("extending-diseasystore-example")`.
 
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
 

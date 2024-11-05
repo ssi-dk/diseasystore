@@ -143,7 +143,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
           private = list(
             .ds_map = list("n_cyl" = "dummy_cyl", "vs" = "dummy_vs"),
             dummy_cyl = FeatureHandler$new(
-              compute = function(start_date, end_date, slice_ts, source_conn) {
+              compute = function(start_date, end_date, slice_ts, source_conn, ...) {
                 out <- benchmark_data |>
                   dplyr::transmute(
                     "key_car" = .data$car, "n_cyl" = .data$cyl,
@@ -155,7 +155,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
               key_join = key_join_sum
             ),
             dummy_vs = FeatureHandler$new(
-              compute = function(start_date, end_date, slice_ts, source_conn) {
+              compute = function(start_date, end_date, slice_ts, source_conn, ...) {
                 out <- benchmark_data |>
                   dplyr::transmute(
                     "key_car" = .data$car, .data$vs,

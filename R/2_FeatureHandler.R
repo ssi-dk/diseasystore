@@ -53,7 +53,8 @@ FeatureHandler <- R6::R6Class(                                                  
     #' @description
     #'   Creates a new instance of the `FeatureHandler` [R6][R6::R6Class] class.
     #' @param compute (`function`)\cr
-    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn)".
+    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
+    #'
     #'   This function should return a `data.frame` with the computed feature (computed from the source connection).
     #'   The `data.frame` should contain the following columns:
     #'    * key_*: One (or more) columns containing keys to link this feature with other features
@@ -61,7 +62,7 @@ FeatureHandler <- R6::R6Class(                                                  
     #'    * valid_from, valid_until: A set of columns containing the time period for which this feature information
     #'    is valid.\cr
     #' @param get (`function`)\cr
-    #'   (Optional). A function of the form "function(target_table, slice_ts, target_conn)".
+    #'   (Optional). A function of the form "function(target_table, slice_ts, target_conn, ...)".
     #'   This function should retrieve the computed feature from the target connection.\cr
     #' @param key_join (`function`)\cr
     #'   A function like one of the aggregators from [aggregators()].
@@ -87,7 +88,7 @@ FeatureHandler <- R6::R6Class(                                                  
       }
 
       if (is.null(get)) {
-        args <- append(args, c("get" = function(target_table, slice_ts, target_conn) {
+        args <- append(args, c("get" = function(target_table, slice_ts, target_conn, ...) {
           SCDB::get_table(target_conn, target_table, slice_ts = slice_ts)
         }))
       } else {
@@ -111,7 +112,7 @@ FeatureHandler <- R6::R6Class(                                                  
   active = list(
 
     #' @field compute (`function`)\cr
-    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn)".
+    #'   A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
     #'   This function should compute the feature from the source connection.
     compute = function() private$.compute,
 

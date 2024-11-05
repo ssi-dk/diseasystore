@@ -55,7 +55,7 @@ They define the three methods associated with features (\code{compute}, \code{ge
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
 \item{\code{compute}}{(\code{function})\cr
-A function of the form "function(start_date, end_date, slice_ts, source_conn)".
+A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
 This function should compute the feature from the source connection.}
 
 \item{\code{get}}{(\code{function})\cr
@@ -87,7 +87,8 @@ Creates a new instance of the \code{FeatureHandler} \link[R6:R6Class]{R6} class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{compute}}{(\code{function})\cr
-A function of the form "function(start_date, end_date, slice_ts, source_conn)".
+A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
+
 This function should return a \code{data.frame} with the computed feature (computed from the source connection).
 The \code{data.frame} should contain the following columns:
 \itemize{
@@ -98,7 +99,7 @@ is valid.\cr
 }}
 
 \item{\code{get}}{(\code{function})\cr
-(Optional). A function of the form "function(target_table, slice_ts, target_conn)".
+(Optional). A function of the form "function(target_table, slice_ts, target_conn, ...)".
 This function should retrieve the computed feature from the target connection.\cr}
 
 \item{\code{key_join}}{(\code{function})\cr

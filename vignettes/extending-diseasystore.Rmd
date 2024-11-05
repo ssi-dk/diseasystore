@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 
 This vignette gives you the knowledge you need to create your own `diseasystore`.
 
+Once you have familiarised yourself with the concepts, you can consult the `vignette("extending-diseasystore-example")`,
+where we go through how a individual-level `diseasystore` can be implemented.
+
 # The diseasy data model
 To begin, we go through the data model used within the `diseasystores`.
 It is this data model that enables the automatic coupling of features and powers the package.
@@ -93,9 +96,9 @@ Each feature[^3] in the `diseasystore` has an associated `FeatureHandler` which 
 and aggregation of the feature.
 
 ## Computing features
-The `FeatureHandler` defines a `compute` function which must be on the form:
+The `FeatureHandler` defines a `$compute()` function which must be on the form:
 ```
-compute = function(start_date, end_date, slice_ts, source_conn)
+compute = function(start_date, end_date, slice_ts, source_conn, ...)
 ```
 The arguments `start_date` and `end_date` indicates the period for which features should be computed.
 The `diseasystores` are [dynamically expanded](diseasystore.html#dynamically-expanded), so feature computation is often
@@ -111,6 +114,15 @@ compute the features is stored (e.g. a database connection or directory).
 Note that multiple features can be computed by a single `FeatureHandler`.
 For example, you may decide that it is more convenient for compute multiple different features simultaneously
 (e.g. a hospitalisation and the classification of said hospitalisation or a test and the associated test result).
+
+When `$compute()` is called by the `diseasystore`, it also passes a reference to itself as `ds` via the `...` argument.
+This means that if the implementation of `$compute()` needs access to other features to compute the given feature,
+the compute function can pick up the `ds` reference adding it to the function signature:
+```
+compute = function(start_date, end_date, slice_ts, source_conn, ds, ...)
+```
+And then use `ds$get_feature(<feature>, start_date = start_date, end_date = end_date, slice_ts = slice_ts)` to retrieve
+the necessary features for the computation.
 
 ## Retrieving features
 The `FeatureHandler` defines a `$get()` function which must be in the form:
@@ -145,7 +157,10 @@ argument.
 
 ## Putting it all together
 By now, you should know the basics of creating your own `FeatureHandlers`.
-To see some `FeatureHandlers` in action, you can consult a few of those bundled with the `diseasystore` package.
+
+For a detailed walkthrough on creating a `diseasystore`, see the `vignette("extending-diseasystore-example")`.
+
+To see some other `FeatureHandlers` in action, you can consult a few of those bundled with the `diseasystore` package.
 
 For example:
 
@@ -216,6 +231,8 @@ To allow the `diseasystores` to be used programmatically, we expose the period o
 
 ## Limiting support for some database backends
 In some cases, the `diseasystores` may not be compatible with all database backends.
+For example, the bundled `DiseasystoreSimulist` (see `vignette("extending-diseasystore-example")`) is not compatible
+with SQLite due to lack of date support.
 
 In this case, we add a check to the `initialize` method of the `diseasystore` to ensure that the database backend is
 compatible with the `diseasystore`.
@@ -223,7 +240,8 @@ compatible with the `diseasystore`.
   initialize = function(...) {
     super$initialize(...)
 
-    # We do not support SQLite for this diseasystore since it has poor support for date operations
+    # We do not support SQLite for this diseasystore since it has poor support
+    # for date operations
     checkmate::assert_disjunct(class(self$target_conn), "SQLiteConnection")
 
     ...
