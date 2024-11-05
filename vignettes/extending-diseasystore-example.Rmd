@@ -506,9 +506,7 @@ data1 <- ds$key_join_features(
 print(data1)
 ```
 
-```{r no_stratifications_plot, eval = suggests_available && rlang::is_installed("ggplot2"),
-  fig.alt = "The number of positive tests over time in the example data."}
-
+```{r no_stratifications_plot, eval = suggests_available && rlang::is_installed("ggplot2"), fig.alt = "The number of positive tests over time in the example data."}
 ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive)) +
   ggplot2::geom_line()
 ```
@@ -534,9 +532,7 @@ data2 <- ds$key_join_features(
 print(data2)
 ```
 
-```{r stratifications_positive_sex_age_plot, eval = suggests_available && rlang::is_installed("ggplot2"),
-  fig.alt = "The number of positive tests over time per age group in the example data."}
-
+```{r stratifications_positive_sex_age_plot, eval = suggests_available && rlang::is_installed("ggplot2"), fig.alt = "The number of positive tests over time per age group and sex in the example data."}
 ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_positive, color = age_group)) +
   ggplot2::geom_line() +
   ggplot2::facet_wrap(~ sex)
@@ -563,9 +559,7 @@ data3 <- ds$key_join_features(
 print(data3)
 ```
 
-```{r stratifications_admission_generation_plot, eval = suggests_available && rlang::is_installed("ggplot2"),
-  fig.alt = "The number of positive tests over time per age group in the example data."}
-
+```{r stratifications_admission_generation_plot, eval = suggests_available && rlang::is_installed("ggplot2"), fig.alt = "The number of positive tests over time per age group in the example data."}
 ggplot2::ggplot(data3, ggplot2::aes(x = date, y = n_admission, color = generation)) +
   ggplot2::geom_line()
 ```
