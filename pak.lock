@@ -1029,7 +1029,7 @@
       "version": "1.1.2",
       "type": "standard",
       "direct": false,
-      "binary": false,
+      "binary": true,
       "dependencies": "DBI",
       "vignettes": false,
       "metadata": {
@@ -1037,13 +1037,13 @@
         "RemoteType": "standard",
         "RemoteRef": "duckdb",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-        "RemotePkgPlatform": "source",
+        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
         "RemoteSha": "1.1.2"
       },
       "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/duckdb_1.1.2.tar.gz",
-      "target": "src/contrib/duckdb_1.1.2.tar.gz",
-      "platform": "source",
-      "rversion": "*",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/duckdb_1.1.2.tar.gz",
+      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
+      "rversion": "4.4",
       "directpkg": false,
       "license": "MIT + file LICENSE",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1051,10 +1051,8 @@
       "install_args": "",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "needscompilation": true,
-      "repotype": "cranlike",
-      "sha256": "1e14e39db3dc1c8b87ddd185c28deb4d11c3b073d3188852ab632339591c1825",
-      "filesize": 5222398
+      "needscompilation": false,
+      "repotype": "cranlike"
     },
     {
       "ref": "ellipsis",
@@ -1783,7 +1781,7 @@
     {
       "ref": "httr2",
       "package": "httr2",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1795,10 +1793,10 @@
         "RemoteRef": "httr2",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.0.5"
+        "RemoteSha": "1.0.6"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/httr2_1.0.5.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/httr2_1.0.5.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/httr2_1.0.6.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/httr2_1.0.6.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3434,37 +3432,6 @@
       "repotype": "cranlike"
     },
     {
-      "ref": "rematch2",
-      "package": "rematch2",
-      "version": "2.1.2",
-      "type": "standard",
-      "direct": false,
-      "binary": true,
-      "dependencies": "tibble",
-      "vignettes": false,
-      "metadata": {
-        "RemotePkgRef": "rematch2",
-        "RemoteType": "standard",
-        "RemoteRef": "rematch2",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.1.2"
-      },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rematch2_2.1.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rematch2_2.1.2.tar.gz",
-      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-      "rversion": "4.4",
-      "directpkg": false,
-      "license": "MIT + file LICENSE",
-      "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "params": [],
-      "install_args": "",
-      "sysreqs": "",
-      "sysreqs_packages": {},
-      "needscompilation": false,
-      "repotype": "cranlike"
-    },
-    {
       "ref": "remotes",
       "package": "remotes",
       "version": "2.5.0",
@@ -3567,7 +3534,7 @@
     {
       "ref": "rmarkdown",
       "package": "rmarkdown",
-      "version": "2.28",
+      "version": "2.29",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3579,10 +3546,10 @@
         "RemoteRef": "rmarkdown",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.28"
+        "RemoteSha": "2.29"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rmarkdown_2.28.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rmarkdown_2.28.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/rmarkdown_2.29.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/rmarkdown_2.29.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4650,11 +4617,11 @@
     {
       "ref": "waldo",
       "package": "waldo",
-      "version": "0.5.3",
+      "version": "0.6.0",
       "type": "standard",
       "direct": false,
       "binary": true,
-      "dependencies": ["cli", "diffobj", "glue", "rematch2", "rlang", "tibble"],
+      "dependencies": ["cli", "diffobj", "glue", "rlang"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "waldo",
@@ -4662,10 +4629,10 @@
         "RemoteRef": "waldo",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "0.5.3"
+        "RemoteSha": "0.6.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/waldo_0.5.3.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/waldo_0.5.3.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/waldo_0.6.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/waldo_0.6.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
