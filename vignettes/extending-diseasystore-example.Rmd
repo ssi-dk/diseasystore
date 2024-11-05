@@ -91,6 +91,7 @@ DiseasystoreSimulist <- R6::R6Class(
     .label = "Simulist Synthetic Data",
 
   ...
+  )
 )
 ```
 Notice that the names for the `FeatureHandlers` have the prefix "simulist_". The features are stored in the data base
