@@ -1029,7 +1029,7 @@
       "version": "1.1.2",
       "type": "standard",
       "direct": false,
-      "binary": false,
+      "binary": true,
       "dependencies": "DBI",
       "vignettes": false,
       "metadata": {
@@ -1051,10 +1051,8 @@
       "install_args": "",
       "sysreqs": "",
       "sysreqs_packages": {},
-      "needscompilation": true,
-      "repotype": "cranlike",
-      "sha256": "1e14e39db3dc1c8b87ddd185c28deb4d11c3b073d3188852ab632339591c1825",
-      "filesize": 5222398
+      "needscompilation": false,
+      "repotype": "cranlike"
     },
     {
       "ref": "ellipsis",
