@@ -256,7 +256,7 @@ test_diseasystore <- function(
 
     # Check that the constructor throws an error if the connection is skipped in the tests
     for (conn in conn_generator()) {
-      if (!checkmate::test_class(conn, skip_backends)) {
+      if (!checkmate::test_multi_class(conn, skip_backends)) {
         DBI::dbDisconnect(conn)
         next
       }
