@@ -180,8 +180,8 @@ the interval $t \in \left[\textrm{valid_from}, \textrm{valid_until}\right)$.
 
 After computing the feature, we filter to ensure that the data is returned only for the requested time period.
 
-Finally, we also how the feature can be summarised. That is, we need to specify the type of `key_join` the feature
-should use.
+Finally, we also specify how the feature can be summarised. That is, we need to specify the type of `key_join` the
+feature should use.
 
 To illustrate how to determine the type of `key_join`, we imagine that we want to determine the number of people who
 are born on each date. Given our data set, we could perform the following operations to summarize the data:
@@ -192,7 +192,8 @@ simulist_data |>
 ```
 
 That is, our feature has a record for each individual, and to summarise the feature, we need to `count` the individuals
-within each group. This is different from semi-aggregated data where we would `sum` the values within each group.
+within each group. This is different from semi-aggregated data where we would `sum` the values within each group
+(see `?aggregators` for available aggregators).
 
 
 ## The `sex` `FeatureHandler`
@@ -328,9 +329,9 @@ the period requested by the user), and compute their age throughout the study pe
 The age at the start of the study period is computed directly by from the birth date of the individuals using the
 age helper function `age_on_date()`[^2].
 
-Once the age at start is known, we determine the length of the study period (in years) and compute the birth days of
+Once the age at start is known, we determine the length of the study period (in years) and compute the birthdays of
 the individuals throughout the period[^3]. Each birthday has an associated age and a validity period which runs from
-the birthday to the next birthday. Notice that we sometimes compute birth days that fall outside of the study period,
+the birthday to the next birthday. Notice that we sometimes compute birthdays that fall outside of the study period,
 which we filter out before combining to a single data set with `dplyr::union_all()`.
 
 In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
