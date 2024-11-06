@@ -1,4 +1,4 @@
-# diseasystore (development version)
+# diseasystore 0.3.0
 
 ## Breaking change
 
