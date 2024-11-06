@@ -9,10 +9,10 @@
 #' @noRd
 diseasy_code_linters <- function() {
   linters <- list(
-    nolint_position_linter(120),
-    nolint_line_length_linter(120),
-    non_ascii_linter(),
-    param_and_field_linter()
+    "nolint_position_linter" = nolint_position_linter(120),
+    "nolint_line_length_linter" = nolint_line_length_linter(120),
+    "non_ascii_linter" = non_ascii_linter(),
+    "param_and_field_linter" = param_and_field_linter()
   )
 
   return(linters)
