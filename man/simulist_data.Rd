@@ -27,9 +27,6 @@ The data set consists of a \code{tibble} with columns:
 \item \code{date_death}: The date of death.
 }
 }
-\seealso{
-\code{\link[simulist:simulist-package]{simulist::simulist()}}
-}
 \author{
 Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}
 }
