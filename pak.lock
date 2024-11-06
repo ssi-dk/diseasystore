@@ -2202,7 +2202,7 @@
     {
       "ref": "local::.",
       "package": "diseasystore",
-      "version": "0.2.2.9000",
+      "version": "0.3.0",
       "type": "local",
       "direct": true,
       "binary": false,
@@ -2213,7 +2213,7 @@
         "RemoteType": "local"
       },
       "sources": "file:///home/runner/work/diseasystore/diseasystore",
-      "target": "src/contrib/diseasystore_0.2.2.9000.tar.gz",
+      "target": "src/contrib/diseasystore_0.3.0.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": true,
