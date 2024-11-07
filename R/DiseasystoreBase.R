@@ -265,7 +265,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       out <- dplyr::inner_join(
         out,
         validities,
-        by = dplyr::join_by(x$valid_from <= y$valid_until, x$valid_until > y$valid_from),
+        sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND "LHS"."valid_until" > "RHS"."valid_from"',
         suffix = c("", ".p")
       ) |>
         dplyr::select(!c("valid_from.p", "valid_until.p")) |>
