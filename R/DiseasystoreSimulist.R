@@ -94,7 +94,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
             ) |>
             dplyr::filter( # Now we remove the birthdays that fall outside of the study period
               .data$birthday <= {{ end_date }},
-              .data$birthday < .data$valid_until | is.na(.data$valid_until)
+              .data$birthday < .data$valid_until
             ) |>
             dplyr::transmute( # We assign the birth dates as the validity periods
               "key_pnr" = .data$key_pnr,

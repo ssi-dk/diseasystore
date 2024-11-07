@@ -12,11 +12,11 @@ test_that("truncate_interlace works", {
     # In x, the mpg was changed on 2000-01-01 for all but the first 10 cars
     x <- list(
       utils::head(x, 10) |>
-        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("9999-01-01")),
       utils::tail(x, base::nrow(x) - 10) |>
         dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2000-01-01")),
       utils::tail(x, base::nrow(x) - 10) |>
-        dplyr::mutate("mpg" = 0.9 * mpg, "valid_from" = as.Date("2000-01-01"), "valid_until" = as.Date(NA))
+        dplyr::mutate("mpg" = 0.9 * mpg, "valid_from" = as.Date("2000-01-01"), "valid_until" = as.Date("9999-01-01"))
     ) |>
       purrr::reduce(dplyr::union_all) |>
       dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
@@ -25,11 +25,11 @@ test_that("truncate_interlace works", {
     # In y, the wt was changed on 2010-01-01 for all but the last 10 cars
     y <- list(
       utils::head(y, base::nrow(y) - 10) |>
-        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("9999-01-01")),
       utils::tail(y, 10) |>
         dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2010-01-01")),
       utils::tail(y, 10) |>
-        dplyr::mutate(wt = 1.1 * wt, "valid_from" = as.Date("2010-01-01"), "valid_until" = as.Date(NA))
+        dplyr::mutate(wt = 1.1 * wt, "valid_from" = as.Date("2010-01-01"), "valid_until" = as.Date("9999-01-01"))
     ) |>
       purrr::reduce(dplyr::union_all) |>
       dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
@@ -39,15 +39,15 @@ test_that("truncate_interlace works", {
     # In z, the qsec was changed on 2020-01-01 for all but the last and first 10 cars
     z <- list(
       utils::head(z, base::nrow(z) - 10) |>
-        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("9999-01-01")),
       utils::tail(z, 10) |>
-        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date(NA)),
+        dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("9999-01-01")),
       utils::head(z, base::nrow(z) - 10) |>
         utils::tail(base::nrow(z) - 10) |>
         dplyr::mutate("valid_from" = as.Date("1990-01-01"), "valid_until" = as.Date("2020-01-01")),
       utils::head(z, base::nrow(z) - 10) |>
         utils::tail(base::nrow(z) - 10) |>
-        dplyr::mutate(qsec = 1.1 * qsec, "valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
+        dplyr::mutate(qsec = 1.1 * qsec, "valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date("9999-01-01"))
     ) |>
       purrr::reduce(dplyr::union_all) |>
       dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
@@ -59,7 +59,7 @@ test_that("truncate_interlace works", {
       dplyr::transmute(
         .data$key_name,
         "valid_from" = as.Date("1985-01-01"),
-        "valid_until" = as.Date(NA)
+        "valid_until" = as.Date("9999-01-01")
       ) |>
       dplyr::copy_to(conn, df = _, name = SCDB::unique_table_name("diseasystore"))
     SCDB::defer_db_cleanup(p1)

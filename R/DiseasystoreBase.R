@@ -262,10 +262,12 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()))
       SCDB::defer_db_cleanup(validities)
 
-      out <- dplyr::inner_join(out, validities,
-                               sql_on = '"LHS"."valid_from" <= "RHS"."valid_until" AND
-                                         ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
-                               suffix = c("", ".p")) |>
+      out <- dplyr::inner_join(
+        out,
+        validities,
+        by = dplyr::join_by(x$valid_from <= y$valid_until, x$valid_until > y$valid_from),
+        suffix = c("", ".p")
+      ) |>
         dplyr::select(!c("valid_from.p", "valid_until.p")) |>
         dplyr::compute()
 

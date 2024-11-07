@@ -18,7 +18,7 @@ DiseasystoreDummy <- R6::R6Class(                                               
               "key_car" = rownames(mtcars),
               .data$cyl,
               valid_from = Sys.Date(),
-              valid_until = as.Date(NA)
+              valid_until = as.Date("9999-01-01")
             )
         )
       }
@@ -31,7 +31,7 @@ DiseasystoreDummy <- R6::R6Class(                                               
               "key_car" = rownames(mtcars),
               .data$vs,
               valid_from = Sys.Date(),
-              valid_until = as.Date(NA)
+              valid_until = as.Date("9999-01-01")
             )
         )
       }
@@ -44,7 +44,7 @@ DiseasystoreDummy <- R6::R6Class(                                               
               "key_car" = rownames(mtcars),
               .data$am,
               valid_from = Sys.Date(),
-              valid_until = as.Date(NA)
+              valid_until = as.Date("9999-01-01")
             )
         )
       }

@@ -351,8 +351,8 @@ test_diseasystore <- function(
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
         )
 
-        # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
-        # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
+        # Check that valid_until (date) is (strictly) greater than valid_from (date)
+        # Remember that data is valid in the interval [valid_from, valid_until)
         testthat::expect_equal(
           SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
           0

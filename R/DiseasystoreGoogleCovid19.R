@@ -101,7 +101,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
                         age_group_sep   = dplyr::if_else(.data$age_group_upper == "", "+", "-")) |>
           tidyr::unite("age_group", "age_group_lower", "age_group_sep", "age_group_upper", sep = "", na.rm = TRUE) |>
           dplyr::select("key_location" = "location_key", "age_group", "n_population") |>
-          dplyr::mutate(valid_from = as.Date("2020-01-01"), valid_until = as.Date(NA))
+          dplyr::mutate(valid_from = as.Date("2020-01-01"), valid_until = as.Date("9999-01-01"))
 
         return(out)
       },
@@ -130,7 +130,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
                                                       NA, .data$region_id),
                         subregion_id = dplyr::if_else(.data$key_location != .data$subregion_id,
                                                       NA, .data$subregion_id)) |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
+          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date("9999-01-01"))
 
         return(out)
       },
@@ -185,7 +185,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
         # And finally copy to the DB
         out <- age_bin_map |>
           dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA)) |>
+          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date("9999-01-01")) |>
           dplyr::ungroup()
 
         return(out)

@@ -22,38 +22,38 @@
 #'   # In x, the mpg was changed on 2000-01-01 for all but the first 10 cars
 #'   x <- list(utils::head(x, 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
-#'                             "valid_until" = as.Date(NA)),
+#'                             "valid_until" = as.Date("9999-01-01")),
 #'             utils::tail(x, base::nrow(x) - 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
 #'                             "valid_until" = as.Date("2000-01-01")),
 #'             utils::tail(x, base::nrow(x) - 10) |>
 #'               dplyr::mutate("mpg" = 0.9 * mpg,
 #'                             "valid_from" = as.Date("2000-01-01"),
-#'                             "valid_until" = as.Date(NA))) |>
+#'                             "valid_until" = as.Date("9999-01-01"))) |>
 #'     purrr::reduce(dplyr::union_all)
 
 #'
 #'   # In y, the wt was changed on 2010-01-01 for all but the last 10 cars
 #'   y <- list(utils::head(y, base::nrow(y) - 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
-#'                             "valid_until" = as.Date(NA)),
+#'                             "valid_until" = as.Date("9999-01-01")),
 #'             utils::tail(y, 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
 #'                             "valid_until" = as.Date("2010-01-01")),
 #'             utils::tail(y, 10) |>
 #'               dplyr::mutate(wt = 1.1 * wt,
 #'                             "valid_from" = as.Date("2010-01-01"),
-#'                             "valid_until" = as.Date(NA))) |>
+#'                             "valid_until" = as.Date("9999-01-01"))) |>
 #'     purrr::reduce(dplyr::union_all)
 #'
 #'
 #'   # In z, the qsec was changed on 2020-01-01 for all but the last and first 10 cars
 #'   z <- list(utils::head(z, base::nrow(z) - 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
-#'                             "valid_until" = as.Date(NA)),
+#'                             "valid_until" = as.Date("9999-01-01")),
 #'             utils::tail(z, 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
-#'                             "valid_until" = as.Date(NA)),
+#'                             "valid_until" = as.Date("9999-01-01")),
 #'             utils::head(z, base::nrow(z) - 10) |>
 #'               utils::tail(base::nrow(z) - 10) |>
 #'               dplyr::mutate("valid_from" = as.Date("1990-01-01"),
@@ -62,14 +62,14 @@
 #'               utils::tail(base::nrow(z) - 10) |>
 #'               dplyr::mutate(qsec = 1.1 * qsec,
 #'                             "valid_from" = as.Date("2020-01-01"),
-#'                             "valid_until" = as.Date(NA))) |>
+#'                             "valid_until" = as.Date("9999-01-01"))) |>
 #'     purrr::reduce(dplyr::union_all)
 #'
 #'
 #'   # We choose a primary interval to interlace on
 #'   primary <- dplyr::transmute(data, key_name,
 #'                               valid_from = as.Date("1985-01-01"),
-#'                               valid_until = as.Date(NA))
+#'                               valid_until = as.Date("9999-01-01"))
 #'
 #'
 #'   # Perform the truncated interlace
@@ -101,8 +101,8 @@ truncate_interlace <- function(primary, secondary = NULL) {
       # We then join the tables by these keys and truncate the secondary table to validity range of the primary
       dplyr::left_join(x = primary, y = .x, suffix = c("", ".y"), by = common_keys) |>
         dplyr::filter( # Keep secondary records that is within validity of the primary data.
-          (.data$valid_from  < .data$valid_until.y) | is.na(.data$valid_until.y),
-          (.data$valid_until > .data$valid_from.y)  | is.na(.data$valid_until)
+          .data$valid_from  < .data$valid_until.y,
+          .data$valid_until > .data$valid_from.y
         ) |>
         dplyr::mutate(
           "valid_from"  = ifelse(.data$valid_from  >= .data$valid_from.y,  .data$valid_from,  .data$valid_from.y),      # nolint: ifelse_censor_linter
