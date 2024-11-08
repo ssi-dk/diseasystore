@@ -77,7 +77,6 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
     purrr::reduce(dplyr::intersect)
 
   # Install the missing packages
-  .libPaths(lib_dir_common)
   dplyr::union(common_scdb_packages$ref, common_diseasystore_packages$ref) |>
     purrr::discard(rlang::is_installed) |>
     pak::pkg_install(lib = lib_dir_common, dependencies = FALSE)
@@ -107,12 +106,17 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && identical(Sys.geten
     .libPaths(c(lib_dir, lib_paths_common))
 
 
+    # Install dependencies
     pak::lockfile_create(scdb_source, "SCDB.lock", dependencies = TRUE)
     pak::lockfile_create(diseasystore_source, "diseasystore.lock", dependencies = TRUE)
 
     union(jsonlite::fromJSON("SCDB.lock")$packages$ref, jsonlite::fromJSON("diseasystore.lock")$packages$ref) |>
       purrr::discard(rlang::is_installed) |>
       pak::pkg_install(lib = lib_dir, dependencies = FALSE)
+
+    # Explicitly install the packages
+    pak::pkg_install(scdb_source, lib = lib_dir, dependencies = FALSE)
+    pak::pkg_install(diseasystore_source, lib = lib_dir, dependencies = FALSE)
 
   })
 }
@@ -129,16 +133,15 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
     # Use the pre-installed packages
     lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
-    .libPaths(c(lib_dir, lib_paths_common))
 
-    library("diseasystore")                                                                                             # nolint: library_call_linter
+    library("diseasystore", lib.loc = lib_dir)                                                                                             # nolint: library_call_linter
 
     # Add proper version labels to the benchmarks
     if (scdb_version == "CRAN") {
-      scdb_version <- paste0("SCDB v",  packageVersion("SCDB"))
+      scdb_version <- paste0("SCDB v",  packageVersion("SCDB", lib.loc = lib_dir))
     }
     if (diseasystore_version == "CRAN") {
-      diseasystore_version <- paste0("diseasystore v",  packageVersion("diseasystore"))
+      diseasystore_version <- paste0("diseasystore v",  packageVersion("diseasystore", lib.loc = lib_dir))
     }
 
     try({
