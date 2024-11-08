@@ -418,17 +418,17 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Add the new valid counts
       t_add <- out |>
         dplyr::group_by(!!!stratification) |>
-        dplyr::group_by(date = valid_from, .add = TRUE) |>
+        dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename(n_add = n) |>
+        dplyr::rename("n_add" = "n") |>
         dplyr::compute()
 
       # Add the new invalid counts
       t_remove <- out |>
         dplyr::group_by(!!!stratification) |>
-        dplyr::group_by(date = valid_until, .add = TRUE) |>
+        dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename(n_remove = n) |>
+        dplyr::rename("n_remove" = "n") |>
         dplyr::compute()
 
       # Get all combinations to merge onto
@@ -456,17 +456,17 @@ DiseasystoreBase <- R6::R6Class(                                                
       data <- t_add |>
         dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
-        tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
+        tidyr::replace_na(list("n_add" = 0, "n_remove" = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
-        dplyr::mutate(date, !!observable := cumsum(n_add) - cumsum(n_remove)) |>
+        dplyr::mutate(!!observable := cumsum(.data$n_add) - cumsum(.data$n_remove)) |>
         dplyr::ungroup() |>
-        dplyr::select(date, all_of(stratification_names), !!observable) |>
+        dplyr::select("date", all_of(stratification_names), !!observable) |>
         dplyr::collect()
 
       # Ensure date is of type Date
       data <- data |>
-        dplyr::mutate(date = as.Date(date))
+        dplyr::mutate("date" = as.Date(.data$date))
 
 
       # Clean up
