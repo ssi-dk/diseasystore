@@ -133,6 +133,13 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
 
     library("diseasystore")                                                                                             # nolint: library_call_linter
 
+    # Add proper version labels to the benchmarks
+    if (scdb_version == "CRAN") {
+      scdb_version <- paste0("SCDB v",  packageVersion("SCDB"))
+    }
+    if (diseasystore_version == "CRAN") {
+      diseasystore_version <- paste0("diseasystore v",  packageVersion("diseasystore"))
+    }
 
     try({
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
@@ -225,7 +232,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
           "benchmark_function" = "get_feature()",
           "database" = names(conns)[[1]],
           "version" = !!ifelse(diseasystore_version == "branch", substr(sha, 1, 10), diseasystore_version),
-          "SCDB" = factor(scdb_version, levels = c("CRAN", "main")),
+          "SCDB" = factor(scdb_version, levels = unique(c(scdb_version, "main"))),
           "n" = n
         )
 
@@ -269,7 +276,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
           "benchmark_function" = "key_join_features()",
           "database" = names(conns)[[1]],
           "version" = !!ifelse(diseasystore_version == "branch", substr(sha, 1, 10), diseasystore_version),
-          "SCDB" = factor(scdb_version, levels = c("CRAN", "main")),
+          "SCDB" = factor(scdb_version, levels = unique(c(scdb_version, "main"))),
           "n" = n
         )
 
