@@ -134,7 +134,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
     # Use the pre-installed packages
     lib_dir <- file.path("installations", glue::glue("{diseasystore_version}_{scdb_version}"))
 
-    library("diseasystore", lib.loc = lib_dir)                                                                                             # nolint: library_call_linter
+    library("diseasystore", lib.loc = lib_dir)                                                                          # nolint: library_call_linter
 
     # Add proper version labels to the benchmarks
     if (scdb_version == "CRAN") {
