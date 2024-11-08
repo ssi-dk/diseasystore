@@ -239,10 +239,11 @@ g <- ggplot2::ggplot(
     scales = "free_y",
     labeller = labeller
   ) +
+  ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(n.dodge = 2)) +
   ggplot2::labs(x = "Codebase version", y = "Time (s)") +
   ggplot2::theme(
     legend.position = "bottom",
-    legend.justification = "left"
+    legend.justification = "left",
   ) +
   ggplot2::ylim(0, NA)
 
