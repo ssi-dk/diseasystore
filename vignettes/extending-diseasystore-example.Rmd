@@ -522,7 +522,7 @@ data2 <- ds$key_join_features(
       age,
       breaks = c(0, 15, 30, Inf),
       labels = !!age_labels(c(0, 15, 30)),
-      include.lowest = TRUE
+      right = FALSE
     ),
     sex
   ),
