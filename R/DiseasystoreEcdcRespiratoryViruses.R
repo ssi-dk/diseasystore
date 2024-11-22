@@ -104,7 +104,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
 )
 
 
-# Set default options for the package related to the Google COVID-19 store
+# Set default options for the package related to the EU-ECDC Respiratory viruses feature store
 rlang::on_load({
   options(
     "diseasystore.DiseasystoreEcdcRespiratoryViruses.remote_conn" =
