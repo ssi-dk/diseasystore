@@ -62,7 +62,7 @@ test_diseasystore <- function(
 
   coll <- checkmate::makeAssertCollection()
   checkmate::assert_class(diseasystore_generator, "R6ClassGenerator", add = coll)
-  checkmate::assert_choice(as.character(diseasystore_generator$inherit), "DiseasystoreBase", add = coll)
+  checkmate::assert_character(rlang::quo_text(diseasystore_generator$inherit), pattern = "DiseasystoreBase", add = coll)
   checkmate::assert_function(conn_generator, args = "skip_backends", add = coll)
   conns <- conn_generator()
   purrr::walk(conns, ~ checkmate::assert_multi_class(., c("DBIConnection", "OdbcConnection"), add = coll))

@@ -24,7 +24,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
     #' @description
     #'   Creates a new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
     #' @param ...
-    #'   Arguments passed to the `DiseasystoreBase` constructor.
+    #'   Arguments passed to the `?DiseasystoreBase` constructor.
     #' @return
     #'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.
     initialize = function(...) {
@@ -104,7 +104,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
 )
 
 
-# Set default options for the package related to the Google COVID-19 store
+# Set default options for the package related to the EU-ECDC Respiratory viruses feature store
 rlang::on_load({
   options(
     "diseasystore.DiseasystoreEcdcRespiratoryViruses.remote_conn" =

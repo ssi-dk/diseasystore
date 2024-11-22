@@ -45,19 +45,19 @@ If you have [extended](extending-diseasystore.html) `diseasystore` with either y
 external package, then attaching the package to your search path will allow it to show up as available.
 
 Note: `diseasystores` are found if they are defined within packages named `diseasystore*` and are of the class
-`DiseasystoreBase`.
+`?DiseasystoreBase`.
 
 Each of these `diseasystores` may have their own vignette that further details their content, use and/or tips and tricks.
-This is for example the case with [`DiseasystoreGoogleCovid19`](diseasystore-google-covid-19.html).
+This is for example the case with `?DiseasystoreGoogleCovid19`.
 
 # Using a diseasystore
 To use a `diseasystore` we need to first do some configuration.
 The `diseasystores` are designed to work with data bases to store the computed features in.
 Each `diseasystore` may require individual configuration as listed in its documentation or accompanying vignette.
 
-For this Quick start, we will configure a `DiseasystoreGoogleCovid19` to use a local `duckdb` data base
+For this Quick start, we will configure a `?DiseasystoreGoogleCovid19` to use a local `{duckdb}` data base
 Ideally, we want to use a faster, more capable, data base to store the features in.
-The `diseasystores` uses `SCDB` in the back end and can use any data base back end supported by `SCDB`.
+The `diseasystores` uses `{SCDB}` in the back end and can use any data base back end supported by `{SCDB}`.
 
 ```{r google_setup_hidden, include = FALSE, eval = suggests_available && not_on_cran}
 # The files we need are stored remotely in Google's API
@@ -149,10 +149,10 @@ The real strength of `diseasystore` comes from its built-in automatic aggregatio
 
 We saw above that the features come with additional associated "key_*" and "valid_from/until" columns.
 
-This additional information is used to do automatic aggregation through the `$key_join_features()` method
+This additional information is used to do automatic aggregation through the `?DieasystoreBase$key_join_features()` method
 (see [extending-diseasystore](extending-diseasystore.html) for more details).
 
-To use this method, you need to provide the `observable` that you want to aggregate and the `stratification` you want 
+To use this method, you need to provide the `observable` that you want to aggregate and the `stratification` you want
 to apply to the aggregation.
 
 To see which features are considered "observables" and which are considered "stratifications" you can use the included methods:
@@ -208,12 +208,12 @@ SCDB::get_tables(ds$target_conn, show_temporary = FALSE)
 `diseasystores` have a number of options available to make configuration easier.
 These options all start with "diseasystore.".
 
-To see all options related to `diseasystore`, we can use the `diseasyoption` function without arguments.
+To see all options related to `diseasystore`, we can use the `diseasyoption()` function without arguments.
 
 ```{r diseasyoption_list}
 diseasyoption()
 ```
-This returns all options related to `diseasystore` and its sister package `diseasy`.
+This returns all options related to `diseasystore` and its sister package `{diseasy}`.
 
 If you want the options for a specific `package`, you can use the `namespace` argument.
 Notice that several options are set as empty strings (""). These are treated as `NULL` by `diseasystore`[^2].
@@ -221,7 +221,7 @@ Notice that several options are set as empty strings (""). These are treated as 
 Importantly, the options are _scoped_.
 Consider the above options for "source_conn":
 Looking at the list of options we find "diseasystore.source_conn" and "diseasystore.DiseasystoreGoogleCovid19.source_conn".
-The former is a general setting while the latter is specific setting for `DiseasystoreGoogleCovid19`.
+The former is a general setting while the latter is specific setting for `?DiseasystoreGoogleCovid19`.
 The general setting is used as fallback if no specific setting is found.
 
 This allows you to set a general configuration to use and to overwrite it for specific cases.
@@ -230,7 +230,7 @@ To get the option related to a scope, we can use the `diseasyoption()` function.
 ```{r diseasyoption_example_1}
 diseasyoption("source_conn", class = "DiseasystoreGoogleCovid19")
 ```
-As we saw in the options, a `source_conn` option was defined specifically for `DiseasystoreGoogleCovid19`.
+As we saw in the options, a `source_conn` option was defined specifically for `?DiseasystoreGoogleCovid19`.
 
 If we try the same for the hypothetical `DiseasystoreDiseaseY`, we see that no value is defined as we have not yet
 configured the fallback value.

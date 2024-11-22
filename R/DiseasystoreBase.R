@@ -334,8 +334,10 @@ DiseasystoreBase <- R6::R6Class(                                                
           stop(err)
         }
 
-        stratification_names <- purrr::map(stratification, rlang::as_label)
-        stratification_names <- purrr::imap_chr(stratification_names, ~ ifelse(.y == "", .x, .y)) |> unname()
+        stratification_names <- stratification |>
+          purrr::map(rlang::as_label) |>
+          purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
+          unname()
 
         # Check stratification features are not observables
         stopifnot("Stratification features cannot be observables" =
@@ -381,7 +383,16 @@ DiseasystoreBase <- R6::R6Class(                                                
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
 
       # Give warning if stratification features are already in the observables data
-      existing_stratification <- intersect(colnames(observable_data), stratification_features)
+      # First we identify the computations being done in the stratifications, only stratifications that compute a new
+      # entity can lead to unexpected behaviour. If the user just request a already existing stratification, there will
+      # be no ambiguities.
+      new_stratifications <- stratification |>
+        purrr::map(rlang::as_label) |>
+        names() |>
+        purrr::discard(~ . == "")
+
+      # .. and then we look for overlap with existing stratifications
+      existing_stratification <- intersect(colnames(observable_data), new_stratifications)
       if (length(existing_stratification) > 0) {
         warning("Observable already stratified by: ", toString(existing_stratification), ". ",
                 "Output might be inconsistent with expectation.")
@@ -416,17 +427,17 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Add the new valid counts
       t_add <- out |>
         dplyr::group_by(!!!stratification) |>
-        dplyr::group_by(date = valid_from, .add = TRUE) |>
+        dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename(n_add = n) |>
+        dplyr::rename("n_add" = "n") |>
         dplyr::compute()
 
       # Add the new invalid counts
       t_remove <- out |>
         dplyr::group_by(!!!stratification) |>
-        dplyr::group_by(date = valid_until, .add = TRUE) |>
+        dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename(n_remove = n) |>
+        dplyr::rename("n_remove" = "n") |>
         dplyr::compute()
 
       # Get all combinations to merge onto
@@ -454,17 +465,17 @@ DiseasystoreBase <- R6::R6Class(                                                
       data <- t_add |>
         dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
-        tidyr::replace_na(list(n_add = 0, n_remove = 0)) |>
+        tidyr::replace_na(list("n_add" = 0, "n_remove" = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
-        dplyr::mutate(date, !!observable := cumsum(n_add) - cumsum(n_remove)) |>
+        dplyr::mutate(!!observable := cumsum(.data$n_add) - cumsum(.data$n_remove)) |>
         dplyr::ungroup() |>
-        dplyr::select(date, all_of(stratification_names), !!observable) |>
+        dplyr::select("date", all_of(stratification_names), !!observable) |>
         dplyr::collect()
 
       # Ensure date is of type Date
       data <- data |>
-        dplyr::mutate(date = as.Date(date))
+        dplyr::mutate("date" = as.Date(.data$date))
 
 
       # Clean up
@@ -662,7 +673,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Find updates that overlap with requested range
       logs <- logs |>
-        dplyr::filter(ds_start_date <= end_date, start_date <= ds_end_date, success == TRUE)                            # nolint: redundant_equals_linter. required for dbplyr translations
+        dplyr::filter(
+          .data$ds_start_date <= {{ end_date }},
+          {{ start_date }} <= .data$ds_end_date,
+          .data$success == TRUE                                                                                         # nolint: redundant_equals_linter. Required for dbplyr translations
+        )
 
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {

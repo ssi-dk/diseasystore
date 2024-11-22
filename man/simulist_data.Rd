@@ -10,8 +10,8 @@ Lambert J, Tamayo C (2024).
 \doi{10.5281/zenodo.10471458}, https://epiverse-trace.github.io/simulist/.
 }
 \description{
-This data set contains a synthetic linelist created with the \code{simulist} package.
-This linelist is used as an example data set for the \code{DiseasystoreSimulist} class.
+This data set contains a synthetic line list created with the \code{simulist} package.
+This line list is used as an example data set for the \code{DiseasystoreSimulist} class.
 }
 \details{
 The data set consists of a \code{tibble} with columns:
@@ -26,9 +26,6 @@ The data set consists of a \code{tibble} with columns:
 \item \code{date_discharge}: The date of discharge from hospital.
 \item \code{date_death}: The date of death.
 }
-}
-\seealso{
-\code{\link[simulist:simulist-package]{simulist::simulist()}}
 }
 \author{
 Rasmus Skytte Randl\\u00F8v \email{rske@ssi.dk}

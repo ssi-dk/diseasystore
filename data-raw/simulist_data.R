@@ -1,3 +1,11 @@
+if (!rlang::is_installed("simulist")) {
+  message(
+    "Generation of this data set requires the `simulist` package. ",
+    "However as it is not released on CRAN we cannot include the it as a suggested package ",
+    "and you need to manually install the package."
+  )
+}
+
 if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
 
   # Configure `simulist` using their example configuration.
