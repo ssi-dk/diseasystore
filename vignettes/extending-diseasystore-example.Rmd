@@ -457,9 +457,9 @@ if (rlang::is_installed("withr")) {
 }
 ```
 
-With the `target_conn` option set, we can easily create a new instance of the `diseasystore`[^5].
+With the `target_conn` option set, we can easily create a new instance of the `diseasystore`.
 ```{r initializing_diseasystore, eval = suggests_available}
-ds <- diseasystore:::DiseasystoreSimulist$new()
+ds <- diseasystore::DiseasystoreSimulist$new()
 ```
 
 ## Retrieving features
@@ -588,6 +588,3 @@ available immediately after, but this is not the case in SQL syntax. Therefore, 
 which generates nested sub-queries which makes the variables available in subsequent calls.
 
 [^4]: The `vignette("diseasystore")` explains the options system in more detail.
-
-[^5]: The `DiseasystoreSimulist` is bundled with the package, but not exported. Therefore, we use the `:::` operator to
-retrieve the class.

@@ -11,13 +11,19 @@
 #'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
-#' @noRd
+#' @export
 #' @importFrom R6 R6Class
 DiseasystoreSimulist <- R6::R6Class(                                                                                    # nolint: object_name_linter.
   classname = "DiseasystoreSimulist",
   inherit = DiseasystoreBase,
 
   public = list(
+    #' @description
+    #'   Creates a new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
+    #' @param ...
+    #'   Arguments passed to the `?DiseasystoreBase` constructor.
+    #' @return
+    #'   A new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
     initialize = function(...) {
       super$initialize(...)
 

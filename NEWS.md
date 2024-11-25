@@ -21,6 +21,8 @@
   In case a backend is insufficient to support the computations, the backend can be blocked for the `diseasystore`.
   `test_diseasystore()` now have a `skip_backend` argument to skip tests for the disallowed backends.
 
+* Added the `?DiseasystoreSimulist` which implements a synthetic, individual-level, data set generated with `simulist`.
+
 ## Minor Improvements and Fixes
 
 * A bug was fixed where data was duplicated when features were not divided into separate tables (#192).
