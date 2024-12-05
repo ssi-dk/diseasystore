@@ -25,6 +25,8 @@ fields (#138).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
 
+* When creating your own `diseasystore` it is now easier to inherit from the base module (#189).
+
 ## Testing:
 
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly:
