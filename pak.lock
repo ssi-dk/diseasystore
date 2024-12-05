@@ -131,7 +131,7 @@
     {
       "ref": "bit",
       "package": "bit",
-      "version": "4.5.0",
+      "version": "4.5.0.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -143,10 +143,10 @@
         "RemoteRef": "bit",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "4.5.0"
+        "RemoteSha": "4.5.0.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/bit_4.5.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/bit_4.5.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/bit_4.5.0.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/bit_4.5.0.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -1092,23 +1092,23 @@
       "type": "github",
       "direct": false,
       "binary": false,
-      "dependencies": ["checkmate", "cli", "distcrete", "distributional", "epiparameterDB", "lifecycle", "pillar", "rlang"],
+      "dependencies": ["cachem", "checkmate", "cli", "distcrete", "distributional", "epiparameterDB", "lifecycle", "pillar", "rlang"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "epiverse-trace/epiparameter",
         "RemoteType": "github",
         "RemoteRef": "HEAD",
-        "RemoteSha": "71d4b4069877f1ea91a3467af8407d6c198d0682",
+        "RemoteSha": "1c94e679b3bf286a852791cd93e110342fe79bd9",
         "RemoteHost": "api.github.com",
         "RemoteRepo": "epiparameter",
         "RemoteUsername": "epiverse-trace",
         "GithubRepo": "epiparameter",
         "GithubUsername": "epiverse-trace",
         "GithubRef": "HEAD",
-        "GithubSHA1": "71d4b4069877f1ea91a3467af8407d6c198d0682"
+        "GithubSHA1": "1c94e679b3bf286a852791cd93e110342fe79bd9"
       },
-      "sources": "https://api.github.com/repos/epiverse-trace/epiparameter/zipball/71d4b4069877f1ea91a3467af8407d6c198d0682",
-      "target": "src/contrib/epiparameter_0.3.0.9000_71d4b40.tar.gz",
+      "sources": "https://api.github.com/repos/epiverse-trace/epiparameter/zipball/1c94e679b3bf286a852791cd93e110342fe79bd9",
+      "target": "src/contrib/epiparameter_0.3.0.9000_1c94e67.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": false,
@@ -1133,17 +1133,17 @@
         "RemotePkgRef": "epiverse-trace/epiparameterDB",
         "RemoteType": "github",
         "RemoteRef": "HEAD",
-        "RemoteSha": "54b3fb732a554347a62d498e242a7c16500a805b",
+        "RemoteSha": "c6bc77a9f5f9f42c13022e2bf37b88b08864c4b6",
         "RemoteHost": "api.github.com",
         "RemoteRepo": "epiparameterDB",
         "RemoteUsername": "epiverse-trace",
         "GithubRepo": "epiparameterDB",
         "GithubUsername": "epiverse-trace",
         "GithubRef": "HEAD",
-        "GithubSHA1": "54b3fb732a554347a62d498e242a7c16500a805b"
+        "GithubSHA1": "c6bc77a9f5f9f42c13022e2bf37b88b08864c4b6"
       },
-      "sources": "https://api.github.com/repos/epiverse-trace/epiparameterDB/zipball/54b3fb732a554347a62d498e242a7c16500a805b",
-      "target": "src/contrib/epiparameterDB_0.1.0_54b3fb7.tar.gz",
+      "sources": "https://api.github.com/repos/epiverse-trace/epiparameterDB/zipball/c6bc77a9f5f9f42c13022e2bf37b88b08864c4b6",
+      "target": "src/contrib/epiparameterDB_0.1.0_c6bc77a.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": false,
@@ -1816,7 +1816,7 @@
     {
       "ref": "httr2",
       "package": "httr2",
-      "version": "1.0.6",
+      "version": "1.0.7",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1828,10 +1828,10 @@
         "RemoteRef": "httr2",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.0.6"
+        "RemoteSha": "1.0.7"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/httr2_1.0.6.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/httr2_1.0.6.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/httr2_1.0.7.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/httr2_1.0.7.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2276,7 +2276,7 @@
     {
       "ref": "later",
       "package": "later",
-      "version": "1.3.2",
+      "version": "1.4.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2288,10 +2288,10 @@
         "RemoteRef": "later",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.3.2"
+        "RemoteSha": "1.4.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/later_1.3.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/later_1.3.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/later_1.4.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/later_1.4.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2755,7 +2755,7 @@
     {
       "ref": "parallelly",
       "package": "parallelly",
-      "version": "1.39.0",
+      "version": "1.40.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2767,10 +2767,10 @@
         "RemoteRef": "parallelly",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.39.0"
+        "RemoteSha": "1.40.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.39.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.39.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.40.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.40.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3103,7 +3103,7 @@
     {
       "ref": "promises",
       "package": "promises",
-      "version": "1.3.0",
+      "version": "1.3.2",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3115,10 +3115,10 @@
         "RemoteRef": "promises",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.3.0"
+        "RemoteSha": "1.3.2"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/promises_1.3.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/promises_1.3.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/promises_1.3.2.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/promises_1.3.2.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3707,7 +3707,7 @@
     {
       "ref": "RSQLite",
       "package": "RSQLite",
-      "version": "2.3.8",
+      "version": "2.3.9",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3719,10 +3719,10 @@
         "RemoteRef": "RSQLite",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.3.8"
+        "RemoteSha": "2.3.9"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.8.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.8.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/RSQLite_2.3.9.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/RSQLite_2.3.9.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4497,7 +4497,7 @@
     {
       "ref": "usethis",
       "package": "usethis",
-      "version": "3.0.0",
+      "version": "3.1.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4509,10 +4509,10 @@
         "RemoteRef": "usethis",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "3.0.0"
+        "RemoteSha": "3.1.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/usethis_3.0.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/usethis_3.0.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/usethis_3.1.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/usethis_3.1.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
