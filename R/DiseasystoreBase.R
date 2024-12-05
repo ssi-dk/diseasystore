@@ -381,7 +381,16 @@ DiseasystoreBase <- R6::R6Class(                                                
       observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
 
       # Give warning if stratification features are already in the observables data
-      existing_stratification <- intersect(colnames(observable_data), stratification_features)
+      # First we identify the computations being done in the stratifications, only stratifications that compute a new
+      # entity can lead to unexpected behaviour. If the user just request a already existing stratification, there will
+      # be no ambiguities.
+      new_stratifications <- stratification |>
+        purrr::map(rlang::as_label) |>
+        names() |>
+        purrr::discard(~ . == "")
+
+      # .. and then we look for overlap with existing stratifications
+      existing_stratification <- intersect(colnames(observable_data), new_stratifications)
       if (length(existing_stratification) > 0) {
         warning("Observable already stratified by: ", toString(existing_stratification), ". ",
                 "Output might be inconsistent with expectation.")

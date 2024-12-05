@@ -25,6 +25,10 @@ fields (#138).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
 
+* Warnings about existing stratifications now only appear if the requested stratification contains a named expression
+  matching an existing stratification. Simply requesting the stratification from the feature store will no longer
+  produce a warning (#190).
+
 ## Testing:
 
 * `test_diseasystore()` now also checks that the `FeatureHandler`s return data directly:
