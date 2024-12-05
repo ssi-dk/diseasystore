@@ -310,6 +310,39 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()))
       SCDB::defer_db_cleanup(study_dates)
 
+      # Fetch the requested observable from the feature store and truncate to the start and end dates
+      # to simplify the interlaced output
+      observable_data <- self$get_feature(observable, start_date, end_date) |>
+        dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
+        dplyr::mutate(
+          "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),          # nolint: ifelse_censor_linter
+          "valid_until" = dplyr::coalesce(
+            ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),                   # nolint: ifelse_censor_linter
+            .data$valid_until.d
+          )
+        ) |>
+        dplyr::select(!ends_with(".d"))
+
+      # Determine the keys
+      observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
+
+      # Give warning if stratification features are already in the observables data
+      # First we identify the computations being done in the stratifications, only stratifications that compute a new
+      # entity can lead to unexpected behaviour. If the user just request a already existing stratification, there will
+      # be no ambiguities.
+      new_stratifications <- stratification |>
+        purrr::map(rlang::as_label) |>
+        names() |>
+        purrr::discard(~ . == "")
+
+      # .. and then we look for overlap with existing stratifications
+      existing_stratification <- intersect(colnames(observable_data), new_stratifications)
+      if (length(existing_stratification) > 0) {
+        warning("Observable already stratified by: ", toString(existing_stratification), ". ",
+                "Output might be inconsistent with expectation.")
+      }
+
+
       # Determine which features are affected by a stratification
       if (!is.null(stratification)) {
 
@@ -334,15 +367,19 @@ DiseasystoreBase <- R6::R6Class(                                                
           stop(err)
         }
 
-        stratification_names <- purrr::map(stratification, rlang::as_label)
-        stratification_names <- purrr::imap_chr(stratification_names, ~ ifelse(.y == "", .x, .y)) |> unname()
+        # Determine the name of the columns created by the stratifications
+        stratification_names <- stratification |>
+          purrr::map(rlang::as_label) |>
+          purrr::imap_chr(~ ifelse(.y == "", .x, .y)) |>
+          unname()
 
-        # Check stratification features are not observables
+        # Check stratification names do not collide with any of the observables
         stopifnot("Stratification features cannot be observables" =
                     purrr::none(stratification_names, ~ . %in% self$available_observables))
 
         # Fetch requested stratification features from the feature store
         stratification_data <- stratification_features |>
+          purrr::discard(~ . %in% colnames(observable_data)) |> # Skip those already in the observable data
           unique() |>
           purrr::map(~ {
             # Fetch the requested stratification feature from the feature store and truncate to the start
@@ -358,44 +395,16 @@ DiseasystoreBase <- R6::R6Class(                                                
               ) |>
               dplyr::select(!ends_with(".d"))
           })
+
+        # Check if no stratification data was pulled
+        if (length(stratification_data) == 0) stratification_data <- NULL
+
       } else {
         stratification_features <- NULL
         stratification_names <- NULL
         stratification_data <- NULL
       }
 
-      # Fetch the requested observable from the feature store and truncate to the start and end dates
-      # to simplify the interlaced output
-      observable_data <- self$get_feature(observable, start_date, end_date) |>
-        dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
-        dplyr::mutate(
-          "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),          # nolint: ifelse_censor_linter
-          "valid_until" = dplyr::coalesce(
-            ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),                   # nolint: ifelse_censor_linter
-            .data$valid_until.d
-          )
-        ) |>
-        dplyr::select(!ends_with(".d"))
-
-      # Determine the keys
-      observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
-
-      # Give warning if stratification features are already in the observables data
-      existing_stratification <- intersect(colnames(observable_data), stratification_features)
-      if (length(existing_stratification) > 0) {
-        warning("Observable already stratified by: ", toString(existing_stratification), ". ",
-                "Output might be inconsistent with expectation.")
-      }
-
-      # Map stratification_data to observable_keys (if not already)
-      if (!is.null(stratification_data)) {
-        stratification_keys <- purrr::map(stratification_data,
-                                          ~ colnames(dplyr::select(., tidyselect::starts_with("key_"))))
-
-        stratification_data <- stratification_data |>
-          purrr::map_if(!purrr::map_lgl(stratification_keys, ~ any(observable_keys %in% .)),
-                        ~ .)
-      }
 
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, stratification_data) |>

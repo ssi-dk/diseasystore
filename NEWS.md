@@ -19,6 +19,8 @@ fields (#138).
 
 ## Minor Improvements and Fixes:
 
+* A bug was fixed where data was duplicated when features were not divided into separate tables (#192).
+
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
   * On backends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
   * Due to `slice_ts` not being correctly matched with existing data on some backends (#172).
