@@ -8,7 +8,7 @@ specifically designed for serve disease data for epidemic preparedness.
 What makes a `diseasystore` special, is that features can be
 automatically coupled and stratified within the `diseasystore` package.
 
-The package forms the data-backbone of the `{diseasy}` package.
+The package forms the data-backbone of the `diseasy` package.
 
 ## Handling of diverse data sources
 Different data sources are handled by individual `diseasystores` which

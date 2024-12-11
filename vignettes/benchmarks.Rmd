@@ -45,7 +45,7 @@ benchmark_data <- tibble::as_tibble(data_generator(1000)) |>
 benchmark_data
 ```
 
-A simple `diseasystore` is built around this data, with two `FeatureHandlers`, one each for the `cyl` and `vs`
+A simple `diseasystore` is built around this data, with two `?FeatureHandler`s, one each for the `cyl` and `vs`
 variables.
 ```{r, eval = FALSE}
 DiseasystoreMtcars <- R6::R6Class(
@@ -82,20 +82,20 @@ DiseasystoreMtcars <- R6::R6Class(
 ```
 
 Two separate benchmark functions are created.
-The first benchmarking function tests the computation time of `$get_feature()` by computing first the `n_cyl` feature
+The first benchmarking function tests the computation time of `?DiseasystoreBase$get_feature()` by computing first the `n_cyl` feature
 then computing the `vs` feature, before finally deleting the computations from the database.
 
-The second benchmarking function tests the computation time of `$key_join_features()` by joining the `vs` feature to the
+The second benchmarking function tests the computation time of `?DiseasystoreBase$key_join_features()` by joining the `vs` feature to the
 `n_cyl` observation. Note that the `n_cyl` and `vs` are re-computed before the benchmarks are started and are not
-deleted by the benchmarking function as was the case for the benchmark of `$get_feature()`. In addition, we only use
+deleted by the benchmarking function as was the case for the benchmark of `?DiseasystoreBase$get_feature()`. In addition, we only use
 the first 100 rows of the `benchmark_data` for this test to reduce computation time.
 
-The performance of these benchmark functions are timed with the `microbenchmark` package using 10 replicates.
+The performance of these benchmark functions are timed with the `{{microbenchmark}}` package using 10 replicates.
 All benchmarks are run on the same machine.
 
 The results of the benchmark are shown graphically below (mean and standard deviation), where we compare the current
 development version of `diseasystore` with the current CRAN version. In addition, we run the benchmarks with the
-current development version of `SCDB` versus the current CRAN version since `SCDB` is used internally in `diseasystore`.
+current development version of `{SCDB}` versus the current CRAN version since `{SCDB}` is used internally in `diseasystore`.
 
 ```{r, echo = FALSE, eval = rlang::is_installed("here")}
 benchmark_location <- c(
