@@ -13,13 +13,21 @@ fields (#138).
   In case a backend is insufficient to support the computations, the backend can be blocked for the `diseasystore`.
   `test_diseasystore()` now have a `skip_backend` argument to skip tests for the disallowed backends.
 
+* Additional arguments (`...`) can now be passed to the `compute()` and `get()` functions in `FeatureHandler`s.
+  Furthermore, a reference to the `diseasystore` is now passed to `compute()` to give the `Featurehandler` access
+  to other features via `ds$get_feature()` (#162).
+
 ## Minor Improvements and Fixes:
+
+* A bug was fixed where data was duplicated when features were not divided into separate tables (#192).
 
 * Two bugs were fixed in `$determine_new_ranges()` where existing tables were not detected:
   * On backends that use "catalog" to structure table (DuckDB and SQL Server) (fix also requires SCDB > v0.4) (#158).
   * Due to `slice_ts` not being correctly matched with existing data on some backends (#172).
 
 * Long stratification expression are now properly parsed in `$key_join_features()` (#161).
+
+* When creating your own `diseasystore` it is now easier to inherit from the base module (#189).
 
 ## Testing:
 
@@ -29,6 +37,9 @@ fields (#138).
   * Checks that the `valid_from` and `valid_until` columns are chronologically ordered (#176).
 
 ## Documentation:
+
+* An example has been added for building a `diseasystore` with individual level data (#162).
+  See `vignette("extending-diseasystore-example")`.
 
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
 
