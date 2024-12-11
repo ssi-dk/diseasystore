@@ -35,6 +35,12 @@
 
 * When creating your own `diseasystore` it is now easier to inherit from the base module (#189).
 
+* When creating your own `diseasystore` it is now easier to inherit from the base module (#189).
+
+* Warnings about existing stratifications now only appear if the requested stratification contains a named expression
+  matching an existing stratification. Simply requesting the stratification from the feature store will no longer
+  produce a warning (#192).
+
 ## Testing
 * `test_diseasystore()` now also checks the `?FeatureHandler` return data directly:
   * Checks that data is only within the study period (#154).
