@@ -12,7 +12,15 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+# Set a flag to determine if this is being run on CRAN
+on_cran <- !identical(Sys.getenv("NOT_CRAN"), "true")
 ```
+
+```{r setup}
+library(diseasystore)
+```
+
 
 To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
 a simple benchmark:
@@ -45,7 +53,7 @@ benchmark_data <- tibble::as_tibble(data_generator(1000)) |>
 benchmark_data
 ```
 
-A simple `diseasystore` is built around this data, with two `FeatureHandlers`, one each for the `cyl` and `vs`
+A simple `diseasystore` is built around this data, with two `?FeatureHandler`s, one each for the `cyl` and `vs`
 variables.
 ```{r, eval = FALSE}
 DiseasystoreMtcars <- R6::R6Class(
@@ -82,20 +90,33 @@ DiseasystoreMtcars <- R6::R6Class(
 ```
 
 Two separate benchmark functions are created.
-The first benchmarking function tests the computation time of `$get_feature()` by computing first the `n_cyl` feature
-then computing the `vs` feature, before finally deleting the computations from the database.
+The first benchmarking function tests the computation time of `?DiseasystoreBase$get_feature()` by computing first the
+`n_cyl` feature then computing the `vs` feature, before finally deleting the computations from the database.
 
-The second benchmarking function tests the computation time of `$key_join_features()` by joining the `vs` feature to the
-`n_cyl` observation. Note that the `n_cyl` and `vs` are re-computed before the benchmarks are started and are not
-deleted by the benchmarking function as was the case for the benchmark of `$get_feature()`. In addition, we only use
-the first 100 rows of the `benchmark_data` for this test to reduce computation time.
+The second benchmarking function tests the computation time of `?DiseasystoreBase$key_join_features()` by joining the
+`vs` feature to the `n_cyl` observation. Note that the `n_cyl` and `vs` are re-computed before the benchmarks are
+started and are not deleted by the benchmarking function as was the case for the benchmark of
+`?DiseasystoreBase$get_feature()`. In addition, we only use the first 100 rows of the `benchmark_data` for this test
+to reduce computation time.
 
-The performance of these benchmark functions are timed with the `microbenchmark` package using 10 replicates.
+The performance of these benchmark functions are timed with the `{{microbenchmark}}` package using 10 replicates.
 All benchmarks are run on the same machine.
 
-The results of the benchmark are shown graphically below (mean and standard deviation), where we compare the current
-development version of `diseasystore` with the current CRAN version. In addition, we run the benchmarks with the
-current development version of `SCDB` versus the current CRAN version since `SCDB` is used internally in `diseasystore`.
+```{r benchmark context, results = "asis", include = FALSE}
+if (on_cran) {
+  cat(
+    "The results of the benchmark are shown graphically below (mean and standard deviation), where measure the",
+    "performance of `diseasystore`."
+  )
+} else {
+  cat(
+    "The results of the benchmark are shown graphically below (mean and standard deviation), where we compare the",
+    "current development version of `diseasystore` with the current CRAN version. In addition, we run the benchmarks",
+    "with the current development version of `{SCDB}` versus the current CRAN version since `{SCDB}` is used",
+    "internally in `diseasystore`."
+  )
+}
+```
 
 ```{r, echo = FALSE, eval = rlang::is_installed("here")}
 benchmark_location <- c(
@@ -106,12 +127,26 @@ benchmark_location <- c(
   purrr::discard(~ identical(., "")) |>
   purrr::pluck(1)
 
-benchmarks <- readRDS(benchmark_location)
+benchmarks <- readRDS(benchmark_location) |>
+  dplyr::mutate("version" = as.character(.data$version))
+
+# The benchmark contains data for the CRAN version, the main branch and whatever branch the workflow was run on.
+# We need to render the vignette differently dependent on where the vignette is rendered.
+
+# If we render the vignette on CRAN, we need to only show benchmarks for the current CRAN version SCDB and the
+# newest development benchmarks -- but mark these benchmarks as having the new version of diseasystore.
+# (since we are releasing a new version of diseasystore, these benchmarks will belong to the new CRAN version)
+
+# If we render the vignette on main, we need to render the benchmarks from the non-main branch as the main results
+# That is because these benchmarks will be newer than those on main, and the code that generate the results
+# will have been merged onto main -- causing the vignette to be rendered.
+
+# If we render the vignette on the non-main branch, we need to render all of the benchmarks
 
 # Determine if the SHA is on main
 sha <- benchmarks |>
-  dplyr::distinct(version) |>
-  dplyr::filter(!(version %in% c("CRAN", "main"))) |>
+  dplyr::distinct(.data$version) |>
+  dplyr::filter(!startsWith(.data$version, "diseasystore"), .data$version != "main") |>
   dplyr::pull("version")
 
 # Check local git history
@@ -125,17 +160,27 @@ on_main <- tryCatch({
   return(identical(Sys.getenv("CI"), "true"))
 })
 
-# If the SHA has been merged, use as the "main" version and remove the other, older, main version
-if (on_main) {
+# If we are on CRAN, use the newest benchmark (version = sha) and keep only CRAN SCDB results
+# This benchmark is then labelled with the neweset version number of diseasystore (the one we just deployed to CRAN)
+if (on_cran) {
+
   benchmarks <- benchmarks |>
-    dplyr::filter(version != "main") |>
-    dplyr::mutate(version = dplyr::if_else(.data$version == "CRAN", "CRAN", "development"))
+    dplyr::filter(.data$version == !!sha, .data$SCDB != "main") |>
+    dplyr::mutate("version" = paste0("diseasystore v", packageVersion("diseasystore")))
+
+} else if (on_main) {
+
+  # If the SHA has been merged, use as the "main" version and remove the other, older, main version
+  benchmarks <- benchmarks |>
+    dplyr::filter(.data$version != "main") |>
+    dplyr::mutate("version" = dplyr::if_else(.data$version == sha, "development", .data$version))
+
 }
 ```
 
 ```{r Generate alt text for benchmarks, echo = FALSE, results = "hide", eval = rlang::is_installed("here")}
 benchmark_alt_text <- benchmarks |>
-  dplyr::filter(.data$version == "CRAN", .data$SCDB == "CRAN") |>
+  dplyr::filter(startsWith(.data$version, "diseasystore v"), .data$SCDB != "main") |>
   dplyr::transmute(
     .data$benchmark_function,
     .data$database,
@@ -194,6 +239,7 @@ g <- ggplot2::ggplot(
     scales = "free_y",
     labeller = labeller
   ) +
+  ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(n.dodge = 2)) +
   ggplot2::labs(x = "Codebase version", y = "Time (s)") +
   ggplot2::theme(
     legend.position = "bottom",

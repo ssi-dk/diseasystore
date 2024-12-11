@@ -1,7 +1,7 @@
 #' simulist_data
 #'
-#' This data set contains a synthetic linelist created with the `simulist` package.
-#' This linelist is used as an example data set for the `DiseasystoreSimulist` class.
+#' This data set contains a synthetic line list created with the `simulist` package.
+#' This line list is used as an example data set for the `DiseasystoreSimulist` class.
 #'
 #' The data set consists of a `tibble` with columns:
 #' - `id`: A unique identifier for each individual.
@@ -22,5 +22,4 @@
 #'   *simulist: Simulate Disease Outbreak Line List and Contacts Data*.
 #'   \doi{10.5281/zenodo.10471458}, https://epiverse-trace.github.io/simulist/.
 #' @keywords data internal
-#' @seealso [simulist::simulist()]
 NULL

@@ -18,6 +18,7 @@ See the vignette("diseasystore-google-covid-19") for details on how to configure
     target_conn = DBI::dbConnect(RSQLite::SQLite())
   )
 
+
   rm(ds)
 \dontshow{\}) # examplesIf}
 }

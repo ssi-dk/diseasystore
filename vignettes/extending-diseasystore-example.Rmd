@@ -65,7 +65,7 @@ In this example we will implement the following features:
 
 Notice that the naming of the features differ by the prefix `n_` versus no prefix.
 This dichotomy separates "stratifications" from "observables". Either is considered a "feature" in the diseasystore,
-but the type of data (stratification vs. observable) is used when we join the data in `$key_join_features()`.
+but the type of data (stratification vs. observable) is used when we join the data in `?DiseasystoreBase$key_join_features()`.
 However, there are no differences in the implementation of the features --- only in the naming.
 
 This way of naming features follows the default convention of `diseasystore`. However, we are free to overwrite with
@@ -81,9 +81,8 @@ In that case, we would need to update the `$.observables_regex` field to read[^1
   )
 ```
 
-
-With the features identified, we begin by assigning a `FeatureHandler` to each feature, and design the map between
-the feature names and the responsible `FeatureHandlers`:
+With the features identified, we begin by assigning a `?FeatureHandler` to each feature, and design the map between
+the feature names and the responsible `?FeatureHandler`s:
 
 ```{r ds_map, eval = FALSE}
 DiseasystoreSimulist <- R6::R6Class(
@@ -107,21 +106,21 @@ DiseasystoreSimulist <- R6::R6Class(
   )
 )
 ```
-Notice that the names for the `FeatureHandlers` have the prefix "simulist_". The features are stored in the data base
+Notice that the names for the `?FeatureHandlers` have the prefix "simulist_". The features are stored in the data base
 using these names, so we include the prefix to avoid any potential conflicts with other features in the database.
-For example, the hospitalisation in `DiseasystoreGoogleCovid19` are stored in a table called "google_covid_19_hospital".
+For example, the hospitalisation in `?DiseasystoreGoogleCovid19` are stored in a table called "google_covid_19_hospital".
 Had both `diseasystores` omitted the prefixes, they would both attempt to write to the same "hospital" table in the
 database.
 
 # Feature implementation
 With the features identified, it is time to implement them in the `diseasystore`.
 
-That is, we need to construct the `FeatureHandlers` for each feature.
+That is, we need to construct the `?FeatureHandlers` for each feature.
 
 ## The `birth` `FeatureHandler`
 We start by implementing the `birth` feature.
 
-For this example, we will show first the code that implements the `FeatureHandler` and then describe the code in detail.
+For this example, we will show first the code that implements the `?FeatureHandler` and then describe the code in detail.
 ```{r feature_handler_birth, eval = FALSE}
 private = list(
   ...
@@ -152,11 +151,11 @@ private = list(
 )
 ```
 
-Notice that we create a new instance of `FeatureHandler` and assign it to the `simulist_birth` field in the private
+Notice that we create a new instance of `?FeatureHandler` and assign it to the `simulist_birth` field in the private
 list.
 
-Lets focus on the `FeatureHandler` we create:
-Here, we need to define how the feature is computed (that is, we implement the `compute()` function).
+Lets focus on the `?FeatureHandler` we create:
+Here, we need to define how the feature is computed (that is, we implement the `?FeatureHandler$compute()` function).
 
 The signature of this function is fixed, and must take the arguments `start_date`, `end_date`, `slice_ts`,
 `source_conn`, but can then take additional arguments in `...`.
@@ -181,8 +180,8 @@ the interval $t \in \left[\textrm{valid_from}, \textrm{valid_until}\right)$.
 
 After computing the feature, we filter to ensure that the data is returned only for the requested time period.
 
-Finally, we also how the feature can be summarised. That is, we need to specify the type of `key_join` the feature
-should use.
+Finally, we also specify how the feature can be summarised. That is, we need to specify the type of `key_join` the
+feature should use.
 
 To illustrate how to determine the type of `key_join`, we imagine that we want to determine the number of people who
 are born on each date. Given our data set, we could perform the following operations to summarize the data:
@@ -193,7 +192,8 @@ simulist_data |>
 ```
 
 That is, our feature has a record for each individual, and to summarise the feature, we need to `count` the individuals
-within each group. This is different from semi-aggregated data where we would `sum` the values within each group.
+within each group. This is different from semi-aggregated data where we would `sum` the values within each group
+(see `?aggregators` for available aggregators).
 
 
 ## The `sex` `FeatureHandler`
@@ -233,15 +233,16 @@ private = list(
 )
 ```
 
-Notice that we again create a new instance of `FeatureHandler` and assign it to the `simulist_sex` field in the
+Notice that we again create a new instance of `?FeatureHandler` and assign it to the `simulist_sex` field in the
 private list.
 
 The computation of the feature is mostly straightforward, but we would like to use the validity period computed
 in the `birth` feature (the same logic applies for the validity period of the "sex" information as the "birth"
 information)
 
-Therefore, we immediately see a difference in the function signature of the `compute()` function, where we include
-the `ds` argument which, like the others, are passed to the feature handler by `diseasystore` when we compute features.
+Therefore, we immediately see a difference in the function signature of the `?FeatureHandler$compute()` function,
+where we include the `ds` argument which, like the others, are passed to the feature handler by `diseasystore` when
+we compute features.
 This argument holds a reference to the `diseasystore` we are building, so we can use it to retrieve other features
 (in this case, the `birth` feature).
 
@@ -320,7 +321,7 @@ private = list(
 ```
 
 As with the `sex` feature, this feature also depends on the `birth` feature, so we include the `ds` argument in the
-function signature of `compute()`.
+function signature of `?FeatureHandler$compute()`.
 
 Since the age is time-dependent, we need to compute the age of the individuals at the start of the study period (i.e.
 the period requested by the user), and compute their age throughout the study period.
@@ -328,10 +329,10 @@ the period requested by the user), and compute their age throughout the study pe
 The age at the start of the study period is computed directly by from the birth date of the individuals using the
 age helper function `age_on_date()`[^2].
 
-Once the age at start is known, we determine the length of the study period (in years) and compute the birth days of
+Once the age at start is known, we determine the length of the study period (in years) and compute the birthdays of
 the individuals throughout the period[^3]. Each birthday has an associated age and a validity period which runs from
-the birthday to the next birthday. Notice that we sometimes compute birth days that fall outside of the study period,
-which we filter out before combining to a single data set with `dplyr::union_all`.
+the birthday to the next birthday. Notice that we sometimes compute birthdays that fall outside of the study period,
+which we filter out before combining to a single data set with `dplyr::union_all()`.
 
 In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
 
@@ -456,9 +457,9 @@ if (rlang::is_installed("withr")) {
 }
 ```
 
-With the `target_conn` option set, we can easily create a new instance of the `diseasystore`[^5].
+With the `target_conn` option set, we can easily create a new instance of the `diseasystore`.
 ```{r initializing_diseasystore, eval = suggests_available}
-ds <- diseasystore:::DiseasystoreSimulist$new()
+ds <- diseasystore::DiseasystoreSimulist$new()
 ```
 
 ## Retrieving features
@@ -489,7 +490,7 @@ Since we have individual level data, we can combine the features arbitrarily usi
 This stratification can by any expression using the features in the `diseasystore`. Since we are working expressions,
 we need to pass the expressions as "quosures" using `rlang::quos()`.
 
-These expressions have very few limits. As long as they are translatable by `dbplyr` to SQL, they can be used.
+These expressions have very few limits. As long as they are translatable by `{dbplyr}` to SQL, they can be used.
 
 Lets look at some examples:
 
@@ -521,7 +522,7 @@ data2 <- ds$key_join_features(
       age,
       breaks = c(0, 15, 30, Inf),
       labels = !!age_labels(c(0, 15, 30)),
-      include.lowest = TRUE
+      right = FALSE
     ),
     sex
   ),
@@ -582,11 +583,8 @@ date-related arithmetic that is common in feature computation. These are availab
 by `diseasystore`.
 
 [^3]: Notice that we split the `dplyr::mutate()` calls into several calls since SQL translation works differently from
-"normal" `dplyr` behaviour. Normally in `dplyr`, the variable created earlier in one `dplyr::mutate()` call is available
-immediately after, but this is not the case in SQL syntax. Therefore, we split the `dplyr::mutate()` calls which
-generates nested sub-queries which makes the variables available in subsequent calls.
+"normal" `{dplyr}` behaviour. Normally in `{dplyr}`, the variable created earlier in one `dplyr::mutate()` call is
+available immediately after, but this is not the case in SQL syntax. Therefore, we split the `dplyr::mutate()` calls
+which generates nested sub-queries which makes the variables available in subsequent calls.
 
 [^4]: The `vignette("diseasystore")` explains the options system in more detail.
-
-[^5]: The `DiseasystoreSimulist` is bundled with the package, but not exported. Therefore, we use the `:::` operator to
-retrieve the class.

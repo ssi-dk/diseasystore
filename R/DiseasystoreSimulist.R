@@ -2,22 +2,30 @@
 #'
 #' @description
 #'   This `DiseasystoreSimulist` [R6][R6::R6Class] brings support for individual level data.
-#' @examples
+#' @examplesIf requireNamespace("duckdb", quietly = TRUE)
 #'   ds <- DiseasystoreSimulist$new(
 #'     source_conn = ".",
-#'     target_conn = DBI::dbConnect(RSQLite::SQLite())
+#'     target_conn = DBI::dbConnect(duckdb::duckdb())
 #'   )
+#'
+#*   ds$available_features
 #'
 #'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
-#' @noRd
+#' @export
 #' @importFrom R6 R6Class
 DiseasystoreSimulist <- R6::R6Class(                                                                                    # nolint: object_name_linter.
   classname = "DiseasystoreSimulist",
   inherit = DiseasystoreBase,
 
   public = list(
+    #' @description
+    #'   Creates a new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
+    #' @param ...
+    #'   Arguments passed to the `?DiseasystoreBase` constructor.
+    #' @return
+    #'   A new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
     initialize = function(...) {
       super$initialize(...)
 
