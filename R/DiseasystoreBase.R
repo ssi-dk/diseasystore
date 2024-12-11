@@ -273,15 +273,10 @@ DiseasystoreBase <- R6::R6Class(                                                
     },
 
     #' @description
-    #'   Joins various features from feature store assuming a primary feature (observable)
-    #'   that contains keys to witch the secondary features (defined by `stratification`) can be joined.
-    #' @param observable (`character`)\cr
-    #'   The name of a feature defined in the feature store
-    #' @param stratification (`list`(`quosures`) or `NULL`)\cr
-    #'   Expressions in `stratification` are evaluated to find appropriate features.
-    #'   These are then joined to the observable feature before `stratification` is performed.
-    #'
-    #'   If `NULL` (default) no stratification is performed.
+    #'   Joins various features from the feature store assuming a primary feature (observable)
+    #'   that contains keys to witch the secondary features (defined by `stratification`) are joined.
+    #' @param observable `r rd_observable()`
+    #' @param stratification `r rd_stratification()`
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @return

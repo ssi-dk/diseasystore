@@ -25,8 +25,7 @@ Should take a \code{skip_backend} that does not open connections for the given b
 \item{data_files}{(\code{character()})\cr
 List of files that should be available when testing.}
 
-\item{target_schema}{(\code{character(1)})\cr
-The data base schema where the tests should be run.}
+\item{target_schema}{(\code{character})\cr The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with <target_schema>.}
 
 \item{test_start_date}{(\code{Date})\cr
 The earliest date to retrieve data from during tests.}
@@ -37,7 +36,7 @@ List of connection types to skip tests for due to missing functionality.}
 \item{...}{Other parameters passed to the diseasystore generator.}
 }
 \value{
-NULL (called for side effects)
+\code{NULL} (called for side effects)
 }
 \description{
 This function runs a battery of tests of the given diseasystore.
