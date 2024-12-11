@@ -2,10 +2,10 @@
 #'
 #' @description
 #'   This `DiseasystoreSimulist` [R6][R6::R6Class] brings support for individual level data.
-#' @examples
+#' @examplesIf requireNamespace("duckdb", quietly = TRUE)
 #'   ds <- DiseasystoreSimulist$new(
 #'     source_conn = ".",
-#'     target_conn = DBI::dbConnect(RSQLite::SQLite())
+#'     target_conn = DBI::dbConnect(duckdb::duckdb())
 #'   )
 #'
 #'   rm(ds)

@@ -16,6 +16,7 @@ This \code{DiseasystoreSimulist} \link[R6:R6Class]{R6} brings support for indivi
   )
 
   rm(ds)
+\dontshow{\}) # examplesIf}
 }
 \section{Super class}{
 \code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreSimulist}
