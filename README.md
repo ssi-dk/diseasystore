@@ -23,7 +23,7 @@ via `{SCDB}` and can be automatically coupled and stratified within the
 `diseasystore` package. This allows for a high degree of flexibility and
 reproducibility in the handling of disease data.
 
-The package forms the data-backbone of the `diseasy` package.
+The package forms the data-backbone of the `{diseasy}` package.
 
 ## Handling of diverse data sources
 
