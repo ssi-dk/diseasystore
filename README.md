@@ -18,10 +18,12 @@ tests](https://github.com/ssi-dk/diseasystore/actions/workflows/all-workflows.ya
 The `diseasystore` package provides feature stores implemented in R
 specifically designed for serve disease data for epidemic preparedness.
 
-What makes a `diseasystore` special, is that features can be
-automatically coupled and stratified within the `diseasystore` package.
+What makes a `diseasystore` special, is that features are time-versioned
+via `{SCDB}` and can be automatically coupled and stratified within the
+`diseasystore` package. This allows for a high degree of flexibility and
+reproducibility in the handling of disease data.
 
-The package forms the data-backbone of the `{diseasy}` package.
+The package forms the data-backbone of the `diseasy` package.
 
 ## Handling of diverse data sources
 
