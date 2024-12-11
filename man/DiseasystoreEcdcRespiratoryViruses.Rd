@@ -18,6 +18,7 @@ See the vignette("diseasystore-ecdc-respiratory-viruses") for details on how to 
     target_conn = DBI::dbConnect(RSQLite::SQLite())
   )
 
+
   rm(ds)
 \dontshow{\}) # examplesIf}
 }

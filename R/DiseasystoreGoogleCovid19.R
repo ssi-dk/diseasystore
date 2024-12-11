@@ -50,6 +50,8 @@ google_covid_19_metric <- function(google_pattern, out_name) {                  
 #'     target_conn = DBI::dbConnect(RSQLite::SQLite())
 #'   )
 #'
+#*   ds$available_features
+#'
 #'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreGoogleCovid19` [R6][R6::R6Class] class.

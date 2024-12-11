@@ -10,6 +10,8 @@
 #'     target_conn = DBI::dbConnect(RSQLite::SQLite())
 #'   )
 #'
+#*   ds$available_features
+#'
 #'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreEcdcRespiratoryViruses` [R6][R6::R6Class] class.

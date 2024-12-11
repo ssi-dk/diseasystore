@@ -8,6 +8,8 @@
 #'     target_conn = DBI::dbConnect(duckdb::duckdb())
 #'   )
 #'
+#*   ds$available_features
+#'
 #'   rm(ds)
 #' @return
 #'   A new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
