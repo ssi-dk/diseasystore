@@ -63,7 +63,7 @@ test_that("documentation_template_linter works", {
   skip_if_not_installed("devtools")
 
   lintr::expect_lint(
-    "#' @param observable text", # rd_observable defined in R/0_documentation.R                                         # nolint: documentation_template_linter, param_and_field_linter
+    "#' @param observable (`character(1)`)\\cr", # rd_observable defined in R/0_documentation.R                         # nolint: documentation_template_linter
     list("line_number" = 1, "type" = "style"),
     documentation_template_linter()
   )
