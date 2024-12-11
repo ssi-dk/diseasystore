@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="diseasystore: Google Health COVID-19 Open Data">
 </head>
 <body>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,11 @@
     <li><h6 class="dropdown-header" data-toc-skip>Package usage</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a></li>
+    <li><a class="dropdown-item" href="../articles/benchmarks.html">diseasystore: Benchmarks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a></li>
+    <li><a class="dropdown-item" href="../articles/extending-diseasystore-example.html">Extending diseasystore - simulist example</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -71,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: Google Health COVID-19 Open Data</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.2.2/vignettes/diseasystore-google-covid-19.Rmd" class="external-link"><code>vignettes/diseasystore-google-covid-19.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/diseasystore-google-covid-19.Rmd" class="external-link"><code>vignettes/diseasystore-google-covid-19.Rmd</code></a></small>
       <div class="d-none name"><code>diseasystore-google-covid-19.Rmd</code></div>
     </div>
 
@@ -85,7 +87,7 @@ repository of COVID-19 data.</p>
 <code>diseasystore</code> package.</p>
 <p>First, it is a good idea to copy the relevant Google COVID-19 data
 files locally and store that location as an option for the package.
-<code>DiseasystoreGoogleCovid19</code> uses only the age-stratified
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> uses only the age-stratified
 metrics for COVID-19, so only a subset of the repository is needed to
 download.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -122,7 +124,7 @@ features in. These should be configured before use and can be stored in
 the packages options.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># We define target_conn as a function that opens a DBIconnection to the DB</span></span>
-<span><span class="va">target_conn</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">target_conn</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span></span>
 <span>  <span class="st">"diseasystore.DiseasystoreGoogleCovid19.target_conn"</span> <span class="op">=</span> <span class="va">target_conn</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -145,15 +147,18 @@ data.</p>
 <span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span>feature <span class="op">=</span> <span class="st">"n_hospital"</span>,</span>
 <span>               start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>,</span>
 <span>               end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-06-01"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;`dbplyr_EZ1U7X59H5`&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 []</span></span></span>
+<span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
+<span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
+<span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_ZQdHOrDslY&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>262       <span style="text-decoration: underline;">18</span>263</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>263       <span style="text-decoration: underline;">18</span>264</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>264       <span style="text-decoration: underline;">18</span>265</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>265       <span style="text-decoration: underline;">18</span>266</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>266       <span style="text-decoration: underline;">18</span>267</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span> 2020-01-01 2020-01-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           6                    0 2020-01-01 2020-01-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           7                    1 2020-01-01 2020-01-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           0                   <span style="color: #BB0000;">NA</span> 2020-01-02 2020-01-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           4                    0 2020-01-02 2020-01-03 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
   </main>
 </div>
@@ -165,7 +170,7 @@ data.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

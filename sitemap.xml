@@ -2,9 +2,11 @@
 <url><loc>https://ssi-dk.github.io/diseasystore/404.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/LICENSE.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/PULL_REQUEST_TEMPLATE.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasystore/articles/benchmarks.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/articles/diseasystore-ecdc-respiratory-viruses.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/articles/diseasystore-google-covid-19.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/articles/diseasystore.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasystore/articles/extending-diseasystore-example.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/articles/extending-diseasystore.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/articles/index.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/authors.html</loc></url>
@@ -13,8 +15,11 @@
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreBase.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreEcdcRespiratoryViruses.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreGoogleCovid19.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasystore/reference/DiseasystoreSimulist.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasystore/reference/add_years.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/age_labels.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasystore/reference/age_on_date.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/aggregators.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/available_diseasystores.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/diseasyoption.html</loc></url>
@@ -24,6 +29,7 @@
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/get_diseasystore.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/grapes-.-grapes.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/index.html</loc></url>
+<url><loc>https://ssi-dk.github.io/diseasystore/reference/simulist_data.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/source_conn_helpers.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/test_diseasystore.html</loc></url>
 <url><loc>https://ssi-dk.github.io/diseasystore/reference/to_diseasystore_case.html</loc></url>

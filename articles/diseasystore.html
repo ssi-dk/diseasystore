@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="diseasystore: quick start guide">
 </head>
 <body>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,11 @@
     <li><h6 class="dropdown-header" data-toc-skip>Package usage</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a></li>
+    <li><a class="dropdown-item" href="../articles/benchmarks.html">diseasystore: Benchmarks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a></li>
+    <li><a class="dropdown-item" href="../articles/extending-diseasystore-example.html">Extending diseasystore - simulist example</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -71,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: quick start guide</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.2.2/vignettes/diseasystore.Rmd" class="external-link"><code>vignettes/diseasystore.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/diseasystore.Rmd" class="external-link"><code>vignettes/diseasystore.Rmd</code></a></small>
       <div class="d-none name"><code>diseasystore.Rmd</code></div>
     </div>
 
@@ -86,7 +88,8 @@
 can use the <code><a href="../reference/available_diseasystores.html">available_diseasystores()</a></code> function.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/available_diseasystores.html">available_diseasystores</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "DiseasystoreEcdcRespiratoryViruses" "DiseasystoreGoogleCovid19"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "DiseasystoreEcdcRespiratoryViruses" "DiseasystoreGoogleCovid19"         </span></span>
+<span><span class="co">#&gt; [3] "DiseasystoreSimulist"</span></span></code></pre></div>
 <p>This function looks for <code>diseasystores</code> on the current
 search path. By default, this will show the <code>diseasystores</code>
 bundled with the base package. If you have <a href="extending-diseasystore.html">extended</a>
@@ -96,10 +99,10 @@ the package to your search path will allow it to show up as
 available.</p>
 <p>Note: <code>diseasystores</code> are found if they are defined within
 packages named <code>diseasystore*</code> and are of the class
-<code>DiseasystoreBase</code>.</p>
+<code><a href="../reference/DiseasystoreBase.html">DiseasystoreBase</a></code>.</p>
 <p>Each of these <code>diseasystores</code> may have their own vignette
 that further details their content, use and/or tips and tricks. This is
-for example the case with <a href="diseasystore-google-covid-19.html"><code>DiseasystoreGoogleCovid19</code></a>.</p>
+for example the case with <code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="using-a-diseasystore">Using a diseasystore<a class="anchor" aria-label="anchor" href="#using-a-diseasystore"></a>
@@ -110,14 +113,14 @@ data bases to store the computed features in. Each
 <code>diseasystore</code> may require individual configuration as listed
 in its documentation or accompanying vignette.</p>
 <p>For this Quick start, we will configure a
-<code>DiseasystoreGoogleCovid19</code> to use a local
-<code>SQLite</code> data base Ideally, we want to use a faster, more
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> to use a local
+<a href="https://r.duckdb.org/" class="external-link">duckdb</a> data base Ideally, we want to use a faster, more
 capable, data base to store the features in. The
-<code>diseasystores</code> uses <code>SCDB</code> in the back end and
-can use any data base back end supported by <code>SCDB</code>.</p>
+<code>diseasystores</code> uses <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> in the back end and
+can use any data base back end supported by <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>  target_conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  target_conn <span class="op">=</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span>,</span>
 <span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-15"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -138,15 +141,18 @@ interval simpler.</p>
 creation of <code>ds</code>):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span><span class="st">"n_hospital"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;`dbplyr_EZ1U7X59H5`&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 []</span></span></span>
+<span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
+<span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
+<span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_ZQdHOrDslY&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>322       <span style="text-decoration: underline;">18</span>323</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>330       <span style="text-decoration: underline;">18</span>331</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           0                    0      <span style="text-decoration: underline;">18</span>324       <span style="text-decoration: underline;">18</span>325</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           0                    1      <span style="text-decoration: underline;">18</span>323       <span style="text-decoration: underline;">18</span>324</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           0                    1      <span style="text-decoration: underline;">18</span>327       <span style="text-decoration: underline;">18</span>328</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           2                    1 2020-03-01 2020-03-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           3                   <span style="color: #BB0000;">NA</span> 2020-03-01 2020-03-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           6                    0 2020-03-01 2020-03-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           3                    0 2020-03-02 2020-03-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           6                    1 2020-03-02 2020-03-03 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 <p>Notice that features have associated “key_*” and “valid_from/until”
 columns. These are used for one of the primary selling points of
@@ -157,15 +163,15 @@ columns. These are used for one of the primary selling points of
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span><span class="st">"n_hospital"</span>,</span>
 <span>               start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-01"</span><span class="op">)</span>,</span>
 <span>               end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-02"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;`dbplyr_oBF7QxMz0h`&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 []</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_gWfAlMkPN1&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span>      <span style="text-decoration: underline;">18</span>322       <span style="text-decoration: underline;">18</span>323</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           0                    1      <span style="text-decoration: underline;">18</span>323       <span style="text-decoration: underline;">18</span>324</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           1                    0      <span style="text-decoration: underline;">18</span>323       <span style="text-decoration: underline;">18</span>324</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           1                    1      <span style="text-decoration: underline;">18</span>322       <span style="text-decoration: underline;">18</span>323</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           2                    1      <span style="text-decoration: underline;">18</span>322       <span style="text-decoration: underline;">18</span>323</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           2                    1 2020-03-01 2020-03-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           3                   <span style="color: #BB0000;">NA</span> 2020-03-01 2020-03-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           6                    0 2020-03-01 2020-03-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           3                    0 2020-03-02 2020-03-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           6                    1 2020-03-02 2020-03-03 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -206,14 +212,25 @@ built-in automatic aggregation.</p>
 <p>We saw above that the features come with additional associated
 “key_*” and “valid_from/until” columns.</p>
 <p>This additional information is used to do automatic aggregation
-through the <code>$key_join_features()</code> method (see <a href="extending-diseasystore.html">extending-diseasystore</a> for more
-details).</p>
+through the <code><a href="../reference/DieasystoreBase.html#method-DieasystoreBase-key_join_features">$key_join_features()</a></code> method
+(see <a href="extending-diseasystore.html">extending-diseasystore</a>
+for more details).</p>
 <p>To use this method, you need to provide the <code>observable</code>
 that you want to aggregate and the <code>stratification</code> you want
 to apply to the aggregation.</p>
+<p>To see which features are considered “observables” and which are
+considered “stratifications” you can use the included methods:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="va">available_observables</span></span>
+<span><span class="co">#&gt; [1] "n_population"    "n_hospital"      "n_deaths"        "n_positive"     </span></span>
+<span><span class="co">#&gt; [5] "n_icu"           "n_ventilator"    "min_temperature" "max_temperature"</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="va">available_stratifications</span></span>
+<span><span class="co">#&gt; [1] "age_group"    "country_id"   "country"      "region_id"    "region"      </span></span>
+<span><span class="co">#&gt; [6] "subregion_id" "subregion"</span></span></code></pre></div>
 <p>Lets start with an simple example where we request no stratification
 (<code>NULL</code>):</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_hospital"</span>,</span>
 <span>                     stratification <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 15 × 2</span></span></span>
@@ -232,32 +249,32 @@ hospitalised).</p>
 <p>To specify a level of <code>stratification</code>, we need to supply
 a list of <code>quosures</code> (see
 <code><a href="https://rlang.r-lib.org/reference/topic-quosure.html" class="external-link">help("topic-quosure", package = "rlang")</a></code>).</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_hospital"</span>,</span>
 <span>                     stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">country_id</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 15 × 3</span></span></span>
 <span><span class="co">#&gt;   date       country_id n_hospital</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR                  3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02 AR                  6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03 AR                  5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-04 AR                 12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-05 AR                  8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-15 AR                 70</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-01 AR                  3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-02 AR                  6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-03 AR                  5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-04 AR                 12</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 10 more rows</span></span></span></code></pre></div>
 <p>The <code>stratification</code> argument is very flexible, so we can
 supply any valid R expression:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span>observable <span class="op">=</span> <span class="st">"n_hospital"</span>,</span>
 <span>                     stratification <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">quos</a></span><span class="op">(</span><span class="va">country_id</span>,</span>
 <span>                                                  old <span class="op">=</span> <span class="va">age_group</span> <span class="op">==</span> <span class="st">"90+"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 4</span></span></span>
-<span><span class="co">#&gt;   date       country_id   old n_hospital</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR             0         27</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02 AR             0         54</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03 AR             0         45</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-04 AR             0        108</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-05 AR             0         72</span></span>
+<span><span class="co">#&gt;   date       country_id old   n_hospital</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR         FALSE         27</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02 AR         FALSE         54</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03 AR         FALSE         45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-04 AR         FALSE        108</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2020-03-05 AR         FALSE         72</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -272,85 +289,30 @@ match tables by and a <code>schema</code> argument to specify the schema
 to delete from<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;If using &lt;code&gt;SQLite&lt;/code&gt; as the back end, it will
 instead prepend the schema specification to the pattern before matching
 (e.g. “ds\..*“).&lt;/p&gt;"><sup>1</sup></a>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    schema                              table</span></span>
-<span><span class="co">#&gt; 1    main       ds.google_covid_19_age_group</span></span>
-<span><span class="co">#&gt; 2    main           ds.google_covid_19_index</span></span>
-<span><span class="co">#&gt; 3    main        ds.google_covid_19_hospital</span></span>
-<span><span class="co">#&gt; 4    main                           ds.locks</span></span>
-<span><span class="co">#&gt; 5    main                            ds.logs</span></span>
-<span><span class="co">#&gt; 6    temp                ds_validities_11946</span></span>
-<span><span class="co">#&gt; 7    temp                     SCDB_11946_020</span></span>
-<span><span class="co">#&gt; 8    temp                     SCDB_11946_024</span></span>
-<span><span class="co">#&gt; 9    temp                  dbplyr_kgPY1bPB7z</span></span>
-<span><span class="co">#&gt; 10   temp               ds_study_dates_11946</span></span>
-<span><span class="co">#&gt; 11   temp                  dbplyr_VdisgpRrIA</span></span>
-<span><span class="co">#&gt; 12   temp                  dbplyr_5bG7gFZ2RI</span></span>
-<span><span class="co">#&gt; 13   temp ds_google_covid_19_age_group_11946</span></span>
-<span><span class="co">#&gt; 14   temp          ds_all_combinations_11946</span></span>
-<span><span class="co">#&gt; 15   temp                  dbplyr_hByrdeDhSC</span></span>
-<span><span class="co">#&gt; 16   temp                  dbplyr_T1j3HbFlCu</span></span>
-<span><span class="co">#&gt; 17   temp                  dbplyr_bdClHujZ6V</span></span>
-<span><span class="co">#&gt; 18   temp                     SCDB_11946_012</span></span>
-<span><span class="co">#&gt; 19   temp                  dbplyr_2zDoz7gvmR</span></span>
-<span><span class="co">#&gt; 20   temp                     SCDB_11946_009</span></span>
-<span><span class="co">#&gt; 21   temp                     SCDB_11946_017</span></span>
-<span><span class="co">#&gt; 22   temp                  dbplyr_EZ1U7X59H5</span></span>
-<span><span class="co">#&gt; 23   temp                  dbplyr_PzDsCtpAUT</span></span>
-<span><span class="co">#&gt; 24   temp                  dbplyr_oFQJxb20Bt</span></span>
-<span><span class="co">#&gt; 25   temp                     SCDB_11946_016</span></span>
-<span><span class="co">#&gt; 26   temp                  dbplyr_oBF7QxMz0h</span></span>
-<span><span class="co">#&gt; 27   temp                  dbplyr_MWTk61j7Q4</span></span>
-<span><span class="co">#&gt; 28   temp                     SCDB_11946_001</span></span>
-<span><span class="co">#&gt; 29   temp                     SCDB_11946_008</span></span>
-<span><span class="co">#&gt; 30   temp  ds_google_covid_19_hospital_11946</span></span>
-<span><span class="co">#&gt; 31   temp     ds_google_covid_19_index_11946</span></span>
-<span><span class="co">#&gt; 32   temp                  dbplyr_uVs7TnBty9</span></span>
-<span><span class="co">#&gt; 33   temp                     SCDB_11946_004</span></span>
-<span><span class="co">#&gt; 34   temp                     SCDB_11946_025</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span>, show_temporary <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   catalog schema                        table</span></span>
+<span><span class="co">#&gt; 1  memory   main ds.google_covid_19_age_group</span></span>
+<span><span class="co">#&gt; 2  memory   main  ds.google_covid_19_hospital</span></span>
+<span><span class="co">#&gt; 3  memory   main     ds.google_covid_19_index</span></span>
+<span><span class="co">#&gt; 4  memory   main                     ds.locks</span></span>
+<span><span class="co">#&gt; 5  memory   main                      ds.logs</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/drop_diseasystore.html">drop_diseasystore</a></span><span class="op">(</span>conn <span class="op">=</span> <span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    schema                              table</span></span>
-<span><span class="co">#&gt; 1    temp                ds_validities_11946</span></span>
-<span><span class="co">#&gt; 2    temp                     SCDB_11946_020</span></span>
-<span><span class="co">#&gt; 3    temp                     SCDB_11946_024</span></span>
-<span><span class="co">#&gt; 4    temp                  dbplyr_kgPY1bPB7z</span></span>
-<span><span class="co">#&gt; 5    temp               ds_study_dates_11946</span></span>
-<span><span class="co">#&gt; 6    temp                  dbplyr_VdisgpRrIA</span></span>
-<span><span class="co">#&gt; 7    temp                  dbplyr_5bG7gFZ2RI</span></span>
-<span><span class="co">#&gt; 8    temp ds_google_covid_19_age_group_11946</span></span>
-<span><span class="co">#&gt; 9    temp          ds_all_combinations_11946</span></span>
-<span><span class="co">#&gt; 10   temp                  dbplyr_hByrdeDhSC</span></span>
-<span><span class="co">#&gt; 11   temp                  dbplyr_T1j3HbFlCu</span></span>
-<span><span class="co">#&gt; 12   temp                  dbplyr_bdClHujZ6V</span></span>
-<span><span class="co">#&gt; 13   temp                     SCDB_11946_012</span></span>
-<span><span class="co">#&gt; 14   temp                  dbplyr_2zDoz7gvmR</span></span>
-<span><span class="co">#&gt; 15   temp                     SCDB_11946_009</span></span>
-<span><span class="co">#&gt; 16   temp                     SCDB_11946_017</span></span>
-<span><span class="co">#&gt; 17   temp                  dbplyr_EZ1U7X59H5</span></span>
-<span><span class="co">#&gt; 18   temp                  dbplyr_PzDsCtpAUT</span></span>
-<span><span class="co">#&gt; 19   temp                  dbplyr_oFQJxb20Bt</span></span>
-<span><span class="co">#&gt; 20   temp                     SCDB_11946_016</span></span>
-<span><span class="co">#&gt; 21   temp                  dbplyr_oBF7QxMz0h</span></span>
-<span><span class="co">#&gt; 22   temp                  dbplyr_MWTk61j7Q4</span></span>
-<span><span class="co">#&gt; 23   temp                     SCDB_11946_001</span></span>
-<span><span class="co">#&gt; 24   temp                     SCDB_11946_008</span></span>
-<span><span class="co">#&gt; 25   temp  ds_google_covid_19_hospital_11946</span></span>
-<span><span class="co">#&gt; 26   temp     ds_google_covid_19_index_11946</span></span>
-<span><span class="co">#&gt; 27   temp                  dbplyr_uVs7TnBty9</span></span>
-<span><span class="co">#&gt; 28   temp                     SCDB_11946_004</span></span>
-<span><span class="co">#&gt; 29   temp                     SCDB_11946_025</span></span></code></pre></div>
+<span><span class="fu">SCDB</span><span class="fu">::</span><span class="fu"><a href="https://ssi-dk.github.io/SCDB/reference/get_tables.html" class="external-link">get_tables</a></span><span class="op">(</span><span class="va">ds</span><span class="op">$</span><span class="va">target_conn</span>, show_temporary <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] catalog schema  table  </span></span>
+<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="diseasystore-options">diseasystore options<a class="anchor" aria-label="anchor" href="#diseasystore-options"></a>
 </h2>
 <p><code>diseasystores</code> have a number of options available to make
 configuration easier. These options all start with “diseasystore.”.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="va">.</span>, <span class="st">"diseasystore"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<p>To see all options related to <code>diseasystore</code>, we can use
+the <code><a href="../reference/diseasyoption.html">diseasyoption()</a></code> function without arguments.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $diseasystore.DiseasystoreEcdcRespiratoryViruses.pull</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -398,8 +360,12 @@ configuration easier. These options all start with “diseasystore.”.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $diseasystore.verbose</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
-<p>Notice that several options are set as empty strings (““). These are
-treated as <code>NULL</code> by <code>diseasystore</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;R’s &lt;code&gt;&lt;a href="https://rdrr.io/r/base/options.html" class="external-link"&gt;options()&lt;/a&gt;&lt;/code&gt; does not allow setting an
+<p>This returns all options related to <code>diseasystore</code> and its
+sister package <code>{diseasy}</code>.</p>
+<p>If you want the options for a specific <code>package</code>, you can
+use the <code>namespace</code> argument. Notice that several options are
+set as empty strings (““). These are treated as <code>NULL</code> by
+<code>diseasystore</code><a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;R’s &lt;code&gt;&lt;a href="https://rdrr.io/r/base/options.html" class="external-link"&gt;options()&lt;/a&gt;&lt;/code&gt; does not allow setting an
 option to &lt;code&gt;NULL&lt;/code&gt;. By setting options as empty strings, the
 user can see the available options to set.&lt;/p&gt;'><sup>2</sup></a>.</p>
 <p>Importantly, the options are <em>scoped</em>. Consider the above
@@ -407,33 +373,33 @@ options for “source_conn”: Looking at the list of options we find
 “diseasystore.source_conn” and
 “diseasystore.DiseasystoreGoogleCovid19.source_conn”. The former is a
 general setting while the latter is specific setting for
-<code>DiseasystoreGoogleCovid19</code>. The general setting is used as
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code>. The general setting is used as
 fallback if no specific setting is found.</p>
 <p>This allows you to set a general configuration to use and to
 overwrite it for specific cases.</p>
 <p>To get the option related to a scope, we can use the
 <code><a href="../reference/diseasyoption.html">diseasyoption()</a></code> function.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"source_conn"</span>, class <span class="op">=</span> <span class="st">"DiseasystoreGoogleCovid19"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "https://storage.googleapis.com/covid19-open-data/v3/"</span></span></code></pre></div>
 <p>As we saw in the options, a <code>source_conn</code> option was
-defined specifically for <code>DiseasystoreGoogleCovid19</code>.</p>
+defined specifically for <code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code>.</p>
 <p>If we try the same for the hypothetical
 <code>DiseasystoreDiseaseY</code>, we see that no value is defined as we
 have not yet configured the fallback value.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"source_conn"</span>, class <span class="op">=</span> <span class="st">"DiseasystoreDiseaseY"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>If we change our general setting for <code>source_conn</code> and
 retry, we see that we get the fallback value.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"diseasystore.source_conn"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"local"</span>, <span class="st">"path"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"source_conn"</span>, class <span class="op">=</span> <span class="st">"DiseasystoreDiseaseY"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "local/path"</span></span></code></pre></div>
 <p>Finally, we can use the <code>.default</code> argument as a final
 fallback value in case no option is set for either general or specific
 case.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"non_existent"</span>, class <span class="op">=</span> <span class="st">"DiseasystoreDiseaseY"</span>, .default <span class="op">=</span> <span class="st">"final fallback"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "final fallback"</span></span></code></pre></div>
 </div>
@@ -449,7 +415,7 @@ case.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

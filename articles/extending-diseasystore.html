@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Extending diseasystore">
 </head>
 <body>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,11 @@
     <li><h6 class="dropdown-header" data-toc-skip>Package usage</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a></li>
+    <li><a class="dropdown-item" href="../articles/benchmarks.html">diseasystore: Benchmarks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a></li>
+    <li><a class="dropdown-item" href="../articles/extending-diseasystore-example.html">Extending diseasystore - simulist example</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -71,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Extending diseasystore</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.2.2/vignettes/extending-diseasystore.Rmd" class="external-link"><code>vignettes/extending-diseasystore.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/extending-diseasystore.Rmd" class="external-link"><code>vignettes/extending-diseasystore.Rmd</code></a></small>
       <div class="d-none name"><code>extending-diseasystore.Rmd</code></div>
     </div>
 
@@ -79,6 +81,10 @@
     
 <p>This vignette gives you the knowledge you need to create your own
 <code>diseasystore</code>.</p>
+<p>Once you have familiarised yourself with the concepts, you can
+consult the <code><a href="../articles/extending-diseasystore-example.html">vignette("extending-diseasystore-example")</a></code>,
+where we go through how a individual-level <code>diseasystore</code> can
+be implemented.</p>
 <div class="section level2">
 <h2 id="the-diseasy-data-model">The diseasy data model<a class="anchor" aria-label="anchor" href="#the-diseasy-data-model"></a>
 </h2>
@@ -108,25 +114,25 @@ validity is a single day (such as a test result) and the
 <code>valid_until</code> column will be the day after
 <code>valid_from</code>.</p>
 <p>By convention, we place these column as the last columns of the
-table<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The &lt;code&gt;SCDB&lt;/code&gt; package places
+table<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The &lt;a href="https://github.com/ssi-dk/SCDB" class="external-link"&gt;SCDB&lt;/a&gt; package places
 &lt;code&gt;checksum&lt;/code&gt;, &lt;code&gt;from_ts&lt;/code&gt;, and &lt;code&gt;until_ts&lt;/code&gt;
 as the last columns. But &lt;code&gt;valid_from&lt;/code&gt; and
 &lt;code&gt;valid_until&lt;/code&gt; should be the last columns in the output passed
-to &lt;code&gt;SCDB&lt;/code&gt;.&lt;/p&gt;"><sup>1</sup></a>.</p>
+to &lt;code&gt;SCDB&lt;/code&gt;.&lt;/p&gt;'><sup>1</sup></a>.</p>
 </div>
 <div class="section level4">
 <h4 id="from_ts-and-until_ts">
 <code>from_ts</code> and <code>until_ts</code><a class="anchor" aria-label="anchor" href="#from_ts-and-until_ts"></a>
 </h4>
 <p><code>diseasystore</code> uses <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> in the background
-to store the computed features. <code>SCDB</code> implements the second
-temporal dimension which indicates when a record was present in the
-data. This information is encoded in the columns <code>from_ts</code>
-and <code>until_ts</code>. Normally, you don’t see these columns when
-working with <code>diseasystore</code> since they are masked by
-<code>SCDB</code>. However, if you inspect the tables created in the
-database by diseasystore, you will find they are present. For our
-purposes, it is sufficient to know that these column gives a
+to store the computed features. <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> implements the
+second temporal dimension which indicates when a record was present in
+the data. This information is encoded in the columns
+<code>from_ts</code> and <code>until_ts</code>. Normally, you don’t see
+these columns when working with <code>diseasystore</code> since they are
+masked by <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a>. However, if you inspect the tables
+created in the database by diseasystore, you will find they are present.
+For our purposes, it is sufficient to know that these column gives a
 time-versioned data base where we can extract previous versions through
 the <code>slice_ts</code> argument. By supplying any time <code>τ</code>
 as <code>slice_ts</code>, we get the data as they were available on that
@@ -153,13 +159,19 @@ machine learning and is any individual piece of information.</p>
 <p>We subdivide features into two categories: “observables” and
 “stratifications”. On most levels, these are indistinguishable, but
 their purposes differ and hence we need to handle them individually.</p>
+<p>To see the available features of a <code>diseasystore</code>, you can
+use the <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-available_features">$available_features()</a></code> method.</p>
 <div class="section level4">
 <h4 id="observables">Observables<a class="anchor" aria-label="anchor" href="#observables"></a>
 </h4>
-<p>In <code>diseasystore</code> any feature whose name either starts
-with “n_” or ends with “_temperature” are treated as “observables”. From
-a modelling perspective, these observables are typically the metrics you
+<p>In <code>diseasystore</code> any feature whose name starts with “n_”
+is treated as “observables” (by default). For specific
+<code>diseasystores</code>, the naming convention may differ. From a
+modelling perspective, these observables are typically the metrics you
 want to model or take as inputs to inform your model.</p>
+<p>To see the available observables in a <code>diseasystore</code>, you
+can use the <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-available_observables">$available_observables()</a></code>
+method.</p>
 </div>
 <div class="section level4">
 <h4 id="stratifications">Stratifications<a class="anchor" aria-label="anchor" href="#stratifications"></a>
@@ -171,6 +183,9 @@ features).</p>
 <p>A prominent example for most disease models would be a stratification
 feature like “age_group”, since most diseases show a strong dependency
 on the age of the affected individuals.</p>
+<p>To see the available observables in a <code>diseasystore</code>, you
+can use the <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-available_stratifications">$available_stratifications()</a></code>
+method.</p>
 </div>
 <div class="section level4">
 <h4 id="naming-convention">Naming convention<a class="anchor" aria-label="anchor" href="#naming-convention"></a>
@@ -188,16 +203,17 @@ analyses and disease models to new <code>diseasystores</code>.</p>
 <h2 id="creating-featurehandlers">Creating FeatureHandlers<a class="anchor" aria-label="anchor" href="#creating-featurehandlers"></a>
 </h2>
 <p>To facilitate the automatic coupling and aggregation of features, we
-use the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> class. Each feature<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Or “coupled” set of features as we will soon see.&lt;/p&gt;"><sup>3</sup></a> in the
-<code>diseasystore</code> has an associated <code>FeatureHandler</code>
+use the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> class. Each feature<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Or “coupled” set of features as we will soon see.&lt;/p&gt;"><sup>3</sup></a> in the
+<code>diseasystore</code> has an associated <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>
 which implements the computation, retrieval and aggregation of the
 feature.</p>
 <div class="section level3">
 <h3 id="computing-features">Computing features<a class="anchor" aria-label="anchor" href="#computing-features"></a>
 </h3>
-<p>The <code>FeatureHandler</code> defines a <code>compute</code>
-function which must be on the form:</p>
-<pre><code>compute = function(start_date, end_date, slice_ts, source_conn)</code></pre>
+<p>The <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> defines a
+<code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function which must be on the
+form:</p>
+<pre><code>compute = function(start_date, end_date, slice_ts, source_conn, ...)</code></pre>
 <p>The arguments <code>start_date</code> and <code>end_date</code>
 indicates the period for which features should be computed. The
 <code>diseasystores</code> are <a href="diseasystore.html#dynamically-expanded">dynamically expanded</a>,
@@ -212,16 +228,28 @@ date, features corresponding to this date should be computed.</p>
 FeatureHandler indicating where the source data needed to compute the
 features is stored (e.g. a database connection or directory).</p>
 <p>Note that multiple features can be computed by a single
-<code>FeatureHandler</code>. For example, you may decide that it is more
-convenient for compute multiple different features simultaneously
+<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>. For example, you may decide that it is
+more convenient for compute multiple different features simultaneously
 (e.g. a hospitalisation and the classification of said hospitalisation
 or a test and the associated test result).</p>
+<p>When <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> is called by the
+<code>diseasystore</code>, it also passes a reference to itself as
+<code>ds</code> via the <code>...</code> argument. This means that if
+the implementation of <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> needs
+access to other features to compute the given feature, the compute
+function can pick up the <code>ds</code> reference adding it to the
+function signature:</p>
+<pre><code>compute = function(start_date, end_date, slice_ts, source_conn, ds, ...)</code></pre>
+<p>And then use
+<code>ds$get_feature(&lt;feature&gt;, start_date = start_date, end_date = end_date, slice_ts = slice_ts)</code>
+to retrieve the necessary features for the computation.</p>
 </div>
 <div class="section level3">
 <h3 id="retrieving-features">Retrieving features<a class="anchor" aria-label="anchor" href="#retrieving-features"></a>
 </h3>
-<p>The <code>FeatureHandler</code> defines a <code>$get()</code>
-function which must be in the form:</p>
+<p>The <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> defines a
+<code><a href="../reference/FeatureHandler.html#method-FeatureHandler-get">$get()</a></code> function which must be in the
+form:</p>
 <pre><code>get = function(target_table, slice_ts, target_conn)</code></pre>
 <p>Typically, you do not need to specify this function since the default
 (a variant of <code><a href="https://ssi-dk.github.io/SCDB/reference/get_table.html" class="external-link">SCDB::get_table()</a></code>) always works.</p>
@@ -234,11 +262,11 @@ above, <code>slice_ts</code> is the time-keeping variable.</p>
 <div class="section level3">
 <h3 id="aggregators">Aggregators<a class="anchor" aria-label="anchor" href="#aggregators"></a>
 </h3>
-<p>The <code>FeatureHandler</code> defines a <code>key_join</code>
+<p>The <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> defines a <code>key_join</code>
 function which must be on the form:</p>
 <pre><code>key_join = function(.data, feature)</code></pre>
 <p>In most cases, you should be able to use the bundled
-<code>key_join_*</code> functions (see <code><a href="../reference/aggregators.html">?aggregators</a></code> for a
+<code>key_join_*</code> functions (see <code><a href="../reference/aggregators.html">aggregators</a></code> for a
 full list).</p>
 <p>In the event, that you need to create your own aggregator the
 arguments are as follows:</p>
@@ -258,9 +286,12 @@ argument.</p>
 <h3 id="putting-it-all-together">Putting it all together<a class="anchor" aria-label="anchor" href="#putting-it-all-together"></a>
 </h3>
 <p>By now, you should know the basics of creating your own
-<code>FeatureHandlers</code>. To see some <code>FeatureHandlers</code>
-in action, you can consult a few of those bundled with the
-<code>diseasystore</code> package.</p>
+<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s.</p>
+<p>For a detailed walkthrough on creating a <code>diseasystore</code>,
+see the <code><a href="../articles/extending-diseasystore-example.html">vignette("extending-diseasystore-example")</a></code>.</p>
+<p>To see some other <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s in action, you can
+consult a few of those bundled with the <code>diseasystore</code>
+package.</p>
 <p>For example:</p>
 <ul>
 <li><p><a href="https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L161" class="external-link">DiseasystoreGoogleCovid19:
@@ -274,7 +305,7 @@ min temperature</a></p></li>
 <h2 id="creating-a-diseasystore">Creating a <code>diseasystore</code><a class="anchor" aria-label="anchor" href="#creating-a-diseasystore"></a>
 </h2>
 <p>With the knowledge of how to build custom
-<code>FeatureHandlers</code>, we turn our attention to the remaining
+<code>?FeatureHandlers</code>, we turn our attention to the remaining
 parts of the <code>diseasystore</code>’s anatomy.</p>
 <p>The <code>diseasystores</code> are <a href="https://r6.r-lib.org/index.html" class="external-link">R6 classes</a> which is a
 implementation of object-oriented (OO) programming. To those unfamiliar
@@ -285,31 +316,36 @@ public functions and variables are visible to the user of the
 visible only to us (the developers).</p>
 <p>When extending <code>diseasystore</code>, we are only writing private
 functions and variables. The public functions and variables are handled
-elsewhere<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;By the &lt;code&gt;DiseasystoreBase&lt;/code&gt; class.&lt;/p&gt;"><sup>4</sup></a>.</p>
+elsewhere<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;By the &lt;code&gt;&lt;a href="../reference/DiseasystoreBase.html"&gt;?DiseasystoreBase&lt;/a&gt;&lt;/code&gt; class.&lt;/p&gt;'><sup>4</sup></a>.</p>
 <div class="section level3">
 <h3 id="ds_map">ds_map<a class="anchor" aria-label="anchor" href="#ds_map"></a>
 </h3>
 <p>The <code>ds_map</code> field of the <code>diseasystore</code> tells
-the <code>diseasystore</code> which <code>FeatureHandler</code> is
+the <code>diseasystore</code> which <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> is
 responsible for each feature, thus allowing the
 <code>diseasystore</code> to retrieve the features specified in the
 <code>observable</code> and <code>stratification</code> arguments of
-calls to <code>$get_feature()</code>.</p>
+calls to <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>.</p>
 <p>In other words, it maps the names of features to their corresponding
-<code>FeatureHandlers</code>.</p>
-<p>As we saw above, a <code>FeatureHandler</code> may compute more than
+<code>?FeatureHandlers</code>.</p>
+<p>As we saw above, a <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> may compute more than
 a single feature. Each feature should be mapped to the
-<code>FeatureHandler</code> here or else the <code>diseasystore</code>
+<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> here or else the <code>diseasystore</code>
 will not be able to automatically interact with it.</p>
-<p>By convention, the name of the <code>FeatureHandler</code> should be
+<p>By convention, the name of the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> should be
 snake_case and contain a <code>diseasystore</code> specific prefix
-(e.g. for <code>DiseasystoreGoogleCovid19</code>, all
-<code>FeatureHandlers</code> are named “google_covid_19_<feature>”).</feature></p>
+(e.g. for <code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code>, all
+<code>?FeatureHandlers</code> are named
+“google_covid_19_<feature>”).</feature></p>
 <p>These names are used as the table names when storing the features in
 the database, and the prefix helps structure the database
 accordingly.</p>
 <p>This latter part becomes important when <a href="diseasystore.html#dropping-computed-features">clean up</a> for the
 data base needs to be performed.</p>
+<p>By default, any feature whose name starts with “n_” is treated as an
+observable feature. To override this behaviour, you can specify the
+regex pattern <code>$observables_regex</code> to match the names of the
+observable features in your case.</p>
 </div>
 <div class="section level3">
 <h3 id="key-join-filter">Key join filter<a class="anchor" aria-label="anchor" href="#key-join-filter"></a>
@@ -321,13 +357,13 @@ that the data includes aggregations at different levels, nested within
 the data.</p>
 <p>For example, the Google COVID-19 data repository contains information
 on both country-level and region-level in the same data files. When the
-user of <code>DiseasystoreGoogleCovid19</code> asks to get a feature
+user of <code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> asks to get a feature
 stratified by, for example, “country_id”, we need to filter out the data
 aggregated at the region level.</p>
-<p>This is the purpose of <code>$key_join_filter()</code>. It takes as
-input the requested stratifications and filters the data accordingly
-after the features have been joined inside the
-<code>diseasystore</code>.</p>
+<p>This is the purpose of
+<code><a href="../reference/DiseastoreBase.html#method-DiseastoreBase-key_join_filter">$key_join_filter()</a></code>. It takes as input the
+requested stratifications and filters the data accordingly after the
+features have been joined inside the <code>diseasystore</code>.</p>
 <p>For an example, you can consult <a href="https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L75" class="external-link">DiseasystoreGoogleCovid19:
 key_join_filter</a></p>
 </div>
@@ -337,7 +373,37 @@ key_join_filter</a></p>
 <p>The <code>diseasystore</code> package includes the function
 <code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> to test the <code>diseasystores</code>.
 You can see how to call the testing suite in action with
-<code>DiseasystoreGoogleCovid19</code> as an example <a href="https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R" class="external-link">here</a>.</p>
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> as an example <a href="https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R" class="external-link">here</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="exposing-the-period-of-data-availability">Exposing the period of data availability<a class="anchor" aria-label="anchor" href="#exposing-the-period-of-data-availability"></a>
+</h3>
+<p>To allow the <code>diseasystores</code> to be used programmatically,
+we expose the period of data availability for each
+<code>diseasystore</code>. These are defined in the
+<code>$.min_start_date</code> and <code>$.max_end_date</code> private
+fields of the <code>diseasystore</code>.</p>
+</div>
+<div class="section level3">
+<h3 id="limiting-support-for-some-database-backends">Limiting support for some database backends<a class="anchor" aria-label="anchor" href="#limiting-support-for-some-database-backends"></a>
+</h3>
+<p>In some cases, the <code>diseasystores</code> may not be compatible
+with all database backends. For example, the bundled
+<code>DiseasystoreSimulist</code> (see
+<code><a href="../articles/extending-diseasystore-example.html">vignette("extending-diseasystore-example")</a></code>) is not
+compatible with SQLite due to lack of date support.</p>
+<p>In this case, we add a check to the <code>initialize</code> method of
+the <code>diseasystore</code> to ensure that the database backend is
+compatible with the <code>diseasystore</code>.</p>
+<pre><code><span>  <span class="va">initialize</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">super</span><span class="op">$</span><span class="fu">initialize</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># We do not support SQLite for this diseasystore since it has poor support</span></span>
+<span>    <span class="co"># for date operations</span></span>
+<span>    <span class="fu">checkmate</span><span class="fu">::</span><span class="fu"><a href="https://mllg.github.io/checkmate/reference/checkDisjunct.html" class="external-link">assert_disjunct</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">self</span><span class="op">$</span><span class="va">target_conn</span><span class="op">)</span>, <span class="st">"SQLiteConnection"</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="va">...</span></span>
+<span>  <span class="op">}</span></span></code></pre>
 </div>
 </div>
 
@@ -352,7 +418,7 @@ You can see how to call the testing suite in action with
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

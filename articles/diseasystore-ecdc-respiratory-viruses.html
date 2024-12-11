@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="diseasystore: ECDC Respiratory Viruses Weekly">
 </head>
 <body>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,9 +44,11 @@
     <li><h6 class="dropdown-header" data-toc-skip>Package usage</h6></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-ecdc-respiratory-viruses.html">diseasystore: ECDC Respiratory Viruses Weekly</a></li>
     <li><a class="dropdown-item" href="../articles/diseasystore-google-covid-19.html">diseasystore: Google Health COVID-19 Open Data</a></li>
+    <li><a class="dropdown-item" href="../articles/benchmarks.html">diseasystore: Benchmarks</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer guides</h6></li>
     <li><a class="dropdown-item" href="../articles/extending-diseasystore.html">Extending diseasystore</a></li>
+    <li><a class="dropdown-item" href="../articles/extending-diseasystore-example.html">Extending diseasystore - simulist example</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -71,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: ECDC Respiratory Viruses Weekly</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.2.2/vignettes/diseasystore-ecdc-respiratory-viruses.Rmd" class="external-link"><code>vignettes/diseasystore-ecdc-respiratory-viruses.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/diseasystore-ecdc-respiratory-viruses.Rmd" class="external-link"><code>vignettes/diseasystore-ecdc-respiratory-viruses.Rmd</code></a></small>
       <div class="d-none name"><code>diseasystore-ecdc-respiratory-viruses.Rmd</code></div>
     </div>
 
@@ -114,7 +116,7 @@ features in. These should be configured before use and can be stored in
 the packages options.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># We define target_conn as a function that opens a DBIconnection to the DB</span></span>
-<span><span class="va">target_conn</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">target_conn</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="op">)</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">duckdb</span><span class="fu">::</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span></span>
 <span>  <span class="st">"diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn"</span> <span class="op">=</span> <span class="va">target_conn</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -148,15 +150,18 @@ time you request a feature.</p>
 <span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span>feature <span class="op">=</span> <span class="st">"iliari_rates"</span>,</span>
 <span>               start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-01-01"</span><span class="op">)</span>,</span>
 <span>               end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-03-01"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;`dbplyr_EZ1U7X59H5`&gt; [?? x 6]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 []</span></span></span>
+<span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
+<span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
+<span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_ZQdHOrDslY&gt; [?? x 6]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_location age_group infection_type  rate valid_from valid_until</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Austria      <span style="color: #BB0000;">NA</span>        ILI            <span style="text-decoration: underline;">2</span>072.      <span style="text-decoration: underline;">19</span>387       <span style="text-decoration: underline;">19</span>394</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Austria      <span style="color: #BB0000;">NA</span>        ILI            <span style="text-decoration: underline;">2</span>140.      <span style="text-decoration: underline;">19</span>380       <span style="text-decoration: underline;">19</span>387</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Austria      <span style="color: #BB0000;">NA</span>        ILI            <span style="text-decoration: underline;">2</span>160.      <span style="text-decoration: underline;">19</span>394       <span style="text-decoration: underline;">19</span>401</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Austria      <span style="color: #BB0000;">NA</span>        ILI            <span style="text-decoration: underline;">2</span>411.      <span style="text-decoration: underline;">19</span>373       <span style="text-decoration: underline;">19</span>380</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Austria      <span style="color: #BB0000;">NA</span>        ILI            <span style="text-decoration: underline;">2</span>469.      <span style="text-decoration: underline;">19</span>401       <span style="text-decoration: underline;">19</span>408</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Austria      65+       ILI             404. 2023-02-27 2023-03-06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Austria      15-64     ILI            <span style="text-decoration: underline;">3</span>144. 2023-02-20 2023-02-27 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Austria      15-64     ILI            <span style="text-decoration: underline;">2</span>177. 2023-02-06 2023-02-13 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Austria      15-64     ILI            <span style="text-decoration: underline;">2</span>295. 2023-01-30 2023-02-06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Austria      05-14     ILI            <span style="text-decoration: underline;">1</span>723. 2023-01-30 2023-02-06 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
   </main>
 </div>
@@ -168,7 +173,7 @@ time you request a feature.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
