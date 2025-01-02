@@ -2213,7 +2213,7 @@
       "type": "local",
       "direct": true,
       "binary": false,
-      "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect", "zoo"],
+      "dependencies": ["checkmate", "curl", "DBI", "dbplyr", "dplyr", "glue", "ISOweek", "jsonlite", "lubridate", "pkgcond", "purrr", "readr", "rlang", "R6", "SCDB", "stringr", "tidyr", "tidyselect"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "local::.",
@@ -2495,7 +2495,7 @@
     {
       "ref": "openssl",
       "package": "openssl",
-      "version": "2.2.2",
+      "version": "2.3.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2507,10 +2507,10 @@
         "RemoteRef": "openssl",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "2.2.2"
+        "RemoteSha": "2.3.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/openssl_2.2.2.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/openssl_2.2.2.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/openssl_2.3.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/openssl_2.3.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2533,7 +2533,7 @@
     {
       "ref": "parallelly",
       "package": "parallelly",
-      "version": "1.40.1",
+      "version": "1.41.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2545,10 +2545,10 @@
         "RemoteRef": "parallelly",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.40.1"
+        "RemoteSha": "1.41.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.40.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.40.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/parallelly_1.41.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/parallelly_1.41.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2564,11 +2564,11 @@
     {
       "ref": "pillar",
       "package": "pillar",
-      "version": "1.9.0",
+      "version": "1.10.0",
       "type": "standard",
       "direct": false,
       "binary": true,
-      "dependencies": ["cli", "fansi", "glue", "lifecycle", "rlang", "utf8", "vctrs"],
+      "dependencies": ["cli", "glue", "lifecycle", "rlang", "utf8", "vctrs"],
       "vignettes": false,
       "metadata": {
         "RemotePkgRef": "pillar",
@@ -2576,10 +2576,10 @@
         "RemoteRef": "pillar",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.9.0"
+        "RemoteSha": "1.10.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pillar_1.9.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/pillar_1.9.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/pillar_1.10.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/pillar_1.10.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3678,7 +3678,7 @@
     {
       "ref": "shiny",
       "package": "shiny",
-      "version": "1.9.1",
+      "version": "1.10.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3690,10 +3690,10 @@
         "RemoteRef": "shiny",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.9.1"
+        "RemoteSha": "1.10.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shiny_1.9.1.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/shiny_1.9.1.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/shiny_1.10.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/shiny_1.10.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4674,37 +4674,6 @@
       "rversion": "4.4",
       "directpkg": false,
       "license": "MIT + file LICENSE",
-      "dep_types": ["Depends", "Imports", "LinkingTo"],
-      "params": [],
-      "install_args": "",
-      "sysreqs": "",
-      "sysreqs_packages": {},
-      "needscompilation": false,
-      "repotype": "cranlike"
-    },
-    {
-      "ref": "zoo",
-      "package": "zoo",
-      "version": "1.8-12",
-      "type": "standard",
-      "direct": false,
-      "binary": true,
-      "dependencies": "lattice",
-      "vignettes": false,
-      "metadata": {
-        "RemotePkgRef": "zoo",
-        "RemoteType": "standard",
-        "RemoteRef": "zoo",
-        "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
-        "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-        "RemoteSha": "1.8-12"
-      },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/jammy/latest/src/contrib/zoo_1.8-12.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-22.04/4.4/zoo_1.8-12.tar.gz",
-      "platform": "x86_64-pc-linux-gnu-ubuntu-22.04",
-      "rversion": "4.4",
-      "directpkg": false,
-      "license": "GPL-2 | GPL-3",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
       "params": [],
       "install_args": "",
