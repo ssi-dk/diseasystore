@@ -643,7 +643,6 @@ DiseasystoreBase <- R6::R6Class(                                                
     # @param slice_ts `r rd_slice_ts()`
     # @return (`tibble`)\cr
     #   A data frame containing continuous un-computed date-ranges
-    #' @importFrom zoo as.Date
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Get a list of the logs for the target_table on the slice_ts
@@ -693,10 +692,8 @@ DiseasystoreBase <- R6::R6Class(                                                
       new_interval <- seq.Date(from = base::as.Date(start_date), to = base::as.Date(end_date), by = "1 day")
 
       # Determine the dates that needs to be computed
-      new_dates <- zoo::as.Date(setdiff(new_interval, ds_dates))
+      new_dates <- as.Date(setdiff(new_interval, ds_dates))
       # setdiff does not preserve type (converts from Date to numeric)
-      # it even breaks the type so hard, that we need to supply the origin also (which for some reason is not default)
-      # so we use the zoo::as.Date, since this is reasonably configured...
 
       # Early return, if no new dates are found
       if (length(new_dates) == 0) {
