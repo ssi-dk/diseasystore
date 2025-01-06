@@ -16,3 +16,5 @@ man-roxygen
 ^CRAN-SUBMISSION$
 ^pak.lock
 ^data-raw$
+^pkg-build$
+
