@@ -15,8 +15,7 @@
 #'   Should take a `skip_backend` that does not open connections for the given backends.
 #' @param data_files (`character()`)\cr
 #'   List of files that should be available when testing.
-#' @param target_schema (`character(1)`)\cr
-#'   The data base schema where the tests should be run.
+#' @param target_schema `r rd_target_schema()`
 #' @param test_start_date (`Date`)\cr
 #'   The earliest date to retrieve data from during tests.
 #' @param skip_backends (`character()`)\cr

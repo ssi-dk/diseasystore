@@ -2,8 +2,8 @@
 #' @importFrom rlang .data
 #' @param pattern (`character(1)`)\cr
 #'   Pattern to match the tables by
-#' @param schema (`character(1)`)\cr
-#'   Schema the diseasystore uses to store data in
+#' @param schema `r rd_schema()`
+#'   The location where the `diseasystore` stores data.
 #' @param conn `r rd_conn()`
 #' @return `r rd_side_effects`
 #' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
