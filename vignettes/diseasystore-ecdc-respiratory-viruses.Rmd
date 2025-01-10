@@ -20,9 +20,11 @@ library(diseasystore)
 
 ```{r hidden_options, include = FALSE}
 if (rlang::is_installed("withr")) {
-  withr::local_options("tibble.print_min" = 5)
-  withr::local_options("diseasystore.verbose" = FALSE)
-  withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
+  withr::local_options(
+    "tibble.print_min" = 5,
+    "diseasystore.verbose" = FALSE,
+    "diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE
+  )
 } else {
   opts <- options(
     "tibble.print_min" = 5,
@@ -33,7 +35,8 @@ if (rlang::is_installed("withr")) {
 
 # We have a "hard" dependency for duckdb to render parts of this vignette
 suggests_available <- rlang::is_installed("duckdb")
-not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") || identical(Sys.getenv("CI"), "true")
+not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") ||
+  identical(Sys.getenv("CI"), "true")
 ```
 
 The Respiratory viruses weekly repository contains weekly summaries of the
@@ -69,23 +72,40 @@ system2(
 ```
 
 ```{r download_data_hidden, include = FALSE, eval = not_on_cran}
-# In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
-# This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
-local_conn <- purrr::detect("vignette_data", checkmate::test_directory_exists, .default = tempdir())
+# In practice, it is best to make a local copy of the data which is
+# stored in the "vignette_data" folder.
+# This folder can either be in the package folder
+# (preferred, please create the folder) or in the tempdir().
+local_conn <- purrr::detect(
+  "vignette_data",
+  checkmate::test_directory_exists,
+  .default = tempdir()
+)
 
 if (rlang::is_installed("withr")) {
-  withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" = local_conn)
-  withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.n_max" = 1000)
+  withr::local_options(
+    "diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" = local_conn,
+    "diseasystore.DiseasystoreEcdcRespiratoryViruses.n_max" = 1000
+  )
 } else {
-  opts <- c(opts, options("diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" = local_conn,
-                          "diseasystore.DiseasystoreEcdcRespiratoryViruses.n_max" = 1000))
+  opts <- c(
+    opts,
+    options(
+      "diseasystore.DiseasystoreEcdcRespiratoryViruses.source_conn" = local_conn,
+      "diseasystore.DiseasystoreEcdcRespiratoryViruses.n_max" = 1000
+    )
+  )
 }
 
 # Define the ECDC file to download
 test_file <- "data/snapshots/2023-11-24_ILIARIRates.csv"
 
 # Create folder and download file
-dir.create(dirname(file.path(local_conn, test_file)), recursive = TRUE, showWarnings = FALSE)
+dir.create(
+  dirname(file.path(local_conn, test_file)),
+  recursive = TRUE,
+  showWarnings = FALSE
+)
 
 if (!file.exists(file.path(local_conn, test_file))) {
   remote_file <- source_conn_github(
@@ -93,12 +113,21 @@ if (!file.exists(file.path(local_conn, test_file))) {
     test_file
   )
 
-  readr::read_csv(remote_file, n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
+  readr::read_csv(
+    remote_file,
+    n_max = 1000,
+    show_col_types = FALSE,
+    progress = FALSE
+  ) |>
     readr::write_csv(file.path(local_conn, test_file))
 }
 
 # Check that the files are available after attempting to download
-if (purrr::some(test_file, ~ !checkmate::test_file_exists(file.path(local_conn, .)))) {
+files_missing <- purrr::some(
+  test_file,
+  ~ !checkmate::test_file_exists(file.path(local_conn, .))
+)
+if (files_missing) {
   data_available <- FALSE
 } else {
   data_available <- TRUE
@@ -120,9 +149,16 @@ options(
 ```{r configure_diseasystore_hidden, include = FALSE, eval = not_on_cran && suggests_available && data_available}
 target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 if (rlang::is_installed("withr")) {
-  withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn)
+  withr::local_options(
+    "diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn
+  )
 } else {
-  opts <- c(opts, options("diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn))
+  opts <- c(
+    opts,
+    options(
+      "diseasystore.DiseasystoreEcdcRespiratoryViruses.target_conn" = target_conn
+    )
+  )
 }
 ```
 
@@ -145,7 +181,10 @@ automatic pulls. Otherwise, the `diseasystore` will check for updates every time
 # Manually update the repository
 system2(
   "git",
-  args = paste("-C", diseasyoption("source_conn", "DiseasystoreEcdcRespiratoryViruses")),
+  args = paste(
+    "-C",
+    diseasyoption("source_conn", "DiseasystoreEcdcRespiratoryViruses")
+  ),
   stdout = TRUE
 )
 
@@ -156,9 +195,11 @@ options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
 
 ```{r using_diseasystore_example_3, eval = not_on_cran && suggests_available && data_available}
 # And then retrieve a feature from the feature store
-ds$get_feature(feature = "iliari_rates",
-               start_date = as.Date("2023-01-01"),
-               end_date = as.Date("2023-03-01"))
+ds$get_feature(
+  feature = "iliari_rates",
+  start_date = as.Date("2023-01-01"),
+  end_date = as.Date("2023-03-01")
+)
 ```
 
 
