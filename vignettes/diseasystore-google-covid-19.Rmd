@@ -28,7 +28,8 @@ if (rlang::is_installed("withr")) {
 
 # We have a "hard" dependency for duckdb to render parts of this vignette
 suggests_available <- rlang::is_installed("duckdb")
-not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") || identical(Sys.getenv("CI"), "true")
+not_on_cran <- interactive() || identical(Sys.getenv("NOT_CRAN"), "true") ||
+  identical(Sys.getenv("CI"), "true")
 ```
 
 The Google COVID-19 data repository is a comprehensive open repository of COVID-19 data.
@@ -76,21 +77,37 @@ purrr::walk(google_files, ~ {
 google_files <- c("by-age.csv", "demographics.csv", "index.csv", "weather.csv")
 remote_conn <- diseasyoption("remote_conn", "DiseasystoreGoogleCovid19")
 
-# In practice, it is best to make a local copy of the data which is stored in the "vignette_data" folder
-# This folder can either be in the package folder (preferred, please create the folder) or in the tempdir()
-local_conn <- purrr::detect("vignette_data", checkmate::test_directory_exists, .default = tempdir())
+# In practice, it is best to make a local copy of the data which is
+# stored in the "vignette_data" folder.
+# This folder can either be in the package folder
+# (preferred, please create the folder) or in the tempdir().
+local_conn <- purrr::detect(
+  "vignette_data",
+  checkmate::test_directory_exists,
+  .default = tempdir()
+)
 
 if (rlang::is_installed("withr")) {
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn)
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000)
+  withr::local_options(
+    "diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn,
+    "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000
+  )
 } else {
-  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn,
-                          "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000))
+  opts <- c(
+    opts,
+    options(
+      "diseasystore.DiseasystoreGoogleCovid19.source_conn" = local_conn,
+      "diseasystore.DiseasystoreGoogleCovid19.n_max" = 1000
+    )
+  )
 }
 
 # Then we download the first n rows of each data set of interest
 try({
-  purrr::discard(google_files, ~ checkmate::test_file_exists(file.path(local_conn, .))) |>
+  purrr::discard(
+    google_files,
+    ~ checkmate::test_file_exists(file.path(local_conn, .))
+  ) |>
     purrr::walk(\(file) {
       paste0(remote_conn, file) |>
         readr::read_csv(n_max = 1000, show_col_types = FALSE, progress = FALSE) |>
@@ -99,7 +116,11 @@ try({
 })
 
 # Check that the files are available after attempting to download
-if (purrr::some(google_files, ~ !checkmate::test_file_exists(file.path(local_conn, .)))) {
+files_missing <- purrr::some(
+  google_files,
+  ~ !checkmate::test_file_exists(file.path(local_conn, .))
+)
+if (files_missing) {
   data_available <- FALSE
 } else {
   data_available <- TRUE
@@ -120,9 +141,14 @@ options(
 ```{r configure_diseasystore_hidden, include = FALSE, eval = not_on_cran && suggests_available && data_available}
 target_conn <- \() DBI::dbConnect(duckdb::duckdb())
 if (rlang::is_installed("withr")) {
-  withr::local_options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
+  withr::local_options(
+    "diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn
+  )
 } else {
-  opts <- c(opts, options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn))
+  opts <- c(
+    opts,
+    options("diseasystore.DiseasystoreGoogleCovid19.target_conn" = target_conn)
+  )
 }
 ```
 
