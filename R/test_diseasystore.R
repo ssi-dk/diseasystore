@@ -325,7 +325,7 @@ test_diseasystore <- function(
           dplyr::collect() |>
           dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
 
-        testthat::expect_equal(
+        testthat::expect_identical(
           SCDB::nrow(reference_out_of_bounds),
           0,
           info = glue::glue("Feature `{.x}` returns data outside the study period.")
@@ -338,12 +338,12 @@ test_diseasystore <- function(
           dplyr::collect() |>
           purrr::map(~ DBI::dbDataType(dbObj = conn, obj = .))
 
-        testthat::expect_equal(
+        testthat::expect_identical(
           purrr::pluck(validity_period_data_types, "valid_from"),
           DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
           info = glue::glue("Feature `{.x}` has a non-Date `valid_from` column.")
         )
-        testthat::expect_equal(
+        testthat::expect_identical(
           purrr::pluck(validity_period_data_types, "valid_until"),
           DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
@@ -351,12 +351,12 @@ test_diseasystore <- function(
 
         # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
         # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
-        testthat::expect_equal(
+        testthat::expect_identical(
           SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
           0
         )
 
-        testthat::expect_equal(
+        testthat::expect_identical(
           reference |>
             dplyr::filter(.data$valid_from >= .data$valid_until) |>
             SCDB::nrow(),
@@ -459,8 +459,8 @@ test_diseasystore <- function(
   # Helper function that checks the output of key_joins
   key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
-    testthat::expect_equal(min(output$date), start_date)
-    testthat::expect_equal(max(output$date), end_date)
+    testthat::expect_identical(min(output$date), start_date)
+    testthat::expect_identical(max(output$date), end_date)
   }
 
 
