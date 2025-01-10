@@ -69,7 +69,7 @@ test_that("age_on_date() works for date input", {
 
     }
 
-    expect_equal(
+    expect_identical(
       dplyr::pull(test_ages,      "age"),
       dplyr::pull(reference_ages, "age")
     )
@@ -118,7 +118,7 @@ test_that("age_on_date() works for reference input", {
 
     }
 
-    expect_equal(
+    expect_identical(
       dplyr::pull(test_ages,      "age"),
       dplyr::pull(reference_ages, "age")
     )
@@ -191,7 +191,7 @@ test_that("add_years() works for positive input", {
 
     }
 
-    expect_equal(
+    expect_identical(
       dplyr::pull(test_ages,      "first_birthday"),
       dplyr::pull(reference_ages, "first_birthday")
     )
@@ -252,7 +252,7 @@ test_that("add_years() works for negative input", {
 
     }
 
-    expect_equal(
+    expect_identical(
       dplyr::pull(test_ages,      "test_date"),
       dplyr::pull(reference_ages, "test_date")
     )
@@ -314,7 +314,7 @@ test_that("add_years() works for reference input", {
 
     }
 
-    expect_equal(
+    expect_identical(
       dplyr::pull(test_ages,      "first_birthday"),
       dplyr::pull(reference_ages, "first_birthday")
     )
@@ -381,7 +381,7 @@ test_that("add_years() works for date input", {
 
     }
 
-    expect_equal(
+    expect_identical(
       dplyr::pull(test_ages,      "future_date"),
       dplyr::pull(reference_ages, "future_date")
     )
