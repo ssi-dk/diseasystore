@@ -146,7 +146,7 @@ test_that("$get_feature verbosity works", {
       type = "message"
     )
     messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
-    expect_equal(messages, character(0))
+    expect_identical(messages, character(0))
 
     rm(ds)
     DBI::dbDisconnect(conn)

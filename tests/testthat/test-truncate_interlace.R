@@ -97,8 +97,8 @@ test_that("truncate_interlace works", {
       max_date_secondary <- purrr::reduce(purrr::map(secondary, ~ max(.x$valid_until)), max)
       max_date <- min(max_date_secondary, max(primary$valid_until))
 
-      expect_equal(min(output$valid_from),  min_date)
-      expect_equal(max(output$valid_until), max_date)
+      expect_equal(min(output$valid_from),  min_date)                                                                   # nolint: expect_identical_linter. The return data types from the different database backends may not always be identical
+      expect_equal(max(output$valid_until), max_date)                                                                   # nolint: expect_identical_linter. The return data types from the different database backends may not always be identical
 
     }
 
