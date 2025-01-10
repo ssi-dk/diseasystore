@@ -69,7 +69,7 @@ test_that("age_on_date() works for date input", {
 
     }
 
-    expect_identical(
+    expect_equal(                                                                                                       # nolint: expect_identical_linter. The return data types from the different database backends may not always be identical
       dplyr::pull(test_ages,      "age"),
       dplyr::pull(reference_ages, "age")
     )
@@ -118,7 +118,7 @@ test_that("age_on_date() works for reference input", {
 
     }
 
-    expect_identical(
+    expect_equal(                                                                                                       # nolint: expect_identical_linter. The return data types from the different database backends may not always be identical
       dplyr::pull(test_ages,      "age"),
       dplyr::pull(reference_ages, "age")
     )
