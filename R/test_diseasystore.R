@@ -327,7 +327,7 @@ test_diseasystore <- function(
 
         testthat::expect_identical(
           SCDB::nrow(reference_out_of_bounds),
-          0,
+          0L,
           info = glue::glue("Feature `{.x}` returns data outside the study period.")
         )
 
@@ -353,14 +353,14 @@ test_diseasystore <- function(
         # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
         testthat::expect_identical(
           SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
-          0
+          0L
         )
 
         testthat::expect_identical(
           reference |>
             dplyr::filter(.data$valid_from >= .data$valid_until) |>
             SCDB::nrow(),
-          0,
+          0L,
           info = glue::glue("Feature `{.x}` has some elements where `valid_from` >= `valid_until`.")
         )
 
