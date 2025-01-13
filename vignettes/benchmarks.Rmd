@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 
 # Set a flag to determine if this is being run on CRAN
-on_cran <- !identical(Sys.getenv("NOT_CRAN"), "true")
+on_cran <- T#!identical(Sys.getenv("NOT_CRAN"), "true")
 ```
 
 ```{r setup}
@@ -258,7 +258,7 @@ if (on_cran) {
   g <- g + ggplot2::theme(text = ggplot2::element_text(size = 8))
 
   # Make the legend two rows
-  g <- g + ggplot2::guides(color = ggplot2::guide_legend(nrow = 2,byrow = TRUE))
+  g <- g + ggplot2::guides(color = ggplot2::guide_legend(nrow = 2, byrow = TRUE))
 
 } else {
   # Add facets to non-CRAN rendering
