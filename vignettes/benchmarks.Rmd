@@ -102,7 +102,7 @@ to reduce computation time.
 The performance of these benchmark functions are timed with the `{{microbenchmark}}` package using 10 replicates.
 All benchmarks are run on the same machine.
 
-```{r benchmark context, results = "asis", include = FALSE}
+```{r benchmark context, results = "asis", echo = FALSE}
 if (on_cran) {
   cat(
     "The results of the benchmark are shown graphically below (mean and standard deviation), where measure the",
@@ -126,6 +126,7 @@ benchmark_location <- c(
 ) |>
   purrr::discard(~ identical(., "")) |>
   purrr::pluck(1)
+
 
 benchmarks <- readRDS(benchmark_location) |>
   dplyr::mutate("version" = as.character(.data$version))
@@ -223,22 +224,27 @@ dodge <- ggplot2::position_dodge(width = 0.6)
 # Insert newline into database name to improve rendering of figures
 labeller <- ggplot2::as_labeller(\(l) stringr::str_replace_all(l, stringr::fixed(" v"), "\nv"))
 
-g <- ggplot2::ggplot(
-  benchmarks,
-  ggplot2::aes(
+# Set aesthetics for CRAN and non-CRAN versions
+if (on_cran) {
+  aes <- ggplot2::aes(
+    x = version,
+    y = time / 1e9,
+    color = database
+  )
+} else {
+  aes <- ggplot2::aes(
     x = version,
     y = time / 1e9,
     group = !!switch(length(groups) > 0, as.symbol(groups)),
     color = !!switch(length(groups) > 0, as.symbol(groups))
   )
+}
+
+g <- ggplot2::ggplot(
+  benchmarks,
+  aes
 ) +
   ggplot2::stat_summary(fun.data = mean_sd, geom = "pointrange", size = 0.5, linewidth = 1, position = dodge) +
-  ggplot2::facet_grid(
-    rows = ggplot2::vars(benchmark_function),
-    cols = ggplot2::vars(database),
-    scales = "free_y",
-    labeller = labeller
-  ) +
   ggplot2::scale_x_discrete(guide = ggplot2::guide_axis(n.dodge = 2)) +
   ggplot2::labs(x = "Codebase version", y = "Time (s)") +
   ggplot2::theme(
@@ -246,6 +252,24 @@ g <- ggplot2::ggplot(
     legend.justification = "left"
   ) +
   ggplot2::ylim(0, NA)
+
+if (on_cran) {
+  # Reduce font size for CRAN version
+  g <- g + ggplot2::theme(text = ggplot2::element_text(size = 8))
+
+  # Make the legend two rows
+  g <- g + ggplot2::guides(color = ggplot2::guide_legend(nrow = 2,byrow = TRUE))
+
+} else {
+  # Add facets to non-CRAN rendering
+  g <- g +
+    ggplot2::facet_grid(
+      rows = ggplot2::vars(benchmark_function),
+      cols = ggplot2::vars(database),
+      scales = "free_y",
+      labeller = labeller
+    )
+}
 
 g
 ```
