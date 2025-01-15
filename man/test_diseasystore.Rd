@@ -36,7 +36,7 @@ List of connection types to skip tests for due to missing functionality.}
 \item{...}{Other parameters passed to the diseasystore generator.}
 }
 \value{
-\code{NULL} (called for side effects)
+NULL (called for side effects)
 }
 \description{
 This function runs a battery of tests of the given diseasystore.

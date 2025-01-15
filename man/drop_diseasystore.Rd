@@ -14,13 +14,13 @@ drop_diseasystore(
 \item{pattern}{(\code{character(1)})\cr
 Pattern to match the tables by}
 
-\item{schema}{(\code{character})\cr A database schema.  If the database backend does not support schema, the tables will be prefixed with \if{html}{\out{<schema>}}.
+\item{schema}{(\code{character})\cr A database schema  If the database backend does not support schema, the tables will be prefixed with \if{html}{\out{<schema>}}.
 The location where the \code{diseasystore} stores data.}
 
 \item{conn}{(\code{DBIConnection})\cr A database connection.}
 }
 \value{
-\code{NULL} (called for side effects)
+NULL (called for side effects)
 }
 \description{
 Drop feature stores from DB
