@@ -351,14 +351,6 @@ DiseasystoreBase <- R6::R6Class(                                                
           unlist() |>
           unique()
 
-        # Report if stratification not found
-        if (is.null(stratification_features)) {
-          err <- glue::glue("Stratification variable not found. ",
-                            "Available stratification variables are: ",
-                            "{toString(self$available_stratifications)}")
-          stop(err, call. = FALSE)
-        }
-
         # Determine the name of the columns created by the stratifications
         stratification_names <- stratification |>
           purrr::map(rlang::as_label) |>
