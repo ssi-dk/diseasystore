@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* In `DiseasystoreBase$key_join_features()`, stratifications no longer need to do computation on other features (#203).
+
+
 # diseasystore 0.3.0
 
 ## Breaking change
