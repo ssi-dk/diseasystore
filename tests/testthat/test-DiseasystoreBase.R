@@ -232,6 +232,66 @@ test_that("DiseasystoreBase$determine_new_ranges() works", {
 })
 
 
+test_that("$key_join_features works with non-computing stratifications", {
+  skip_if_not_installed("RSQLite")
+
+  # Create a dummy, mtcars diseasystore with two features
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+    classname = "DiseasystoreBase",
+    inherit = DiseasystoreBase,
+    private = list(
+      .ds_map = list("n_cyl" = "dummy_cyl", "vs" = "dummy_vs"),
+      dummy_cyl = FeatureHandler$new(
+        compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+          out <- mtcars |>
+            dplyr::mutate(
+              "row_id" = dplyr::row_number(),
+              "car" = paste(rownames(mtcars), .data$row_id)
+            ) |>
+            dplyr::transmute(
+              "key_car" = .data$car, "n_cyl" = .data$cyl,
+              "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id - 1),
+              "valid_until" = .data$valid_from + lubridate::days(2)
+            )
+          return(out)
+        },
+        key_join = key_join_sum
+      ),
+      dummy_vs = FeatureHandler$new(
+        compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+          out <- mtcars |>
+            dplyr::mutate(
+              "row_id" = dplyr::row_number(),
+              "car" = paste(rownames(mtcars), .data$row_id)
+            ) |>
+            dplyr::transmute(
+              "key_car" = .data$car, .data$vs,
+              "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id),
+              "valid_until" = .data$valid_from + lubridate::days(2)
+            )
+          return(out)
+        },
+        key_join = key_join_sum
+      )
+    )
+  )
+
+  # Create new instance
+  ds <- DiseasystoreDummy$new(target_conn = DBI::dbConnect(RSQLite::SQLite()), verbose = FALSE)
+
+  # Check that we can join the features even if stratification does no computation on features
+  expect_no_error(
+    ds$key_join_features(
+      observable = "n_cyl",
+      stratification = rlang::quos(vs = "test"),
+      start_date = Sys.Date() - lubridate::days(2 * nrow(mtcars) - 1),
+      end_date = Sys.Date()
+    )
+  )
+
+})
+
+
 test_that("active binding: ds_map works", {
   ds <- DiseasystoreBase$new(source_conn = "", target_conn = dbplyr::simulate_dbi())
 
