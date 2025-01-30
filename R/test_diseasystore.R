@@ -524,16 +524,19 @@ test_diseasystore <- function(
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-      # Check we can aggregate without feature-independent stratifications
-      output <- ds$key_join_features(
-        observable = ds$available_observables[[1]],
-        stratification = rlang::quos(string = "test", number = 2),
-        test_start_date,
-        test_end_date
-      )
+      if (length(ds$available_observables) > 0) {
 
-      expect_identical(unique(dplyr::pull(output, "string")), "test")
-      expect_identical(unique(dplyr::pull(output, "number")), 2)
+        # Check we can aggregate without feature-independent stratifications
+        output <- ds$key_join_features(
+          observable = ds$available_observables[[1]],
+          stratification = rlang::quos(string = "test", number = 2),
+          test_start_date,
+          test_end_date
+        )
+
+        expect_identical(unique(dplyr::pull(output, "string")), "test")
+        expect_identical(unique(dplyr::pull(output, "number")), 2)
+      }
 
       rm(ds)
       invisible(gc())
