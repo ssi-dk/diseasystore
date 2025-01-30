@@ -562,7 +562,7 @@ test_diseasystore <- function(
           output <- tryCatch({
             ds$key_join_features(
               observable = as.character(observable),
-              stratification = as.character(stratification), # Output of expand.grid is a factor.
+              stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
               start_date = test_start_date,
               end_date = test_end_date
             )
