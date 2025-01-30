@@ -516,6 +516,31 @@ test_diseasystore <- function(
   })
 
 
+  testthat::test_that(glue::glue("{diseasystore_class} can key_join with feature-independent stratification"), {
+    testthat::skip_if_not(local)
+
+    for (conn in conn_generator(skip_backends)) {
+
+      # Initialise without start_date and end_date
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
+
+      # Check we can aggregate without feature-independent stratifications
+      output <- ds$key_join_features(
+        observable = ds$available_observables[[1]],
+        stratification = rlang::quos(string = "test", number = 2),
+        test_start_date,
+        test_end_date
+      )
+
+      expect_identical(unique(dplyr::pull(output, "string")), "test")
+      expect_identical(unique(dplyr::pull(output, "number")), 2)
+
+      rm(ds)
+      invisible(gc())
+    }
+  })
+
+
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
 
