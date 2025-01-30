@@ -541,12 +541,7 @@ test_diseasystore <- function(
               end_date = test_end_date
             )
           }, error = function(e) {
-            checkmate::expect_character(
-              e$message,
-              pattern = glue::glue("Stratification variable not found. ",
-                                   "Available stratification variables are: ",
-                                   "{toString(ds$available_stratifications)}")
-            )
+            checkmate::expect_character(e$message, pattern = "Stratification could not be computed")
             return(NULL)
           })
 
@@ -570,12 +565,7 @@ test_diseasystore <- function(
               end_date = test_end_date
             )
           }, error = function(e) {
-            checkmate::expect_character(
-              e$message,
-              pattern = glue::glue("Stratification variable not found. ",
-                                   "Available stratification variables are: ",
-                                   "{toString(ds$available_stratifications)}")
-            )
+            checkmate::expect_character(e$message, pattern = "Stratification could not be computed")
             return(NULL)
           })
 
