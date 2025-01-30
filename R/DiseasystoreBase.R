@@ -441,8 +441,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       if (!is.null(stratification)) {
         all_combinations <- out |>
-          dplyr::ungroup() |>
-          dplyr::distinct(!!!stratification) |>
+          dplyr::select(dplyr::all_of(stratification_names)) |>
+          dplyr::distinct() |>
           dplyr::cross_join(all_dates, copy = TRUE) |>
           dplyr::compute()
         SCDB::defer_db_cleanup(all_combinations)
