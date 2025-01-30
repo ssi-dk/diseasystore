@@ -28,16 +28,19 @@ It defines the primary methods of each feature stores as well as all of the publ
 A list that maps features known by the feature store to the corresponding feature handlers
 that compute the features. Read only.}
 
-\item{\code{available_features}}{(\code{character})\cr
+\item{\code{available_features}}{(\code{character()})\cr
 A list of available features in the feature store. Read only.}
 
-\item{\code{available_observables}}{(\code{character})\cr
+\item{\code{available_observables}}{(\code{character()})\cr
 A list of available observables in the feature store. Read only.}
 
-\item{\code{available_stratifications}}{(\code{character})\cr
+\item{\code{available_stratifications}}{(\code{character()})\cr
 A list of available stratifications in the feature store. Read only.}
 
-\item{\code{label}}{(\code{character})\cr
+\item{\code{observables_regex}}{(\code{character(1)})\cr
+A list of available stratifications in the feature store. Read only.}
+
+\item{\code{label}}{(\code{character(1)})\cr
 A human readable label of the feature store. Read only.}
 
 \item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located. Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
