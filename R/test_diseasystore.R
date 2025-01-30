@@ -534,8 +534,8 @@ test_diseasystore <- function(
           test_end_date
         )
 
-        expect_identical(unique(dplyr::pull(output, "string")), "test")
-        expect_identical(unique(dplyr::pull(output, "number")), 2)
+        testthat::expect_identical(unique(dplyr::pull(output, "string")), "test")
+        testthat::expect_identical(unique(dplyr::pull(output, "number")), 2)
       }
 
       rm(ds)
