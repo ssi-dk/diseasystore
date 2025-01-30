@@ -394,6 +394,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       out <- truncate_interlace(observable_data, stratification_data) |>
         private$key_join_filter(stratification_features, start_date, end_date) |>
         dplyr::compute()
+      SCDB::defer_db_cleanup(out)
 
       # Retrieve the aggregators (and ensure they work together)
       key_join_aggregators <- c(purrr::pluck(private, purrr::pluck(ds_map, observable)) %.% key_join,
@@ -409,21 +410,35 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       key_join_aggregator <- purrr::pluck(key_join_aggregators, 1)
 
+      # Check stratification can be performed:
+      out <- tryCatch(
+        dplyr::group_by(out, !!!stratification),
+        error = function(e) {
+          error_msg <- glue::glue(
+            "Stratification could not be computed. ",
+            "Error {tolower(substr(e$message, 1, 1))}{substr(e$message, 2, nchar(e$message))}. ",
+            "Available stratification variables are: ",
+            "{toString(self$available_stratifications)}"
+          )
+          stop(error_msg)
+        }
+      )
+
       # Add the new valid counts
       t_add <- out |>
-        dplyr::group_by(!!!stratification) |>
         dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_add" = "n") |>
         dplyr::compute()
+      SCDB::defer_db_cleanup(t_add)
 
       # Add the new invalid counts
       t_remove <- out |>
-        dplyr::group_by(!!!stratification) |>
         dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_remove" = "n") |>
         dplyr::compute()
+      SCDB::defer_db_cleanup(t_remove)
 
       # Get all combinations to merge onto
       all_dates <- tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1))
@@ -434,6 +449,7 @@ DiseasystoreBase <- R6::R6Class(                                                
           dplyr::distinct(!!!stratification) |>
           dplyr::cross_join(all_dates, copy = TRUE) |>
           dplyr::compute()
+        SCDB::defer_db_cleanup(all_combinations)
       } else {
         all_combinations <- all_dates
 
@@ -461,12 +477,6 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Ensure date is of type Date
       data <- data |>
         dplyr::mutate("date" = as.Date(.data$date))
-
-
-      # Clean up
-      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(out))
-      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_add))
-      DBI::dbRemoveTable(self %.% target_conn, SCDB::id(t_remove))
 
       return(data)
     }
