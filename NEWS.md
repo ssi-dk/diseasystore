@@ -8,6 +8,8 @@
 
 * In `DiseasystoreBase$key_join_features()`, stratifications no longer need to do computation on other features (#203).
 
+* The `$observable_regex` field is added, which shows the regex that demarcates observables from stratifications (#204).
+
 
 # diseasystore 0.3.0
 
@@ -64,7 +66,6 @@
   See `vignette("extending-diseasystore-example")`.
 
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
-
 
 ## Minor Improvements and Fixes
 
