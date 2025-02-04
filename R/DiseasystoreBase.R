@@ -184,9 +184,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Check it table is copied to target DB
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
-            ds_feature <- ds_feature |>
-              dplyr::copy_to(self %.% target_conn, df = _,
-                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"))
+            ds_feature <- dplyr::copy_to(
+              self %.% target_conn,
+              df = ds_feature,
+              name = SCDB::unique_table_name(paste0("ds_", feature_loader))
+            )
             SCDB::defer_db_cleanup(ds_feature)
           }
 
@@ -251,8 +253,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
-      validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()))
+      validities <- dplyr::copy_to(
+        self %.% target_conn,
+        df = data.frame(valid_from = start_date, valid_until = end_date),
+        name = SCDB::unique_table_name("ds_validities")
+      )
       SCDB::defer_db_cleanup(validities)
 
       out <- dplyr::inner_join(out, validities,
@@ -260,7 +265,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
         dplyr::select(!c("valid_from.p", "valid_until.p")) |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_get_results"))
 
       return(out)
     },
@@ -294,8 +299,11 @@ DiseasystoreBase <- R6::R6Class(                                                
       ds_map <- self %.% ds_map
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
-      study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()))
+      study_dates <- dplyr::copy_to(
+        self %.% target_conn,
+        df = data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))),
+        name = SCDB::unique_table_name("ds_study_dates")
+      )
       SCDB::defer_db_cleanup(study_dates)
 
       # Fetch the requested observable from the feature store and truncate to the start and end dates
@@ -401,7 +409,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Merge and prepare for counting
       out <- truncate_interlace(observable_data, stratification_data) |>
         private$key_join_filter(stratification_features, start_date, end_date) |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_truncate_interlace"))
 
       # Retrieve the aggregators (and ensure they work together)
       key_join_aggregators <- c(purrr::pluck(private, purrr::pluck(ds_map, observable)) %.% key_join,
@@ -423,7 +431,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_add" = "n") |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_add"))
 
       # Add the new invalid counts
       t_remove <- out |>
@@ -431,27 +439,23 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_remove" = "n") |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_remove"))
 
       # Get all combinations to merge onto
       all_dates <- tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1))
 
-      if (!is.null(stratification)) {
+      if (is.null(stratification)) {
+        all_combinations <- dplyr::copy_to(
+          self %.% target_conn,
+          df = all_dates,
+          name = SCDB::unique_table_name("ds_all_combinations")
+        )
+      } else {
         all_combinations <- out |>
           dplyr::ungroup() |>
           dplyr::distinct(!!!stratification) |>
           dplyr::cross_join(all_dates, copy = TRUE) |>
-          dplyr::compute()
-      } else {
-        all_combinations <- all_dates
-
-        # Copy if needed
-        if (is.null(stratification)) {
-          all_combinations <- all_combinations |>
-            dplyr::copy_to(self %.% target_conn, df = _,
-                           name = paste0("ds_all_combinations_", Sys.getpid()))
-          SCDB::defer_db_cleanup(all_combinations)
-        }
+          dplyr::compute(name = SCDB::unique_table_name("ds_all_combinations"))
       }
 
       # Aggregate across dates
