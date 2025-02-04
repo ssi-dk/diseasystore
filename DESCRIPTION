@@ -41,7 +41,7 @@ Imports:
     readr,
     rlang,
     R6,
-    SCDB (>= 0.4.0),
+    SCDB (>= 0.5.0),
     stringr,
     tidyr,
     tidyselect
