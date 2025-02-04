@@ -42,6 +42,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
       "age_group"      = "ecdc_respitory_viruses_iliari_rates"
     ),
     .label = "ECDC Respitory Viruses",
+    .observables_regex = r"{\w+_rates}",
 
     .min_start_date = as.Date("2014-09-29"),
     .max_end_date = NULL, # Data source is still actively updated
