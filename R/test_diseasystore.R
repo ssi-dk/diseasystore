@@ -285,6 +285,15 @@ test_diseasystore <- function(
   })
 
 
+  testthat::test_that(glue::glue("{diseasystore_class} has observables"), {
+    for (conn in conn_generator(skip_backends)) {
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
+
+      checkmate::expect_character(ds$available_observables, min.len = 1)
+    }
+  })
+
+
   # Set a test_end_date for the test
   test_end_date <- test_start_date + lubridate::days(4)
 
