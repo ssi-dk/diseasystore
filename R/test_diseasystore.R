@@ -156,6 +156,12 @@ test_diseasystore <- function(
 
 
 
+  # Make a little helper function to clean up the connection after each test
+  # and check that intermediate dbplyr tables (e.g. from dplyr::compute() calls) are cleaned up
+  connection_clean_up <- function(conn) {
+    testthat::expect_identical(nrow(SCDB::get_tables(conn, show_temporary = TRUE, pattern = "dbplyr_")), 1)
+    DBI::dbDisconnect(conn)
+  }
 
   #     ######## ########  ######  ########  ######     ########  ########  ######   #### ##    ##  ######
   #        ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ###   ## ##    ##
@@ -194,6 +200,7 @@ test_diseasystore <- function(
     checkmate::expect_date(ds$min_start_date, upper = lubridate::today())
     checkmate::expect_date(ds$max_end_date,   upper = lubridate::today())
 
+    # Clean up
     rm(ds)
     invisible(gc())
   })
@@ -224,6 +231,7 @@ test_diseasystore <- function(
     feature <- testthat::expect_no_error(ds$available_features[[1]])
     testthat::expect_no_error(ds$get_feature(feature))
 
+    # Clean up
     rm(ds)
     invisible(gc())
   })
@@ -244,6 +252,7 @@ test_diseasystore <- function(
 
     testthat::expect_no_error(ds$get_feature(ds$available_features[[1]]))
 
+    # Clean up
     rm(ds)
     invisible(gc())
   })
@@ -382,6 +391,8 @@ test_diseasystore <- function(
 
       })
 
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
@@ -450,6 +461,8 @@ test_diseasystore <- function(
 
       })
 
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
@@ -512,6 +525,8 @@ test_diseasystore <- function(
 
         })
 
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
@@ -587,6 +602,7 @@ test_diseasystore <- function(
         })
 
       # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
