@@ -157,9 +157,10 @@ test_diseasystore <- function(
 
 
   # Make a little helper function to clean up the connection after each test
-  # and check that intermediate dbplyr tables (e.g. from dplyr::compute() calls) are cleaned up
+  # and check that intermediate dbplyr and SCDB tables (e.g. from dplyr::compute() calls) are cleaned up
   connection_clean_up <- function(conn) {
     testthat::expect_identical(nrow(SCDB::get_tables(conn, show_temporary = TRUE, pattern = "dbplyr_")), 0L)
+    testthat::expect_identical(nrow(SCDB::get_tables(conn, show_temporary = TRUE, pattern = "SCDB_")), 0L)
     DBI::dbDisconnect(conn)
   }
 
@@ -575,6 +576,9 @@ test_diseasystore <- function(
         testthat::expect_identical(unique(dplyr::pull(output, "number")), 2)
       }
 
+
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
