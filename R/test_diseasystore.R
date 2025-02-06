@@ -315,7 +315,12 @@ test_diseasystore <- function(
           ),
           expr = {
             feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
-              SCDB::digest_to_checksum() |>
+              SCDB::digest_to_checksum()
+
+            # digest_to_checksum() creates an intermediary table in SQLite
+            if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(feature_checksums)
+
+            feature_checksums <- feature_checksums |>
               dplyr::pull("checksum") |>
               sort()
 
@@ -380,7 +385,12 @@ test_diseasystore <- function(
         }
 
         reference_checksums <- reference |>
-          SCDB::digest_to_checksum() |>
+          SCDB::digest_to_checksum()
+
+        # digest_to_checksum() creates an intermediary table in SQLite
+        if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(reference_checksums)
+
+        reference_checksums <- reference_checksums |>
           dplyr::pull("checksum") |>
           sort()
 
@@ -421,7 +431,12 @@ test_diseasystore <- function(
           expr = {
 
             feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
-              SCDB::digest_to_checksum() |>
+              SCDB::digest_to_checksum()
+
+            # digest_to_checksum() creates an intermediary table in SQLite
+            if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(feature_checksums)
+
+            feature_checksums <- feature_checksums |>
               dplyr::pull("checksum") |>
               sort()
 
@@ -446,7 +461,12 @@ test_diseasystore <- function(
         }
 
         reference_checksums <- reference |>
-          SCDB::digest_to_checksum() |>
+          SCDB::digest_to_checksum()
+
+        # digest_to_checksum() creates an intermediary table in SQLite
+        if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(reference_checksums)
+
+        reference_checksums <- reference_checksums |>
           dplyr::pull("checksum") |>
           sort()
 
