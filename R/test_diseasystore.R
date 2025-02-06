@@ -156,6 +156,12 @@ test_diseasystore <- function(
 
 
 
+  # Make a little helper function to clean up the connection after each test
+  # and check that intermediate dbplyr tables (e.g. from dplyr::compute() calls) are cleaned up
+  connection_clean_up <- function(conn) {
+    testthat::expect_identical(nrow(SCDB::get_tables(conn, show_temporary = TRUE, pattern = "dbplyr_")), 0L)
+    DBI::dbDisconnect(conn)
+  }
 
   #     ######## ########  ######  ########  ######     ########  ########  ######   #### ##    ##  ######
   #        ##    ##       ##    ##    ##    ##    ##    ##     ## ##       ##    ##   ##  ###   ## ##    ##
@@ -194,6 +200,7 @@ test_diseasystore <- function(
     checkmate::expect_date(ds$min_start_date, upper = lubridate::today())
     checkmate::expect_date(ds$max_end_date,   upper = lubridate::today())
 
+    # Clean up
     rm(ds)
     invisible(gc())
   })
@@ -224,6 +231,7 @@ test_diseasystore <- function(
     feature <- testthat::expect_no_error(ds$available_features[[1]])
     testthat::expect_no_error(ds$get_feature(feature))
 
+    # Clean up
     rm(ds)
     invisible(gc())
   })
@@ -244,6 +252,7 @@ test_diseasystore <- function(
 
     testthat::expect_no_error(ds$get_feature(ds$available_features[[1]]))
 
+    # Clean up
     rm(ds)
     invisible(gc())
   })
@@ -303,7 +312,12 @@ test_diseasystore <- function(
           ),
           expr = {
             feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
-              SCDB::digest_to_checksum() |>
+              SCDB::digest_to_checksum()
+
+            # digest_to_checksum() creates an intermediary table in SQLite
+            if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(feature_checksums)
+
+            feature_checksums <- feature_checksums |>
               dplyr::pull("checksum") |>
               sort()
 
@@ -368,12 +382,17 @@ test_diseasystore <- function(
         # Copy to remote and continue checks
         if (!inherits(reference, "tbl_sql") ||
               (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
-          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds_reference"))
           SCDB::defer_db_cleanup(reference)
         }
 
         reference_checksums <- reference |>
-          SCDB::digest_to_checksum() |>
+          SCDB::digest_to_checksum()
+
+        # digest_to_checksum() creates an intermediary table in SQLite
+        if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(reference_checksums)
+
+        reference_checksums <- reference_checksums |>
           dplyr::pull("checksum") |>
           sort()
 
@@ -382,6 +401,8 @@ test_diseasystore <- function(
 
       })
 
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
@@ -412,7 +433,12 @@ test_diseasystore <- function(
           expr = {
 
             feature_checksums <- ds$get_feature(.x, start_date = test_start_date, end_date = test_end_date) |>
-              SCDB::digest_to_checksum() |>
+              SCDB::digest_to_checksum()
+
+            # digest_to_checksum() creates an intermediary table in SQLite
+            if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(feature_checksums)
+
+            feature_checksums <- feature_checksums |>
               dplyr::pull("checksum") |>
               sort()
 
@@ -432,12 +458,17 @@ test_diseasystore <- function(
         # Copy to remote and continue checks
         if (!inherits(reference, "tbl_sql") ||
               (inherits(reference, "tbl_sql") && !identical(dbplyr::remote_con(reference), conn))) {
-          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds"))
+          reference <- dplyr::copy_to(conn, df = reference, name = SCDB::unique_table_name("ds_reference"))
           SCDB::defer_db_cleanup(reference)
         }
 
         reference_checksums <- reference |>
-          SCDB::digest_to_checksum() |>
+          SCDB::digest_to_checksum()
+
+        # digest_to_checksum() creates an intermediary table in SQLite
+        if (inherits(conn, "SQLiteConnection")) SCDB::defer_db_cleanup(reference_checksums)
+
+        reference_checksums <- reference_checksums |>
           dplyr::pull("checksum") |>
           sort()
 
@@ -450,6 +481,8 @@ test_diseasystore <- function(
 
       })
 
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
@@ -512,6 +545,8 @@ test_diseasystore <- function(
 
         })
 
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
@@ -605,6 +640,7 @@ test_diseasystore <- function(
         })
 
       # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
