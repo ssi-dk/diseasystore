@@ -41,7 +41,7 @@ Imports:
     readr,
     rlang,
     R6,
-    SCDB (>= 0.5.0),
+    SCDB (> 0.5.0),
     stringr,
     tidyr,
     tidyselect
@@ -67,3 +67,5 @@ URL: https://github.com/ssi-dk/diseasystore, https://ssi-dk.github.io/diseasysto
 BugReports: https://github.com/ssi-dk/diseasystore/issues
 Config/testthat/edition: 3
 LazyData: true
+Remotes:
+    ssi-dk/SCDB@rc-v0.5.1
