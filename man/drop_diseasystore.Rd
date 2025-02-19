@@ -17,7 +17,7 @@ Pattern to match the tables by}
 \item{schema}{(\code{character})\cr A database schema.  If the database backend does not support schema, the tables will be prefixed with \if{html}{\out{<schema>}}.
 The location where the \code{diseasystore} stores data.}
 
-\item{conn}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection}
+\item{conn}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection.}
 }
 \value{
 \code{NULL} (called for side effects)

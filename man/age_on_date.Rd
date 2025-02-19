@@ -13,7 +13,7 @@ Name of the birth date column.}
 \item{reference_date}{(\code{Date(1)} or \code{character(1)})\cr
 The date to compute the age for (or name of column containing the reference date).}
 
-\item{conn}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection}
+\item{conn}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection.}
 }
 \value{
 SQL query that computes the age on the given date.
