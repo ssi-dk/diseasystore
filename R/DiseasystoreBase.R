@@ -267,7 +267,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
         dplyr::select(!c("valid_from.p", "valid_until.p")) |>
-        dplyr::compute(name = SCDB::unique_table_name("ds_get_results"))
+        dplyr::compute(name = SCDB::unique_table_name("ds_get_feature"))
 
       return(out)
     },
@@ -329,7 +329,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Give warning if stratification features are already in the observables data
       # First we identify the computations being done in the stratifications, only stratifications that compute a new
-      # entity can lead to unexpected behavior. If the user just request a already existing stratification, there will
+      # entity can lead to unexpected behaviour. If the user just request a already existing stratification, there will
       # be no ambiguities.
       new_stratifications <- stratification |>
         purrr::map(rlang::as_label) |>
@@ -403,10 +403,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
         } else {
 
-          # Pre-truncate stratification features to the start and end dates to simplify the interlaced output
+          # Pre-truncate stratification data to the start and end dates to simplify the interlaced output
           stratification_data_truncated <- stratification_data |>
-            purrr::map(~ {
-              dplyr::cross_join(.x, study_dates, suffix = c("", ".d")) |>
+            purrr::map(\(feature) {
+              feature |>
+                dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
                 dplyr::mutate(
                   "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),  # nolint: ifelse_censor_linter
                   "valid_until" = dplyr::coalesce(
