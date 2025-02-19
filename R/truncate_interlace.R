@@ -80,7 +80,9 @@
 truncate_interlace <- function(primary, secondary = NULL) {
 
   # Check edge case
-  if (is.null(secondary)) return(primary)
+  if (is.null(secondary) || is.list(secondary) && length(secondary) == 0) {
+    return(primary)
+  }
 
   # Ensure secondary is list
   if (!inherits(secondary, "list")) secondary <- list(secondary)
