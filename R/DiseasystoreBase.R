@@ -416,7 +416,7 @@ DiseasystoreBase <- R6::R6Class(                                                
             "Available stratification variables are: ",
             "{toString(self$available_stratifications)}"
           )
-          stop(error_msg)
+          stop(error_msg, call. = FALSE)
         }
       )
 
