@@ -88,7 +88,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
         # Now, compute the next birthdays of the individual (as many as we need to cover the study period)
         # and compute the age of the individuals throughout the study period with their birthdays denoting the starts
         # and ends of the validity periods.
-        out <- purrr::map(
+        out <- purrr::map(                                                                                              # nolint start: consecutive_mutate_linter
           seq.int(from = 0, to = ceiling(lubridate::interval(start_date, end_date) / lubridate::years(1))),
           ~ age |>
             dplyr::mutate(
@@ -99,7 +99,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
             ) |>
             dplyr::mutate( # NOTE: Again, we need the split to make "birthday" available for the next mutate
               "next_birthday" = !!add_years("birthday", 1, conn = ds %.% target_conn) # And when that age is not valid
-            ) |>
+            ) |>                                                                                                        # nolint end: consecutive_mutate_linter
             dplyr::filter( # Now we remove the birthdays that fall outside of the study period
               .data$birthday <= {{ end_date }},
               .data$birthday < .data$valid_until | is.na(.data$valid_until)
