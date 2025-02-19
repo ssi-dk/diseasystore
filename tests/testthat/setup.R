@@ -34,8 +34,9 @@ for (conn in get_test_conns()) {
 
   # Check test schemas are empty
   n_tables_in_test_schemas <- SCDB::get_tables(conn) |>
-    dplyr::filter(.data$schema %in% c(target_schema_1, target_schema_2)) |>
-    nrow()
+    dplyr::pull("schema") |>
+    purrr::keep(~ . %in% c(target_schema_1, target_schema_2)) |>
+    length()
   checkmate::assert_true(n_tables_in_test_schemas == 0)
 
   # Disconnect

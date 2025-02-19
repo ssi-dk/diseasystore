@@ -354,15 +354,10 @@ test_diseasystore <- function(
 
         # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
         # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
-        testthat::expect_identical(
-          SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
-          0L
-        )
+        testthat::expect_identical(sum(is.na(dplyr::pull(reference, "valid_from"))), 0L)
 
         testthat::expect_identical(
-          reference |>
-            dplyr::filter(.data$valid_from >= .data$valid_until) |>
-            SCDB::nrow(),
+          sum(dplyr::pull(reference, "valid_from") >= dplyr::pull(reference, "valid_until"), na.rm = TRUE),
           0L,
           info = glue::glue("Feature `{.x}` has some elements where `valid_from` >= `valid_until`.")
         )
