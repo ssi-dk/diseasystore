@@ -82,7 +82,7 @@ FeatureHandler <- R6::R6Class(                                                  
 
       # Set defaults for missing functions
       if (is.null(compute)) {
-        args <- append(args, c("compute" = \(...) stop("compute not configured!")))
+        args <- append(args, c("compute" = \(...) stop("compute not configured!", call. = FALSE)))
       } else {
         checkmate::assert_function(compute, args = c("start_date", "end_date", "slice_ts", "source_conn"))
       }
@@ -96,7 +96,7 @@ FeatureHandler <- R6::R6Class(                                                  
       }
 
       if (is.null(key_join)) {
-        args  <- append(args, c("key_join" = \(...) stop("key_join not configured!")))
+        args  <- append(args, c("key_join" = \(...) stop("key_join not configured!", call. = FALSE)))
       } else {
         checkmate::assert_function(key_join, args = c(".data", "feature"))
       }

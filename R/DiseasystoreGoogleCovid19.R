@@ -128,11 +128,12 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
                            "subregion"    = .data$subregion2_name,
                            .data$aggregation_level) |>
           tidyr::unite("region_id", "country_code", "subregion1_code", na.rm = TRUE) |>
-          dplyr::mutate(region_id    = dplyr::if_else(.data$country_id == .data$region_id,
-                                                      NA, .data$region_id),
-                        subregion_id = dplyr::if_else(.data$key_location != .data$subregion_id,
-                                                      NA, .data$subregion_id)) |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA))
+          dplyr::mutate(
+            "region_id" = dplyr::if_else(.data$country_id == .data$region_id, NA, .data$region_id),
+            "subregion_id" = dplyr::if_else(.data$key_location != .data$subregion_id, NA, .data$subregion_id),
+            "valid_from" = as.Date("2020-01-01"),
+            "valid_until" = as.Date(NA)
+          )
 
         return(out)
       },
@@ -271,7 +272,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
       } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
         return(.data |> dplyr::filter(.data$key_location == .data$subregion_id))
       } else {
-        stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
+        stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)", call. = FALSE)
       }
     }
   )

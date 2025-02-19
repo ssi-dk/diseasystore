@@ -96,7 +96,7 @@ test_diseasystore <- function(
                                    r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
       source_conn_helper <- source_conn_path                                                                            # nolint: object_usage_linter
     } else {
-      stop("`source_conn_helper` could not be determined!")
+      stop("`source_conn_helper` could not be determined!", call. = FALSE)
     }
 
     # Then look for availability of files and download if needed
@@ -137,7 +137,10 @@ test_diseasystore <- function(
 
   # Throw warning if remote data unavailable (only throw if we are working locally, don't run this check on CRAN)
   if (!is.null(remote_conn) && curl::has_internet() && !on_cran && !remote_data_available) {
-    warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
+    warning(
+      glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"),
+      call. = FALSE
+    )
   }
 
   # Check that the files are available after attempting to download
@@ -269,7 +272,7 @@ test_diseasystore <- function(
               stringr::str_remove_all(stringr::fixed("\n *")) |>
               stringr::str_remove_all(stringr::fixed("* ")) |>
               simpleError(message = _) |>
-              stop()
+              stop()                                                                                                    # nolint: condition_call_linter
           }
         ),
         paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
@@ -325,9 +328,9 @@ test_diseasystore <- function(
           dplyr::collect() |>
           dplyr::filter(.data$valid_until <= !!test_start_date | !!test_end_date < .data$valid_from)
 
-        testthat::expect_equal(
+        testthat::expect_identical(
           SCDB::nrow(reference_out_of_bounds),
-          0,
+          0L,
           info = glue::glue("Feature `{.x}` returns data outside the study period.")
         )
 
@@ -338,12 +341,12 @@ test_diseasystore <- function(
           dplyr::collect() |>
           purrr::map(~ DBI::dbDataType(dbObj = conn, obj = .))
 
-        testthat::expect_equal(
+        testthat::expect_identical(
           purrr::pluck(validity_period_data_types, "valid_from"),
           DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
           info = glue::glue("Feature `{.x}` has a non-Date `valid_from` column.")
         )
-        testthat::expect_equal(
+        testthat::expect_identical(
           purrr::pluck(validity_period_data_types, "valid_until"),
           DBI::dbDataType(dbObj = conn, obj = as.Date(0)),
           info = glue::glue("Feature `{.x}` has a non-Date `valid_until` column.")
@@ -351,16 +354,11 @@ test_diseasystore <- function(
 
         # Check that valid_until (date or NA) is (strictly) greater than valid_from (date)
         # Remember that data is valid in the interval [valid_from, valid_until) and NA is treated as infinite
-        testthat::expect_equal(
-          SCDB::nrow(dplyr::filter(reference, is.na(.data$valid_from))),
-          0
-        )
+        testthat::expect_identical(sum(is.na(dplyr::pull(reference, "valid_from"))), 0L)
 
-        testthat::expect_equal(
-          reference |>
-            dplyr::filter(.data$valid_from >= .data$valid_until) |>
-            SCDB::nrow(),
-          0,
+        testthat::expect_identical(
+          sum(dplyr::pull(reference, "valid_from") >= dplyr::pull(reference, "valid_until"), na.rm = TRUE),
+          0L,
           info = glue::glue("Feature `{.x}` has some elements where `valid_from` >= `valid_until`.")
         )
 
@@ -459,8 +457,8 @@ test_diseasystore <- function(
   # Helper function that checks the output of key_joins
   key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
-    testthat::expect_equal(min(output$date), start_date)
-    testthat::expect_equal(max(output$date), end_date)
+    testthat::expect_identical(min(output$date), start_date)
+    testthat::expect_identical(max(output$date), end_date)
   }
 
 

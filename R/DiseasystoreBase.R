@@ -69,8 +69,8 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
       # Check source and target conn has been set correctly
-      if (is.null(self %.% source_conn)) stop("source_conn option not defined for ", class(self)[1])
-      if (is.null(self %.% target_conn)) stop("target_conn option not defined for ", class(self)[1])
+      if (is.null(self %.% source_conn)) stop("source_conn option not defined for ", class(self)[1], call. = FALSE)
+      if (is.null(self %.% target_conn)) stop("target_conn option not defined for ", class(self)[1], call. = FALSE)
       checkmate::assert_class(self %.% target_conn, "DBIConnection")
 
 
@@ -161,7 +161,10 @@ DiseasystoreBase <- R6::R6Class(                                                
           Sys.sleep(diseasyoption("lock_wait_increment", self))
           wait_time <- wait_time + diseasyoption("lock_wait_increment", self)
           if (wait_time > diseasyoption("lock_wait_max", self)) {
-            stop(glue::glue("Lock not released within {diseasyoption('lock_wait_max', self)/60} minutes. Giving up."))
+            stop(
+              glue::glue("Lock not released within {diseasyoption('lock_wait_max', self)/60} minutes. Giving up."),
+              call. = FALSE
+            )
           }
         }
 
@@ -333,8 +336,12 @@ DiseasystoreBase <- R6::R6Class(                                                
       # .. and then we look for overlap with existing stratifications
       existing_stratification <- intersect(colnames(observable_data), new_stratifications)
       if (length(existing_stratification) > 0) {
-        warning("Observable already stratified by: ", toString(existing_stratification), ". ",
-                "Output might be inconsistent with expectation.")
+        warning(
+          "Observable already stratified by: ",
+          toString(existing_stratification), ". ",
+          "Output might be inconsistent with expectation.",
+          call. = FALSE
+        )
       }
 
 
@@ -359,7 +366,7 @@ DiseasystoreBase <- R6::R6Class(                                                
           err <- glue::glue("Stratification variable not found. ",
                             "Available stratification variables are: ",
                             "{toString(self$available_stratifications)}")
-          stop(err)
+          stop(err, call. = FALSE)
         }
 
         # Determine the name of the columns created by the stratifications
@@ -412,7 +419,10 @@ DiseasystoreBase <- R6::R6Class(                                                
                                            ~ purrr::pluck(private, purrr::pluck(ds_map, .x)) %.% key_join))
 
       if (length(unique(key_join_aggregators)) > 1) {
-        stop("(At least one) stratification feature does not match observable aggregator. Not implemented yet.")
+        stop(
+          "(At least one) stratification feature does not match observable aggregator. Not implemented yet.",
+          call. = FALSE
+        )
       }
 
       key_join_aggregator <- purrr::pluck(key_join_aggregators, 1)
