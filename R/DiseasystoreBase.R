@@ -88,16 +88,6 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
     #' @description
-    #'   Closes the open DB connection when removing the object
-    finalize = function() {
-      purrr::walk(list(self %.% target_conn, self %.% source_conn),
-                  ~ if (inherits(., "DBIConnection") && !inherits(., "TestConnection") && DBI::dbIsValid(.)) {
-                    DBI::dbDisconnect(., shutdown = TRUE)
-                  })
-    },
-
-
-    #' @description
     #'   Computes, stores, and returns the requested feature for the study period.
     #' @param feature (`character`)\cr
     #'   The name of a feature defined in the feature store.
@@ -738,6 +728,17 @@ DiseasystoreBase <- R6::R6Class(                                                
                                start_date = self %.% start_date,
                                end_date   = self %.% end_date) {
       return(.data) # By default, no filtering is performed
+    },
+
+
+    # @description
+    #   Closes the open DB connection when removing the object
+    finalize = function() {
+      list(self %.% target_conn, self %.% source_conn) |>
+        purrr::keep(~ inherits(., "DBIConnection")) |>
+        purrr::discard(~ inherits(., "TestConnection")) |>
+        purrr::keep(~ DBI::dbIsValid(.)) |>
+        purrr::walk(DBI::dbDisconnect)
     }
   )
 )

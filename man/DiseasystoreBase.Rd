@@ -62,7 +62,6 @@ A human readable label of the feature store. Read only.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiseasystoreBase-new}{\code{DiseasystoreBase$new()}}
-\item \href{#method-DiseasystoreBase-finalize}{\code{DiseasystoreBase$finalize()}}
 \item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
 \item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
 \item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
@@ -108,16 +107,6 @@ Boolean that controls enables debugging information.}
 \subsection{Returns}{
 A new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} class.
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreBase-finalize"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreBase-finalize}{}}}
-\subsection{Method \code{finalize()}}{
-Closes the open DB connection when removing the object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$finalize()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreBase-get_feature"></a>}}

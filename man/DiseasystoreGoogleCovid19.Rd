@@ -34,7 +34,6 @@ See the vignette("diseasystore-google-covid-19") for details on how to configure
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="finalize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-finalize'><code>diseasystore::DiseasystoreBase$finalize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
