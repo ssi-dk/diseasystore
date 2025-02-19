@@ -22,7 +22,7 @@
 
   # Check for existence
   if (!(field_name %in% names(env))) {
-    stop(field_name, " not found in ", env_name)
+    stop(field_name, " not found in ", env_name, call. = FALSE)
   }
 
   # Retrieve the object

@@ -57,13 +57,16 @@ drop_diseasystore <- function(
 
   # Ensure schema is the same for all identified tables (if not, we have unwanted ambiguity)
   if (length(unique(dplyr::pull(tables_to_delete, "schema"))) > 1) {
-    stop("Tables marked for deletion spread across schemas. Unwanted ambiguity detected!")
+    stop("Tables marked for deletion spread across schemas. Unwanted ambiguity detected!", call. = FALSE)
   }
 
   # Check if the table "logs" is in the list of tables to delete, if yes, all tables must be deleted.
   if (purrr::some(tables_to_delete$table, ~ endsWith(., ".logs")) &&
         !identical(tables_to_delete, dplyr::filter(tables, stringr::str_starts(.data$db_table_id, ds_context)))) {
-    stop(glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"))
+    stop(
+      glue::glue("'{schema}.logs' set to delete. Can only delete if entire feature store is dropped!"),
+      call. = FALSE
+    )
   }
 
   # Drop the combined column to make it convertible to id

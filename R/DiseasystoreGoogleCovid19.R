@@ -271,7 +271,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
       } else if (purrr::some(stratification_features, ~ . %in% c("subregion_id", "subregion"))) {
         return(.data |> dplyr::filter(.data$key_location == .data$subregion_id))
       } else {
-        stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)")
+        stop("Edge case detected in $key_join_filter() (DiseasyStoreGoogleCovid19)", call. = FALSE)
       }
     }
   )

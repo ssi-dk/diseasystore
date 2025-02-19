@@ -38,14 +38,14 @@ source_conn_path <- function(source_conn, file) {
     matching_file <- purrr::keep(dir(source_conn), ~ startsWith(., file)) |>
       purrr::pluck(1) # Ensure we only have one match
 
-    if (is.null(matching_file)) stop(file, " could not be found in ", source_conn)
+    if (is.null(matching_file)) stop(file, " could not be found in ", source_conn, call. = FALSE)
 
     file_location <- file.path(source_conn, matching_file)
 
   } else if (checkmate::test_character(source_conn, pattern = url_regex)) { # source_conn is a URL
     file_location <- file.path(stringr::str_remove(source_conn, "/$"), file)
   } else {
-    stop("source_conn could not be parsed to valid directory or URL\n")
+    stop("source_conn could not be parsed to valid directory or URL\n", call. = FALSE)
   }
 
   return(file_location)
@@ -98,12 +98,12 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     # Update the local repo -- give warning if we cannot
     if (pull) {
       if (!checkmate::test_directory_exists(file.path(source_conn, ".git"))) {
-        stop("The directory ", source_conn, " does not appear to be a git repository. Cannot pull.")
+        stop("The directory ", source_conn, " does not appear to be a git repository. Cannot pull.", call. = FALSE)
       }
       tryCatch(
         msg <- system2("git", args = c(paste("-C", source_conn), "pull"), stdout = TRUE),                               # nolint: implicit_assignment_linter
         warning = function(w) {
-          stop(paste(c("Your local repository could not be updated!", msg), collapse = "\n"))
+          stop(paste(c("Your local repository could not be updated!", msg), collapse = "\n"), call. = FALSE)
         }
       )
     }
@@ -154,7 +154,8 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
       warning(
         "Data returned from GitHub API has been truncated! ",
         "The returned file may not be correct.",
-        "Consider cloning the repository and use a local source_conn."
+        "Consider cloning the repository and use a local source_conn.",
+        call. = FALSE
       )
     }
 
@@ -168,7 +169,7 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     return(file_path)
 
   } else {
-    stop("source_conn could not be parsed to valid GitHub repository or GitHub API URL\n")
+    stop("source_conn could not be parsed to valid GitHub repository or GitHub API URL\n", call. = FALSE)
   }
 
 }

@@ -96,7 +96,7 @@ test_diseasystore <- function(
                                    r"{\b(?:https?|ftp):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]}")) {
       source_conn_helper <- source_conn_path                                                                            # nolint: object_usage_linter
     } else {
-      stop("`source_conn_helper` could not be determined!")
+      stop("`source_conn_helper` could not be determined!", call. = FALSE)
     }
 
     # Then look for availability of files and download if needed
@@ -137,7 +137,10 @@ test_diseasystore <- function(
 
   # Throw warning if remote data unavailable (only throw if we are working locally, don't run this check on CRAN)
   if (!is.null(remote_conn) && curl::has_internet() && !on_cran && !remote_data_available) {
-    warning(glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"))
+    warning(
+      glue::glue("remote_conn for {diseasystore_class} unavailable despite internet being available!"),
+      call. = FALSE
+    )
   }
 
   # Check that the files are available after attempting to download
@@ -269,7 +272,7 @@ test_diseasystore <- function(
               stringr::str_remove_all(stringr::fixed("\n *")) |>
               stringr::str_remove_all(stringr::fixed("* ")) |>
               simpleError(message = _) |>
-              stop()
+              stop()                                                                                                    # nolint: condition_call_linter
           }
         ),
         paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")

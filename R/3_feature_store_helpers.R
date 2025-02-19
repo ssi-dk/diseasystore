@@ -29,7 +29,9 @@ available_diseasystores <- function() {
   available_diseasystores <- purrr::keep(search(), ~ stringr::str_detect(., ":diseasystore\\.*"))
 
   # Give warning if none is found
-  if (length(available_diseasystores) == 0) stop("No diseasystores found. Have you attached the libraries?")
+  if (length(available_diseasystores) == 0) {
+    stop("No diseasystores found. Have you attached the libraries?", call. = FALSE)
+  }
 
   # Show available feature stores
   available_diseasystores <- available_diseasystores |>
