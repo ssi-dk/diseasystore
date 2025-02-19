@@ -13,7 +13,7 @@ The date to add years to (or name of column containing the reference date).}
 \item{years}{(\code{numeric(1)} or \code{character(1)})\cr
 The length of the time interval in whole years (or name of column containing the number of years).}
 
-\item{conn}{(\code{DBIConnection})\cr A database connection.}
+\item{conn}{(\code{DBIConnection} or \code{function})\cr A database connection or function that opens a database connection}
 }
 \value{
 SQL query for the time interval.
