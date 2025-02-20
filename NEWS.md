@@ -4,6 +4,9 @@
 
 * The `$observable_regex` field is added, which shows the regex that demarcates observables from stratifications (#204).
 
+* Improved clean up of temporary tables (#207).
+  Tables created internally in `diseasystore` are now labelled and removed when no longer needed.
+
 
 # diseasystore 0.3.0
 
