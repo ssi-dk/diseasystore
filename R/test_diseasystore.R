@@ -457,8 +457,8 @@ test_diseasystore <- function(
   # Helper function that checks the output of key_joins
   key_join_features_tester <- function(output, start_date, end_date) {
     # The output dates should match start and end date
-    testthat::expect_identical(min(output$date), start_date)
-    testthat::expect_identical(max(output$date), end_date)
+    testthat::expect_equal(min(output$date), start_date)                                                                # nolint: expect_identical_linter. R 4.5 makes dates more confusing than it already is
+    testthat::expect_equal(max(output$date), end_date)                                                                  # nolint: expect_identical_linter.
   }
 
 
