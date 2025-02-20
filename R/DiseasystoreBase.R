@@ -500,7 +500,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     ),
 
 
-    #' @field available_features (`character`)\cr
+    #' @field available_features (`character()`)\cr
     #'   A list of available features in the feature store. Read only.
     available_features = purrr::partial(
       .f = active_binding,
@@ -509,25 +509,34 @@ DiseasystoreBase <- R6::R6Class(                                                
     ),
 
 
-    #' @field available_observables (`character`)\cr
+    #' @field available_observables (`character()`)\cr
     #'   A list of available observables in the feature store. Read only.
     available_observables = purrr::partial(
       .f = active_binding,
       name = "available_observables",
-      expr = return(purrr::keep(self$available_features, ~ stringr::str_detect(., private$.observables_regex)))
+      expr = return(purrr::keep(self$available_features, ~ stringr::str_detect(., self$observables_regex)))
     ),
 
 
-    #' @field available_stratifications (`character`)\cr
+    #' @field available_stratifications (`character()`)\cr
     #'   A list of available stratifications in the feature store. Read only.
     available_stratifications = purrr::partial(
       .f = active_binding,
       name = "available_stratifications",
-      expr = return(purrr::discard(self$available_features, ~ stringr::str_detect(., private$.observables_regex)))
+      expr = return(purrr::discard(self$available_features, ~ stringr::str_detect(., self$observables_regex)))
     ),
 
 
-    #' @field label (`character`)\cr
+    #' @field observables_regex (`character(1)`)\cr
+    #'   A list of available stratifications in the feature store. Read only.
+    observables_regex = purrr::partial(
+      .f = active_binding,
+      name = "observables_regex",
+      expr = return(private$.observables_regex)
+    ),
+
+
+    #' @field label (`character(1)`)\cr
     #'   A human readable label of the feature store. Read only.
     label = purrr::partial(
       .f = active_binding,
