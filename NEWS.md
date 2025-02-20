@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* Improved clean up of temporary tables (#207).
+  Tables created internally in `diseasystore` are now labelled and removed when no longer needed.
+
 # diseasystore 0.3.0
 
 ## Breaking change
