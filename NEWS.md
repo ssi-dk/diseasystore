@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* The `$observable_regex` field is added, which shows the regex that demarcates observables from stratifications (#204).
+
+
 # diseasystore 0.3.0
 
 ## Breaking change
@@ -55,7 +60,6 @@
   See `vignette("extending-diseasystore-example")`.
 
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
-
 
 ## Minor Improvements and Fixes
 
