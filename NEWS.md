@@ -1,11 +1,17 @@
 # diseasystore (development version)
 
+## Breaking change
+
+* `DiseasystoreBase$key_join_features()` no longer accept character stratifications -- must use `rlang::quos()` (#203).
+
 ## Minor Improvements and Fixes
 
 * The `$observable_regex` field is added, which shows the regex that demarcates observables from stratifications (#204).
 
 * Improved clean up of temporary tables (#207).
   Tables created internally in `diseasystore` are now labelled and removed when no longer needed.
+
+* In `DiseasystoreBase$key_join_features()`, stratifications no longer need to do computation on other features (#203).
 
 
 # diseasystore 0.3.0

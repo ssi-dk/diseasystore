@@ -552,6 +552,34 @@ test_diseasystore <- function(
   })
 
 
+  testthat::test_that(glue::glue("{diseasystore_class} can key_join with feature-independent stratification"), {
+    testthat::skip_if_not(local)
+
+    for (conn in conn_generator(skip_backends)) {
+
+      # Initialise without start_date and end_date
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
+
+      if (length(ds$available_observables) > 0) {
+
+        # Check we can aggregate with feature-independent stratifications
+        output <- ds$key_join_features(
+          observable = ds$available_observables[[1]],
+          stratification = rlang::quos(string = "test", number = 2),
+          test_start_date,
+          test_end_date
+        )
+
+        testthat::expect_identical(unique(dplyr::pull(output, "string")), "test")
+        testthat::expect_identical(unique(dplyr::pull(output, "number")), 2)
+      }
+
+      rm(ds)
+      invisible(gc())
+    }
+  })
+
+
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
 
@@ -570,17 +598,12 @@ test_diseasystore <- function(
           output <- tryCatch({
             ds$key_join_features(
               observable = as.character(observable),
-              stratification = as.character(stratification), # Output of expand.grid is a factor.
+              stratification = eval(parse(text = glue::glue("rlang::quos({stratification})"))),
               start_date = test_start_date,
               end_date = test_end_date
             )
           }, error = function(e) {
-            checkmate::expect_character(
-              e$message,
-              pattern = glue::glue("Stratification variable not found. ",
-                                   "Available stratification variables are: ",
-                                   "{toString(ds$available_stratifications)}")
-            )
+            checkmate::expect_character(e$message, pattern = "Stratification could not be computed")
             return(NULL)
           })
 
@@ -604,12 +627,7 @@ test_diseasystore <- function(
               end_date = test_end_date
             )
           }, error = function(e) {
-            checkmate::expect_character(
-              e$message,
-              pattern = glue::glue("Stratification variable not found. ",
-                                   "Available stratification variables are: ",
-                                   "{toString(ds$available_stratifications)}")
-            )
+            checkmate::expect_character(e$message, pattern = "Stratification could not be computed")
             return(NULL)
           })
 

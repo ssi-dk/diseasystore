@@ -288,11 +288,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       coll <- checkmate::makeAssertCollection()
       checkmate::assert_choice(observable, self$available_observables, add = coll)
-      checkmate::assert(
-        checkmate::check_list(stratification, types = "character", null.ok = TRUE),
-        checkmate::check_multi_class(stratification, c("character", "quosure", "quosures"), null.ok = TRUE),
-        add = coll
-      )
+      checkmate::assert_multi_class(stratification, c("quosure", "quosures"), null.ok = TRUE, add = coll)
       checkmate::assert_date(start_date, add = coll)
       checkmate::assert_date(end_date, add = coll)
       checkmate::reportAssertions(coll)
@@ -371,14 +367,6 @@ DiseasystoreBase <- R6::R6Class(                                                
           unlist() |>
           unique()
 
-        # Report if stratification not found
-        if (is.null(stratification_features)) {
-          err <- glue::glue("Stratification variable not found. ",
-                            "Available stratification variables are: ",
-                            "{toString(self$available_stratifications)}")
-          stop(err, call. = FALSE)
-        }
-
         # Determine the name of the columns created by the stratifications
         stratification_names <- stratification |>
           purrr::map(rlang::as_label) |>
@@ -448,9 +436,22 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       key_join_aggregator <- purrr::pluck(key_join_aggregators, 1)
 
+      # Check stratification can be performed:
+      out <- tryCatch(
+        dplyr::group_by(out, !!!stratification),
+        error = function(e) {
+          error_msg <- glue::glue(
+            "Stratification could not be computed. ",
+            "Error {tolower(substr(e$message, 1, 1))}{substr(e$message, 2, nchar(e$message))}. ",
+            "Available stratification variables are: ",
+            "{toString(self$available_stratifications)}"
+          )
+          stop(error_msg, call. = FALSE)
+        }
+      )
+
       # Add the new valid counts
       t_add <- out |>
-        dplyr::group_by(!!!stratification) |>
         dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_add" = "n") |>
@@ -459,7 +460,6 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Add the new invalid counts
       t_remove <- out |>
-        dplyr::group_by(!!!stratification) |>
         dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_remove" = "n") |>
@@ -478,8 +478,8 @@ DiseasystoreBase <- R6::R6Class(                                                
         all_combinations <- all_dates
       } else {
         all_combinations <- out |>
-          dplyr::ungroup() |>
-          dplyr::distinct(!!!stratification) |>
+          dplyr::select(dplyr::all_of(stratification_names)) |>
+          dplyr::distinct() |>
           dplyr::cross_join(all_dates) |>
           dplyr::compute(name = SCDB::unique_table_name("ds_all_combinations"))
         SCDB::defer_db_cleanup(all_combinations)
