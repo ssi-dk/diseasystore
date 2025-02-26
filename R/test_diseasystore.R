@@ -526,7 +526,7 @@ test_diseasystore <- function(
 
       if (length(ds$available_observables) > 0) {
 
-        # Check we can aggregate without feature-independent stratifications
+        # Check we can aggregate with feature-independent stratifications
         output <- ds$key_join_features(
           observable = ds$available_observables[[1]],
           stratification = rlang::quos(string = "test", number = 2),

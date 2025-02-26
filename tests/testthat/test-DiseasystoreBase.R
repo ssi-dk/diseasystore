@@ -279,7 +279,7 @@ test_that("$key_join_features works with non-computing stratifications", {
   # Create new instance
   ds <- DiseasystoreDummy$new(target_conn = DBI::dbConnect(RSQLite::SQLite()), verbose = FALSE)
 
-  # Check that we can join the features even if stratification does no computation on features
+  # Check that we can join the features even if stratification does not compute on features
   expect_no_error(
     ds$key_join_features(
       observable = "n_cyl",
