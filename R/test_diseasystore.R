@@ -574,6 +574,9 @@ test_diseasystore <- function(
         testthat::expect_identical(unique(dplyr::pull(output, "number")), 2)
       }
 
+
+      # Clean up
+      connection_clean_up(conn)
       rm(ds)
       invisible(gc())
     }
