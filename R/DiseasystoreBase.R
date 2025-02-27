@@ -184,9 +184,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
           # Check it table is copied to target DB
           if (!inherits(ds_feature, "tbl_dbi") || !identical(self %.% source_conn, self %.% target_conn)) {
-            ds_feature <- ds_feature |>
-              dplyr::copy_to(self %.% target_conn, df = _,
-                             name = paste("ds", feature_loader, Sys.getpid(), sep = "_"))
+            ds_feature <- dplyr::copy_to(
+              self %.% target_conn,
+              df = ds_feature,
+              name = SCDB::unique_table_name(paste0("ds_", feature_loader))
+            )
             SCDB::defer_db_cleanup(ds_feature)
           }
 
@@ -201,7 +203,9 @@ DiseasystoreBase <- R6::R6Class(                                                
                 dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
             }
 
-            ds_updated_feature <- dplyr::union_all(ds_existing, ds_feature) |> dplyr::compute()
+            ds_updated_feature <- dplyr::union_all(ds_existing, ds_feature) |>
+              dplyr::compute(name = SCDB::unique_table_name("ds_updated_feature"))
+            SCDB::defer_db_cleanup(ds_updated_feature)
           } else {
             ds_updated_feature <- ds_feature
           }
@@ -251,8 +255,11 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # We need to slice to the period of interest.
       # to ensure proper conversion of variables, we first copy the limits over and then do an inner_join
-      validities <- data.frame(valid_from = start_date, valid_until = end_date) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_validities_", Sys.getpid()))
+      validities <- dplyr::copy_to(
+        self %.% target_conn,
+        df = data.frame(valid_from = start_date, valid_until = end_date),
+        name = SCDB::unique_table_name("ds_validities")
+      )
       SCDB::defer_db_cleanup(validities)
 
       out <- dplyr::inner_join(out, validities,
@@ -260,7 +267,7 @@ DiseasystoreBase <- R6::R6Class(                                                
                                          ("LHS"."valid_until" > "RHS"."valid_from" OR "LHS"."valid_until" IS NULL)',
                                suffix = c("", ".p")) |>
         dplyr::select(!c("valid_from.p", "valid_until.p")) |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_get_feature"))
 
       return(out)
     },
@@ -290,13 +297,19 @@ DiseasystoreBase <- R6::R6Class(                                                
       ds_map <- self %.% ds_map
 
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
-      study_dates <- data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))) |>
-        dplyr::copy_to(self %.% target_conn, df = _, name = paste0("ds_study_dates_", Sys.getpid()))
+      study_dates <- dplyr::copy_to(
+        self %.% target_conn,
+        df = data.frame(valid_from = start_date, valid_until = base::as.Date(end_date + lubridate::days(1))),
+        name = SCDB::unique_table_name("ds_study_dates")
+      )
       SCDB::defer_db_cleanup(study_dates)
 
       # Fetch the requested observable from the feature store and truncate to the start and end dates
       # to simplify the interlaced output
-      observable_data <- self$get_feature(observable, start_date, end_date) |>
+      observable_data <- self$get_feature(observable, start_date, end_date)
+      SCDB::defer_db_cleanup(observable_data)
+
+      observable_data <- observable_data |>
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
         dplyr::mutate(
           "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),          # nolint: ifelse_censor_linter
@@ -308,7 +321,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::select(!ends_with(".d"))
 
       # Determine the keys
-      observable_keys  <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
+      observable_keys <- colnames(dplyr::select(observable_data, tidyselect::starts_with("key_")))
 
       # Give warning if stratification features are already in the observables data
       # First we identify the computations being done in the stratifications, only stratifications that compute a new
@@ -332,7 +345,14 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
       # Determine which features are affected by a stratification
-      if (!is.null(stratification)) {
+      if (is.null(stratification)) {
+
+        stratification_features <- NULL
+        stratification_names <- NULL
+        stratification_data <- NULL
+        out <- observable_data
+
+      } else {
 
         # Create regex detection for features
         ds_map_regex <- paste0(r"{(?<=^|\W)}", names(ds_map), r"{(?=$|\W)}")
@@ -361,36 +381,46 @@ DiseasystoreBase <- R6::R6Class(                                                
         stratification_data <- stratification_features |>
           purrr::discard(~ . %in% colnames(observable_data)) |> # Skip those already in the observable data
           unique() |>
-          purrr::map(~ {
-            # Fetch the requested stratification feature from the feature store and truncate to the start
-            #  and end dates to simplify the interlaced output
-            self$get_feature(.x, start_date, end_date) |>
-              dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
-              dplyr::mutate(
-                "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),    # nolint: ifelse_censor_linter
-                "valid_until" = dplyr::coalesce(
-                  ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),             # nolint: ifelse_censor_linter
-                  .data$valid_until.d
-                )
-              ) |>
-              dplyr::select(!ends_with(".d"))
-          })
+          purrr::map(~ self$get_feature(.x, start_date, end_date))
 
         # Check if no stratification data was pulled
-        if (length(stratification_data) == 0) stratification_data <- NULL
+        if (length(stratification_data) == 0) {
 
-      } else {
-        stratification_features <- NULL
-        stratification_names <- NULL
-        stratification_data <- NULL
+          stratification_data <- NULL
+          out <- observable_data
+
+        } else {
+
+          # Pre-truncate stratification data to the start and end dates to simplify the interlaced output
+          stratification_data_truncated <- stratification_data |>
+            purrr::map(\(feature) {
+              feature |>
+                dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
+                dplyr::mutate(
+                  "valid_from" = ifelse(.data$valid_from >= .data$valid_from.d, .data$valid_from, .data$valid_from.d),  # nolint: ifelse_censor_linter
+                  "valid_until" = dplyr::coalesce(
+                    ifelse(.data$valid_until <= .data$valid_until.d, .data$valid_until, .data$valid_until.d),           # nolint: ifelse_censor_linter
+                    .data$valid_until.d
+                  )
+                ) |>
+                dplyr::select(!ends_with(".d"))
+            })
+
+          # Merge stratifications to the observables
+          out <- truncate_interlace(observable_data, stratification_data_truncated)
+          if (length(stratification_data_truncated) == 1) {
+            out <- dplyr::compute(out, name = SCDB::unique_table_name("ds_truncate_interlace"))
+          }
+          SCDB::defer_db_cleanup(out)
+
+          # Stratification data is no longer needed
+          purrr::walk(stratification_data, SCDB::defer_db_cleanup)
+        }
       }
 
 
-      # Merge and prepare for counting
-      out <- truncate_interlace(observable_data, stratification_data) |>
-        private$key_join_filter(stratification_features, start_date, end_date) |>
-        dplyr::compute()
-      SCDB::defer_db_cleanup(out)
+      # Run the filtering needed for semi-aggregated data
+      out <- private$key_join_filter(out, stratification_features, start_date, end_date)
 
       # Retrieve the aggregators (and ensure they work together)
       key_join_aggregators <- c(purrr::pluck(private, purrr::pluck(ds_map, observable)) %.% key_join,
@@ -425,7 +455,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_add" = "n") |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_add"))
       SCDB::defer_db_cleanup(t_add)
 
       # Add the new invalid counts
@@ -433,29 +463,26 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
         dplyr::rename("n_remove" = "n") |>
-        dplyr::compute()
+        dplyr::compute(name = SCDB::unique_table_name("ds_remove"))
       SCDB::defer_db_cleanup(t_remove)
 
       # Get all combinations to merge onto
-      all_dates <- tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1))
+      all_dates <- dplyr::copy_to(
+        self %.% target_conn,
+        df = tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1)),
+        name = SCDB::unique_table_name("ds_all_dates")
+      )
+      SCDB::defer_db_cleanup(all_dates)
 
-      if (!is.null(stratification)) {
+      if (is.null(stratification)) {
+        all_combinations <- all_dates
+      } else {
         all_combinations <- out |>
           dplyr::select(dplyr::all_of(stratification_names)) |>
           dplyr::distinct() |>
-          dplyr::cross_join(all_dates, copy = TRUE) |>
-          dplyr::compute()
+          dplyr::cross_join(all_dates) |>
+          dplyr::compute(name = SCDB::unique_table_name("ds_all_combinations"))
         SCDB::defer_db_cleanup(all_combinations)
-      } else {
-        all_combinations <- all_dates
-
-        # Copy if needed
-        if (is.null(stratification)) {
-          all_combinations <- all_combinations |>
-            dplyr::copy_to(self %.% target_conn, df = _,
-                           name = paste0("ds_all_combinations_", Sys.getpid()))
-          SCDB::defer_db_cleanup(all_combinations)
-        }
       }
 
       # Aggregate across dates

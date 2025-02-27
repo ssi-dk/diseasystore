@@ -83,7 +83,7 @@ DiseasystoreSimulist <- R6::R6Class(                                            
         # Using birth date, compute the age at the start of the study period
         age <- ds$get_feature("birth", start_date, end_date, slice_ts) |>
           dplyr::mutate(age_at_start = as.integer(!!age_on_date("birth", start_date, conn = ds %.% target_conn))) |>
-          dplyr::compute()
+          dplyr::compute(name = SCDB::unique_table_name("ds_simulist_age"))
 
         # Now, compute the next birthdays of the individual (as many as we need to cover the study period)
         # and compute the age of the individuals throughout the study period with their birthdays denoting the starts
