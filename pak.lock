@@ -3354,7 +3354,7 @@
     {
       "ref": "RPostgres",
       "package": "RPostgres",
-      "version": "1.4.7",
+      "version": "1.4.8",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -3366,10 +3366,10 @@
         "RemoteRef": "RPostgres",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.4.7"
+        "RemoteSha": "1.4.8"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/RPostgres_1.4.7.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/RPostgres_1.4.7.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/RPostgres_1.4.8.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/RPostgres_1.4.8.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -3709,7 +3709,7 @@
     {
       "ref": "ssi-dk/SCDB@rc-v0.5.1",
       "package": "SCDB",
-      "version": "0.5.0.9000",
+      "version": "0.5.1",
       "type": "github",
       "direct": false,
       "binary": false,
@@ -3719,17 +3719,17 @@
         "RemotePkgRef": "ssi-dk/SCDB@rc-v0.5.1",
         "RemoteType": "github",
         "RemoteRef": "rc-v0.5.1",
-        "RemoteSha": "370664e8820e8b245d436e8a1122ae4f8e37da71",
+        "RemoteSha": "7c9b1a40873fd340c8ce3b69dfa8f94c6e76b18a",
         "RemoteHost": "api.github.com",
         "RemoteRepo": "SCDB",
         "RemoteUsername": "ssi-dk",
         "GithubRepo": "SCDB",
         "GithubUsername": "ssi-dk",
         "GithubRef": "rc-v0.5.1",
-        "GithubSHA1": "370664e8820e8b245d436e8a1122ae4f8e37da71"
+        "GithubSHA1": "7c9b1a40873fd340c8ce3b69dfa8f94c6e76b18a"
       },
-      "sources": "https://api.github.com/repos/ssi-dk/SCDB/zipball/370664e8820e8b245d436e8a1122ae4f8e37da71",
-      "target": "src/contrib/SCDB_0.5.0.9000_370664e.tar.gz",
+      "sources": "https://api.github.com/repos/ssi-dk/SCDB/zipball/7c9b1a40873fd340c8ce3b69dfa8f94c6e76b18a",
+      "target": "src/contrib/SCDB_0.5.1_7c9b1a4.tar.gz",
       "platform": "source",
       "rversion": "*",
       "directpkg": false,
@@ -4093,7 +4093,7 @@
     {
       "ref": "tinytex",
       "package": "tinytex",
-      "version": "0.55",
+      "version": "0.56",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4105,10 +4105,10 @@
         "RemoteRef": "tinytex",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "0.55"
+        "RemoteSha": "0.56"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.55.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/tinytex_0.55.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/tinytex_0.56.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/tinytex_0.56.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
