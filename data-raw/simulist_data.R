@@ -6,7 +6,7 @@ if (!rlang::is_installed("simulist")) {
   )
 }
 
-if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
+if (rlang::is_installed(c("simulist", "usethis", "withr"))) {
 
   # Configure `simulist` using their example configuration.
   # The Get Started configuration does not work with the current versions of epiparameter and simulist.
