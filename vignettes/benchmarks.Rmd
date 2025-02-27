@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 # Set a flag to determine if the vignette should be run in simple context (vignettes)
 # or in an extended context (pkgdown)
-simple_rendering <- !pkgdown::in_pkgdown()
+simple_rendering <- rlang::is_installed("pkgdown") && !pkgdown::in_pkgdown()
 ```
 
 ```{r setup}

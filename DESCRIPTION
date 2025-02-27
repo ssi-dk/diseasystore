@@ -54,6 +54,7 @@ Suggests:
     lintr,
     microbenchmark,
     odbc,
+    pkgdown,
     rmarkdown,
     RSQLite,
     RPostgres,
