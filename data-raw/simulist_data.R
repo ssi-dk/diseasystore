@@ -12,7 +12,7 @@ if (rlang::is_installed("simulist") && rlang::is_installed("usethis")) {
   # The Get Started configuration does not work with the current versions of epiparameter and simulist.
 
   # Generate the full simulist
-  set.seed(1)
+  withr::local_seed(1)
 
   simulist_data <- simulist::sim_linelist(                                                                              # nolint: namespace_linter. simulist is not installed by default
     contact_distribution = function(x) stats::dpois(x = x, lambda = 2),
