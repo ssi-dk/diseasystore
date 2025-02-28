@@ -1,5 +1,7 @@
 # diseasystore (development version)
 
+# diseasystore 0.3.1
+
 ## Breaking change
 
 * `DiseasystoreBase$key_join_features()` no longer accept character stratifications -- must use `rlang::quos()` (#203).
