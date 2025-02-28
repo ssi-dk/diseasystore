@@ -15,7 +15,7 @@ diseasystore before calling test_diseasystore.'><meta property="og:image" conten
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +49,7 @@ diseasystore before calling test_diseasystore.'><meta property="og:image" conten
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Test a given diseasy store</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/R/test_diseasystore.R" class="external-link"><code>R/test_diseasystore.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/R/test_diseasystore.R" class="external-link"><code>R/test_diseasystore.R</code></a></small>
       <div class="d-none name"><code>test_diseasystore.Rd</code></div>
     </div>
 
@@ -95,8 +95,7 @@ List of files that should be available when testing.</p></dd>
 
 
 <dt id="arg-target-schema">target_schema<a class="anchor" aria-label="anchor" href="#arg-target-schema"></a></dt>
-<dd><p>(<code>character(1)</code>)<br>
-The data base schema where the tests should be run.</p></dd>
+<dd><p>(<code>character</code>)<br> The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with <code>&lt;target_schema&gt;.</code>.</p></dd>
 
 
 <dt id="arg-test-start-date">test_start_date<a class="anchor" aria-label="anchor" href="#arg-test-start-date"></a></dt>
@@ -115,7 +114,7 @@ List of connection types to skip tests for due to missing functionality.</p></dd
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL (called for side effects)</p>
+    <p><code>NULL</code> (called for side effects)</p>
     </div>
 
     <div class="section level2">
@@ -140,15 +139,13 @@ List of connection types to skip tests for due to missing functionality.</p></dd
 <span class="r-in"><span>    slice_ts <span class="op">=</span> <span class="st">"2023-11-24"</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">Test passed</span> 😀</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="color: #0000BB; font-weight: bold;">Skip</span><span style="font-weight: bold;">: DiseasystoreEcdcRespiratoryViruses can initialise with remote source_conn</span> ──</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Reason: empty test</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">Test passed</span> 🎊</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ── <span style="color: #BBBB00; font-weight: bold;">Failure</span><span style="font-weight: bold;">: DiseasystoreEcdcRespiratoryViruses can initialise with default source_conn</span> ──</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected `ds$get_feature(ds$available_features[[1]])` to run without any errors.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> i Actually got a &lt;purrr_error_indexed&gt; with text:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   i In index: 1.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Caused by error in `source_conn_github()`:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ! The directory /tmp/Rtmp026ZJm does not appear to be a git repository. Cannot pull.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Caused by error:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ! The directory /tmp/RtmprFrXo8 does not appear to be a git repository. Cannot pull.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> Test failed</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

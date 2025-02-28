@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: Benchmarks</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/benchmarks.Rmd" class="external-link"><code>vignettes/benchmarks.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/vignettes/benchmarks.Rmd" class="external-link"><code>vignettes/benchmarks.Rmd</code></a></small>
       <div class="d-none name"><code>benchmarks.Rmd</code></div>
     </div>
 
@@ -104,7 +104,7 @@ and given a unique ID (the row number of the data):</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 31,990 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: carb &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>A simple <code>diseasystore</code> is built around this data, with
-two <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s, one each for the <code>cyl</code> and
+two <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>s, one each for the <code>cyl</code> and
 <code>vs</code> variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DiseasystoreMtcars</span> <span class="op">&lt;-</span> <span class="fu">R6</span><span class="fu">::</span><span class="kw"><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6Class</a></span><span class="op">(</span></span>
@@ -140,22 +140,28 @@ two <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s,
 <span><span class="op">)</span></span></code></pre></div>
 <p>Two separate benchmark functions are created. The first benchmarking
 function tests the computation time of
-<code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code> by computing first the
+<code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code> by computing first the
 <code>n_cyl</code> feature then computing the <code>vs</code> feature,
 before finally deleting the computations from the database.</p>
 <p>The second benchmarking function tests the computation time of
-<code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code> by joining the
+<code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code> by joining the
 <code>vs</code> feature to the <code>n_cyl</code> observation. Note that
 the <code>n_cyl</code> and <code>vs</code> are re-computed before the
 benchmarks are started and are not deleted by the benchmarking function
 as was the case for the benchmark of
-<code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>. In addition, we only use
+<code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>. In addition, we only use
 the first 100 rows of the <code>benchmark_data</code> for this test to
 reduce computation time.</p>
 <p>The performance of these benchmark functions are timed with the
 <code>{{microbenchmark}}</code> package using 10 replicates. All
 benchmarks are run on the same machine.</p>
-<p><img src="benchmarks_files/figure-html/unnamed-chunk-4-1.png" alt="The results for the benchmarks of the CRAN versions are as follows: The get_feature() benchmark takes 4 seconds to run on the DuckDB, PostgreSQL, SQLite backends. The get_feature() benchmark takes 6 seconds to run on the SQL Server backends. The key_join_features() benchmark takes 3 seconds to run on the PostgreSQL backends. The key_join_features() benchmark takes 4 seconds to run on the SQLite backends. The key_join_features() benchmark takes 5 seconds to run on the DuckDB backends. The key_join_features() benchmark takes 11 seconds to run on the SQL Server backends." width="700"></p>
+<p>The results of the benchmark are shown graphically below (mean and
+standard deviation), where we compare the current development version of
+<code>diseasystore</code> with the current CRAN version. In addition, we
+run the benchmarks with the current development version of
+<a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> versus the current CRAN version since
+<a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> is used internally in <code>diseasystore</code>.</p>
+<p><img src="benchmarks_files/figure-html/unnamed-chunk-4-1.png" alt="The results for the benchmarks of the CRAN versions are as follows: The get_feature() benchmark takes 3 seconds to run on the SQLite backends. The get_feature() benchmark takes 4 seconds to run on the DuckDB, PostgreSQL backends. The get_feature() benchmark takes 6 seconds to run on the SQL Server backends. The key_join_features() benchmark takes 1 seconds to run on the DuckDB backends. The key_join_features() benchmark takes 3 seconds to run on the PostgreSQL backends. The key_join_features() benchmark takes 4 seconds to run on the SQLite backends. The key_join_features() benchmark takes 8 seconds to run on the SQL Server backends." width="700"></p>
   </main>
 </div>
 

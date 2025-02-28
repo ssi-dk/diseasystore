@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: ECDC Respiratory Viruses Weekly</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/diseasystore-ecdc-respiratory-viruses.Rmd" class="external-link"><code>vignettes/diseasystore-ecdc-respiratory-viruses.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/vignettes/diseasystore-ecdc-respiratory-viruses.Rmd" class="external-link"><code>vignettes/diseasystore-ecdc-respiratory-viruses.Rmd</code></a></small>
       <div class="d-none name"><code>diseasystore-ecdc-respiratory-viruses.Rmd</code></div>
     </div>
 
@@ -139,7 +139,10 @@ time you request a feature.</p>
 <code class="sourceCode R"><span><span class="co"># Manually update the repository</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system2.html" class="external-link">system2</a></span><span class="op">(</span></span>
 <span>  <span class="st">"git"</span>,</span>
-<span>  args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"-C"</span>, <span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"source_conn"</span>, <span class="st">"DiseasystoreEcdcRespiratoryViruses"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>    <span class="st">"-C"</span>,</span>
+<span>    <span class="fu"><a href="../reference/diseasyoption.html">diseasyoption</a></span><span class="op">(</span><span class="st">"source_conn"</span>, <span class="st">"DiseasystoreEcdcRespiratoryViruses"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  stdout <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -147,21 +150,23 @@ time you request a feature.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"diseasystore.DiseasystoreEcdcRespiratoryViruses.pull"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># And then retrieve a feature from the feature store</span></span>
-<span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span>feature <span class="op">=</span> <span class="st">"iliari_rates"</span>,</span>
-<span>               start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-01-01"</span><span class="op">)</span>,</span>
-<span>               end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-03-01"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span></span>
+<span>  feature <span class="op">=</span> <span class="st">"iliari_rates"</span>,</span>
+<span>  start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-01-01"</span><span class="op">)</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2023-03-01"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
 <span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
 <span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_ZQdHOrDslY&gt; [?? x 6]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;ds_get_feature_wK4ZE6kU1N&gt; [?? x 6]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.0 [unknown@Linux 6.8.0-1021-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_location age_group infection_type  rate valid_from valid_until</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Austria      65+       ILI             404. 2023-02-27 2023-03-06 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Austria      15-64     ILI            <span style="text-decoration: underline;">3</span>144. 2023-02-20 2023-02-27 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Austria      15-64     ILI            <span style="text-decoration: underline;">2</span>177. 2023-02-06 2023-02-13 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Austria      15-64     ILI            <span style="text-decoration: underline;">2</span>295. 2023-01-30 2023-02-06 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Austria      05-14     ILI            <span style="text-decoration: underline;">1</span>723. 2023-01-30 2023-02-06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Austria      05-14     ILI            <span style="text-decoration: underline;">1</span>743. 2023-02-13 2023-02-20 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Austria      65+       ILI            <span style="text-decoration: underline;">1</span>381. 2023-02-06 2023-02-13 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Austria      05-14     ILI            <span style="text-decoration: underline;">1</span>723. 2023-01-30 2023-02-06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Belgium      15-64     ARI            <span style="text-decoration: underline;">1</span>439. 2023-02-27 2023-03-06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Belgium      05-14     ARI            <span style="text-decoration: underline;">2</span>137. 2022-12-26 2023-01-02 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
   </main>
 </div>

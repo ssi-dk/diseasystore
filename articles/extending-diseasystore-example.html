@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Extending diseasystore - simulist example</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/extending-diseasystore-example.Rmd" class="external-link"><code>vignettes/extending-diseasystore-example.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/vignettes/extending-diseasystore-example.Rmd" class="external-link"><code>vignettes/extending-diseasystore-example.Rmd</code></a></small>
       <div class="d-none name"><code>extending-diseasystore-example.Rmd</code></div>
     </div>
 
@@ -146,7 +146,7 @@ individuals</li>
 “stratifications” from “observables”. Either is considered a “feature”
 in the diseasystore, but the type of data (stratification
 vs. observable) is used when we join the data in
-<code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code>. However, there are
+<code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code>. However, there are
 no differences in the implementation of the features — only in the
 naming.</p>
 <p>This way of naming features follows the default convention of
@@ -164,8 +164,8 @@ to update the <code>$.observables_regex</code> field to read<a class="footnote-r
 <span>    <span class="va">...</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p>With the features identified, we begin by assigning a
-<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> to each feature, and design the map between
-the feature names and the responsible <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s:</p>
+<code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> to each feature, and design the map between
+the feature names and the responsible <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>s:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>DiseasystoreSimulist <span class="ot">&lt;-</span> R6<span class="sc">::</span><span class="fu">R6Class</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">classname =</span> <span class="st">"DiseasystoreSimulist"</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">inherit =</span> DiseasystoreBase,</span>
@@ -190,7 +190,7 @@ the feature names and the responsible <code><a href="../reference/FeatureHandler
 prefix “simulist_”. The features are stored in the data base using these
 names, so we include the prefix to avoid any potential conflicts with
 other features in the database. For example, the hospitalisation in
-<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> are stored in a table called
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">?DiseasystoreGoogleCovid19</a></code> are stored in a table called
 “google_covid_19_hospital”. Had both <code>diseasystores</code> omitted
 the prefixes, they would both attempt to write to the same “hospital”
 table in the database.</p>
@@ -207,7 +207,7 @@ each feature.</p>
 </h3>
 <p>We start by implementing the <code>birth</code> feature.</p>
 <p>For this example, we will show first the code that implements the
-<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> and then describe the code in detail.</p>
+<code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> and then describe the code in detail.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>private <span class="ot">=</span> <span class="fu">list</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  ...</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
@@ -235,12 +235,12 @@ each feature.</p>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>  ...</span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>)</span></code></pre></div>
-<p>Notice that we create a new instance of <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>
+<p>Notice that we create a new instance of <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>
 and assign it to the <code>simulist_birth</code> field in the private
 list.</p>
-<p>Lets focus on the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> we create: Here, we
+<p>Lets focus on the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> we create: Here, we
 need to define how the feature is computed (that is, we implement the
-<code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function).</p>
+<code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function).</p>
 <p>The signature of this function is fixed, and must take the arguments
 <code>start_date</code>, <code>end_date</code>, <code>slice_ts</code>,
 <code>source_conn</code>, but can then take additional arguments in
@@ -291,7 +291,7 @@ to summarize the data:</p>
 summarise the feature, we need to <code>count</code> the individuals
 within each group. This is different from semi-aggregated data where we
 would <code>sum</code> the values within each group (see
-<code><a href="../reference/aggregators.html">aggregators</a></code> for available aggregators).</p>
+<code><a href="../reference/aggregators.html">?aggregators</a></code> for available aggregators).</p>
 </div>
 <div class="section level3">
 <h3 id="the-sex-featurehandler">The <code>sex</code> <code>FeatureHandler</code><a class="anchor" aria-label="anchor" href="#the-sex-featurehandler"></a>
@@ -329,14 +329,14 @@ can mostly extract directly from the data set:</p>
 <span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  ...</span>
 <span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>)</span></code></pre></div>
 <p>Notice that we again create a new instance of
-<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> and assign it to the
+<code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> and assign it to the
 <code>simulist_sex</code> field in the private list.</p>
 <p>The computation of the feature is mostly straightforward, but we
 would like to use the validity period computed in the <code>birth</code>
 feature (the same logic applies for the validity period of the “sex”
 information as the “birth” information)</p>
 <p>Therefore, we immediately see a difference in the function signature
-of the <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function, where we include
+of the <code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function, where we include
 the <code>ds</code> argument which, like the others, are passed to the
 feature handler by <code>diseasystore</code> when we compute features.
 This argument holds a reference to the <code>diseasystore</code> we are
@@ -417,7 +417,7 @@ features, as it is a time-dependent feature.</p>
 <p>As with the <code>sex</code> feature, this feature also depends on
 the <code>birth</code> feature, so we include the <code>ds</code>
 argument in the function signature of
-<code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code>.</p>
+<code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code>.</p>
 <p>Since the age is time-dependent, we need to compute the age of the
 individuals at the start of the study period (i.e. the period requested
 by the user), and compute their age throughout the study period.</p>
@@ -591,15 +591,15 @@ new instance of the <code>diseasystore</code>.</p>
 <span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
 <span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
 <span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_fYWxNDvhnc&gt; [?? x 4]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;ds_get_feature_aBG4XIpEOl&gt; [?? x 4]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.0 [unknown@Linux 6.8.0-1021-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_pnr sex    valid_from valid_until</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       1 Male   1951-12-17 2019-12-09 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>      40 Female 1931-12-11 2020-01-12 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>      69 Male   1945-11-21 2020-01-18 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>      82 Female 2001-10-19 2020-01-24 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>      99 Male   1948-10-21 2020-01-30 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     216 Male   1940-06-30 2020-01-24 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     331 Female 1964-02-28 2020-01-28 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     502 Male   1944-09-20 2020-02-08 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     538 Male   2016-07-22 2020-01-19 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     659 Female 1985-04-11 2020-02-02 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span></span>
@@ -607,15 +607,15 @@ new instance of the <code>diseasystore</code>.</p>
 <span>  start_date <span class="op">=</span> <span class="va">ds</span><span class="op">$</span><span class="va">min_start_date</span>,</span>
 <span>  end_date <span class="op">=</span> <span class="va">ds</span><span class="op">$</span><span class="va">max_end_date</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_biPlfS5HbO&gt; [?? x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;ds_get_feature_5XAubxe6Z9&gt; [?? x 3]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.0 [unknown@Linux 6.8.0-1021-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_pnr valid_from valid_until</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      46 2020-01-10 2020-01-11 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>      47 2020-01-03 2020-01-04 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>      57 2020-01-02 2020-01-03 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>      59 2019-12-29 2019-12-30 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>      64 2020-01-03 2020-01-04 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>      20 2019-12-21 2019-12-22 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>      59 2019-12-29 2019-12-30 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     133 2020-01-05 2020-01-06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     172 2020-01-02 2020-01-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     199 2020-01-11 2020-01-12 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -680,11 +680,11 @@ translatable by <a href="https://dbplyr.tidyverse.org/" class="external-link">db
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 912 × 4</span></span></span>
 <span><span class="co">#&gt;   date       age_group sex    n_positive</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01 30+       Female          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02 30+       Female          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03 30+       Female          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04 30+       Female          0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-12-05 30+       Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01 00-14     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02 00-14     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03 00-14     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04 00-14     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-12-05 00-14     Female          0</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 907 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data2</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">n_positive</span>, color <span class="op">=</span> <span class="va">age_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>

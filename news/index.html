@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,32 +41,46 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0" id="diseasystore-030">diseasystore 0.3.0<a class="anchor" aria-label="anchor" href="#diseasystore-030"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.3.1" id="diseasystore-031">diseasystore 0.3.1<a class="anchor" aria-label="anchor" href="#diseasystore-031"></a></h2><p class="text-muted">CRAN release: 2025-02-28</p>
+<div class="section level3">
+<h3 id="breaking-change-0-3-1">Breaking change<a class="anchor" aria-label="anchor" href="#breaking-change-0-3-1"></a></h3>
+<ul><li>
+<code>DiseasystoreBase$key_join_features()</code> no longer accept character stratifications – must use <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">rlang::quos()</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/203" class="external-link">#203</a>).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-fixes-0-3-1">Minor Improvements and Fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-3-1"></a></h3>
+<ul><li><p>The <code>$observable_regex</code> field is added, which shows the regex that demarcates observables from stratifications (<a href="https://github.com/ssi-dk/diseasystore/issues/204" class="external-link">#204</a>).</p></li>
+<li><p>Improved clean up of temporary tables (<a href="https://github.com/ssi-dk/diseasystore/issues/207" class="external-link">#207</a>). Tables created internally in <code>diseasystore</code> are now labelled and removed when no longer needed.</p></li>
+<li><p>In <code>DiseasystoreBase$key_join_features()</code>, stratifications no longer need to do computation on other features (<a href="https://github.com/ssi-dk/diseasystore/issues/203" class="external-link">#203</a>).</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="diseasystore-030">diseasystore 0.3.0<a class="anchor" aria-label="anchor" href="#diseasystore-030"></a></h2><p class="text-muted">CRAN release: 2024-12-11</p>
 <div class="section level3">
 <h3 id="breaking-change-0-3-0">Breaking change<a class="anchor" aria-label="anchor" href="#breaking-change-0-3-0"></a></h3>
-<ul><li>Additional arguments (<code>...</code>) are now passed to the <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> and <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-get">$get()</a></code> functions in <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/162" class="external-link">#162</a>). Furthermore, a reference to the <code>diseasystore</code> is now passed to <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> as <code>ds</code> to give the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> access to other features via <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>.</li>
+<ul><li>Additional arguments (<code>...</code>) are now passed to the <code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> and <code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-get">$get()</a></code> functions in <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/162" class="external-link">#162</a>). Furthermore, a reference to the <code>diseasystore</code> is now passed to <code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> as <code>ds</code> to give the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> access to other features via <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-0-3-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-3-0"></a></h3>
 <ul><li><p>New age helpers <code><a href="../reference/add_years.html">add_years()</a></code> and <code><a href="../reference/age_on_date.html">age_on_date()</a></code> has been added to help compute features for individual data (<a href="https://github.com/ssi-dk/diseasystore/issues/125" class="external-link">#125</a>).</p></li>
-<li><p>Added the fields <code><a href="../reference/DiseasystoreBase.html#active-bindings">$available_observables</a></code> and <code><a href="../reference/DiseasystoreBase.html#active-bindings">$available_features</a></code> for easier overview (<a href="https://github.com/ssi-dk/diseasystore/issues/139" class="external-link">#139</a>).</p></li>
-<li><p>The data availability period for each <code>diseasystore</code> is now exposed via the <code><a href="../reference/DiseasystoreBase.html#active-bindings">$min_start_date</a></code> and <code><a href="../reference/DiseasystoreBase.html#active-bindings">$max_end_date</a></code> fields (<a href="https://github.com/ssi-dk/diseasystore/issues/138" class="external-link">#138</a>).</p></li>
+<li><p>Added the fields <code><a href=".{2}/reference/DiseasystoreBase.html#active-bindings">$available_observables</a></code> and <code><a href=".{2}/reference/DiseasystoreBase.html#active-bindings">$available_features</a></code> for easier overview (<a href="https://github.com/ssi-dk/diseasystore/issues/139" class="external-link">#139</a>).</p></li>
+<li><p>The data availability period for each <code>diseasystore</code> is now exposed via the <code><a href=".{2}/reference/DiseasystoreBase.html#active-bindings">$min_start_date</a></code> and <code><a href=".{2}/reference/DiseasystoreBase.html#active-bindings">$max_end_date</a></code> fields (<a href="https://github.com/ssi-dk/diseasystore/issues/138" class="external-link">#138</a>).</p></li>
 <li><p><code>diseasystores</code> can now have variable backend support (<a href="https://github.com/ssi-dk/diseasystore/issues/175" class="external-link">#175</a>). In case a backend is insufficient to support the computations, the backend can be blocked for the <code>diseasystore</code>. <code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> now have a <code>skip_backend</code> argument to skip tests for the disallowed backends.</p></li>
-<li><p>Added the <code><a href="../reference/DiseasystoreSimulist.html">DiseasystoreSimulist</a></code> which implements a synthetic, individual-level, data set generated with <code>simulist</code>.</p></li>
+<li><p>Added the <code><a href="../reference/DiseasystoreSimulist.html">?DiseasystoreSimulist</a></code> which implements a synthetic, individual-level, data set generated with <code>simulist</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-0-3-0">Minor Improvements and Fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-3-0"></a></h3>
 <ul><li><p>A bug was fixed where data was duplicated when features were not divided into separate tables (<a href="https://github.com/ssi-dk/diseasystore/issues/192" class="external-link">#192</a>).</p></li>
 <li>
-<p>Two bugs were fixed in <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-determine_new_ranges">$determine_new_ranges()</a></code> where existing tables were not detected:</p>
+<p>Two bugs were fixed in <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-determine_new_ranges">$determine_new_ranges()</a></code> where existing tables were not detected:</p>
 <ul><li>On backends that use “catalog” to structure table (DuckDB and SQL Server) (also requires <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> &gt; v0.4) (<a href="https://github.com/ssi-dk/diseasystore/issues/158" class="external-link">#158</a>).</li>
 <li>Due to <code>slice_ts</code> not being correctly matched with existing data on some backends (<a href="https://github.com/ssi-dk/diseasystore/issues/172" class="external-link">#172</a>).</li>
 </ul></li>
-<li><p>Long stratification expression are now properly parsed in <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/161" class="external-link">#161</a>).</p></li>
+<li><p>Long stratification expression are now properly parsed in <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/161" class="external-link">#161</a>).</p></li>
 <li><p>When creating your own <code>diseasystore</code> it is now easier to inherit from the base module (<a href="https://github.com/ssi-dk/diseasystore/issues/189" class="external-link">#189</a>).</p></li>
 <li><p>When creating your own <code>diseasystore</code> it is now easier to inherit from the base module (<a href="https://github.com/ssi-dk/diseasystore/issues/189" class="external-link">#189</a>).</p></li>
 <li><p>Warnings about existing stratifications now only appear if the requested stratification contains a named expression matching an existing stratification. Simply requesting the stratification from the feature store will no longer produce a warning (<a href="https://github.com/ssi-dk/diseasystore/issues/192" class="external-link">#192</a>).</p></li>
@@ -74,7 +88,7 @@
 <div class="section level3">
 <h3 id="testing-0-3-0">Testing<a class="anchor" aria-label="anchor" href="#testing-0-3-0"></a></h3>
 <ul><li>
-<code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> now also checks the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> return data directly:
+<code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> now also checks the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> return data directly:
 <ul><li>Checks that data is only within the study period (<a href="https://github.com/ssi-dk/diseasystore/issues/154" class="external-link">#154</a>).</li>
 <li>Checks that <code>valid_from</code> and <code>valid_until</code> has class <code>Date</code> (<a href="https://github.com/ssi-dk/diseasystore/issues/154" class="external-link">#154</a>).</li>
 <li>Checks that the <code>valid_from</code> and <code>valid_until</code> columns are chronologically ordered (<a href="https://github.com/ssi-dk/diseasystore/issues/176" class="external-link">#176</a>).</li>
@@ -108,7 +122,7 @@
 <h2 class="pkg-version" data-toc-text="0.2.0" id="diseasystore-020">diseasystore 0.2.0<a class="anchor" aria-label="anchor" href="#diseasystore-020"></a></h2><p class="text-muted">CRAN release: 2024-03-20</p>
 <div class="section level3">
 <h3 id="new-features-0-2-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
-<ul><li><p><code><a href="../reference/DiseasystoreEcdcRespiratoryViruses.html">DiseasystoreEcdcRespiratoryViruses</a></code>: A feature store that uses the ECDC Respiratory viruses weekly repository (<a href="https://github.com/ssi-dk/diseasystore/issues/124" class="external-link">#124</a>).</p></li>
+<ul><li><p><code><a href="../reference/DiseasystoreEcdcRespiratoryViruses.html">?DiseasystoreEcdcRespiratoryViruses</a></code>: A feature store that uses the ECDC Respiratory viruses weekly repository (<a href="https://github.com/ssi-dk/diseasystore/issues/124" class="external-link">#124</a>).</p></li>
 <li>
 <p>With the release of <a href="https://github.com/ssi-dk/SCDB" class="external-link">SCDB</a> v0.4, we now support more database backends:</p>
 <ul><li><p>SQLite with attached schemas (<a href="https://github.com/ssi-dk/diseasystore/issues/121" class="external-link">#121</a>).</p></li>
@@ -146,18 +160,18 @@
 <div class="section level3">
 <h3 id="features-0-1">Features<a class="anchor" aria-label="anchor" href="#features-0-1"></a></h3>
 <ul><li>
-<p><code><a href="../reference/DiseasystoreBase.html">DiseasystoreBase</a></code>: A base class for the diseasystores.</p>
+<p><code><a href="../reference/DiseasystoreBase.html">?DiseasystoreBase</a></code>: A base class for the diseasystores.</p>
 <ul><li>R6 class that defines the interface for the diseasystores.</li>
 </ul></li>
 <li>
-<p><code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code>: A feature store that uses the Google COVID-19 Open Data repository.</p>
+<p><code><a href="../reference/DiseasystoreGoogleCovid19.html">?DiseasystoreGoogleCovid19</a></code>: A feature store that uses the Google COVID-19 Open Data repository.</p>
 <ul><li>R6 class that builds on the base class to provide interface to the Google COVID-19 data.</li>
 </ul></li>
 <li>
-<p><code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>: A simple class to handle individual feature computations.</p>
+<p><code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>: A simple class to handle individual feature computations.</p>
 <ul><li>Defines the interface for each individual feature in the diseasystores.</li>
 </ul></li>
-<li><p>Aggregators: A set of aggregators for the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> to use.</p></li>
+<li><p>Aggregators: A set of aggregators for the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> to use.</p></li>
 <li><p><code><a href="../reference/drop_diseasystore.html">drop_diseasystore()</a></code>: A function to remove data from a feature store.</p></li>
 <li>
 <p>Added a informative operator to access data <code>%.%</code>.</p>

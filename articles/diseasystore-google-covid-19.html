@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: Google Health COVID-19 Open Data</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/diseasystore-google-covid-19.Rmd" class="external-link"><code>vignettes/diseasystore-google-covid-19.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/vignettes/diseasystore-google-covid-19.Rmd" class="external-link"><code>vignettes/diseasystore-google-covid-19.Rmd</code></a></small>
       <div class="d-none name"><code>diseasystore-google-covid-19.Rmd</code></div>
     </div>
 
@@ -87,7 +87,7 @@ repository of COVID-19 data.</p>
 <code>diseasystore</code> package.</p>
 <p>First, it is a good idea to copy the relevant Google COVID-19 data
 files locally and store that location as an option for the package.
-<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> uses only the age-stratified
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">?DiseasystoreGoogleCovid19</a></code> uses only the age-stratified
 metrics for COVID-19, so only a subset of the repository is needed to
 download.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -150,15 +150,15 @@ data.</p>
 <span><span class="co">#&gt; Note: method with signature 'DBIConnection#Id' chosen for function 'dbExistsTable',</span></span>
 <span><span class="co">#&gt;  target signature 'duckdb_connection#Id'.</span></span>
 <span><span class="co">#&gt;  "duckdb_connection#ANY" would also be valid</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;dbplyr_ZQdHOrDslY&gt; [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.1.3 [unknown@Linux 6.5.0-1025-azure:R 4.4.2/:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;ds_get_feature_wK4ZE6kU1N&gt; [?? x 5]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: DuckDB v1.2.0 [unknown@Linux 6.8.0-1021-azure:R 4.4.2/:memory:]</span></span></span>
 <span><span class="co">#&gt;   key_location key_age_bin n_hospital valid_from valid_until</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           0                   <span style="color: #BB0000;">NA</span> 2020-01-01 2020-01-02 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           6                    0 2020-01-01 2020-01-02 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           7                    1 2020-01-01 2020-01-02 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           0                   <span style="color: #BB0000;">NA</span> 2020-01-02 2020-01-03 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           4                    0 2020-01-02 2020-01-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> AR           6                    0 2020-01-01 2020-01-02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> AR           6                    0 2020-01-02 2020-01-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> AR           8                    0 2020-01-02 2020-01-03 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> AR           0                   <span style="color: #BB0000;">NA</span> 2020-01-03 2020-01-04 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> AR           1                    0 2020-01-04 2020-01-05 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
   </main>
 </div>

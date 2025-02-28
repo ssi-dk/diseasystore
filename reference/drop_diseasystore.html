@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Drop feature stores from DB</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/R/drop_diseasystore.R" class="external-link"><code>R/drop_diseasystore.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/R/drop_diseasystore.R" class="external-link"><code>R/drop_diseasystore.R</code></a></small>
       <div class="d-none name"><code>drop_diseasystore.Rd</code></div>
     </div>
 
@@ -68,17 +68,17 @@ Pattern to match the tables by</p></dd>
 
 
 <dt id="arg-schema">schema<a class="anchor" aria-label="anchor" href="#arg-schema"></a></dt>
-<dd><p>(<code>character(1)</code>)<br>
-Schema the diseasystore uses to store data in</p></dd>
+<dd><p>(<code>character</code>)<br> A database schema.  If the database backend does not support schema, the tables will be prefixed with <code>&lt;schema&gt;.</code>
+The location where the <code>diseasystore</code> stores data.</p></dd>
 
 
 <dt id="arg-conn">conn<a class="anchor" aria-label="anchor" href="#arg-conn"></a></dt>
-<dd><p>(<code>DBIConnection</code>)<br> A database connection.</p></dd>
+<dd><p>(<code>DBIConnection</code> or <code>function</code>)<br> A database connection or function that opens a database connection.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL (called for side effects)</p>
+    <p><code>NULL</code> (called for side effects)</p>
     </div>
 
     <div class="section level2">

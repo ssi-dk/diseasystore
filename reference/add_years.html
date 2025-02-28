@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Backend-dependent time interval (in years)</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/R/age_helpers.R" class="external-link"><code>R/age_helpers.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/R/age_helpers.R" class="external-link"><code>R/age_helpers.R</code></a></small>
       <div class="d-none name"><code>add_years.Rd</code></div>
     </div>
 
@@ -69,7 +69,7 @@ The length of the time interval in whole years (or name of column containing the
 
 
 <dt id="arg-conn">conn<a class="anchor" aria-label="anchor" href="#arg-conn"></a></dt>
-<dd><p>(<code>DBIConnection</code>)<br> A database connection.</p></dd>
+<dd><p>(<code>DBIConnection</code> or <code>function</code>)<br> A database connection or function that opens a database connection.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -86,7 +86,7 @@ The length of the time interval in whole years (or name of column containing the
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Time computation on SQLite is not precise! For long time intervals, the result may be off by 1+ days. Consider using DuckDB as a local database with precise age computation.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Time computation on SQLite is not precise! For long time intervals, the result may be off by 1+ days. Consider using DuckDB as a local database with precise age computation.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Time computation on SQLite is not precise! For long time intervals, the result may be off by 1+ days. Consider using DuckDB as a local database with precise age computation.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [1 x 3]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [?? x 3]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.47.1 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   birth X.test_age. first_birthday</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>

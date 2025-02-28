@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Extending diseasystore</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/vignettes/extending-diseasystore.Rmd" class="external-link"><code>vignettes/extending-diseasystore.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/vignettes/extending-diseasystore.Rmd" class="external-link"><code>vignettes/extending-diseasystore.Rmd</code></a></small>
       <div class="d-none name"><code>extending-diseasystore.Rmd</code></div>
     </div>
 
@@ -160,7 +160,7 @@ machine learning and is any individual piece of information.</p>
 “stratifications”. On most levels, these are indistinguishable, but
 their purposes differ and hence we need to handle them individually.</p>
 <p>To see the available features of a <code>diseasystore</code>, you can
-use the <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-available_features">$available_features()</a></code> method.</p>
+use the <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-available_features">$available_features()</a></code> method.</p>
 <div class="section level4">
 <h4 id="observables">Observables<a class="anchor" aria-label="anchor" href="#observables"></a>
 </h4>
@@ -170,7 +170,7 @@ is treated as “observables” (by default). For specific
 modelling perspective, these observables are typically the metrics you
 want to model or take as inputs to inform your model.</p>
 <p>To see the available observables in a <code>diseasystore</code>, you
-can use the <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-available_observables">$available_observables()</a></code>
+can use the <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-available_observables">$available_observables()</a></code>
 method.</p>
 </div>
 <div class="section level4">
@@ -184,7 +184,7 @@ features).</p>
 feature like “age_group”, since most diseases show a strong dependency
 on the age of the affected individuals.</p>
 <p>To see the available observables in a <code>diseasystore</code>, you
-can use the <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-available_stratifications">$available_stratifications()</a></code>
+can use the <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-available_stratifications">$available_stratifications()</a></code>
 method.</p>
 </div>
 <div class="section level4">
@@ -203,15 +203,15 @@ analyses and disease models to new <code>diseasystores</code>.</p>
 <h2 id="creating-featurehandlers">Creating FeatureHandlers<a class="anchor" aria-label="anchor" href="#creating-featurehandlers"></a>
 </h2>
 <p>To facilitate the automatic coupling and aggregation of features, we
-use the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> class. Each feature<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Or “coupled” set of features as we will soon see.&lt;/p&gt;"><sup>3</sup></a> in the
-<code>diseasystore</code> has an associated <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>
+use the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> class. Each feature<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Or “coupled” set of features as we will soon see.&lt;/p&gt;"><sup>3</sup></a> in the
+<code>diseasystore</code> has an associated <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>
 which implements the computation, retrieval and aggregation of the
 feature.</p>
 <div class="section level3">
 <h3 id="computing-features">Computing features<a class="anchor" aria-label="anchor" href="#computing-features"></a>
 </h3>
-<p>The <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> defines a
-<code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function which must be on the
+<p>The <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> defines a
+<code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> function which must be on the
 form:</p>
 <pre><code>compute = function(start_date, end_date, slice_ts, source_conn, ...)</code></pre>
 <p>The arguments <code>start_date</code> and <code>end_date</code>
@@ -228,14 +228,14 @@ date, features corresponding to this date should be computed.</p>
 FeatureHandler indicating where the source data needed to compute the
 features is stored (e.g. a database connection or directory).</p>
 <p>Note that multiple features can be computed by a single
-<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>. For example, you may decide that it is
+<code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>. For example, you may decide that it is
 more convenient for compute multiple different features simultaneously
 (e.g. a hospitalisation and the classification of said hospitalisation
 or a test and the associated test result).</p>
-<p>When <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> is called by the
+<p>When <code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> is called by the
 <code>diseasystore</code>, it also passes a reference to itself as
 <code>ds</code> via the <code>...</code> argument. This means that if
-the implementation of <code><a href="../reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> needs
+the implementation of <code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-compute">$compute()</a></code> needs
 access to other features to compute the given feature, the compute
 function can pick up the <code>ds</code> reference adding it to the
 function signature:</p>
@@ -247,8 +247,8 @@ to retrieve the necessary features for the computation.</p>
 <div class="section level3">
 <h3 id="retrieving-features">Retrieving features<a class="anchor" aria-label="anchor" href="#retrieving-features"></a>
 </h3>
-<p>The <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> defines a
-<code><a href="../reference/FeatureHandler.html#method-FeatureHandler-get">$get()</a></code> function which must be in the
+<p>The <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> defines a
+<code><a href=".{2}/reference/FeatureHandler.html#method-FeatureHandler-get">$get()</a></code> function which must be in the
 form:</p>
 <pre><code>get = function(target_table, slice_ts, target_conn)</code></pre>
 <p>Typically, you do not need to specify this function since the default
@@ -262,11 +262,11 @@ above, <code>slice_ts</code> is the time-keeping variable.</p>
 <div class="section level3">
 <h3 id="aggregators">Aggregators<a class="anchor" aria-label="anchor" href="#aggregators"></a>
 </h3>
-<p>The <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> defines a <code>key_join</code>
+<p>The <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> defines a <code>key_join</code>
 function which must be on the form:</p>
 <pre><code>key_join = function(.data, feature)</code></pre>
 <p>In most cases, you should be able to use the bundled
-<code>key_join_*</code> functions (see <code><a href="../reference/aggregators.html">aggregators</a></code> for a
+<code>key_join_*</code> functions (see <code><a href="../reference/aggregators.html">?aggregators</a></code> for a
 full list).</p>
 <p>In the event, that you need to create your own aggregator the
 arguments are as follows:</p>
@@ -286,10 +286,10 @@ argument.</p>
 <h3 id="putting-it-all-together">Putting it all together<a class="anchor" aria-label="anchor" href="#putting-it-all-together"></a>
 </h3>
 <p>By now, you should know the basics of creating your own
-<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s.</p>
+<code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>s.</p>
 <p>For a detailed walkthrough on creating a <code>diseasystore</code>,
 see the <code><a href="../articles/extending-diseasystore-example.html">vignette("extending-diseasystore-example")</a></code>.</p>
-<p>To see some other <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code>s in action, you can
+<p>To see some other <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code>s in action, you can
 consult a few of those bundled with the <code>diseasystore</code>
 package.</p>
 <p>For example:</p>
@@ -321,20 +321,20 @@ elsewhere<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-c
 <h3 id="ds_map">ds_map<a class="anchor" aria-label="anchor" href="#ds_map"></a>
 </h3>
 <p>The <code>ds_map</code> field of the <code>diseasystore</code> tells
-the <code>diseasystore</code> which <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> is
+the <code>diseasystore</code> which <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> is
 responsible for each feature, thus allowing the
 <code>diseasystore</code> to retrieve the features specified in the
 <code>observable</code> and <code>stratification</code> arguments of
-calls to <code><a href="../reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>.</p>
+calls to <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-get_feature">$get_feature()</a></code>.</p>
 <p>In other words, it maps the names of features to their corresponding
 <code>?FeatureHandlers</code>.</p>
-<p>As we saw above, a <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> may compute more than
+<p>As we saw above, a <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> may compute more than
 a single feature. Each feature should be mapped to the
-<code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> here or else the <code>diseasystore</code>
+<code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> here or else the <code>diseasystore</code>
 will not be able to automatically interact with it.</p>
-<p>By convention, the name of the <code><a href="../reference/FeatureHandler.html">FeatureHandler</a></code> should be
+<p>By convention, the name of the <code><a href="../reference/FeatureHandler.html">?FeatureHandler</a></code> should be
 snake_case and contain a <code>diseasystore</code> specific prefix
-(e.g. for <code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code>, all
+(e.g. for <code><a href="../reference/DiseasystoreGoogleCovid19.html">?DiseasystoreGoogleCovid19</a></code>, all
 <code>?FeatureHandlers</code> are named
 “google_covid_19_<feature>”).</feature></p>
 <p>These names are used as the table names when storing the features in
@@ -357,11 +357,11 @@ that the data includes aggregations at different levels, nested within
 the data.</p>
 <p>For example, the Google COVID-19 data repository contains information
 on both country-level and region-level in the same data files. When the
-user of <code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> asks to get a feature
+user of <code><a href="../reference/DiseasystoreGoogleCovid19.html">?DiseasystoreGoogleCovid19</a></code> asks to get a feature
 stratified by, for example, “country_id”, we need to filter out the data
 aggregated at the region level.</p>
 <p>This is the purpose of
-<code><a href="../reference/DiseastoreBase.html#method-DiseastoreBase-key_join_filter">$key_join_filter()</a></code>. It takes as input the
+<code><a href=".{2}/reference/DiseastoreBase.html#method-DiseastoreBase-key_join_filter">$key_join_filter()</a></code>. It takes as input the
 requested stratifications and filters the data accordingly after the
 features have been joined inside the <code>diseasystore</code>.</p>
 <p>For an example, you can consult <a href="https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L75" class="external-link">DiseasystoreGoogleCovid19:
@@ -373,7 +373,7 @@ key_join_filter</a></p>
 <p>The <code>diseasystore</code> package includes the function
 <code><a href="../reference/test_diseasystore.html">test_diseasystore()</a></code> to test the <code>diseasystores</code>.
 You can see how to call the testing suite in action with
-<code><a href="../reference/DiseasystoreGoogleCovid19.html">DiseasystoreGoogleCovid19</a></code> as an example <a href="https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R" class="external-link">here</a>.</p>
+<code><a href="../reference/DiseasystoreGoogleCovid19.html">?DiseasystoreGoogleCovid19</a></code> as an example <a href="https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R" class="external-link">here</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="exposing-the-period-of-data-availability">Exposing the period of data availability<a class="anchor" aria-label="anchor" href="#exposing-the-period-of-data-availability"></a>

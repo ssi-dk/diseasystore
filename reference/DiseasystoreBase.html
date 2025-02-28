@@ -9,7 +9,7 @@ It defines the primary methods of each feature stores as well as all of the publ
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,7 +43,7 @@ It defines the primary methods of each feature stores as well as all of the publ
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore base handler</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.0/R/DiseasystoreBase.R" class="external-link"><code>R/DiseasystoreBase.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.1/R/DiseasystoreBase.R" class="external-link"><code>R/DiseasystoreBase.R</code></a></small>
       <div class="d-none name"><code>DiseasystoreBase.Rd</code></div>
     </div>
 
@@ -66,22 +66,27 @@ that compute the features. Read only.</p></dd>
 
 
 <dt><code>available_features</code></dt>
-<dd><p>(<code>character</code>)<br>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 A list of available features in the feature store. Read only.</p></dd>
 
 
 <dt><code>available_observables</code></dt>
-<dd><p>(<code>character</code>)<br>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
 A list of available observables in the feature store. Read only.</p></dd>
 
 
 <dt><code>available_stratifications</code></dt>
-<dd><p>(<code>character</code>)<br>
+<dd><p>(<code><a href="https://rdrr.io/r/base/character.html" class="external-link">character()</a></code>)<br>
+A list of available stratifications in the feature store. Read only.</p></dd>
+
+
+<dt><code>observables_regex</code></dt>
+<dd><p>(<code>character(1)</code>)<br>
 A list of available stratifications in the feature store. Read only.</p></dd>
 
 
 <dt><code>label</code></dt>
-<dd><p>(<code>character</code>)<br>
+<dd><p>(<code>character(1)</code>)<br>
 A human readable label of the feature store. Read only.</p></dd>
 
 
@@ -94,7 +99,7 @@ A human readable label of the feature store. Read only.</p></dd>
 
 
 <dt><code>target_schema</code></dt>
-<dd><p>(<code>character</code>)<br> The schema to place the feature store in. Read only. If the database backend does not support schema, the tables will be prefixed with &lt;target_schema&gt;.</p></dd>
+<dd><p>(<code>character</code>)<br> The schema to place the feature store in. Read only. If the database backend does not support schema, the tables will be prefixed with <code>&lt;target_schema&gt;.</code>.</p></dd>
 
 
 <dt><code>start_date</code></dt>
@@ -126,7 +131,6 @@ A human readable label of the feature store. Read only.</p></dd>
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
 <ul><li><p><a href="#method-DiseasystoreBase-new"><code>DiseasystoreBase$new()</code></a></p></li>
-<li><p><a href="#method-DiseasystoreBase-finalize"><code>DiseasystoreBase$finalize()</code></a></p></li>
 <li><p><a href="#method-DiseasystoreBase-get_feature"><code>DiseasystoreBase$get_feature()</code></a></p></li>
 <li><p><a href="#method-DiseasystoreBase-key_join_features"><code>DiseasystoreBase$key_join_features()</code></a></p></li>
 <li><p><a href="#method-DiseasystoreBase-clone"><code>DiseasystoreBase$clone()</code></a></p></li>
@@ -168,7 +172,7 @@ A human readable label of the feature store. Read only.</p></dd>
 
 
 <dt><code>target_schema</code></dt>
-<dd><p>(<code>character</code>)<br> The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with &lt;target_schema&gt;.</p></dd>
+<dd><p>(<code>character</code>)<br> The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with <code>&lt;target_schema&gt;.</code>.</p></dd>
 
 
 <dt><code>verbose</code></dt>
@@ -183,18 +187,10 @@ Boolean that controls enables debugging information.</p></dd>
 <p>A new instance of the <code>DiseasystoreBase</code> <a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6</a> class.</p>
 </div>
 
-</div><p></p><hr><a id="method-DiseasystoreBase-finalize"></a><div class="section">
-<h3 id="method-finalize-">Method <code>finalize()</code><a class="anchor" aria-label="anchor" href="#method-finalize-"></a></h3>
-<p>Closes the open DB connection when removing the object</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">finalize</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-
 </div><p></p><hr><a id="method-DiseasystoreBase-get_feature"></a><div class="section">
 <h3 id="method-get-feature-">Method <code>get_feature()</code><a class="anchor" aria-label="anchor" href="#method-get-feature-"></a></h3>
 <p>Computes, stores, and returns the requested feature for the study period.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">get_feature</span><span class="op">(</span></span>
 <span>  <span class="va">feature</span>,</span>
 <span>  start_date <span class="op">=</span> <span class="va">self</span> <span class="op"><a href="../reference/grapes-.-grapes.html">%.%</a></span> <span class="va">start_date</span>,</span>
@@ -231,9 +227,9 @@ The name of a feature defined in the feature store.</p></dd>
 
 </div><p></p><hr><a id="method-DiseasystoreBase-key_join_features"></a><div class="section">
 <h3 id="method-key-join-features-">Method <code>key_join_features()</code><a class="anchor" aria-label="anchor" href="#method-key-join-features-"></a></h3>
-<p>Joins various features from feature store assuming a primary feature (observable)
-that contains keys to witch the secondary features (defined by <code>stratification</code>) can be joined.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p>Joins various features from the feature store assuming a primary feature (observable)
+that contains keys to witch the secondary features (defined by <code>stratification</code>) are joined.</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">key_join_features</span><span class="op">(</span></span>
 <span>  <span class="va">observable</span>,</span>
 <span>  stratification <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -245,15 +241,11 @@ that contains keys to witch the secondary features (defined by <code>stratificat
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>observable</code></dt>
-<dd><p>(<code>character</code>)<br>
-The name of a feature defined in the feature store</p></dd>
+<dd><p>(<code>character</code>)<br> The observable to provide data or prediction for.</p></dd>
 
 
 <dt><code>stratification</code></dt>
-<dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br>
-Expressions in <code>stratification</code> are evaluated to find appropriate features.
-These are then joined to the observable feature before <code>stratification</code> is performed.</p>
-<p>If <code>NULL</code> (default) no stratification is performed.</p></dd>
+<dd><p>(<code>list</code>(<code>quosures</code>) or <code>NULL</code>)<br> Use <code>rlang::quos(...)</code> to specify stratification. If given, expressions in stratification evaluated to give the stratification level.</p></dd>
 
 
 <dt><code>start_date</code></dt>
@@ -274,7 +266,7 @@ These are then joined to the observable feature before <code>stratification</cod
 </div><p></p><hr><a id="method-DiseasystoreBase-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DiseasystoreBase</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
