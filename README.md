@@ -1,8 +1,10 @@
-diseasystore
-<a href="https://ssi-dk.github.io/diseasystore/"><img src="man/figures/logo.png" align="right" height="138" alt="diseasystore website" /></a>
+README
 ================
 
 <!-- README.md is generated from README.Rmd. Please edit that file. -->
+
+# diseasystore <a href="https://ssi-dk.github.io/diseasystore/"><img src="man/figures/logo.png" align="right" height="138" alt="diseasystore website" /></a>
+
 <!-- badges: start -->
 
 [![CRAN
