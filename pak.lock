@@ -1,7 +1,7 @@
 {
   "lockfile_version": 1,
   "os": "Ubuntu 24.04.2 LTS",
-  "r_version": "R version 4.4.2 (2024-10-31)",
+  "r_version": "R version 4.4.3 (2025-02-28)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
     {
@@ -1685,7 +1685,7 @@
       "repotype": "cranlike"
     },
     {
-      "ref": "installed::/opt/R/4.4.2/lib/R/library/codetools",
+      "ref": "installed::/opt/R/4.4.3/lib/R/library/codetools",
       "package": "codetools",
       "version": "0.2-20",
       "type": "installed",
@@ -1694,7 +1694,7 @@
       "dependencies": [],
       "vignettes": false,
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.4.2/lib/R/library/codetools",
+        "RemotePkgRef": "installed::/opt/R/4.4.3/lib/R/library/codetools",
         "RemoteType": "installed",
         "RemotePkgPlatform": "*",
         "RemoteSha": "0.2-20"
@@ -1702,7 +1702,7 @@
       "sources": [],
       "target": "src/contrib/codetools_0.2-20.tar.gz",
       "platform": "*",
-      "rversion": "R 4.4.2",
+      "rversion": "R 4.4.3",
       "directpkg": false,
       "license": "GPL",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1711,10 +1711,10 @@
       "sysreqs_packages": {},
       "needscompilation": false,
       "repotype": "cran",
-      "built": "R 4.4.2; ; 2024-11-07 07:13:54 UTC; unix"
+      "built": "R 4.4.3; ; 2025-02-28 10:08:40 UTC; unix"
     },
     {
-      "ref": "installed::/opt/R/4.4.2/lib/R/library/lattice",
+      "ref": "installed::/opt/R/4.4.3/lib/R/library/lattice",
       "package": "lattice",
       "version": "0.22-6",
       "type": "installed",
@@ -1723,7 +1723,7 @@
       "dependencies": [],
       "vignettes": false,
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.4.2/lib/R/library/lattice",
+        "RemotePkgRef": "installed::/opt/R/4.4.3/lib/R/library/lattice",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "0.22-6"
@@ -1731,7 +1731,7 @@
       "sources": [],
       "target": "src/contrib/lattice_0.22-6.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.2",
+      "rversion": "R 4.4.3",
       "directpkg": false,
       "license": "GPL (>= 2)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1740,27 +1740,27 @@
       "sysreqs_packages": {},
       "needscompilation": true,
       "repotype": "cran",
-      "built": "R 4.4.2; x86_64-pc-linux-gnu; 2024-11-07 07:09:53 UTC; unix"
+      "built": "R 4.4.3; x86_64-pc-linux-gnu; 2025-02-28 10:04:54 UTC; unix"
     },
     {
-      "ref": "installed::/opt/R/4.4.2/lib/R/library/MASS",
+      "ref": "installed::/opt/R/4.4.3/lib/R/library/MASS",
       "package": "MASS",
-      "version": "7.3-61",
+      "version": "7.3-64",
       "type": "installed",
       "direct": false,
       "binary": true,
       "dependencies": [],
       "vignettes": false,
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.4.2/lib/R/library/MASS",
+        "RemotePkgRef": "installed::/opt/R/4.4.3/lib/R/library/MASS",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
-        "RemoteSha": "7.3-61"
+        "RemoteSha": "7.3-64"
       },
       "sources": [],
-      "target": "src/contrib/MASS_7.3-61.tar.gz",
+      "target": "src/contrib/MASS_7.3-64.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.2",
+      "rversion": "R 4.4.3",
       "directpkg": false,
       "license": "GPL-2 | GPL-3",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1769,27 +1769,27 @@
       "sysreqs_packages": {},
       "needscompilation": true,
       "repotype": "cran",
-      "built": "R 4.4.2; x86_64-pc-linux-gnu; 2024-11-07 07:09:46 UTC; unix"
+      "built": "R 4.4.3; x86_64-pc-linux-gnu; 2025-02-28 10:04:48 UTC; unix"
     },
     {
-      "ref": "installed::/opt/R/4.4.2/lib/R/library/Matrix",
+      "ref": "installed::/opt/R/4.4.3/lib/R/library/Matrix",
       "package": "Matrix",
-      "version": "1.7-1",
+      "version": "1.7-2",
       "type": "installed",
       "direct": false,
       "binary": true,
       "dependencies": "lattice",
       "vignettes": false,
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.4.2/lib/R/library/Matrix",
+        "RemotePkgRef": "installed::/opt/R/4.4.3/lib/R/library/Matrix",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
-        "RemoteSha": "1.7-1"
+        "RemoteSha": "1.7-2"
       },
       "sources": [],
-      "target": "src/contrib/Matrix_1.7-1.tar.gz",
+      "target": "src/contrib/Matrix_1.7-2.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.2",
+      "rversion": "R 4.4.3",
       "directpkg": false,
       "license": "GPL (>= 2) | file LICENCE",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1798,10 +1798,10 @@
       "sysreqs_packages": {},
       "needscompilation": true,
       "repotype": "cran",
-      "built": "R 4.4.2; x86_64-pc-linux-gnu; 2024-11-07 07:10:01 UTC; unix"
+      "built": "R 4.4.3; x86_64-pc-linux-gnu; 2025-02-28 10:05:02 UTC; unix"
     },
     {
-      "ref": "installed::/opt/R/4.4.2/lib/R/library/mgcv",
+      "ref": "installed::/opt/R/4.4.3/lib/R/library/mgcv",
       "package": "mgcv",
       "version": "1.9-1",
       "type": "installed",
@@ -1810,7 +1810,7 @@
       "dependencies": ["nlme", "Matrix"],
       "vignettes": false,
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.4.2/lib/R/library/mgcv",
+        "RemotePkgRef": "installed::/opt/R/4.4.3/lib/R/library/mgcv",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
         "RemoteSha": "1.9-1"
@@ -1818,7 +1818,7 @@
       "sources": [],
       "target": "src/contrib/mgcv_1.9-1.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.2",
+      "rversion": "R 4.4.3",
       "directpkg": false,
       "license": "GPL (>= 2)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1827,27 +1827,27 @@
       "sysreqs_packages": {},
       "needscompilation": true,
       "repotype": "cran",
-      "built": "R 4.4.2; x86_64-pc-linux-gnu; 2024-11-07 07:14:13 UTC; unix"
+      "built": "R 4.4.3; x86_64-pc-linux-gnu; 2025-02-28 10:08:59 UTC; unix"
     },
     {
-      "ref": "installed::/opt/R/4.4.2/lib/R/library/nlme",
+      "ref": "installed::/opt/R/4.4.3/lib/R/library/nlme",
       "package": "nlme",
-      "version": "3.1-166",
+      "version": "3.1-167",
       "type": "installed",
       "direct": false,
       "binary": true,
       "dependencies": "lattice",
       "vignettes": false,
       "metadata": {
-        "RemotePkgRef": "installed::/opt/R/4.4.2/lib/R/library/nlme",
+        "RemotePkgRef": "installed::/opt/R/4.4.3/lib/R/library/nlme",
         "RemoteType": "installed",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu",
-        "RemoteSha": "3.1-166"
+        "RemoteSha": "3.1-167"
       },
       "sources": [],
-      "target": "src/contrib/nlme_3.1-166.tar.gz",
+      "target": "src/contrib/nlme_3.1-167.tar.gz",
       "platform": "x86_64-pc-linux-gnu",
-      "rversion": "R 4.4.2",
+      "rversion": "R 4.4.3",
       "directpkg": false,
       "license": "GPL (>= 2)",
       "dep_types": ["Depends", "Imports", "LinkingTo"],
@@ -1856,7 +1856,7 @@
       "sysreqs_packages": {},
       "needscompilation": true,
       "repotype": "cran",
-      "built": "R 4.4.2; x86_64-pc-linux-gnu; 2024-11-07 07:13:00 UTC; unix"
+      "built": "R 4.4.3; x86_64-pc-linux-gnu; 2025-02-28 10:07:46 UTC; unix"
     },
     {
       "ref": "isoband",
@@ -1954,7 +1954,7 @@
     {
       "ref": "jsonlite",
       "package": "jsonlite",
-      "version": "1.9.0",
+      "version": "1.9.1",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -1966,10 +1966,10 @@
         "RemoteRef": "jsonlite",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.9.0"
+        "RemoteSha": "1.9.1"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/jsonlite_1.9.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/jsonlite_1.9.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/jsonlite_1.9.1.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/jsonlite_1.9.1.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -2420,7 +2420,7 @@
     {
       "ref": "odbc",
       "package": "odbc",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -2432,10 +2432,10 @@
         "RemoteRef": "odbc",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.5.0"
+        "RemoteSha": "1.6.0"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/odbc_1.5.0.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/odbc_1.5.0.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/odbc_1.6.0.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/odbc_1.6.0.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
@@ -4461,7 +4461,7 @@
     {
       "ref": "xml2",
       "package": "xml2",
-      "version": "1.3.6",
+      "version": "1.3.7",
       "type": "standard",
       "direct": false,
       "binary": true,
@@ -4473,10 +4473,10 @@
         "RemoteRef": "xml2",
         "RemoteRepos": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
         "RemotePkgPlatform": "x86_64-pc-linux-gnu-ubuntu-24.04",
-        "RemoteSha": "1.3.6"
+        "RemoteSha": "1.3.7"
       },
-      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/xml2_1.3.6.tar.gz",
-      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/xml2_1.3.6.tar.gz",
+      "sources": "https://packagemanager.posit.co/cran/__linux__/noble/latest/src/contrib/xml2_1.3.7.tar.gz",
+      "target": "src/contrib/x86_64-pc-linux-gnu-ubuntu-24.04/4.4/xml2_1.3.7.tar.gz",
       "platform": "x86_64-pc-linux-gnu-ubuntu-24.04",
       "rversion": "4.4",
       "directpkg": false,
