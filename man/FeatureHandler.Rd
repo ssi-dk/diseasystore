@@ -11,7 +11,7 @@ This \code{FeatureHandler} \link[R6:R6Class]{R6} handles individual features for
 They define the three methods associated with features (\code{compute}, \code{get} and \code{key_join}).
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   # The FeatureHandler is typically configured as part of making a new Diseasystore.
   # Most often, we need only specify `compute` and `key_join` to get a functioning FeatureHandler
 

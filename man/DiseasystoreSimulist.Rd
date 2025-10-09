@@ -10,7 +10,7 @@ A new instance of the \code{DiseasystoreSimulist} \link[R6:R6Class]{R6} class.
 This \code{DiseasystoreSimulist} \link[R6:R6Class]{R6} brings support for individual level data.
 }
 \examples{
-\dontshow{if (requireNamespace("duckdb", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("duckdb", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   ds <- DiseasystoreSimulist$new(
     source_conn = ".",
     target_conn = DBI::dbConnect(duckdb::duckdb())

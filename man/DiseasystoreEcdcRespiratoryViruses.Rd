@@ -12,7 +12,7 @@ Respiratory viruses weekly data repository.
 See the vignette("diseasystore-ecdc-respiratory-viruses") for details on how to configure the feature store.
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   ds <- DiseasystoreEcdcRespiratoryViruses$new(
     source_conn = ".",
     target_conn = DBI::dbConnect(RSQLite::SQLite())

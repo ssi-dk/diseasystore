@@ -11,7 +11,7 @@ This \code{DiseasystoreBase} \link[R6:R6Class]{R6} class forms the basis of all 
 It defines the primary methods of each feature stores as well as all of the public methods.
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   # DiseasystoreBase is mostly used as the basis of other, more specific, classes
   # The DiseasystoreBase can be initialised individually if needed.
 

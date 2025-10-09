@@ -22,7 +22,7 @@ SQL query for the time interval.
 Provides the sql code for a time interval (in years).
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 
   dplyr::copy_to(conn, data.frame(birth = as.Date("2001-04-03"), "test_age")) |>

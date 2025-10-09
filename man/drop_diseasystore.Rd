@@ -26,7 +26,7 @@ The location where the \code{diseasystore} stores data.}
 Drop feature stores from DB
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 
   drop_diseasystore(conn = conn)

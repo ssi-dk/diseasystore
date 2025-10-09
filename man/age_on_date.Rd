@@ -22,7 +22,7 @@ SQL query that computes the age on the given date.
 Provides the sql code to compute the age of a person on a given date.
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
   conn <- SCDB::get_connection(drv = RSQLite::SQLite())
 
   dplyr::copy_to(conn, data.frame(birth = as.Date("2001-04-03"), "test_age")) |>
