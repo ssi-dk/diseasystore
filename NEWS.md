@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* Compatibility with `stringr v.1.6.0` (#218, @hadley)
+
+
 # diseasystore 0.3.1
 
 ## Breaking change
