@@ -469,7 +469,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Get all combinations to merge onto
       all_dates <- dplyr::copy_to(
         self %.% target_conn,
-        df = tibble::tibble(date = seq.Date(from = start_date, to = end_date, by = 1)),
+        df = tibble::tibble(date = as.Date(as.numeric(seq.Date(from = start_date, to = end_date, by = 1)))), # See PR #220
         name = SCDB::unique_table_name("ds_all_dates")
       )
       SCDB::defer_db_cleanup(all_dates)

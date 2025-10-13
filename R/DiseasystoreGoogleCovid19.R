@@ -21,7 +21,7 @@ google_covid_19_metric <- function(google_pattern, out_name) {                  
         readr::read_csv(n_max = diseasyoption("n_max", "DiseasystoreGoogleCovid19", .default = Inf),
                         show_col_types = FALSE) |>
         dplyr::mutate("date" = as.Date(.data$date)) |>
-        dplyr::filter(.data$date >= as.Date("2020-01-01"),
+        dplyr::filter(.data$date >= as.Date(as.numeric(as.Date("2020-01-01"))), # See PR #220
                       {{ start_date }} <= .data$date, .data$date <= {{ end_date }}) |>
         dplyr::select("location_key", "date", tidyselect::starts_with(glue::glue("new_{google_pattern}"))) |>
         tidyr::pivot_longer(!c("location_key", "date"),
@@ -103,7 +103,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
                         age_group_sep   = dplyr::if_else(.data$age_group_upper == "", "+", "-")) |>
           tidyr::unite("age_group", "age_group_lower", "age_group_sep", "age_group_upper", sep = "", na.rm = TRUE) |>
           dplyr::select("key_location" = "location_key", "age_group", "n_population") |>
-          dplyr::mutate(valid_from = as.Date("2020-01-01"), valid_until = as.Date(NA))
+          dplyr::mutate(valid_from = as.Date(as.numeric(as.Date("2020-01-01"))), valid_until = as.Date(NA_real_)) # See PR #220
 
         return(out)
       },
@@ -131,8 +131,8 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
           dplyr::mutate(
             "region_id" = dplyr::if_else(.data$country_id == .data$region_id, NA, .data$region_id),
             "subregion_id" = dplyr::if_else(.data$key_location != .data$subregion_id, NA, .data$subregion_id),
-            "valid_from" = as.Date("2020-01-01"),
-            "valid_until" = as.Date(NA)
+            "valid_from" = as.Date(as.numeric(as.Date("2020-01-01"))), # See PR #220
+            "valid_until" = as.Date(NA_real_) # See PR #220
           )
 
         return(out)
@@ -188,7 +188,7 @@ DiseasystoreGoogleCovid19 <- R6::R6Class(                                       
         # And finally copy to the DB
         out <- age_bin_map |>
           dplyr::rename("key_age_bin" = "age_bin", "key_location" = "location_key") |>
-          dplyr::mutate("valid_from" = as.Date("2020-01-01"), "valid_until" = as.Date(NA)) |>
+          dplyr::mutate("valid_from" = as.Date(as.numeric(as.Date("2020-01-01"))), "valid_until" = as.Date(NA_real_)) |> # See PR #220
           dplyr::ungroup()
 
         return(out)

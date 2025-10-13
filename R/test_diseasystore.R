@@ -72,6 +72,8 @@ test_diseasystore <- function(
   checkmate::assert_true(is.null(diseasyoption("remote_conn", diseasystore_class)) || curl::has_internet(), add = coll)
   checkmate::reportAssertions(coll)
 
+  # Force convert test_start_date to internal numeric representation (https://github.com/ssi-dk/diseasystore/pull/220)
+  test_start_date <- as.Date(as.numeric(test_start_date))
 
   # Store the current options for the connections
   remote_conn <- diseasyoption("remote_conn", diseasystore_class)
