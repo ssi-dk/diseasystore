@@ -70,6 +70,8 @@ jobs:
             # Works with no error
             DBI::dbWriteTable(conn, "#realsxp_test", data)
 
+            # Check table was created
+            DBI::dbExistsTable(conn, "#realsxp_test")
 
 
             # Dates created directly with seq.Date() fails
@@ -81,7 +83,9 @@ jobs:
             .Internal(inspect(data))
 
             # Fails with error
-            DBI::dbWriteTable(conn, "#intsxp_test", data)
+            try(DBI::dbWriteTable(conn, "#intsxp_test", data))
+
+            DBI::dbExistsTable(conn, "#intsxp_test")
 
             # Disconnect
             DBI::dbDisconnect(conn)
