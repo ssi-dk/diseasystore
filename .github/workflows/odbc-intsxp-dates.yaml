@@ -1,0 +1,90 @@
+on:
+  workflow_call:
+    inputs:
+      cache_version:
+        type: string
+        default: '1'
+
+jobs:
+  code-coverage-mssql:
+    name: "🧪 Tests: SQL Server 2022"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install a SQL Server suite of tools
+        uses: potatoqualitee/mssqlsuite@v1.8
+        with:
+          install: sqlengine, sqlpackage, sqlclient
+          version: 2022
+          show-log: true
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: ${{ inputs.cache_version }}
+          extra-packages: |
+            local::.
+            any::pak
+            any::jsonlite
+            any::rcmdcheck
+            any::devtools
+            any::lintr
+            any::covr
+            any::roxygen2
+            any::pkgdown
+            any::rmarkdown
+            any::styler
+          needs: build, check, coverage, roxygen2, lint, website
+
+      - name: Test INTSXP issue
+        run: |
+            # Connect to SQL Server
+            conn <- DBI::dbConnect(
+                drv = odbc::odbc(),
+                driver = "ODBC Driver 18 for SQL Server",
+                server = "localhost",
+                database = "master",
+                UID = "SA",
+                PWD = "dbatools.I0",
+                TrustServerCertificate = "yes"
+            )
+
+            # Dates created directly with as.Date() normally works well
+            data <- data.frame("dates" = c(as.Date("2020-01-01"), as.Date("2020-01-02")))
+
+            # Internal representation is REALSXP
+            .Internal(inspect(data))
+
+            # Works with no error
+            DBI::dbWriteTable(conn, "#realsxp_test", dates)
+
+
+
+            # Dates created directly with seq.Date() fails
+            data <- data.frame(
+              "dates" = seq.Date(from = as.Date("2020-01-01"), to = as.Date("2020-01-02"), by = "1 day")
+            )
+
+            # Internal representation is REALSXP
+            .Internal(inspect(data))
+
+            # Fails with error
+            DBI::dbWriteTable(conn, "#intsxp_test", dates)
+
+            # Disconnect
+            DBI::dbDisconnect(conn)
+
+        shell: Rscript {0}
+
