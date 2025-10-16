@@ -68,7 +68,7 @@ jobs:
             .Internal(inspect(data))
 
             # Works with no error
-            DBI::dbWriteTable(conn, "#realsxp_test", dates)
+            DBI::dbWriteTable(conn, "#realsxp_test", data)
 
 
 
@@ -81,7 +81,7 @@ jobs:
             .Internal(inspect(data))
 
             # Fails with error
-            DBI::dbWriteTable(conn, "#intsxp_test", dates)
+            DBI::dbWriteTable(conn, "#intsxp_test", data)
 
             # Disconnect
             DBI::dbDisconnect(conn)
