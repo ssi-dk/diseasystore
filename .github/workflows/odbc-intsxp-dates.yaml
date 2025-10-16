@@ -6,7 +6,7 @@ on:
         default: '1'
 
 jobs:
-  code-coverage-mssql:
+  mssql:
     name: "🧪 Tests: SQL Server 2022"
     runs-on: ubuntu-latest
 
@@ -72,20 +72,22 @@ jobs:
 
             # Check table was created
             DBI::dbExistsTable(conn, "#realsxp_test")
-
+            print(dplyr::tbl(conn, DBI::Id("#realsxp_test")))
 
             # Dates created directly with seq.Date() fails
             data <- data.frame(
               "dates" = seq.Date(from = as.Date("2020-01-01"), to = as.Date("2020-01-02"), by = "1 day")
             )
 
-            # Internal representation is REALSXP
+            # Internal representation is INTSXP
             .Internal(inspect(data))
 
             # Fails with error
             try(DBI::dbWriteTable(conn, "#intsxp_test", data))
 
+            # Check if table was created
             DBI::dbExistsTable(conn, "#intsxp_test")
+            print(dplyr::tbl(conn, DBI::Id("#intsxp_test")))
 
             # Disconnect
             DBI::dbDisconnect(conn)
