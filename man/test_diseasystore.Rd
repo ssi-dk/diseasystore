@@ -48,25 +48,18 @@ The location of the local data should be configured in the options for "source_c
 diseasystore before calling test_diseasystore.
 }
 \examples{
-\dontshow{if (requireNamespace("RSQLite", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+\dontshow{if (requireNamespace("duckdb", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
-  withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
+  # Generator for connections
+  conns <- \(skip_backends) list(DBI::dbConnect(duckdb::duckdb()))
 
-  conn_generator <- function(skip_backends = NULL) {
-     switch(
-       ("SQLiteConnection" \%in\% skip_backends) + 1,
-       list(DBI::dbConnect(RSQLite::SQLite())), # SQLiteConnection not in skip_backends
-       list() # SQLiteConnection in skip_backends
-     )
-  }
-
+  # Call the testing suite
   test_diseasystore(
-    DiseasystoreEcdcRespiratoryViruses,
-    conn_generator,
-    data_files = "data/snapshots/2023-11-24_ILIARIRates.csv",
-    target_schema = "test_ds",
-    test_start_date = as.Date("2022-06-20"),
-    slice_ts = "2023-11-24"
+    diseasystore_generator = DiseasystoreSimulist,
+    conn_generator = conns,
+    target_schema = "test",
+    test_start_date = as.Date("2020-02-20"),
+    skip_backends = "SQLiteConnection"
   )
 }
 \dontshow{\}) # examplesIf}

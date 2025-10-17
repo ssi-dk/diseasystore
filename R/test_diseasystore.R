@@ -23,25 +23,18 @@
 #' @param ...
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
-#' @examplesIf requireNamespace("RSQLite", quietly = TRUE)
+#' @examplesIf requireNamespace("duckdb", quietly = TRUE)
 #' \donttest{
-#'   withr::local_options("diseasystore.DiseasystoreEcdcRespiratoryViruses.pull" = FALSE)
+#'   # Generator for connections
+#'   conns <- \(skip_backends) list(DBI::dbConnect(duckdb::duckdb()))
 #'
-#'   conn_generator <- function(skip_backends = NULL) {
-#'      switch(
-#'        ("SQLiteConnection" %in% skip_backends) + 1,
-#'        list(DBI::dbConnect(RSQLite::SQLite())), # SQLiteConnection not in skip_backends
-#'        list() # SQLiteConnection in skip_backends
-#'      )
-#'   }
-#'
+#'   # Call the testing suite
 #'   test_diseasystore(
-#'     DiseasystoreEcdcRespiratoryViruses,
-#'     conn_generator,
-#'     data_files = "data/snapshots/2023-11-24_ILIARIRates.csv",
-#'     target_schema = "test_ds",
-#'     test_start_date = as.Date("2022-06-20"),
-#'     slice_ts = "2023-11-24"
+#'     diseasystore_generator = DiseasystoreSimulist,
+#'     conn_generator = conns,
+#'     target_schema = "test",
+#'     test_start_date = as.Date("2020-02-20"),
+#'     skip_backends = "SQLiteConnection"
 #'   )
 #' }
 #' @importFrom curl has_internet
