@@ -2,7 +2,9 @@
 
 ## Minor Improvements and Fixes
 
-* Compatibility with `stringr v.1.6.0` (#218, @hadley)
+* Compatibility with `stringr v.1.6.0` (#218, @hadley).
+
+* Transfer of `Dates` to SQL Server now works again (#220).
 
 
 # diseasystore 0.3.1
