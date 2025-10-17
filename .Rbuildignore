@@ -17,4 +17,4 @@ man-roxygen
 ^pak.lock
 ^data-raw$
 ^pkg-build$
-
+^\.markdownlint\.json$
