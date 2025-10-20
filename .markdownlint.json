@@ -1,0 +1,10 @@
+{
+  "no-duplicate-heading": {
+    "siblings_only": true
+  },
+  "single-h1":false,
+  "no-multiple-blanks":false,
+  "line-length": {
+    "line_length": 120
+  }
+}

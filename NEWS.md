@@ -1,4 +1,11 @@
-# diseasystore (development version)
+# diseasystore 0.3.2
+
+## Minor Improvements and Fixes
+
+* Compatibility with `stringr v.1.6.0` (#218, @hadley).
+
+* Transfer of `Dates` to SQL Server now works again (#220).
+
 
 # diseasystore 0.3.1
 
@@ -59,7 +66,13 @@
   matching an existing stratification. Simply requesting the stratification from the feature store will no longer
   produce a warning (#192).
 
+* `diseasyoption()` can now be called without the `option` argument to return all `diseasy/diseasystore` options (#159).
+
+  In addition, a new `namespace` argument can restrict the option look-up to a specific package (e.g. `diseasystore`).
+
+
 ## Testing
+
 * `test_diseasystore()` now also checks the `?FeatureHandler` return data directly:
   * Checks that data is only within the study period (#154).
   * Checks that `valid_from` and `valid_until` has class `Date` (#154).
@@ -72,16 +85,10 @@
 
 * Added benchmarking vignette `vignette("benchmarks")` (#144).
 
-## Minor Improvements and Fixes
-
-* `diseasyoption()` can now be called without the `option` argument to return all `diseasy/diseasystore` options (#159).
-
-  In addition, a new `namespace` argument can restrict the option look-up to a specific package (e.g. `diseasystore`).
-
 
 # diseasystore 0.2.2
 
-## Minor Improvements and Fixes:
+## Minor Improvements and Fixes
 
 * The `%.%` operator is made more flexible to function as a drop-in replacement for `$` (#145).
 
@@ -164,8 +171,8 @@
 * The functions are fully documented.
 
 * Vignettes for the use of the package is included.
-  - `vignette("quick-start")`
-  - `vignette("extending-diseasystore")`
+  * `vignette("quick-start")`
+  * `vignette("extending-diseasystore")`
 
 * Vignette for the Google COVID-19 data is included.
   * `vignette("diseasystore-google-covid-19")`
