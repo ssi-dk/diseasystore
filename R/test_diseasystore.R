@@ -301,6 +301,21 @@ test_diseasystore <- function(
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
 
+        # Determine target_table for computations
+        feature_loader <- purrr::pluck(.y, .x)
+        target_table <- SCDB::id(paste(ds %.% target_schema, feature_loader, sep = "."), ds %.% target_conn)
+
+        # Check that a single range of dates are to be computed
+        ds_missing_ranges <- ds$determine_missing_ranges(
+          target_table = target_table,
+          start_date   = test_start_date,
+          end_date     = test_end_date,
+          slice_ts     = ds %.% slice_ts
+        )
+
+        # If all dates are mapped correctly, we should have filled our missing dates
+        testthat::expect_identical(nrow(ds_missing_ranges), 1L)
+
         # Suppress our user facing, informative warnings
         pkgcond::suppress_warnings(
           class = c(
@@ -391,12 +406,8 @@ test_diseasystore <- function(
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
-
-        # Check for timestamp conversion issues
-        feature_loader <- purrr::pluck(.y, .x)
-        target_table <- SCDB::id(paste(ds %.% target_schema, feature_loader, sep = "."), ds %.% target_conn)
-
-        ds_missing_ranges <- ds$determine_new_ranges(
+        # Check that no ranges are now missing computation
+        ds_missing_ranges <- ds$determine_missing_ranges(
           target_table = target_table,
           start_date   = test_start_date,
           end_date     = test_end_date,

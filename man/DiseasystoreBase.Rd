@@ -67,7 +67,7 @@ A human readable label of the feature store. Read only.}
 \item \href{#method-DiseasystoreBase-new}{\code{DiseasystoreBase$new()}}
 \item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
 \item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
-\item \href{#method-DiseasystoreBase-determine_new_ranges}{\code{DiseasystoreBase$determine_new_ranges()}}
+\item \href{#method-DiseasystoreBase-determine_missing_ranges}{\code{DiseasystoreBase$determine_missing_ranges()}}
 \item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
 }
 }
@@ -177,16 +177,16 @@ A tbl_dbi with the requested joined features for the study period.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreBase-determine_new_ranges"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreBase-determine_new_ranges}{}}}
-\subsection{Method \code{determine_new_ranges()}}{
+\if{html}{\out{<a id="method-DiseasystoreBase-determine_missing_ranges"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreBase-determine_missing_ranges}{}}}
+\subsection{Method \code{determine_missing_ranges()}}{
 Determine which dates are not already computed.
 
 This method parses the \code{message} fields of the logs related to \code{target_table} on the date given by \code{slice_ts}.
 These messages contains information on the date-ranges that are already computed.
 Once parsed, the method compares the computed date-ranges with the requested date-range.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$determine_new_ranges(
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$determine_missing_ranges(
   target_table,
   start_date,
   end_date,

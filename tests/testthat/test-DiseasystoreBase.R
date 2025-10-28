@@ -156,7 +156,7 @@ test_that("$get_feature verbosity works", {
 })
 
 
-test_that("DiseasystoreBase$determine_new_ranges() works", {
+test_that("DiseasystoreBase$determine_missing_ranges() works", {
 
   start_date <- as.Date("2020-01-01")
   end_date   <- as.Date("2020-03-01")
@@ -187,37 +187,37 @@ test_that("DiseasystoreBase$determine_new_ranges() works", {
 
     # Start the tests
     expect_identical(
-      ds$determine_new_ranges("table1", start_date, end_date, ds %.% slice_ts),
+      ds$determine_missing_ranges("table1", start_date, end_date, ds %.% slice_ts),
       tibble::tibble(start_date = as.Date(character(0)),
                      end_date   = as.Date(character(0)))
     )
 
     expect_identical(
-      ds$determine_new_ranges("table2", start_date, end_date, ds %.% slice_ts),
+      ds$determine_missing_ranges("table2", start_date, end_date, ds %.% slice_ts),
       tibble::tibble(start_date = !!start_date,
                      end_date   = !!end_date)
     )
 
     expect_identical(
-      ds$determine_new_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
+      ds$determine_missing_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
       tibble::tibble(start_date = !!end_date + lubridate::days(1),
                      end_date   = !!end_date + lubridate::days(5))
     )
 
     expect_identical(
-      ds$determine_new_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
+      ds$determine_missing_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
       tibble::tibble(start_date = !!start_date - lubridate::days(5),
                      end_date   = !!start_date - lubridate::days(1))
     )
 
     expect_identical(
-      ds$determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), ds %.% slice_ts),
+      ds$determine_missing_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), ds %.% slice_ts),
       tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
                      end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5)))
     )
 
     expect_identical(
-      ds$determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), ds %.% slice_ts),
+      ds$determine_missing_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), ds %.% slice_ts),
       tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
                      end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3)))
     )

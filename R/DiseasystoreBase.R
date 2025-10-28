@@ -132,7 +132,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
 
       # Determine dates that need computation
-      ds_missing_ranges <- self$determine_new_ranges(
+      ds_missing_ranges <- self$determine_missing_ranges(
         target_table = target_table,
         start_date   = start_date,
         end_date     = end_date,
@@ -157,7 +157,7 @@ DiseasystoreBase <- R6::R6Class(                                                
 
         # Once the locks are release
         # Re-determine dates that need computation
-        ds_missing_ranges <- self$determine_new_ranges(
+        ds_missing_ranges <- self$determine_missing_ranges(
           target_table = target_table,
           start_date   = start_date,
           end_date     = end_date,
@@ -517,7 +517,7 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @param slice_ts `r rd_slice_ts()`
     #' @return (`tibble`)\cr
     #'   A data frame containing continuous un-computed date-ranges
-    determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
+    determine_missing_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Create log table
       SCDB::create_logs_if_missing(
