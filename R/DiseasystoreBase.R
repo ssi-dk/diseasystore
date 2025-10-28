@@ -520,16 +520,15 @@ DiseasystoreBase <- R6::R6Class(                                                
     determine_missing_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Create log table
-      SCDB::create_logs_if_missing(
-        log_table = paste(self %.% target_schema, "logs", sep = "."),
-        conn = self %.% target_conn
+      log_table_id <- SCDB::id(
+        paste(self %.% target_schema, "logs", sep = "."),
+        self %.% target_conn
       )
 
+      SCDB::create_logs_if_missing(log_table = log_table_id, conn = self %.% target_conn)
+
       # Get a list of the logs for the target_table on the slice_ts
-      logs <- dplyr::tbl(
-        self %.% target_conn,
-        SCDB::id(paste(self %.% target_schema, "logs", sep = "."), self %.% target_conn)
-      ) |>
+      logs <- dplyr::tbl(self %.% target_conn, log_table_id) |>
         dplyr::filter(.data$date == !!SCDB::db_timestamp(slice_ts, self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
