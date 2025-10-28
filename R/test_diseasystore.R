@@ -405,6 +405,12 @@ test_diseasystore <- function(
 
         # If all dates are mapped correctly, we should have filled our missing dates
         testthat::expect_identical(nrow(ds_missing_ranges), 0L)
+
+        # Make a specific test for the broken join in DiseasystoreBase
+        ds_existing <- dplyr::tbl(conn, target_table) |>
+          dplyr::filter(.data$from_ts == ds %.% slice_ts)
+
+        testthat::expect_gt(nrow(ds_existing), 0L)
       })
 
       # Clean up
