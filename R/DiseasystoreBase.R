@@ -532,9 +532,7 @@ DiseasystoreBase <- R6::R6Class(                                                
         dplyr::filter(.data$date == !!SCDB::db_timestamp(slice_ts, self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
-        dplyr::filter(
-          .data$target_table == !!as.character(target_table)
-        )
+        dplyr::filter(.data$target_table == !!as.character(target_table))
 
       # If no logs are found, we need to compute on the entire range
       if (nrow(logs) == 0) {
@@ -543,8 +541,10 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Determine the date ranges used
       logs <- logs |>
-        dplyr::mutate("ds_start_date" = stringr::str_extract(.data$message, r"{(?<=ds-range: )(\d{4}-\d{2}-\d{2})}"),
-                      "ds_end_date"   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")) |>
+        dplyr::mutate(
+          "ds_start_date" = stringr::str_extract(.data$message, r"{(?<=ds-range: )(\d{4}-\d{2}-\d{2})}"),
+          "ds_end_date"   = stringr::str_extract(.data$message, r"{(\d{4}-\d{2}-\d{2})$}")
+        ) |>
         dplyr::mutate(across(.cols = c("ds_start_date", "ds_end_date"), .fns = base::as.Date))
 
       # Find updates that overlap with requested range
@@ -558,8 +558,10 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Determine the dates covered on this slice_ts
       if (nrow(logs) > 0) {
         ds_dates <- logs |>
-          dplyr::transmute("ds_start_date" = base::as.Date(ds_start_date),
-                           "ds_end_date" = base::as.Date(ds_end_date)) |>
+          dplyr::transmute(
+            "ds_start_date" = base::as.Date(ds_start_date),
+            "ds_end_date" = base::as.Date(ds_end_date)
+          ) |>
           purrr::pmap(\(ds_start_date, ds_end_date) seq.Date(from = ds_start_date, to = ds_end_date, by = "1 day")) |>
           purrr::reduce(dplyr::union_all) |> # union does not preserve type (converts from Date to numeric)
           unique() # so we have to use union_all (preserves type) followed by unique (preserves type)
@@ -576,21 +578,25 @@ DiseasystoreBase <- R6::R6Class(                                                
 
       # Early return, if no new dates are found
       if (length(new_dates) == 0) {
-        return(tibble::tibble(start_date = base::as.Date(character(0)), end_date = base::as.Date(character(0))))
+        return(tibble::tibble("start_date" = base::as.Date(character(0)), "end_date" = base::as.Date(character(0))))
       }
 
       # Reduce to single intervals
       new_ranges <- tibble::tibble(date = new_dates) |>
-        dplyr::mutate("prev_date_diff" = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
-                      "first_in_segment" = dplyr::case_when(
-                        is.na(.data$prev_date_diff) ~ TRUE,   # Nothing before, must be a new segment
-                        .data$prev_date_diff > 1 ~ TRUE,      # Previous segment is long before, must be a new segment
-                        TRUE ~ FALSE                          # All other cases are not the first in segment
-                      )) |>
+        dplyr::mutate(
+          "prev_date_diff" = as.numeric(difftime(.data$date, dplyr::lag(.data$date), units = "days")),
+          "first_in_segment" = dplyr::case_when(
+            is.na(.data$prev_date_diff) ~ TRUE,   # Nothing before, must be a new segment
+            .data$prev_date_diff > 1 ~ TRUE,      # Previous segment is long before, must be a new segment
+            TRUE ~ FALSE                          # All other cases are not the first in segment
+          )
+        ) |>
         dplyr::group_by(cumsum(.data$first_in_segment)) |>
-        dplyr::summarise(start_date = min(.data$date, na.rm = TRUE),
-                         end_date   = max(.data$date, na.rm = TRUE),
-                         .groups = "drop") |>
+        dplyr::summarise(
+          "start_date" = min(.data$date, na.rm = TRUE),
+          "end_date"   = max(.data$date, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
         dplyr::select("start_date", "end_date")
 
       return(new_ranges)
