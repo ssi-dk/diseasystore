@@ -314,7 +314,11 @@ test_diseasystore <- function(
         )
 
         # If all dates are mapped correctly, we should have filled our missing dates
-        testthat::expect_identical(nrow(ds_missing_ranges), 1L)
+        testthat::expect_identical(
+          nrow(ds_missing_ranges),
+          1L,
+          info = glue::glue("`determine_missing_ranges()` did not return missing range for feature `{.x}`.")
+        )
 
         # Suppress our user facing, informative warnings
         pkgcond::suppress_warnings(
@@ -415,7 +419,11 @@ test_diseasystore <- function(
         )
 
         # If all dates are mapped correctly, we should have filled our missing dates
-        testthat::expect_identical(nrow(ds_missing_ranges), 0L)
+        testthat::expect_identical(
+          nrow(ds_missing_ranges),
+          0L,
+          info = glue::glue("`determine_missing_ranges()` returned missing range for feature `{.x}` after computation.")
+        )
 
         # Make a specific test for the broken join in DiseasystoreBase
         ds_existing <- dplyr::tbl(conn, target_table) |>
