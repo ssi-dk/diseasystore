@@ -186,40 +186,38 @@ test_that("DiseasystoreBase$determine_new_ranges() works", {
 
 
     # Start the tests
-    determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
-
     expect_identical(
-      determine_new_ranges("table1", start_date, end_date, ds %.% slice_ts),
+      ds$determine_new_ranges("table1", start_date, end_date, ds %.% slice_ts),
       tibble::tibble(start_date = as.Date(character(0)),
                      end_date   = as.Date(character(0)))
     )
 
     expect_identical(
-      determine_new_ranges("table2", start_date, end_date, ds %.% slice_ts),
+      ds$determine_new_ranges("table2", start_date, end_date, ds %.% slice_ts),
       tibble::tibble(start_date = !!start_date,
                      end_date   = !!end_date)
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
+      ds$determine_new_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
       tibble::tibble(start_date = !!end_date + lubridate::days(1),
                      end_date   = !!end_date + lubridate::days(5))
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
+      ds$determine_new_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
       tibble::tibble(start_date = !!start_date - lubridate::days(5),
                      end_date   = !!start_date - lubridate::days(1))
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), ds %.% slice_ts),
+      ds$determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), ds %.% slice_ts),
       tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
                      end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5)))
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), ds %.% slice_ts),
+      ds$determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), ds %.% slice_ts),
       tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
                      end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3)))
     )
