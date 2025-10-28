@@ -131,13 +131,6 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Determine where these features are stored
       target_table <- SCDB::id(paste(self %.% target_schema, feature_loader, sep = "."), self %.% target_conn)
 
-
-      # Create log table
-      SCDB::create_logs_if_missing(
-        log_table = paste(self %.% target_schema, "logs", sep = "."),
-        conn = self %.% target_conn
-      )
-
       # Determine dates that need computation
       ds_missing_ranges <- self$determine_new_ranges(
         target_table = target_table,
@@ -525,6 +518,12 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @return (`tibble`)\cr
     #'   A data frame containing continuous un-computed date-ranges
     determine_new_ranges = function(target_table, start_date, end_date, slice_ts) {
+
+      # Create log table
+      SCDB::create_logs_if_missing(
+        log_table = paste(self %.% target_schema, "logs", sep = "."),
+        conn = self %.% target_conn
+      )
 
       # Get a list of the logs for the target_table on the slice_ts
       logs <- dplyr::tbl(
