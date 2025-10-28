@@ -391,6 +391,20 @@ test_diseasystore <- function(
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
+
+        # Check for timestamp conversion issues
+        feature_loader <- purrr::pluck(.y, .x)
+        target_table <- SCDB::id(paste(ds %.% target_schema, feature_loader, sep = "."), ds %.% target_conn)
+
+        ds_missing_ranges <- ds$.__enclos_env__$private$determine_new_ranges(
+          target_table = target_table,
+          start_date   = test_start_date,
+          end_date     = test_end_date,
+          slice_ts     = ds %.% slice_ts
+        )
+
+        # If all dates are mapped correctly, we should have filled our missing dates
+        testthat::expect_identical(nrow(ds_missing_ranges), 0L)
       })
 
       # Clean up
