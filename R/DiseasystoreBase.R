@@ -133,14 +133,18 @@ DiseasystoreBase <- R6::R6Class(                                                
 
 
       # Create log table
-      SCDB::create_logs_if_missing(log_table = paste(self %.% target_schema, "logs", sep = "."),
-                                   conn = self %.% target_conn)
+      SCDB::create_logs_if_missing(
+        log_table = paste(self %.% target_schema, "logs", sep = "."),
+        conn = self %.% target_conn
+      )
 
       # Determine dates that need computation
-      ds_missing_ranges <- private$determine_new_ranges(target_table = target_table,
-                                                        start_date   = start_date,
-                                                        end_date     = end_date,
-                                                        slice_ts     = slice_ts)
+      ds_missing_ranges <- private$determine_new_ranges(
+        target_table = target_table,
+        start_date   = start_date,
+        end_date     = end_date,
+        slice_ts     = slice_ts
+      )
 
       # If there are any missing ranges, put a lock on the data base
       if (nrow(ds_missing_ranges) > 0) {
