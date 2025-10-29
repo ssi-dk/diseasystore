@@ -297,48 +297,9 @@ test_diseasystore <- function(
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-      # Determine which features should result in new computation as we
-      # iterate through
-      ds_map_ <- data.frame(
-        row.names = names(ds$ds_map),
-        "feature" = names(ds$ds_map),
-        "feature_loader" = as.character(ds$ds_map)
-      )
-      ds_map_ <- ds_map_[ds$available_features, ] |>
-        dplyr::mutate(
-          "first_computation" = dplyr::row_number() == 1,
-          .by = "feature_loader"
-        )
-
-
       # Attempt to get features from the feature store
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-
-        # Determine where these features are stored
-        target_table <- SCDB::id(paste(ds %.% target_schema, .y, sep = "."), ds %.% target_conn)
-
-
-        # Check that a single range of dates are to be computed
-        if (ds_map_[.x, "first_computation"]) {
-
-          ds_missing_ranges <- ds$determine_missing_ranges(
-            target_table = target_table,
-            start_date   = test_start_date,
-            end_date     = test_end_date,
-            slice_ts     = ds %.% slice_ts
-          )
-
-          # If all dates are mapped correctly, we should have filled our missing dates
-          testthat::expect_identical(
-            ds_missing_ranges,
-            tibble::tibble(
-              "start_date" = test_start_date,
-              "end_date"   = test_end_date
-            ),
-            info = glue::glue("`determine_missing_ranges()` did not return missing range for feature `{.x}`.")
-          )
-        }
 
         # Suppress our user facing, informative warnings
         pkgcond::suppress_warnings(
@@ -430,6 +391,9 @@ test_diseasystore <- function(
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
+        # Determine where these features are stored
+        target_table <- SCDB::id(paste(ds %.% target_schema, .y, sep = "."), ds %.% target_conn)
+
         # Check that no ranges are now missing computation
         ds_missing_ranges <- ds$determine_missing_ranges(
           target_table = target_table,
@@ -465,47 +429,9 @@ test_diseasystore <- function(
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-      # Determine which features should result in new computation as we
-      # iterate through
-      ds_map_ <- data.frame(
-        row.names = names(ds$ds_map),
-        "feature" = names(ds$ds_map),
-        "feature_loader" = as.character(ds$ds_map)
-      )
-      ds_map_ <- ds_map_[ds$available_features, ] |>
-        dplyr::mutate(
-          "first_computation" = dplyr::row_number() == 1,
-          .by = "feature_loader"
-        )
-
-
       # Attempt to get features from the feature store (using different dates)
       # then check that they match the expected value from the generators
       purrr::walk2(ds$available_features, ds$ds_map, ~ {
-
-        # Determine where these features are stored
-        target_table <- SCDB::id(paste(ds %.% target_schema, .y, sep = "."), ds %.% target_conn)
-
-        # Check that a single range of dates are to be computed
-        if (ds_map_[.x, "first_computation"]) {
-
-          ds_missing_ranges <- ds$determine_missing_ranges(
-            target_table = target_table,
-            start_date   = test_start_date,
-            end_date     = test_end_date,
-            slice_ts     = ds %.% slice_ts
-          )
-
-          # If all dates are mapped correctly, we should have filled our missing dates
-          testthat::expect_identical(
-            ds_missing_ranges,
-            tibble::tibble(
-              "start_date" = test_start_date + lubridate::days(5),
-              "end_date" = test_end_date
-            ),
-            info = glue::glue("`determine_missing_ranges()` did not return missing range for feature `{.x}`.")
-          )
-        }
 
         # Suppress our user facing, informative warnings
         pkgcond::suppress_warnings(
@@ -562,6 +488,8 @@ test_diseasystore <- function(
           info = glue::glue("Feature `{.x}` has a mismatch between `$get_feature()` and `$compute()`.")
         )
 
+        # Determine where these features are stored
+        target_table <- SCDB::id(paste(ds %.% target_schema, .y, sep = "."), ds %.% target_conn)
 
         # Check that no ranges are now missing computation
         ds_missing_ranges <- ds$determine_missing_ranges(
