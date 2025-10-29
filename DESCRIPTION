@@ -47,7 +47,7 @@ Imports:
     tidyselect
 Suggests:
     devtools,
-    duckdb,
+    duckdb (<= 1.3.3),
     ggplot2,
     here,
     knitr,
