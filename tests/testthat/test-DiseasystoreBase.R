@@ -156,6 +156,85 @@ test_that("$get_feature verbosity works", {
 })
 
 
+test_that("$get_feature() works with different slice_ts data_types", {
+  for (conn in get_test_conns()) {
+
+    # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
+    DiseasystoreDummy <- R6::R6Class(                                                                                   # nolint: object_name_linter
+      classname = "DiseasystoreBase",
+      inherit = DiseasystoreBase,
+      private = list(
+        .ds_map = list("cyl" = "dummy_mtcars"),
+        dummy_mtcars = FeatureHandler$new(
+          compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+            return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
+          }
+        )
+      )
+    )
+
+    # Create an instance for tests
+    ds <- DiseasystoreDummy$new(
+      source_conn = file.path("some", "path"),
+      target_conn = conn,
+      verbose = FALSE
+    )
+
+    # Determine where these features are stored
+    target_table <- SCDB::id(paste(ds %.% target_schema, "dummy_mtcars", sep = "."), ds %.% target_conn)
+
+    # Get a reference to the logs table
+    log_table_id <- SCDB::id(paste(ds %.% target_schema, "logs", sep = "."), ds %.% target_conn)
+
+    # Create list of slice_ts to test
+    slice_tss <- list(
+      "Date" = Sys.Date(),
+      "character Date" = as.character(Sys.Date()),
+      "Integer Date" = as.Date(as.integer(Sys.Date())),
+      "POSIXct" = Sys.time(),
+      "character timestamp" = as.character(Sys.time())
+    )
+
+    for (slice_ts in slice_tss) {
+      # Ensure we start from a clean state
+      drop_diseasystore(conn = ds %.% target_conn, schema = ds %.% target_schema)
+
+      log_table <- SCDB::create_logs_if_missing(log_table = log_table_id, conn = ds %.% target_conn)
+      expect_identical(SCDB::nrow(log_table), 0L)
+
+      # Check no data has been computed
+      ds_missing_ranges <- ds$determine_missing_ranges(
+        target_table = target_table,
+        start_date   = Sys.Date(),
+        end_date     = Sys.Date(),
+        slice_ts     = slice_ts
+      )
+      expect_identical(SCDB::nrow(ds_missing_ranges), 1L)
+
+      # Compute feature
+      ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date(), slice_ts = slice_ts)
+
+      # Check data has been computed
+      expect_identical(SCDB::nrow(log_table), 1L)
+
+      # Check no missing ranges are returned after computation
+      ds_missing_ranges <- ds$determine_missing_ranges(
+        target_table = target_table,
+        start_date   = Sys.Date(),
+        end_date     = Sys.Date(),
+        slice_ts     = slice_ts
+      )
+      testthat::expect_identical(SCDB::nrow(ds_missing_ranges), 0L)
+    }
+
+    rm(ds)
+    DBI::dbDisconnect(conn)
+  }
+
+  invisible(gc())
+})
+
+
 test_that("DiseasystoreBase$determine_missing_ranges() works", {
 
   start_date <- as.Date("2020-01-01")
