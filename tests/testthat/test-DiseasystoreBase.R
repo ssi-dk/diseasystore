@@ -192,7 +192,7 @@ test_that("$get_feature() works with different slice_ts data_types", {
       "character Date" = as.character(Sys.Date()),
       "Integer Date" = as.Date(as.integer(Sys.Date())),
       "POSIXct" = Sys.time(),
-      "character timestamp" = as.character(Sys.time())
+      "character timestamp" = format(Sys.time())
     )
 
     for (slice_ts in slice_tss) {
