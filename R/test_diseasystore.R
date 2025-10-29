@@ -445,13 +445,6 @@ test_diseasystore <- function(
           info = glue::glue("`determine_missing_ranges()` returned missing range for feature `{.x}` after computation.")
         )
 
-        log_table_id <- SCDB::id(
-          paste(ds %.% target_schema, "logs", sep = "."),
-          ds %.% target_conn
-        )
-        print(dplyr::tbl(conn, log_table_id))
-        print(dplyr::select(dplyr::tbl(conn, log_table_id), "date", "message"))
-
         # Make a specific test for the broken join in DiseasystoreBase
         ds_existing <- dplyr::tbl(conn, target_table) |>
           dplyr::filter(.data$from_ts == ds %.% slice_ts)
