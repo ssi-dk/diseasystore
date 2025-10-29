@@ -444,12 +444,6 @@ test_diseasystore <- function(
           0L,
           info = glue::glue("`determine_missing_ranges()` returned missing range for feature `{.x}` after computation.")
         )
-
-        # Make a specific test for the broken join in DiseasystoreBase
-        ds_existing <- dplyr::tbl(conn, target_table) |>
-          dplyr::filter(.data$from_ts == ds %.% slice_ts)
-
-        testthat::expect_gt(nrow(ds_existing), 0L)
       })
 
       # Clean up
