@@ -525,10 +525,10 @@ DiseasystoreBase <- R6::R6Class(                                                
         self %.% target_conn
       )
 
-      SCDB::create_logs_if_missing(log_table = log_table_id, conn = self %.% target_conn)
+      logs <- SCDB::create_logs_if_missing(log_table = log_table_id, conn = self %.% target_conn)
 
       # Get a list of the logs for the target_table on the slice_ts
-      logs <- dplyr::tbl(self %.% target_conn, log_table_id) |>
+      logs <- logs |>
         dplyr::filter(.data$date == !!SCDB::db_timestamp(slice_ts, self %.% target_conn)) |>
         dplyr::collect() |>
         tidyr::unite("target_table", tidyselect::any_of(c("catalog", "schema", "table")), sep = ".", na.rm = TRUE) |>
