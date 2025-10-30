@@ -197,7 +197,9 @@ DiseasystoreBase <- R6::R6Class(                                                
 
             if (SCDB::is.historical(ds_existing)) {
               ds_existing <- ds_existing |>
-                dplyr::filter(.data$from_ts == !!SCDB::db_timestamp(as.character(slice_ts), conn = self %.% target_conn)) |>
+                dplyr::filter(
+                  .data$from_ts == !!SCDB::db_timestamp(as.character(slice_ts), conn = self %.% target_conn)
+                ) |>
                 dplyr::select(!tidyselect::all_of(c("checksum", "from_ts", "until_ts"))) |>
                 dplyr::filter(.data$valid_until <= start_date, .data$valid_from < end_date)
             }
