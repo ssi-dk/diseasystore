@@ -511,12 +511,12 @@ DiseasystoreBase <- R6::R6Class(                                                
     #'   These messages contains information on the date-ranges that are already computed.
     #'   Once parsed, the method compares the computed date-ranges with the requested date-range.
     #' @param target_table (`character` or `Id`)\cr
-    #'   The feature table to investigate
+    #'   The feature table to investigate.
     #' @param start_date `r rd_start_date()`
     #' @param end_date `r rd_end_date()`
     #' @param slice_ts `r rd_slice_ts()`
     #' @return (`tibble`)\cr
-    #'   A data frame containing continuous un-computed date-ranges
+    #'   A `data.frame` containing continuous date-ranges that require computation to cover the requested period
     determine_missing_ranges = function(target_table, start_date, end_date, slice_ts) {
 
       # Create log table

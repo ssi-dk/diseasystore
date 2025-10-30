@@ -198,7 +198,7 @@ Once parsed, the method compares the computed date-ranges with the requested dat
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{target_table}}{(\code{character} or \code{Id})\cr
-The feature table to investigate}
+The feature table to investigate.}
 
 \item{\code{start_date}}{(\code{Date})\cr Study period start.}
 
@@ -210,7 +210,7 @@ The feature table to investigate}
 }
 \subsection{Returns}{
 (\code{tibble})\cr
-A data frame containing continuous un-computed date-ranges
+A \code{data.frame} containing continuous date-ranges that require computation to cover the requested period
 }
 }
 \if{html}{\out{<hr>}}
