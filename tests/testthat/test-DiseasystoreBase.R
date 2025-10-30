@@ -272,6 +272,8 @@ test_that("$get_feature() works with different slice_ts data_types", {
       expect_identical(SCDB::nrow(ds_missing_ranges), 0L)
     }
 
+    # Ensure we leave a clean state
+    drop_diseasystore(conn = ds %.% target_conn, schema = ds %.% target_schema)
     rm(ds)
     DBI::dbDisconnect(conn)
   }
