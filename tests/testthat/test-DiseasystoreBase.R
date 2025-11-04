@@ -209,13 +209,18 @@ test_that("$get_feature() works with different slice_ts data_types", {
       "character timestamp" = format(Sys.time())
     )
 
-    for (slice_ts in slice_tss) {
+    for (slice_ts_index in seq_along(slice_tss)) {
+
+      # Extract test data for the loop
+      slice_ts <- slice_tss[[slice_ts_index]]
+      test_label <- paste("Testing slice_ts of class:", names(slice_tss)[[slice_ts_index]])
+
 
       # Ensure we start from a clean state
       drop_diseasystore(conn = ds %.% target_conn, schema = ds %.% target_schema)
 
       log_table <- SCDB::create_logs_if_missing(log_table = log_table_id, conn = ds %.% target_conn)
-      expect_identical(SCDB::nrow(log_table), 0L)
+      expect_identical(SCDB::nrow(log_table), 0L, info = test_label)
 
       # Check no data has been computed
       ds_missing_ranges <- ds$determine_missing_ranges(
@@ -224,13 +229,13 @@ test_that("$get_feature() works with different slice_ts data_types", {
         end_date     = Sys.Date(),
         slice_ts     = slice_ts
       )
-      expect_identical(SCDB::nrow(ds_missing_ranges), 1L)
+      expect_identical(SCDB::nrow(ds_missing_ranges), 1L, info = test_label)
 
       # Compute feature
       ds$get_feature("n_cyl", start_date = Sys.Date(), end_date = Sys.Date(), slice_ts = slice_ts)
 
       # Check data has been computed
-      expect_identical(SCDB::nrow(log_table), 1L)
+      expect_identical(SCDB::nrow(log_table), 1L, info = test_label)
 
       # Check no missing ranges are returned after computation
       ds_missing_ranges <- ds$determine_missing_ranges(
@@ -239,7 +244,7 @@ test_that("$get_feature() works with different slice_ts data_types", {
         end_date     = Sys.Date(),
         slice_ts     = slice_ts
       )
-      testthat::expect_identical(SCDB::nrow(ds_missing_ranges), 0L)
+      testthat::expect_identical(SCDB::nrow(ds_missing_ranges), 0L, info = test_label)
 
 
       # Attempt to extend the data
@@ -247,29 +252,31 @@ test_that("$get_feature() works with different slice_ts data_types", {
         target_table = target_table,
         start_date   = Sys.Date() - lubridate::days(2),
         end_date     = Sys.Date() + lubridate::days(2),
-        slice_ts     = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types un purpose
+        slice_ts     = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types on purpose
       )
-      expect_identical(SCDB::nrow(ds_missing_ranges), 2L) # There is an interval on other side of the original range
+
+      # There is an interval on either side of the original range
+      expect_identical(SCDB::nrow(ds_missing_ranges), 2L, info = test_label)
 
 
       ds$get_feature(
         "n_cyl",
         start_date = Sys.Date() - lubridate::days(2),
         end_date = Sys.Date() + lubridate::days(2),
-        slice_ts = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types un purpose
+        slice_ts = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types on purpose
       )
 
       # Check data has been computed
-      expect_identical(SCDB::nrow(log_table), 3L)
+      expect_identical(SCDB::nrow(log_table), 3L, info = test_label)
 
       # Attempt to extend the data
       ds_missing_ranges <- ds$determine_missing_ranges(
         target_table = target_table,
         start_date   = Sys.Date() - lubridate::days(2),
         end_date     = Sys.Date() + lubridate::days(2),
-        slice_ts     = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types un purpose
+        slice_ts     = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types on purpose
       )
-      expect_identical(SCDB::nrow(ds_missing_ranges), 0L)
+      expect_identical(SCDB::nrow(ds_missing_ranges), 0L, info = test_label)
     }
 
     # Ensure we leave a clean state
