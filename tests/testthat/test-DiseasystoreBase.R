@@ -205,8 +205,8 @@ test_that("$get_feature() works with different slice_ts data_types", {
       "Date" = Sys.Date(),
       "character Date" = as.character(Sys.Date()),
       "Integer Date" = as.Date(as.integer(Sys.Date())),
-      "POSIXct" = Sys.time(),
-      "character timestamp" = format(Sys.time())
+      "POSIXct" = lubridate::floor_date(Sys.time(), unit = "day"),
+      "character timestamp" = format(lubridate::floor_date(Sys.time(), unit = "day"))
     )
 
     for (slice_ts_index in seq_along(slice_tss)) {
