@@ -103,22 +103,50 @@ test_that("DiseasystoreBase works", {
 })
 
 
-test_that("$get_feature verbosity works", {
-  for (conn in get_test_conns()) {
-
-    # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
-    DiseasystoreDummy <- R6::R6Class(                                                                                   # nolint: object_name_linter
-      classname = "DiseasystoreBase",
-      inherit = DiseasystoreBase,
-      private = list(
-        .ds_map = list("cyl" = "dummy_mtcars"),
-        dummy_mtcars = FeatureHandler$new(
-          compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-            return(dplyr::mutate(mtcars, valid_from = Sys.Date(), valid_until = as.Date(NA)))
-          }
-        )
-      )
+# Create a Dummy diseaystore for the next tests with two features
+DiseasystoreDummy <- R6::R6Class(                                                                                       # nolint: object_name_linter
+  classname = "DiseasystoreBase",
+  inherit = DiseasystoreBase,
+  private = list(
+    .ds_map = list("n_cyl" = "dummy_cyl", "vs" = "dummy_vs"),
+    dummy_cyl = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+        out <- mtcars |>
+          dplyr::mutate(
+            "row_id" = dplyr::row_number(),
+            "car" = paste(rownames(mtcars), .data$row_id)
+          ) |>
+          dplyr::transmute(
+            "key_car" = .data$car, "n_cyl" = .data$cyl,
+            "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id - 1),
+            "valid_until" = .data$valid_from + lubridate::days(2)
+          )
+        return(out)
+      },
+      key_join = key_join_sum
+    ),
+    dummy_vs = FeatureHandler$new(
+      compute = function(start_date, end_date, slice_ts, source_conn, ...) {
+        out <- mtcars |>
+          dplyr::mutate(
+            "row_id" = dplyr::row_number(),
+            "car" = paste(rownames(mtcars), .data$row_id)
+          ) |>
+          dplyr::transmute(
+            "key_car" = .data$car, .data$vs,
+            "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id),
+            "valid_until" = .data$valid_from + lubridate::days(2)
+          )
+        return(out)
+      },
+      key_join = key_join_sum
     )
+  )
+)
+
+
+test_that("$get_feature() verbosity works", {
+  for (conn in get_test_conns()) {
 
     # Create an instance with verbose = TRUE
     ds <- DiseasystoreDummy$new(
@@ -129,7 +157,7 @@ test_that("$get_feature verbosity works", {
 
     # Capture the messages from a get_feature call and compare with expectation
     messages <- capture.output(
-      invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
+      invisible(ds$get_feature("n_cyl", start_date = Sys.Date(), end_date = Sys.Date())),
       type = "message"
     )
 
@@ -137,12 +165,18 @@ test_that("$get_feature verbosity works", {
     # Messages from other sources (duckdb or odbc) are not captured.
     messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
 
-    checkmate::expect_character(messages[[1]], pattern = "feature: cyl needs to be computed on the specified date int.")
-    checkmate::expect_character(messages[[2]], pattern = r"{feature: cyl updated \(elapsed time}")
+    checkmate::expect_character(
+      messages[[1]],
+      pattern = "feature: n_cyl needs to be computed on the specified date int."
+    )
+    checkmate::expect_character(
+      messages[[2]],
+      pattern = r"{feature: n_cyl updated \(elapsed time}"
+    )
 
     # Second identical call should give no messages
     messages <- capture.output(
-      invisible(ds$get_feature("cyl", start_date = Sys.Date(), end_date = Sys.Date())),
+      invisible(ds$get_feature("n_cyl", start_date = Sys.Date(), end_date = Sys.Date())),
       type = "message"
     )
     messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
@@ -156,7 +190,112 @@ test_that("$get_feature verbosity works", {
 })
 
 
-test_that("DiseasystoreBase$determine_new_ranges() works", {
+test_that("$get_feature() works with different slice_ts data_types", {
+  for (conn in get_test_conns()) {
+
+    # Create an instance for tests
+    ds <- DiseasystoreDummy$new(
+      source_conn = file.path("some", "path"),
+      target_conn = conn,
+      verbose = FALSE
+    )
+
+    # Determine where these features are stored
+    target_table <- SCDB::id(paste(ds %.% target_schema, "dummy_cyl", sep = "."), ds %.% target_conn)
+
+    # Get a reference to the logs table
+    log_table_id <- SCDB::id(paste(ds %.% target_schema, "logs", sep = "."), ds %.% target_conn)
+
+    # Create list of slice_ts to test
+    slice_tss <- list(
+      "Date" = Sys.Date(),
+      "character Date" = as.character(Sys.Date()),
+      "Integer Date" = as.Date(as.integer(Sys.Date())),
+      "POSIXct" = lubridate::floor_date(Sys.time(), unit = "day"),
+      "character timestamp" = format(lubridate::floor_date(Sys.time(), unit = "day"))
+    )
+
+    for (slice_ts_index in seq_along(slice_tss)) {
+
+      # Extract test data for the loop
+      slice_ts <- slice_tss[[slice_ts_index]]
+      test_label <- paste("Testing slice_ts of class:", names(slice_tss)[[slice_ts_index]])
+
+
+      # Ensure we start from a clean state
+      drop_diseasystore(conn = ds %.% target_conn, schema = ds %.% target_schema)
+
+      log_table <- SCDB::create_logs_if_missing(log_table = log_table_id, conn = ds %.% target_conn)
+      expect_identical(SCDB::nrow(log_table), 0L, info = test_label)
+
+      # Check no data has been computed
+      ds_missing_ranges <- ds$determine_missing_ranges(
+        target_table = target_table,
+        start_date   = Sys.Date(),
+        end_date     = Sys.Date(),
+        slice_ts     = slice_ts
+      )
+      expect_identical(SCDB::nrow(ds_missing_ranges), 1L, info = test_label)
+
+      # Compute feature
+      ds$get_feature("n_cyl", start_date = Sys.Date(), end_date = Sys.Date(), slice_ts = slice_ts)
+
+      # Check data has been computed
+      expect_identical(SCDB::nrow(log_table), 1L, info = test_label)
+
+      # Check no missing ranges are returned after computation
+      ds_missing_ranges <- ds$determine_missing_ranges(
+        target_table = target_table,
+        start_date   = Sys.Date(),
+        end_date     = Sys.Date(),
+        slice_ts     = slice_ts
+      )
+      testthat::expect_identical(SCDB::nrow(ds_missing_ranges), 0L, info = test_label)
+
+
+      # Attempt to extend the data
+      ds_missing_ranges <- ds$determine_missing_ranges(
+        target_table = target_table,
+        start_date   = Sys.Date() - lubridate::days(2),
+        end_date     = Sys.Date() + lubridate::days(2),
+        slice_ts     = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types on purpose
+      )
+
+      # There is an interval on either side of the original range
+      expect_identical(SCDB::nrow(ds_missing_ranges), 2L, info = test_label)
+
+
+      ds$get_feature(
+        "n_cyl",
+        start_date = Sys.Date() - lubridate::days(2),
+        end_date = Sys.Date() + lubridate::days(2),
+        slice_ts = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types on purpose
+      )
+
+      # Check data has been computed
+      expect_identical(SCDB::nrow(log_table), 3L, info = test_label)
+
+      # Attempt to extend the data
+      ds_missing_ranges <- ds$determine_missing_ranges(
+        target_table = target_table,
+        start_date   = Sys.Date() - lubridate::days(2),
+        end_date     = Sys.Date() + lubridate::days(2),
+        slice_ts     = slice_tss[[1]] # We use first class for slice_ts to mis-match data-types on purpose
+      )
+      expect_identical(SCDB::nrow(ds_missing_ranges), 0L, info = test_label)
+    }
+
+    # Ensure we leave a clean state
+    drop_diseasystore(conn = ds %.% target_conn, schema = ds %.% target_schema)
+    rm(ds)
+    DBI::dbDisconnect(conn)
+  }
+
+  invisible(gc())
+})
+
+
+test_that("DiseasystoreBase$determine_missing_ranges() works", {
 
   start_date <- as.Date("2020-01-01")
   end_date   <- as.Date("2020-03-01")
@@ -186,42 +325,62 @@ test_that("DiseasystoreBase$determine_new_ranges() works", {
 
 
     # Start the tests
-    determine_new_ranges <- ds$.__enclos_env__$private$determine_new_ranges
-
     expect_identical(
-      determine_new_ranges("table1", start_date, end_date, ds %.% slice_ts),
-      tibble::tibble(start_date = as.Date(character(0)),
-                     end_date   = as.Date(character(0)))
+      ds$determine_missing_ranges("table1", start_date, end_date, ds %.% slice_ts),
+      tibble::tibble(
+        start_date = as.Date(character(0)),
+        end_date   = as.Date(character(0))
+      )
     )
 
     expect_identical(
-      determine_new_ranges("table2", start_date, end_date, ds %.% slice_ts),
-      tibble::tibble(start_date = !!start_date,
-                     end_date   = !!end_date)
+      ds$determine_missing_ranges("table2", start_date, end_date, ds %.% slice_ts),
+      tibble::tibble(
+        start_date = !!start_date,
+        end_date   = !!end_date
+      )
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
-      tibble::tibble(start_date = !!end_date + lubridate::days(1),
-                     end_date   = !!end_date + lubridate::days(5))
+      ds$determine_missing_ranges("table1", start_date, end_date + lubridate::days(5), ds %.% slice_ts),
+      tibble::tibble(
+        start_date = !!end_date + lubridate::days(1),
+        end_date   = !!end_date + lubridate::days(5)
+      )
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
-      tibble::tibble(start_date = !!start_date - lubridate::days(5),
-                     end_date   = !!start_date - lubridate::days(1))
+      ds$determine_missing_ranges("table1", start_date - lubridate::days(5), end_date, ds %.% slice_ts),
+      tibble::tibble(
+        start_date = !!start_date - lubridate::days(5),
+        end_date   = !!start_date - lubridate::days(1)
+      )
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(5), ds %.% slice_ts),
-      tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
-                     end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5)))
+      ds$determine_missing_ranges(
+        "table1",
+        start_date - lubridate::days(5),
+        end_date + lubridate::days(5),
+        ds %.% slice_ts
+      ),
+      tibble::tibble(
+        start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+        end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(5))
+      )
     )
 
     expect_identical(
-      determine_new_ranges("table1", start_date - lubridate::days(5), end_date + lubridate::days(3), ds %.% slice_ts),
-      tibble::tibble(start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
-                     end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3)))
+      ds$determine_missing_ranges(
+        "table1",
+        start_date - lubridate::days(5),
+        end_date + lubridate::days(3),
+        ds %.% slice_ts
+      ),
+      tibble::tibble(
+        start_date = c(!!start_date - lubridate::days(5), !!end_date + lubridate::days(1)),
+        end_date   = c(!!start_date - lubridate::days(1), !!end_date + lubridate::days(3))
+      )
     )
 
     rm(ds)
@@ -234,47 +393,6 @@ test_that("DiseasystoreBase$determine_new_ranges() works", {
 
 test_that("$key_join_features works with non-computing stratifications", {
   skip_if_not_installed("RSQLite")
-
-  # Create a dummy, mtcars diseasystore with two features
-  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
-    classname = "DiseasystoreBase",
-    inherit = DiseasystoreBase,
-    private = list(
-      .ds_map = list("n_cyl" = "dummy_cyl", "vs" = "dummy_vs"),
-      dummy_cyl = FeatureHandler$new(
-        compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-          out <- mtcars |>
-            dplyr::mutate(
-              "row_id" = dplyr::row_number(),
-              "car" = paste(rownames(mtcars), .data$row_id)
-            ) |>
-            dplyr::transmute(
-              "key_car" = .data$car, "n_cyl" = .data$cyl,
-              "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id - 1),
-              "valid_until" = .data$valid_from + lubridate::days(2)
-            )
-          return(out)
-        },
-        key_join = key_join_sum
-      ),
-      dummy_vs = FeatureHandler$new(
-        compute = function(start_date, end_date, slice_ts, source_conn, ...) {
-          out <- mtcars |>
-            dplyr::mutate(
-              "row_id" = dplyr::row_number(),
-              "car" = paste(rownames(mtcars), .data$row_id)
-            ) |>
-            dplyr::transmute(
-              "key_car" = .data$car, .data$vs,
-              "valid_from" = Sys.Date() - lubridate::days(2 * .data$row_id),
-              "valid_until" = .data$valid_from + lubridate::days(2)
-            )
-          return(out)
-        },
-        key_join = key_join_sum
-      )
-    )
-  )
 
   # Create new instance
   ds <- DiseasystoreDummy$new(target_conn = DBI::dbConnect(RSQLite::SQLite()), verbose = FALSE)

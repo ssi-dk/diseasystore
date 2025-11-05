@@ -67,6 +67,7 @@ A human readable label of the feature store. Read only.}
 \item \href{#method-DiseasystoreBase-new}{\code{DiseasystoreBase$new()}}
 \item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
 \item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
+\item \href{#method-DiseasystoreBase-determine_missing_ranges}{\code{DiseasystoreBase$determine_missing_ranges()}}
 \item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
 }
 }
@@ -173,6 +174,43 @@ that contains keys to witch the secondary features (defined by \code{stratificat
 }
 \subsection{Returns}{
 A tbl_dbi with the requested joined features for the study period.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiseasystoreBase-determine_missing_ranges"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreBase-determine_missing_ranges}{}}}
+\subsection{Method \code{determine_missing_ranges()}}{
+Determine which dates are not already computed.
+
+This method parses the \code{message} fields of the logs related to \code{target_table} on the date given by \code{slice_ts}.
+These messages contains information on the date-ranges that are already computed.
+Once parsed, the method compares the computed date-ranges with the requested date-range.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$determine_missing_ranges(
+  target_table,
+  start_date,
+  end_date,
+  slice_ts
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{target_table}}{(\code{character} or \code{Id})\cr
+The feature table to investigate.}
+
+\item{\code{start_date}}{(\code{Date})\cr Study period start.}
+
+\item{\code{end_date}}{(\code{Date})\cr Study period end.}
+
+\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+(\code{tibble})\cr
+A \code{data.frame} containing continuous date-ranges that require computation to cover the requested period
 }
 }
 \if{html}{\out{<hr>}}
