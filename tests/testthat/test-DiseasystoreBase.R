@@ -165,8 +165,14 @@ test_that("$get_feature() verbosity works", {
     # Messages from other sources (duckdb or odbc) are not captured.
     messages <- purrr::discard(messages, ~ !startsWith(., "feature:"))
 
-    checkmate::expect_character(messages[[1]], pattern = "feature: n_cyl needs to be computed on the specified date int.")
-    checkmate::expect_character(messages[[2]], pattern = r"{feature: n_cyl updated \(elapsed time}")
+    checkmate::expect_character(
+      messages[[1]],
+      pattern = "feature: n_cyl needs to be computed on the specified date int."
+    )
+    checkmate::expect_character(
+      messages[[2]],
+      pattern = r"{feature: n_cyl updated \(elapsed time}"
+    )
 
     # Second identical call should give no messages
     messages <- capture.output(
