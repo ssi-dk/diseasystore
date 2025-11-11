@@ -310,6 +310,13 @@ DiseasystoreBase <- R6::R6Class(                                                
       observable_data <- self$get_feature(observable, start_date, end_date)
       SCDB::defer_db_cleanup(observable_data)
 
+      # The automatic aggregation of key_join_features only work if observable is countable
+      # In the naming convention, this is indicated by the column being named "n".
+      # Therefore, if no "n" column exists, we interpret the data as non-countable
+      if (!("n" %in% colnames(observable_data))) {
+        pkgcond::pkg_error("Automatic aggregation with `key_join_filter()` only works for countable observables!")
+      }
+
       observable_data <- observable_data |>
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>
         dplyr::mutate(
