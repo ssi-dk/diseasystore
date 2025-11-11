@@ -6,7 +6,8 @@
 \alias{key_join_max}
 \alias{key_join_min}
 \alias{key_join_count}
-\title{Feature aggregators}
+\title{title
+Feature aggregators}
 \usage{
 key_join_sum(.data, feature)
 
@@ -26,7 +27,24 @@ Name of the feature to perform the aggregation over}
 A dplyr::summarise to aggregate the features together using the given function (sum/max/min/count)
 }
 \description{
-Feature aggregators
+When designing a \code{diseasystore} (see \code{vignette("extending-diseasystore")}), each feature must specify
+how that data should be summarised when joined with other data.
+
+The automatic coupling and aggregation is essentially a three part process:
+First, data for the observable is joined with data required to form the stratifications.
+Next, the combined data is grouped at the level of stratification requested.
+Finally, the data is summarised in each group to form a single value for the group.
+
+Below, we provide a set of simple function that perform this final summarisation step.
+
+For semi-aggregated data, a typical key_join aggregator is the \code{key_join_sum()} which just adds the observations
+across the group
+
+In some cases, such as if the observable is the "maximum temperature" the relevant aggregator would be the
+\code{key_join_max()} aggregator which takes the max across the group.
+
+When working with individual level data, the observables often consists of a record per individual and to
+summarise the data we instead need the \code{key_join_count()} aggregator to get the size of the group.
 }
 \examples{
   # Primarily used within the framework but can be used individually:
