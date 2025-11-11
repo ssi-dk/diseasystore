@@ -61,6 +61,11 @@ This coupling requires common "key_\*" columns between the features.
 Any feature in a `diseasystore` therefore must have at least one "key_\*" column.
 By convention, we place these column as the first columns of the table.
 
+Another limitation of the automatic aggregation, is that the observable to aggregate must be countable
+(e.g. it cannot be a rate).
+In practice, any observable that can meaningfully use the `?aggregators` to summarise the data fulfils this requirement.
+
+
 ## Features
 Finally, we come to the main data of the `diseasystore`, namely the features.
 First, a reminder that "feature" here comes from machine learning and is any individual piece of information.
@@ -159,7 +164,7 @@ In the event, that you need to create your own aggregator the arguments are as f
 * `feature` is the name of the feature(s) to aggregate.
 
 Your aggregator should return a `dplyr::summarise()` call that operates on all columns specified in the `feature`
-argument.
+argument and should return the result in a column named "n".
 
 
 ## Putting it all together
