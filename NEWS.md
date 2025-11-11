@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
+
+
 # diseasystore 0.3.2
 
 ## Minor Improvements and Fixes
