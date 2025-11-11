@@ -82,8 +82,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
           dplyr::filter({{ start_date }} < .data$valid_until, .data$valid_from <= {{ end_date }})
 
         return(out)
-      },
-      key_join = \(.data, feature) .data
+      }
     ),
 
 
