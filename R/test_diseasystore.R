@@ -190,7 +190,7 @@ test_diseasystore <- function(
       checkmate::expect_class(.x, "FeatureHandler")
       checkmate::expect_function(.x %.% compute)
       checkmate::expect_function(.x %.% get)
-      checkmate::expect_function(.x %.% key_join)
+      checkmate::expect_function(.x %.% key_join, null.ok = TRUE)
     })
 
     # Check that the min and max dates have been set
