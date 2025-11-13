@@ -548,6 +548,11 @@ test_diseasystore <- function(
   # To do so, we run $key_join_features() with stratfication = NULL to see if the internal error is raised
 
   conns <- conn_generator(skip_backends)
+  if (length(conns) == 0) {
+    # Diseasystore has no testable connections in this workflow
+    return()
+  }
+
   ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conns[[1]], ...)
   observables <- ds$available_observables
   non_aggregatable_observables <- character(0)
