@@ -61,9 +61,11 @@ This coupling requires common "key_\*" columns between the features.
 Any feature in a `diseasystore` therefore must have at least one "key_\*" column.
 By convention, we place these column as the first columns of the table.
 
-Another limitation of the automatic aggregation, is that the observable to aggregate must be countable
-(e.g. it cannot be a rate).
-In practice, any observable that can meaningfully use the `?aggregators` to summarise the data fulfils this requirement.
+Some features will not be meaningfully aggregated automatically e.g. the incidence of a disease must use information
+about the population size to aggregate meaningfully.
+
+In practice, any observable that can meaningfully use the `?aggregators` to summarise the data can automatically
+be coupled.
 
 
 ## Features
