@@ -16,6 +16,10 @@
 
 * Compatibility with `duckdb v1.5.0` (#235).
 
+## Documentation
+
+* Restrictions on automatic data-coupling is now better described (#227)
+
 
 # diseasystore 0.3.2
 
