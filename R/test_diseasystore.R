@@ -545,31 +545,33 @@ test_diseasystore <- function(
 
   # To do so, we run $key_join_features() with stratfication = NULL to see if the internal error is raised
 
-  for (conn in conn_generator(skip_backends)) {
+  conns <- conn_generator(skip_backends)
+  ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conns[[1]], ...)
+  observables <- ds$available_observables
+  non_countable_observables <- character(0)
 
-    ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...)
-    observables <- ds$available_observables
-    non_countable_observables <- character(0)
+  for (observable in observables) {
+    non_countable_observables <- tryCatch(
+      ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date),
 
-    for (observable in observables) {
-      non_countable_observables <- tryCatch(
-        ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date),
-
-        error = function(e) {
-          if (
-            identical(
-              e$message,
-              "Automatic aggregation with `key_join_filter()` only works for countable observables!"
-            )
-          ) {
-            # Mark down the non-countable observable
-            return(c(non_countable_observables, observable))
-          }
+      error = function(e) {
+        if (
+          identical(
+            e$message,
+            "Automatic aggregation with `key_join_filter()` only works for countable observables!"
+          )
+        ) {
+          # Mark down the non-countable observable
+          return(c(non_countable_observables, observable))
         }
-      )
-    }
-    connection_clean_up(conn)
+      }
+    )
   }
+
+  # Clean up
+  purrr::walk(conns, \(conn) connection_clean_up(conn))
+  rm(ds)
+  invisible(gc())
 
   # Filter out the non-countable observables for the remaining tests
   countable_observables <- setdiff(observables, non_countable_observables)
