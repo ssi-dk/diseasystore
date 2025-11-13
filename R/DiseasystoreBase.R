@@ -297,6 +297,18 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Store the ds_map
       ds_map <- self %.% ds_map
 
+
+      # The automatic aggregation of key_join_features only work if the observable can
+      # meaningfully be aggregated (that is, if a suitable "key_join_*"  function
+      # can be chosen for the observable. If no "key_join" function is set, we raise
+      # an error when trying to aggregate
+      if (purrr::pluck(private, ds_map[[observable]], "key_join", is.null)) {
+        pkgcond::pkg_error(
+          "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
+        )
+      }
+
+
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- dplyr::copy_to(
         self %.% target_conn,
@@ -309,13 +321,6 @@ DiseasystoreBase <- R6::R6Class(                                                
       # to simplify the interlaced output
       observable_data <- self$get_feature(observable, start_date, end_date)
       SCDB::defer_db_cleanup(observable_data)
-
-      # The automatic aggregation of key_join_features only work if observable is countable
-      # In the naming convention, this is indicated by the column being named "value".
-      # Therefore, if no "n" column exists, we interpret the data as non-countable
-      if (!("value" %in% colnames(observable_data))) {
-        pkgcond::pkg_error("Automatic aggregation with `key_join_filter()` only works for countable observables!")
-      }
 
       observable_data <- observable_data |>
         dplyr::cross_join(study_dates, suffix = c("", ".d")) |>

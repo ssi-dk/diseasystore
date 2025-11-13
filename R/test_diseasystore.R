@@ -558,7 +558,7 @@ test_diseasystore <- function(
         if (
           identical(
             e$message,
-            "Automatic aggregation with `key_join_filter()` only works for countable observables!"
+            "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
           )
         ) {
           # Mark down the non-countable observable
