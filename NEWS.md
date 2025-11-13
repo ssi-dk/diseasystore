@@ -9,6 +9,10 @@
 
 * Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
 
+## Documentation
+
+* Restrictions on automatic data-coupling is now better described (#227)
+
 
 # diseasystore 0.3.2
 
