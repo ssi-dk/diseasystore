@@ -536,9 +536,11 @@ test_diseasystore <- function(
   # For the most part, the diseasystores should be able to automatically aggregate a feature using.
   # $key_join_features().
   #
-  # The requirement is that the observable is countable (see vignette("extending-diseasystore")),
-  # which most often is the case.
-  # However, if the observable is not countable (such as the rate of a disease), a error will be raised internally
+  # The requirement is that the observable has a corresponding "key_join" function
+  # (see vignette("extending-diseasystore")) which most often is the case.
+
+  # However, if the observable cannot be aggregated simply (such as the rate of a disease), no "key_join" function
+  # can be used and an error will be raised internally
 
   # Since the following tests verify the output of $key_join_features(), we need to determine which observables
   # the tests should run on
@@ -548,10 +550,10 @@ test_diseasystore <- function(
   conns <- conn_generator(skip_backends)
   ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conns[[1]], ...)
   observables <- ds$available_observables
-  non_countable_observables <- character(0)
+  non_aggregatable_observables <- character(0)
 
   for (observable in observables) {
-    non_countable_observables <- tryCatch(
+    non_aggregatable_observables <- tryCatch(
       ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date),
 
       error = function(e) {
@@ -561,8 +563,8 @@ test_diseasystore <- function(
             "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
           )
         ) {
-          # Mark down the non-countable observable
-          return(c(non_countable_observables, observable))
+          # Mark down the non-aggregatable observable
+          return(c(non_aggregatable_observables, observable))
         }
       }
     )
@@ -573,8 +575,8 @@ test_diseasystore <- function(
   rm(ds)
   invisible(gc())
 
-  # Filter out the non-countable observables for the remaining tests
-  countable_observables <- setdiff(observables, non_countable_observables)
+  # Filter out the non-aggregatable observables for the remaining tests
+  aggregatable_observables <- setdiff(observables, non_aggregatable_observables)
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
@@ -586,14 +588,14 @@ test_diseasystore <- function(
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # First check we can aggregate without a stratification
-      for (observable in countable_observables) {
+      for (observable in aggregatable_observables) {
         testthat::expect_no_error(
           ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date)
         )
       }
 
       # Then test combinations with non-NULL stratifications
-      expand.grid(observable     = countable_observables,
+      expand.grid(observable     = aggregatable_observables,
                   stratification = ds$available_stratifications) |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
@@ -639,11 +641,11 @@ test_diseasystore <- function(
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-      if (length(countable_observables) > 0) {
+      if (length(aggregatable_observables) > 0) {
 
         # Check we can aggregate with feature-independent stratifications
         output <- ds$key_join_features(
-          observable = countable_observables[[1]],
+          observable = aggregatable_observables[[1]],
           stratification = rlang::quos(string = "test", number = 2),
           test_start_date,
           test_end_date
@@ -673,7 +675,7 @@ test_diseasystore <- function(
       # Attempt to perform the possible key_joins
 
       # Test key_join with malformed inputs
-      expand.grid(observable     = countable_observables,
+      expand.grid(observable     = aggregatable_observables,
                   stratification = "non_existent_stratification") |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
@@ -697,7 +699,7 @@ test_diseasystore <- function(
         })
 
 
-      expand.grid(observable     = countable_observables,
+      expand.grid(observable     = aggregatable_observables,
                   stratification = "test = non_existent_stratification") |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
