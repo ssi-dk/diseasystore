@@ -166,7 +166,7 @@ In the event, that you need to create your own aggregator the arguments are as f
 * `feature` is the name of the feature(s) to aggregate.
 
 Your aggregator should return a `dplyr::summarise()` call that operates on all columns specified in the `feature`
-argument and should return the result in a column named "n".
+argument and should return the result in a column named "value".
 
 
 ## Putting it all together
