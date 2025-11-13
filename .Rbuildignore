@@ -18,3 +18,4 @@ man-roxygen
 ^data-raw$
 ^pkg-build$
 ^\.markdownlint\.json$
+^dockerfile$
