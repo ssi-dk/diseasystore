@@ -40,39 +40,63 @@
 #'   key_join_count(data, "mpg")  # nrow(mtcars)
 #' @export
 key_join_sum <- function(.data, feature) {
-  return(dplyr::summarise(.data,
-                          dplyr::across(.cols = tidyselect::all_of(feature),
-                                        .fns = list(n = ~ sum(as.numeric(.), na.rm = TRUE)),
-                                        .names = "{.fn}"),
-                          .groups = "drop"))
+  return(
+    dplyr::summarise(
+      .data,
+      dplyr::across(
+        .cols = tidyselect::all_of(feature),
+        .fns = list(value = ~ sum(as.numeric(.), na.rm = TRUE)),
+        .names = "{.fn}"
+      ),
+      .groups = "drop"
+    )
+  )
 }
 
 #' @rdname aggregators
 #' @export
 key_join_max <- function(.data, feature) {
-  return(dplyr::summarise(.data,
-                          dplyr::across(.cols = tidyselect::all_of(feature),
-                                        .fns = list(n = ~ max(as.numeric(.), na.rm = TRUE)),
-                                        .names = "{.fn}"),
-                          .groups = "drop"))
+  return(
+    dplyr::summarise(
+      .data,
+      dplyr::across(
+        .cols = tidyselect::all_of(feature),
+        .fns = list(value = ~ max(as.numeric(.), na.rm = TRUE)),
+        .names = "{.fn}"
+      ),
+      .groups = "drop"
+    )
+  )
 }
 
 #' @rdname aggregators
 #' @export
 key_join_min <- function(.data, feature) {
-  return(dplyr::summarise(.data,
-                          dplyr::across(.cols = tidyselect::all_of(feature),
-                                        .fns = list(n = ~ min(as.numeric(.), na.rm = TRUE)),
-                                        .names = "{.fn}"),
-                          .groups = "drop"))
+  return(
+    dplyr::summarise(
+      .data,
+      dplyr::across(
+        .cols = tidyselect::all_of(feature),
+        .fns = list(value = ~ min(as.numeric(.), na.rm = TRUE)),
+        .names = "{.fn}"
+      ),
+      .groups = "drop"
+    )
+  )
 }
 
 #' @rdname aggregators
 #' @export
 key_join_count <- function(.data, feature) {
-  return(dplyr::summarise(.data,
-                          dplyr::across(.cols = purrr::pluck(tidyselect::starts_with("key"), 1),
-                                        .fns = list(n = ~ dplyr::n()),
-                                        .names = "{.fn}"),
-                          .groups = "drop"))
+  return(
+    dplyr::summarise(
+      .data,
+      dplyr::across(
+        .cols = purrr::pluck(tidyselect::starts_with("key"), 1),
+        .fns = list(value = ~ dplyr::n()),
+        .names = "{.fn}"
+      ),
+      .groups = "drop"
+    )
+  )
 }

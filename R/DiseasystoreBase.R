@@ -311,9 +311,9 @@ DiseasystoreBase <- R6::R6Class(                                                
       SCDB::defer_db_cleanup(observable_data)
 
       # The automatic aggregation of key_join_features only work if observable is countable
-      # In the naming convention, this is indicated by the column being named "n".
+      # In the naming convention, this is indicated by the column being named "value".
       # Therefore, if no "n" column exists, we interpret the data as non-countable
-      if (!("n" %in% colnames(observable_data))) {
+      if (!("value" %in% colnames(observable_data))) {
         pkgcond::pkg_error("Automatic aggregation with `key_join_filter()` only works for countable observables!")
       }
 
@@ -462,7 +462,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       t_add <- out |>
         dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename("n_add" = "n") |>
+        dplyr::rename("value_add" = "value") |>
         dplyr::compute(name = SCDB::unique_table_name("ds_add"))
       SCDB::defer_db_cleanup(t_add)
 
@@ -470,7 +470,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       t_remove <- out |>
         dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename("n_remove" = "n") |>
+        dplyr::rename("value_remove" = "value") |>
         dplyr::compute(name = SCDB::unique_table_name("ds_remove"))
       SCDB::defer_db_cleanup(t_remove)
 
@@ -497,10 +497,10 @@ DiseasystoreBase <- R6::R6Class(                                                
       data <- t_add |>
         dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
-        tidyr::replace_na(list("n_add" = 0, "n_remove" = 0)) |>
+        tidyr::replace_na(list("value_add" = 0, "n_remove" = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
-        dplyr::mutate(!!observable := cumsum(.data$n_add) - cumsum(.data$n_remove)) |>
+        dplyr::mutate(!!observable := cumsum(.data$value_add) - cumsum(.data$value_remove)) |>
         dplyr::ungroup() |>
         dplyr::select("date", all_of(stratification_names), !!observable) |>
         dplyr::collect()
