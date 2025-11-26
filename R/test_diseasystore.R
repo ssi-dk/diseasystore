@@ -549,43 +549,47 @@ test_diseasystore <- function(
 
   conns <- conn_generator(skip_backends)
   if (length(conns) == 0) {
+
     # Diseasystore has no testable connections in this workflow
-    return()
-  }
+    aggregatable_observables <- character(0)
 
-  ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conns[[1]], ...)
-  observables <- ds$available_observables
-  non_aggregatable_observables <- character(0)
+  } else {
 
-  for (observable in observables) {
-    non_aggregatable_observables <- tryCatch(
-      ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date),
+    ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conns[[1]], ...)
+    observables <- ds$available_observables
+    non_aggregatable_observables <- character(0)
 
-      error = function(e) {
-        if (
-          identical(
-            e$message,
-            "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
-          )
-        ) {
-          # Mark down the non-aggregatable observable
-          return(c(non_aggregatable_observables, observable))
+    for (observable in observables) {
+      non_aggregatable_observables <- tryCatch(
+        ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date),
+
+        error = function(e) {
+          if (
+            identical(
+              e$message,
+              "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
+            )
+          ) {
+            # Mark down the non-aggregatable observable
+            return(c(non_aggregatable_observables, observable))
+          }
         }
-      }
-    )
+      )
+    }
+
+    # Clean up
+    purrr::walk(conns, \(conn) connection_clean_up(conn))
+    rm(ds)
+    invisible(gc())
+
+    # Filter out the non-aggregatable observables for the remaining tests
+    aggregatable_observables <- setdiff(observables, non_aggregatable_observables)
   }
-
-  # Clean up
-  purrr::walk(conns, \(conn) connection_clean_up(conn))
-  rm(ds)
-  invisible(gc())
-
-  # Filter out the non-aggregatable observables for the remaining tests
-  aggregatable_observables <- setdiff(observables, non_aggregatable_observables)
 
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
+    testthat::skip_if_not(length(aggregatable_observables) > 0)
 
     for (conn in conn_generator(skip_backends)) {
 
@@ -640,6 +644,7 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join with feature-independent stratification"), {
     testthat::skip_if_not(local)
+    testthat::skip_if_not(length(aggregatable_observables) > 0)
 
     for (conn in conn_generator(skip_backends)) {
 
@@ -671,6 +676,7 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
+    testthat::skip_if_not(length(aggregatable_observables) > 0)
 
     for (conn in conn_generator(skip_backends)) {
 
