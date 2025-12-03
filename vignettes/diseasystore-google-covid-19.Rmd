@@ -67,7 +67,7 @@ purrr::walk(google_files, ~ {
   )
 
   if (!file.exists(destfile)) {
-    download.file(url, destfile)
+    download.file(url, destfile, mode = "wb")
   }
 })
 ```
