@@ -69,4 +69,4 @@ BugReports: https://github.com/ssi-dk/diseasystore/issues
 Config/testthat/edition: 3
 LazyData: true
 Remotes:
-    ssi-dk/SCDB@fix/duckdb-db_timestamp
+    ssi-dk/SCDB@main
