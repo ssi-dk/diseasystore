@@ -73,6 +73,9 @@ a different naming convention if we want to. For example, say we also had a feat
 we may want name the features with the suffix `_temperature` instead (since we are not dealing with the "number" of
 something).
 In that case, we would need to update the `$.observables_regex` field to read[^1]:
+
+[^1]: This is also the implementation in `?DiseasystoreGoogleCovid19`.
+
 ```{r observables_regex, eval = FALSE}
   ...
   private = list(
@@ -329,10 +332,22 @@ the period requested by the user), and compute their age throughout the study pe
 The age at the start of the study period is computed directly by from the birth date of the individuals using the
 age helper function `age_on_date()`[^2].
 
+[^2]: Notice that we don't use `{lubridate}` or syntax such as `birth_date + 365`.
+As you may recall from the primer `vignette("extending-diseasystore")`, features are stored in data bases, not as R
+objects. Therefore, the operations we perform must be translatable to SQL via `{dbplyr}` and date arithmetic are not
+currently translatable consistently. `diseasystore` therefore provides some helper functions for the type of
+date-related arithmetic that is common in feature computation. These are available for the data base back ends supported
+by `diseasystore`.
+
 Once the age at start is known, we determine the length of the study period (in years) and compute the birthdays of
 the individuals throughout the period[^3]. Each birthday has an associated age and a validity period which runs from
 the birthday to the next birthday. Notice that we sometimes compute birthdays that fall outside of the study period,
 which we filter out before combining to a single data set with `dplyr::union_all()`.
+
+[^3]: Notice that we split the `dplyr::mutate()` calls into several calls since SQL translation works differently from
+"normal" `{dplyr}` behaviour. Normally in `{dplyr}`, the variable created earlier in one `dplyr::mutate()` call is
+available immediately after, but this is not the case in SQL syntax. Therefore, we split the `dplyr::mutate()` calls
+which generates nested sub-queries which makes the variables available in subsequent calls.
 
 In all, we end with a data set containing the time-dependent age of the individuals throughout the study period.
 
@@ -440,6 +455,9 @@ We are finally ready to see the `diseasystore` in action.
 ## Configuring the `diseasystore`
 All `diseasystores` require a database to store its features in.
 For convenience, we here set the `target_conn` option[^4] for all `diseasystores`.
+
+[^4]: The `vignette("diseasystore")` explains the options system in more detail.
+
 ```{r configure_diseasystore, eval = FALSE}
 # We define target_conn as a function that opens a DBIconnection to the DB
 target_conn <- \() DBI::dbConnect(duckdb::duckdb())
@@ -572,19 +590,3 @@ if (!rlang::is_installed("withr")) {
   options(opts)
 }
 ```
-
-[^1]: This is also the implementation in `?DiseasystoreGoogleCovid19`.
-
-[^2]: Notice that we don't use `{lubridate}` or syntax such as `birth_date + 365`.
-As you may recall from the primer `vignette("extending-diseasystore")`, features are stored in data bases, not as R
-objects. Therefore, the operations we perform must be translatable to SQL via `{dbplyr}` and date arithmetic are not
-currently translatable consistently. `diseasystore` therefore provides some helper functions for the type of
-date-related arithmetic that is common in feature computation. These are available for the data base back ends supported
-by `diseasystore`.
-
-[^3]: Notice that we split the `dplyr::mutate()` calls into several calls since SQL translation works differently from
-"normal" `{dplyr}` behaviour. Normally in `{dplyr}`, the variable created earlier in one `dplyr::mutate()` call is
-available immediately after, but this is not the case in SQL syntax. Therefore, we split the `dplyr::mutate()` calls
-which generates nested sub-queries which makes the variables available in subsequent calls.
-
-[^4]: The `vignette("diseasystore")` explains the options system in more detail.
