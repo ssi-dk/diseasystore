@@ -26,8 +26,6 @@ test_data <- c(
   seq.Date(from = as.Date("1970-01-01"), to = as.Date("1970-12-31"), by = "1 day"),
   seq.Date(from = as.Date("1940-01-01"), to = as.Date("1940-12-31"), by = "1 day")
 ) |>
-  as.numeric() |> # We convert from date to numeric and back to date, since R decided that dates should now internally
-  as.Date() |> # be integers but they could not be bothered to test how much that would break. # See PR #220
   tibble::tibble(birth_date = _) |>
   dplyr::mutate(reference_date = birth_date + lubridate::days(40 * dplyr::row_number()))
 
@@ -41,7 +39,6 @@ test_that("age_on_date() works for date input", {
     # Copy to the remote
     test_ages <- dplyr::copy_to(conn, test_data, "test_age")
     SCDB::defer_db_cleanup(test_ages)
-
 
     # Compute the reference age using lubridate
     reference_ages <- test_data |>
@@ -140,8 +137,6 @@ test_data <- c(
   seq.Date(from = as.Date("1970-01-01"), to = as.Date("1970-12-31"), by = "1 day"),
   seq.Date(from = as.Date("1940-01-01"), to = as.Date("1940-12-31"), by = "1 day")
 ) |>
-  as.numeric() |> # We convert from date to numeric and back to date, since R decided that dates should now internally
-  as.Date() |> # be integers but they could not be bothered to test how much that would break.
   tibble::tibble(birth_date = _) |>
   dplyr::mutate(years_to_add = 1)
 

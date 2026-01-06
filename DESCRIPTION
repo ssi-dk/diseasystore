@@ -53,7 +53,7 @@ Suggests:
     knitr,
     lintr,
     microbenchmark,
-    odbc,
+    odbc (>= 1.6.4),
     pkgdown,
     rmarkdown,
     RSQLite,
