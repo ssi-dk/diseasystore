@@ -40,6 +40,9 @@ after `valid_from`.
 
 By convention, we place these column as the last columns of the table[^1].
 
+[^1]: The `{SCDB}` package places `checksum`, `from_ts`, and `until_ts` as the last columns. But `valid_from` and
+`valid_until` should be the last columns in the output passed to `SCDB`.
+
 ### `from_ts` and `until_ts`
 `diseasystore` uses `{SCDB}` in the background to store the computed features.
 `{SCDB}` implements the second temporal dimension which indicates when a record was present in the data.
@@ -90,10 +93,14 @@ While there is no formal requirement for the naming of the observables or strati
 practice to use the same names as other `diseasystores` for features where possible[^2].
 This simplifies the process of adapting analyses and disease models to new `diseasystores`.
 
+[^2]: In practice, this means that the names of features should be in `snake_case`.
+
 # Creating FeatureHandlers
 To facilitate the automatic coupling and aggregation of features, we use the `?FeatureHandler` class.
 Each feature[^3] in the `diseasystore` has an associated `?FeatureHandler` which implements the computation, retrieval
 and aggregation of the feature.
+
+[^3]: Or "coupled" set of features as we will soon see.
 
 ## Computing features
 The `?FeatureHandler` defines a `?FeatureHandler$compute()` function which must be on the form:
@@ -183,6 +190,8 @@ variables are visible only to us (the developers).
 When extending `diseasystore`, we are only writing private functions and variables.
 The public functions and variables are handled elsewhere[^4].
 
+[^4]: By the `?DiseasystoreBase` class.
+
 ## ds_map
 The `ds_map` field of the `diseasystore` tells the `diseasystore` which `?FeatureHandler` is responsible for each
 feature, thus allowing the `diseasystore` to retrieve the features specified in the `observable` and `stratification`
@@ -247,9 +256,3 @@ compatible with the `diseasystore`.
     ...
   }
 ```
-
-[^1]: The `{SCDB}` package places `checksum`, `from_ts`, and `until_ts` as the last columns. But `valid_from` and
-      `valid_until` should be the last columns in the output passed to `SCDB`.
-[^2]: In practice, this means that the names of features should be in `snake_case`.
-[^3]: Or "coupled" set of features as we will soon see.
-[^4]: By the `?DiseasystoreBase` class.
