@@ -5,6 +5,14 @@
 * Private method `DiseasystoreBase$determine_missing_ranges()` made public (#224).
   Previously called `$determine_new_ranges()`.
 
+## Minor Improvements and Fixes
+
+* Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
+
+## Documentation
+
+* Restrictions on automatic data-coupling is now better described (#227)
+
 
 # diseasystore 0.3.2
 

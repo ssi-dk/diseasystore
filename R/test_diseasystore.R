@@ -190,7 +190,7 @@ test_diseasystore <- function(
       checkmate::expect_class(.x, "FeatureHandler")
       checkmate::expect_function(.x %.% compute)
       checkmate::expect_function(.x %.% get)
-      checkmate::expect_function(.x %.% key_join)
+      checkmate::expect_function(.x %.% key_join, null.ok = TRUE)
     })
 
     # Check that the min and max dates have been set
@@ -281,6 +281,15 @@ test_diseasystore <- function(
         paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
       )
 
+    }
+  })
+
+
+  testthat::test_that(glue::glue("{diseasystore_class} has observables"), {
+    for (conn in conn_generator(skip_backends)) {
+      ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
+
+      checkmate::expect_character(ds$available_observables, min.len = 1)
     }
   })
 
@@ -524,8 +533,63 @@ test_diseasystore <- function(
   }
 
 
+  # For the most part, the diseasystores should be able to automatically aggregate a feature using.
+  # $key_join_features().
+  #
+  # The requirement is that the observable has a corresponding "key_join" function
+  # (see vignette("extending-diseasystore")) which most often is the case.
+
+  # However, if the observable cannot be aggregated simply (such as the rate of a disease), no "key_join" function
+  # can be used and an error will be raised internally
+
+  # Since the following tests verify the output of $key_join_features(), we need to determine which observables
+  # the tests should run on
+
+  # To do so, we run $key_join_features() with stratfication = NULL to see if the internal error is raised
+
+  conns <- conn_generator(skip_backends)
+  if (length(conns) == 0) {
+
+    # Diseasystore has no testable connections in this workflow
+    aggregatable_observables <- character(0)
+
+  } else {
+
+    ds <- diseasystore_generator$new(verbose = FALSE, target_conn = conns[[1]], ...)
+    observables <- ds$available_observables
+    non_aggregatable_observables <- character(0)
+
+    for (observable in observables) {
+      non_aggregatable_observables <- tryCatch(
+        ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date),
+
+        error = function(e) {
+          if (
+            identical(
+              e$message,
+              "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
+            )
+          ) {
+            # Mark down the non-aggregatable observable
+            return(c(non_aggregatable_observables, observable))
+          }
+        }
+      )
+    }
+
+    # Clean up
+    purrr::walk(conns, \(conn) connection_clean_up(conn))
+    rm(ds)
+    invisible(gc())
+
+    # Filter out the non-aggregatable observables for the remaining tests
+    aggregatable_observables <- setdiff(observables, non_aggregatable_observables)
+  }
+
+
   testthat::test_that(glue::glue("{diseasystore_class} can key_join features"), {
     testthat::skip_if_not(local)
+    testthat::skip_if_not(length(aggregatable_observables) > 0)
 
     for (conn in conn_generator(skip_backends)) {
 
@@ -533,16 +597,14 @@ test_diseasystore <- function(
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
       # First check we can aggregate without a stratification
-      for (observable in ds$available_observables) {
+      for (observable in aggregatable_observables) {
         testthat::expect_no_error(
           ds$key_join_features(observable = observable, stratification = NULL, test_start_date, test_end_date)
         )
       }
 
-
-
       # Then test combinations with non-NULL stratifications
-      expand.grid(observable     = ds$available_observables,
+      expand.grid(observable     = aggregatable_observables,
                   stratification = ds$available_stratifications) |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
@@ -582,17 +644,18 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} can key_join with feature-independent stratification"), {
     testthat::skip_if_not(local)
+    testthat::skip_if_not(length(aggregatable_observables) > 0)
 
     for (conn in conn_generator(skip_backends)) {
 
       # Initialise without start_date and end_date
       ds <- testthat::expect_no_error(diseasystore_generator$new(verbose = FALSE, target_conn = conn, ...))
 
-      if (length(ds$available_observables) > 0) {
+      if (length(aggregatable_observables) > 0) {
 
         # Check we can aggregate with feature-independent stratifications
         output <- ds$key_join_features(
-          observable = ds$available_observables[[1]],
+          observable = aggregatable_observables[[1]],
           stratification = rlang::quos(string = "test", number = 2),
           test_start_date,
           test_end_date
@@ -613,6 +676,7 @@ test_diseasystore <- function(
 
   testthat::test_that(glue::glue("{diseasystore_class} key_join fails gracefully"), {
     testthat::skip_if_not(local)
+    testthat::skip_if_not(length(aggregatable_observables) > 0)
 
     for (conn in conn_generator(skip_backends)) {
 
@@ -622,7 +686,7 @@ test_diseasystore <- function(
       # Attempt to perform the possible key_joins
 
       # Test key_join with malformed inputs
-      expand.grid(observable     = ds$available_observables,
+      expand.grid(observable     = aggregatable_observables,
                   stratification = "non_existent_stratification") |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
@@ -646,7 +710,7 @@ test_diseasystore <- function(
         })
 
 
-      expand.grid(observable     = ds$available_observables,
+      expand.grid(observable     = aggregatable_observables,
                   stratification = "test = non_existent_stratification") |>
         purrr::pwalk(\(observable, stratification) {
           # This code may fail (gracefully) in some cases. These we catch here
