@@ -391,6 +391,23 @@ test_diseasystore <- function(
 
         testthat::expect_identical(feature_checksums, reference_checksums)
 
+        # Determine where these features are stored
+        target_table <- SCDB::id(paste(ds %.% target_schema, .y, sep = "."), ds %.% target_conn)
+
+        # Check that no ranges are now missing computation
+        ds_missing_ranges <- ds$determine_missing_ranges(
+          target_table = target_table,
+          start_date   = test_start_date,
+          end_date     = test_end_date,
+          slice_ts     = ds %.% slice_ts
+        )
+
+        # If all dates are mapped correctly, we should have filled our missing dates
+        testthat::expect_identical(
+          nrow(ds_missing_ranges),
+          0L,
+          info = glue::glue("`determine_missing_ranges()` returned missing range for feature `{.x}` after computation.")
+        )
       })
 
       # Clean up
@@ -469,6 +486,24 @@ test_diseasystore <- function(
           feature_checksums,
           reference_checksums,
           info = glue::glue("Feature `{.x}` has a mismatch between `$get_feature()` and `$compute()`.")
+        )
+
+        # Determine where these features are stored
+        target_table <- SCDB::id(paste(ds %.% target_schema, .y, sep = "."), ds %.% target_conn)
+
+        # Check that no ranges are now missing computation
+        ds_missing_ranges <- ds$determine_missing_ranges(
+          target_table = target_table,
+          start_date   = test_start_date,
+          end_date     = test_end_date,
+          slice_ts     = ds %.% slice_ts
+        )
+
+        # If all dates are mapped correctly, we should have filled our missing dates
+        testthat::expect_identical(
+          nrow(ds_missing_ranges),
+          0L,
+          info = glue::glue("`determine_missing_ranges()` returned missing range for feature `{.x}` after computation.")
         )
 
       })

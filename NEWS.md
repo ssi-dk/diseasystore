@@ -1,5 +1,11 @@
 # diseasystore (development version)
 
+## New Features
+
+* Private method `DiseasystoreBase$determine_missing_ranges()` made public (#224).
+  Previously called `$determine_new_ranges()`.
+
+
 # diseasystore 0.3.2
 
 ## Minor Improvements and Fixes
