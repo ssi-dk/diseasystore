@@ -49,7 +49,6 @@ diseasystore before calling test_diseasystore.
 }
 \examples{
 \dontshow{if (requireNamespace("duckdb", quietly = TRUE)) withAutoprint(\{ # examplesIf}
-\donttest{
   # Generator for connections
   conns <- \(skip_backends) list(DBI::dbConnect(duckdb::duckdb()))
 
@@ -61,6 +60,5 @@ diseasystore before calling test_diseasystore.
     test_start_date = as.Date("2020-02-20"),
     skip_backends = "SQLiteConnection"
   )
-}
 \dontshow{\}) # examplesIf}
 }
