@@ -24,6 +24,7 @@
 #'   Other parameters passed to the diseasystore generator.
 #' @return `r rd_side_effects`
 #' @examplesIf requireNamespace("duckdb", quietly = TRUE)
+#' \donttest{
 #'   # Generator for connections
 #'   conns <- \(skip_backends) list(DBI::dbConnect(duckdb::duckdb()))
 #'
@@ -35,6 +36,7 @@
 #'     test_start_date = as.Date("2020-02-20"),
 #'     skip_backends = "SQLiteConnection"
 #'   )
+#' }
 #' @importFrom curl has_internet
 #' @export
 test_diseasystore <- function(
