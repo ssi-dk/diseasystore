@@ -21,13 +21,13 @@ get_test_conns <- function(skip_backends = NULL) {
     # Define our local connection backends
     conn_list <- list(
       # Backend string = package::function
-      "duckdb" = "duckdb::duckdb"
+      "SQLite" = "RSQLite::SQLite"
     )
 
     # Define our local connection arguments
     conn_args <- list(
       # Backend string = list(named args)
-      "duckdb" = list(dbdir = file.path(tempdir(), "DuckDB.duckdb"))
+      "SQLite" = list(dbname = file.path(tempdir(), "SQLite.SQLite"))
     )
 
     # Define post connection commands to run
