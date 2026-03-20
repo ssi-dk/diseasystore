@@ -1,6 +1,6 @@
 {
   "lockfile_version": 1,
-  "os": "Ubuntu 24.04.4 LTS",
+  "os": "Ubuntu 24.04.3 LTS",
   "r_version": "R version 4.5.3 (2026-03-11)",
   "platform": "x86_64-pc-linux-gnu",
   "packages": [
@@ -251,7 +251,7 @@
     },
     {
       "package": "httpuv",
-      "version": "1.6.16",
+      "version": "1.6.17",
       "binary": true
     },
     {
