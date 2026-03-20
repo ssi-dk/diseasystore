@@ -5,6 +5,8 @@
 * Private method `DiseasystoreBase$determine_missing_ranges()` made public (#224).
   Previously called `$determine_new_ranges()`.
 
+## Minor Improvements and Fixes
+
 * Compatibility with `duckdb v1.5.0` (#235).
 
 
