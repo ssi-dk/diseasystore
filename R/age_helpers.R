@@ -151,6 +151,6 @@ add_years.PqConnection <- function(reference_date, years, conn) {
 add_years.duckdb_connection <- function(reference_date, years, conn) {
   if (inherits(reference_date, "Date")) reference_date <- glue::glue("DATE '{reference_date}'")
   return(
-    dplyr::sql(glue::glue("DATE_TRUNC('day', DATE_ADD({reference_date}, CAST({years} AS bigint) * INTERVAL 1 YEAR))"))
+    dplyr::sql(glue::glue("CAST(DATE_ADD({reference_date}, CAST({years} AS bigint) * INTERVAL 1 YEAR) AS DATE)"))
   )
 }
