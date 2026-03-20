@@ -251,7 +251,7 @@
     },
     {
       "package": "httpuv",
-      "version": "1.6.16",
+      "version": "1.6.17",
       "binary": true
     },
     {
