@@ -2,12 +2,7 @@
 
 Dear team
 
-I see that current CRAN Checks for this package fails on r-oldrel-macos-x86_64.
-(It seems a memory issue is evoked here).
-
-I do not have access to this hardware to investigate the error. 
-Do you require a fix for this when no errors are thrown for r-release-macos-x86_64?
-
+This release fixes the issues on the "donttest" CRAN workflow as required.
 
 ## R CMD check results
 
