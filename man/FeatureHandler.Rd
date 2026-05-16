@@ -52,41 +52,42 @@ They define the three methods associated with features (\code{compute}, \code{ge
 \dontshow{\}) # examplesIf}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{compute}}{(\code{function})\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{compute}}{(\code{function})\cr
 A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
 This function should compute the feature from the source connection.}
 
-\item{\code{get}}{(\code{function})\cr
+    \item{\code{get}}{(\code{function})\cr
 A function of the form "function(target_table, slice_ts, target_conn)".
 This function should retrieve the computed feature from the target connection.}
 
-\item{\code{key_join}}{(\code{function})\cr
+    \item{\code{key_join}}{(\code{function})\cr
 One of the aggregators from \link{aggregators}.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-FeatureHandler-new}{\code{FeatureHandler$new()}}
-\item \href{#method-FeatureHandler-clone}{\code{FeatureHandler$clone()}}
-}
+  \itemize{
+    \item \href{#method-FeatureHandler-initialize}{\code{FeatureHandler$new()}}
+    \item \href{#method-FeatureHandler-clone}{\code{FeatureHandler$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-FeatureHandler-new"></a>}}
-\if{latex}{\out{\hypertarget{method-FeatureHandler-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{FeatureHandler} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FeatureHandler$new(compute = NULL, get = NULL, key_join = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{compute}}{(\code{function})\cr
+\if{html}{\out{<a id="method-FeatureHandler-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-FeatureHandler-initialize}{}}}
+\subsection{\code{FeatureHandler$new()}}{
+  Creates a new instance of the \code{FeatureHandler} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FeatureHandler$new(compute = NULL, get = NULL, key_join = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{compute}}{(\code{function})\cr
 A function of the form "function(start_date, end_date, slice_ts, source_conn, ds (optional), ...)".
 
 This function should return a \code{data.frame} with the computed feature (computed from the source connection).
@@ -97,12 +98,10 @@ The \code{data.frame} should contain the following columns:
 \item valid_from, valid_until: A set of columns containing the time period for which this feature information
 is valid.\cr
 }}
-
-\item{\code{get}}{(\code{function})\cr
+      \item{\code{get}}{(\code{function})\cr
 (Optional). A function of the form "function(target_table, slice_ts, target_conn, ...)".
 This function should retrieve the computed feature from the target connection.\cr}
-
-\item{\code{key_join}}{(\code{function})\cr
+      \item{\code{key_join}}{(\code{function})\cr
 A function like one of the aggregators from \code{\link[=aggregators]{aggregators()}}.
 
 The function should return an expression on the form:
@@ -111,28 +110,31 @@ dplyr::across(.cols = tidyselect::all_of(feature),
 .fns = list(n = ~ aggregation function),
 .names = "\{.fn\}"),
 .groups = "drop")}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new instance of the \code{FeatureHandler} \link[R6:R6Class]{R6} class.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{FeatureHandler} \link[R6:R6Class]{R6} class.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-FeatureHandler-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-FeatureHandler-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{FeatureHandler$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{FeatureHandler$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{FeatureHandler$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

@@ -23,39 +23,39 @@ See the vignette("diseasystore-google-covid-19") for details on how to configure
 \dontshow{\}) # examplesIf}
 }
 \section{Super class}{
-\code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
+\code{\link[diseasystore:DiseasystoreBase]{DiseasystoreBase}} -> \code{DiseasystoreGoogleCovid19}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasystoreGoogleCovid19-clone}{\code{DiseasystoreGoogleCovid19$clone()}}
+  \itemize{
+    \item \href{#method-DiseasystoreGoogleCovid19-clone}{\code{DiseasystoreGoogleCovid19$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="determine_missing_ranges"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-determine_missing_ranges'><code>diseasystore::DiseasystoreBase$determine_missing_ranges()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>diseasystore::DiseasystoreBase$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="determine_missing_ranges"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-determine_missing_ranges'><code>DiseasystoreBase$determine_missing_ranges()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>DiseasystoreBase$get_feature()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="initialize"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-initialize'><code>DiseasystoreBase$initialize()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>DiseasystoreBase$key_join_features()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreGoogleCovid19-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreGoogleCovid19-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreGoogleCovid19$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasystoreGoogleCovid19$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreGoogleCovid19$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

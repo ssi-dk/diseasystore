@@ -23,59 +23,61 @@ See the vignette("diseasystore-ecdc-respiratory-viruses") for details on how to 
 \dontshow{\}) # examplesIf}
 }
 \section{Super class}{
-\code{\link[diseasystore:DiseasystoreBase]{diseasystore::DiseasystoreBase}} -> \code{DiseasystoreEcdcRespiratoryViruses}
+\code{\link[diseasystore:DiseasystoreBase]{DiseasystoreBase}} -> \code{DiseasystoreEcdcRespiratoryViruses}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasystoreEcdcRespiratoryViruses-new}{\code{DiseasystoreEcdcRespiratoryViruses$new()}}
-\item \href{#method-DiseasystoreEcdcRespiratoryViruses-clone}{\code{DiseasystoreEcdcRespiratoryViruses$clone()}}
+  \itemize{
+    \item \href{#method-DiseasystoreEcdcRespiratoryViruses-initialize}{\code{DiseasystoreEcdcRespiratoryViruses$new()}}
+    \item \href{#method-DiseasystoreEcdcRespiratoryViruses-clone}{\code{DiseasystoreEcdcRespiratoryViruses$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="determine_missing_ranges"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-determine_missing_ranges'><code>diseasystore::DiseasystoreBase$determine_missing_ranges()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>diseasystore::DiseasystoreBase$get_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>diseasystore::DiseasystoreBase$key_join_features()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="determine_missing_ranges"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-determine_missing_ranges'><code>DiseasystoreBase$determine_missing_ranges()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="get_feature"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-get_feature'><code>DiseasystoreBase$get_feature()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="diseasystore" data-topic="DiseasystoreBase" data-id="key_join_features"><a href='../../diseasystore/html/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features'><code>DiseasystoreBase$key_join_features()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreEcdcRespiratoryViruses-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreEcdcRespiratoryViruses-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreEcdcRespiratoryViruses$new(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-DiseasystoreEcdcRespiratoryViruses-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreEcdcRespiratoryViruses-initialize}{}}}
+\subsection{\code{DiseasystoreEcdcRespiratoryViruses$new()}}{
+  Creates a new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreEcdcRespiratoryViruses$new(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{Arguments passed to the \code{?DiseasystoreBase} constructor.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6:R6Class]{R6} class.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Arguments passed to the \code{?DiseasystoreBase} constructor.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasystoreEcdcRespiratoryViruses} \link[R6:R6Class]{R6} class.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreEcdcRespiratoryViruses-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreEcdcRespiratoryViruses-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreEcdcRespiratoryViruses$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasystoreEcdcRespiratoryViruses$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreEcdcRespiratoryViruses$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

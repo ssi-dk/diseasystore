@@ -22,62 +22,63 @@ It defines the primary methods of each feature stores as well as all of the publ
 \dontshow{\}) # examplesIf}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{ds_map}}{(\verb{named list}(\code{character}))\cr
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{ds_map}}{(\verb{named list}(\code{character}))\cr
 A list that maps features known by the feature store to the corresponding feature handlers
 that compute the features. Read only.}
 
-\item{\code{available_features}}{(\code{character()})\cr
+    \item{\code{available_features}}{(\code{character()})\cr
 A list of available features in the feature store. Read only.}
 
-\item{\code{available_observables}}{(\code{character()})\cr
+    \item{\code{available_observables}}{(\code{character()})\cr
 A list of available observables in the feature store. Read only.}
 
-\item{\code{available_stratifications}}{(\code{character()})\cr
+    \item{\code{available_stratifications}}{(\code{character()})\cr
 A list of available stratifications in the feature store. Read only.}
 
-\item{\code{observables_regex}}{(\code{character(1)})\cr
+    \item{\code{observables_regex}}{(\code{character(1)})\cr
 A list of available stratifications in the feature store. Read only.}
 
-\item{\code{label}}{(\code{character(1)})\cr
+    \item{\code{label}}{(\code{character(1)})\cr
 A human readable label of the feature store. Read only.}
 
-\item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located. Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
+    \item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located. Read only. Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
 
-\item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in. Read only.}
+    \item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in. Read only.}
 
-\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in. Read only. If the database backend does not support schema, the tables will be prefixed with \verb{<target_schema>.}.}
+    \item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in. Read only. If the database backend does not support schema, the tables will be prefixed with \verb{<target_schema>.}.}
 
-\item{\code{start_date}}{(\code{Date})\cr Study period start. Read only.}
+    \item{\code{start_date}}{(\code{Date})\cr Study period start. Read only.}
 
-\item{\code{end_date}}{(\code{Date})\cr Study period end. Read only.}
+    \item{\code{end_date}}{(\code{Date})\cr Study period end. Read only.}
 
-\item{\code{min_start_date}}{(\code{Date})\cr (Minimum)Study period start. Read only.}
+    \item{\code{min_start_date}}{(\code{Date})\cr (Minimum)Study period start. Read only.}
 
-\item{\code{max_end_date}}{(\code{Date})\cr (Maximum)Study period end. Read only.}
+    \item{\code{max_end_date}}{(\code{Date})\cr (Maximum)Study period end. Read only.}
 
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on. Read only.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DiseasystoreBase-new}{\code{DiseasystoreBase$new()}}
-\item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
-\item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
-\item \href{#method-DiseasystoreBase-determine_missing_ranges}{\code{DiseasystoreBase$determine_missing_ranges()}}
-\item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
-}
+  \itemize{
+    \item \href{#method-DiseasystoreBase-initialize}{\code{DiseasystoreBase$new()}}
+    \item \href{#method-DiseasystoreBase-get_feature}{\code{DiseasystoreBase$get_feature()}}
+    \item \href{#method-DiseasystoreBase-key_join_features}{\code{DiseasystoreBase$key_join_features()}}
+    \item \href{#method-DiseasystoreBase-determine_missing_ranges}{\code{DiseasystoreBase$determine_missing_ranges()}}
+    \item \href{#method-DiseasystoreBase-clone}{\code{DiseasystoreBase$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiseasystoreBase-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DiseasystoreBase-new}{}}}
-\subsection{Method \code{new()}}{
-Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$new(
+\if{html}{\out{<a id="method-DiseasystoreBase-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DiseasystoreBase-initialize}{}}}
+\subsection{\code{DiseasystoreBase$new()}}{
+  Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreBase$new(
   start_date = NULL,
   end_date = NULL,
   slice_ts = NULL,
@@ -85,149 +86,143 @@ Creates a new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} clas
   target_conn = NULL,
   target_schema = NULL,
   verbose = diseasyoption("verbose", self)
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
-
-\item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
-
-\item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.}
-
-\item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with \verb{<target_schema>.}.}
-
-\item{\code{verbose}}{(\code{boolean})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.}
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+      \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+      \item{\code{source_conn}}{(\code{DBIConnection} or \verb{file path})\cr Used to specify where data is located.  Can be \code{DBIConnection} or file path depending on the \code{diseasystore}.}
+      \item{\code{target_conn}}{(\code{DBIConnection})\cr A database connection to store the computed features in.}
+      \item{\code{target_schema}}{(\code{character})\cr The schema to place the feature store in.  If the database backend does not support schema, the tables will be prefixed with \verb{<target_schema>.}.}
+      \item{\code{verbose}}{(\code{boolean})\cr
 Boolean that controls enables debugging information.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} class.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A new instance of the \code{DiseasystoreBase} \link[R6:R6Class]{R6} class.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreBase-get_feature"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreBase-get_feature}{}}}
-\subsection{Method \code{get_feature()}}{
-Computes, stores, and returns the requested feature for the study period.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$get_feature(
+\subsection{\code{DiseasystoreBase$get_feature()}}{
+  Computes, stores, and returns the requested feature for the study period.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreBase$get_feature(
   feature,
   start_date = self \%.\% start_date,
   end_date = self \%.\% end_date,
   slice_ts = self \%.\% slice_ts
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{feature}}{(\code{character})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{feature}}{(\code{character})\cr
 The name of a feature defined in the feature store.}
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.}
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+      \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A tbl_dbi with the requested feature for the study period.
+  }
+}
 
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A tbl_dbi with the requested feature for the study period.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreBase-key_join_features"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreBase-key_join_features}{}}}
-\subsection{Method \code{key_join_features()}}{
-Joins various features from the feature store assuming a primary feature (observable)
+\subsection{\code{DiseasystoreBase$key_join_features()}}{
+  Joins various features from the feature store assuming a primary feature (observable)
 that contains keys to witch the secondary features (defined by \code{stratification}) are joined.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$key_join_features(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreBase$key_join_features(
   observable,
   stratification = NULL,
   start_date = self \%.\% start_date,
   end_date = self \%.\% end_date
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
+      \item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.}
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A tbl_dbi with the requested joined features for the study period.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{observable}}{(\code{character})\cr The observable to provide data or prediction for.}
-
-\item{\code{stratification}}{(\code{list}(\code{quosures}) or \code{NULL})\cr Use \code{rlang::quos(...)} to specify stratification. If given, expressions in stratification evaluated to give the stratification level.}
-
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A tbl_dbi with the requested joined features for the study period.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreBase-determine_missing_ranges"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreBase-determine_missing_ranges}{}}}
-\subsection{Method \code{determine_missing_ranges()}}{
-Determine which dates are not already computed.
+\subsection{\code{DiseasystoreBase$determine_missing_ranges()}}{
+  Determine which dates are not already computed.
 
 This method parses the \code{message} fields of the logs related to \code{target_table} on the date given by \code{slice_ts}.
 These messages contains information on the date-ranges that are already computed.
 Once parsed, the method compares the computed date-ranges with the requested date-range.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$determine_missing_ranges(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreBase$determine_missing_ranges(
   target_table,
   start_date,
   end_date,
   slice_ts
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{target_table}}{(\code{character} or \code{Id})\cr
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{target_table}}{(\code{character} or \code{Id})\cr
 The feature table to investigate.}
-
-\item{\code{start_date}}{(\code{Date})\cr Study period start.}
-
-\item{\code{end_date}}{(\code{Date})\cr Study period end.}
-
-\item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-(\code{tibble})\cr
+      \item{\code{start_date}}{(\code{Date})\cr Study period start.}
+      \item{\code{end_date}}{(\code{Date})\cr Study period end.}
+      \item{\code{slice_ts}}{(\code{Date} or \code{character})\cr Date or timestamp (parsable by \code{as.POSIXct}) to slice the (time-versioned) data on.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    (\code{tibble})\cr
 A \code{data.frame} containing continuous date-ranges that require computation to cover the requested period
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiseasystoreBase-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DiseasystoreBase-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiseasystoreBase$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DiseasystoreBase$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DiseasystoreBase$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
