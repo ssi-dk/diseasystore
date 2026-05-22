@@ -31,7 +31,7 @@
     },
     {
       "package": "bit64",
-      "version": "4.8.0",
+      "version": "4.8.2",
       "binary": true
     },
     {
@@ -51,7 +51,7 @@
     },
     {
       "package": "bslib",
-      "version": "0.10.0",
+      "version": "0.11.0",
       "binary": true
     },
     {
@@ -531,7 +531,7 @@
     },
     {
       "package": "SCDB",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "binary": true
     },
     {
