@@ -11,6 +11,10 @@
 
 * Compatibility with `duckdb v1.5.0` (#235).
 
+## Minor Improvements and Fixes
+
+* Check for internet when connecting to online sources (#243).
+
 
 # diseasystore 0.3.2
 
