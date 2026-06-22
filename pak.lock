@@ -532,7 +532,7 @@
     {
       "package": "SCDB",
       "version": "0.6.1.9000",
-      "binary": true
+      "binary": false
     },
     {
       "package": "sessioninfo",
