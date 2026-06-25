@@ -396,7 +396,7 @@
     },
     {
       "package": "pkgload",
-      "version": "1.5.2",
+      "version": "1.5.3",
       "binary": true
     },
     {
@@ -606,7 +606,7 @@
     },
     {
       "package": "tinytex",
-      "version": "0.59",
+      "version": "0.60",
       "binary": true
     },
     {
