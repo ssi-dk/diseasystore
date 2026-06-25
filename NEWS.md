@@ -1,5 +1,10 @@
 # diseasystore (development version)
 
+## Minor Improvements and Fixes
+
+* Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
+
+
 # diseasystore 0.3.3
 
 ## New Features
@@ -10,6 +15,10 @@
 ## Minor Improvements and Fixes
 
 * Compatibility with `duckdb v1.5.0` (#235).
+
+## Documentation
+
+* Restrictions on automatic data-coupling is now better described (#227)
 
 
 # diseasystore 0.3.2

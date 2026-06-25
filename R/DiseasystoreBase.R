@@ -297,6 +297,18 @@ DiseasystoreBase <- R6::R6Class(                                                
       # Store the ds_map
       ds_map <- self %.% ds_map
 
+
+      # The automatic aggregation of key_join_features only work if the observable can
+      # meaningfully be aggregated (that is, if a suitable "key_join_*"  function
+      # can be chosen for the observable. If no "key_join" function is set, we raise
+      # an error when trying to aggregate
+      if (purrr::pluck(private, ds_map[[observable]], "key_join", is.null)) {
+        pkgcond::pkg_error(
+          "Automatic aggregation with `key_join_filter()` only works for features where \"key_join\" is defined!"
+        )
+      }
+
+
       # We start by copying the study_dates to the conn to ensure SQLite compatibility
       study_dates <- dplyr::copy_to(
         self %.% target_conn,
@@ -455,7 +467,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       t_add <- out |>
         dplyr::group_by("date" = .data$valid_from, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename("n_add" = "n") |>
+        dplyr::rename("value_add" = "value") |>
         dplyr::compute(name = SCDB::unique_table_name("ds_add"))
       SCDB::defer_db_cleanup(t_add)
 
@@ -463,7 +475,7 @@ DiseasystoreBase <- R6::R6Class(                                                
       t_remove <- out |>
         dplyr::group_by("date" = .data$valid_until, .add = TRUE) |>
         key_join_aggregator(observable) |>
-        dplyr::rename("n_remove" = "n") |>
+        dplyr::rename("value_remove" = "value") |>
         dplyr::compute(name = SCDB::unique_table_name("ds_remove"))
       SCDB::defer_db_cleanup(t_remove)
 
@@ -490,10 +502,10 @@ DiseasystoreBase <- R6::R6Class(                                                
       data <- t_add |>
         dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
-        tidyr::replace_na(list("n_add" = 0, "n_remove" = 0)) |>
+        tidyr::replace_na(list("value_add" = 0, "n_remove" = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
-        dplyr::mutate(!!observable := cumsum(.data$n_add) - cumsum(.data$n_remove)) |>
+        dplyr::mutate(!!observable := cumsum(.data$value_add) - cumsum(.data$value_remove)) |>
         dplyr::ungroup() |>
         dplyr::select("date", all_of(stratification_names), !!observable) |>
         dplyr::collect()
