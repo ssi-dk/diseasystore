@@ -81,6 +81,11 @@ rd_target <- function(type = "param") {
         ifelse(type == "field", " Read only.", ""))
 }
 
+rd_diseasy_immunity_dots <- paste(
+  "Optional attributes supplied to the waning function.",
+  "Must be one or both of `delay` and `risk`."
+)
+
 rd_time_scale <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field"))
   paste("(`numeric(1)`)\\cr",
@@ -222,11 +227,11 @@ rd_regional_stratification <- function(type = "param") {
 
 
 ## Templates for DiseasyRegions
-rd_regions <- function(type = "param") {
+rd_area <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field", "generators"))
   paste(
     "(`character()`)\\cr",
-    "The geographic regions of interest.",
+    "The geographic area (list of regions) of interest.",
 
     switch(
       type,
@@ -282,6 +287,18 @@ rd_demography <- function(type = "param") {
     switch(type == "field", "Read only.")
   )
 }
+
+rd_regional_risks <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+
+  paste(
+    "(`named numeric()`)\\cr",
+    "Modifiers tied to each region (identified by vector names).\\cr",
+
+    switch(type == "field", "Read only.")
+  )
+}
+
 
 ## Templates for DiseasyModel
 rd_diseasy_module <- paste(
