@@ -75,7 +75,7 @@ test_that("diseasyoption works", {
   expect_identical(diseasyoption("target_schema"), target_schema_1)
 
   # Check that it works for child classes
-  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter
+  DiseasystoreDummy <- R6::R6Class(                                                                                     # nolint: object_name_linter, namespace_linter. We need to supress namespace_linter until R-CMD-Check works with R6 fully
     classname = "DiseasystoreDummy",
     inherit = DiseasystoreBase,
     public = list(initialize = function(...) {})
@@ -100,6 +100,15 @@ test_that("diseasyoption works", {
   expect_error(
     diseasyoption("target_schema"),
     regex = r"{Multiple options found \(diseasy.target_schema, diseasystore.target_schema\)!}"
+  )
+
+  # Look up all options associated with class
+  checkmate::expect_list(diseasyoption(class = ds))
+
+  # Test that errors are trhown for malformed inputs
+  expect_error(
+    diseasyoption("target_schema", class = ds, namespace = "diseasy"),
+    regex = "Only one of `namespace` or `class` can be given!"
   )
 
   rm(ds)

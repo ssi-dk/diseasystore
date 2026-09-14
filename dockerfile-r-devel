@@ -1,0 +1,30 @@
+FROM rocker/tidyverse:devel
+ENV TZ=Australia/Sydney
+RUN date
+
+# System dependencies (apt-get since r-base is debian based)
+RUN apt-get update
+RUN apt-get install -y libcurl4-gnutls-dev curl # curl files
+RUN apt-get install -y docker.io # docker interface
+RUN apt-get install -y gnupg2 # required to install odbc
+
+# Move pak.lock to the container
+COPY . /app/
+WORKDIR /app
+
+# tex packages are installed in /root/bin so we have to make sure those
+# packages accessible by adding that directory to the PATH variable.
+ENV PATH="${PATH}:/root/bin"
+
+RUN R -e 'install.packages("pak")'
+
+RUN R -e 'getwd(); dir()'
+
+# Install package dependencies compatible with R-devel
+RUN R -e 'pak::local_install_dev_deps()'
+
+# Install workflow dependencies
+RUN R -e 'pak::pak(c("jsonlite", "rcmdcheck", "devtools", "lintr", "covr", "roxygen2", "pkgdown", "rmarkdown", "styler"))'
+
+# Install the dev package
+RUN R -e 'devtools::install()'
