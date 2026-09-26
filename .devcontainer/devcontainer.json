@@ -1,6 +1,6 @@
 {
   "name": "diseasystore",
-  "image": "ghcr.io/ssi-dk/diseasystore:main",
+  "image": "ghcr.io/ssi-dk/diseasystore:repo-sync-AEF-DDF-default",
   "overrideCommand": false,
   "remoteUser": "rstudio",
   "containerEnv": {
