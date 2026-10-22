@@ -2,7 +2,7 @@
   "packages": [
     {
       "package": "arrow",
-      "version": "25.0.1",
+      "version": "24.0.0",
       "_row": "arrow"
     },
     {
@@ -137,7 +137,7 @@
     },
     {
       "package": "data.table",
-      "version": "1.18.6.1",
+      "version": "1.18.4",
       "_row": "data.table"
     },
     {
@@ -342,7 +342,7 @@
     },
     {
       "package": "httr",
-      "version": "1.4.9",
+      "version": "1.4.8",
       "_row": "httr"
     },
     {
