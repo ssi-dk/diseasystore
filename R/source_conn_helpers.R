@@ -31,6 +31,10 @@ source_conn_path <- function(source_conn, file) {
     checkmate::check_character(source_conn, pattern = url_regex)
   )
 
+  if (checkmate::test_character(source_conn, pattern = url_regex)) {
+    checkmate::assert_true(curl::has_internet())
+  }
+
   # Determine the type of location
   if (checkmate::test_directory_exists(source_conn)) { # source_conn is a directory
     # If source_conn is a directory, look for files in the folder and keep the ones that match the requested file
@@ -71,6 +75,10 @@ source_conn_github <- function(source_conn, file, pull = TRUE) {
     checkmate::check_directory_exists(source_conn),
     checkmate::check_character(source_conn, pattern = url_regex)
   )
+
+  if (checkmate::test_character(source_conn, pattern = url_regex) || pull) {
+    checkmate::assert_true(curl::has_internet())
+  }
 
   relative_path <- dirname(file)
 
