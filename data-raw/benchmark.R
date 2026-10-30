@@ -1,7 +1,7 @@
 root <- devtools::package_file()
 if (!file.exists(file.path(root, "DESCRIPTION")) ||
-    !file.exists(file.path(root, "tests", "testthat", "helper-setup.R"))) {
-  stop("Run this script from the package root.")
+      !file.exists(file.path(root, "tests", "testthat", "helper-setup.R"))) {
+  stop("Run this script from the package root.", call. = FALSE)
 }
 
 pak::pkg_install(c("callr", "microbenchmark", "jsonlite"), ask = FALSE)
@@ -82,7 +82,7 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
             loaded_path <- normalizePath(getNamespaceInfo("diseasystore", "path"), winslash = "/")
             expected_path <- normalizePath(file.path(lib_path, "diseasystore"), winslash = "/")
             if (!identical(loaded_path, expected_path)) {
-              stop("Loaded diseasystore from the wrong library: ", loaded_path)
+              stop("Loaded diseasystore from the wrong library: ", loaded_path, call. = FALSE)
             }
 
             # Open connection to the database
@@ -93,7 +93,7 @@ if (identical(Sys.getenv("CI"), "true") && !nzchar(Sys.getenv("BACKEND"))) {
 
             # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
             diseasystore_generator <- \(benchmark_data) {
-              R6::R6Class(
+              R6::R6Class(                                                                                              # nolint: namespace_linter
                 classname = "DiseasystoreBase",
                 inherit = diseasystore::DiseasystoreBase,
                 private = list(

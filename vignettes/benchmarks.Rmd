@@ -18,7 +18,6 @@ knitr::opts_chunk$set(
 simple_rendering <- rlang::is_installed("pkgdown") && !pkgdown::in_pkgdown()
 ```
 
-
 To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
 a simple benchmark:
 A sample dataset is created based on the `datasets::mtcars` dataset. This data is repeated 1000 times and given a unique
