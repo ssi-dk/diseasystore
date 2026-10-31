@@ -37,7 +37,6 @@
 #'     skip_backends = "SQLiteConnection"
 #'   )
 #' }
-#' @importFrom curl has_internet
 #' @export
 test_diseasystore <- function(
   diseasystore_generator = NULL,

@@ -15,7 +15,7 @@
 #'   A new instance of the `DiseasystoreSimulist` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreSimulist <- R6::R6Class(                                                                                    # nolint: object_name_linter.
+DiseasystoreSimulist <- R6::R6Class(                                                                                    # nolint: object_name_linter, namespace_linter
   classname = "DiseasystoreSimulist",
   inherit = DiseasystoreBase,
 

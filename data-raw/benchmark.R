@@ -147,7 +147,7 @@ if (interactive() || (identical(Sys.getenv("CI"), "true") && !identical(Sys.gete
     try({
       # Create a dummy DiseasystoreBase with a mtcars FeatureHandler
       diseasystore_generator <- \(benchmark_data) {
-        R6::R6Class(
+        R6::R6Class(                                                                                                    # nolint: namespace_linter
           classname = "DiseasystoreBase",
           inherit = DiseasystoreBase,
           private = list(

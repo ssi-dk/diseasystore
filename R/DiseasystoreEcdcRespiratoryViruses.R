@@ -72,7 +72,7 @@ DiseasystoreEcdcRespiratoryViruses <- R6::R6Class(                              
               TRUE ~ NA
             ),
             "rate" = .data$value,
-            "valid_from" = ISOweek::ISOweek2date(paste(.data$yearweek, 1, sep = "-")),
+            "valid_from" = ISOweek::ISOweek2date(paste(.data$yearweek, 1, sep = "-")),                                  # nolint: namespace_linter
             "valid_until" = .data$valid_from + lubridate::days(7)
           )
 

@@ -15,7 +15,7 @@
 #'   A new instance of the `DiseasystoreBase` [R6][R6::R6Class] class.
 #' @export
 #' @importFrom R6 R6Class
-DiseasystoreBase <- R6::R6Class(                                                                                        # nolint: object_name_linter
+DiseasystoreBase <- R6::R6Class(                                                                                        # nolint: object_name_linter, namespace_linter
   classname = "DiseasystoreBase",
 
   public = list(
@@ -282,7 +282,6 @@ DiseasystoreBase <- R6::R6Class(                                                
     #' @param end_date `r rd_end_date()`
     #' @return
     #'   A tbl_dbi with the requested joined features for the study period.
-    #' @importFrom dbplyr window_order
     key_join_features = function(observable, stratification = NULL,
                                  start_date = self %.% start_date,
                                  end_date   = self %.% end_date) {
