@@ -18,10 +18,6 @@ knitr::opts_chunk$set(
 simple_rendering <- rlang::is_installed("pkgdown") && !pkgdown::in_pkgdown()
 ```
 
-```{r setup}
-library(diseasystore)
-```
-
 
 To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
 a simple benchmark:
@@ -59,10 +55,10 @@ variables.
 ```{r, eval = FALSE}
 DiseasystoreMtcars <- R6::R6Class(
   classname = "DiseasystoreBase",
-  inherit = DiseasystoreBase,
+  inherit = diseasystore::DiseasystoreBase,
   private = list(
     .ds_map = list("n_cyl" = "mtcars_cyl", "vs" = "mtcars_vs"),
-    mtcars_cyl = FeatureHandler$new(
+    mtcars_cyl = diseasystore::FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn) {
         out <- benchmark_data |>
           dplyr::transmute(
@@ -72,9 +68,9 @@ DiseasystoreMtcars <- R6::R6Class(
           )
         return(out)
       },
-      key_join = key_join_sum
+      key_join = diseasystore::key_join_sum
     ),
-    mtcars_vs = FeatureHandler$new(
+    mtcars_vs = diseasystore::FeatureHandler$new(
       compute = function(start_date, end_date, slice_ts, source_conn) {
         out <- benchmark_data |>
           dplyr::transmute(
@@ -84,7 +80,7 @@ DiseasystoreMtcars <- R6::R6Class(
           )
         return(out)
       },
-      key_join = key_join_sum
+      key_join = diseasystore::key_join_sum
     )
   )
 )

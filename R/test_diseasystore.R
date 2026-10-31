@@ -37,7 +37,6 @@
 #'     skip_backends = "SQLiteConnection"
 #'   )
 #' }
-#' @importFrom curl has_internet
 #' @export
 test_diseasystore <- function(
   diseasystore_generator = NULL,
@@ -281,6 +280,8 @@ test_diseasystore <- function(
         paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
       )
 
+      # Clean up
+      connection_clean_up(conn)
     }
   })
 
