@@ -280,6 +280,8 @@ test_diseasystore <- function(
         paste0("Must be disjunct from \\{'", paste(skip_backends, collapse = "|"), "\\'}")
       )
 
+      # Clean up
+      connection_clean_up(conn)
     }
   })
 
