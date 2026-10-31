@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
 
 # Set a flag to determine if the vignette should be run in simple context
 # or in an extended context
-simple_rendering <- !pkgdown::in_pkgdown() || identical(Sys.getenv("GITHUB_EVENT_NAME"), "release")
+simple_rendering <- !pkgdown::in_pkgdown() ||
+  identical(Sys.getenv("GITHUB_EVENT_NAME"), "release")
 ```
 
 To showcase the performance of `diseasystore` on different database backends, we include this vignette that summarises
