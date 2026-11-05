@@ -395,7 +395,8 @@ test_that("$key_join_features works with non-computing stratifications", {
   skip_if_not_installed("RSQLite")
 
   # Create new instance
-  ds <- DiseasystoreDummy$new(target_conn = DBI::dbConnect(RSQLite::SQLite()), verbose = FALSE)
+  conn <- DBI::dbConnect(RSQLite::SQLite())
+  ds <- DiseasystoreDummy$new(target_conn = conn, verbose = FALSE)
 
   # Check that we can join the features even if stratification does not compute on features
   expect_no_error(
@@ -407,6 +408,7 @@ test_that("$key_join_features works with non-computing stratifications", {
     )
   )
 
+  DBI::dbDisconnect(conn)
 })
 
 

@@ -4,6 +4,8 @@
 
 * Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
 
+* Check for internet when connecting to online sources (#243).
+
 
 # diseasystore 0.3.3
 

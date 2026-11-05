@@ -3,6 +3,7 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.devcontainer$
 ^\.github$
 .lintr
 man-roxygen
@@ -12,6 +13,7 @@ man-roxygen
 ^data-raw$
 ^\.vscode$
 ^doc$
+^installations$
 ^Meta$
 ^CRAN-SUBMISSION$
 ^pak.lock
@@ -19,3 +21,4 @@ man-roxygen
 ^pkg-build$
 ^\.markdownlint\.json$
 ^dockerfile$
+^dockerfile-r-devel$

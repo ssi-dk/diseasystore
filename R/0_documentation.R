@@ -208,6 +208,19 @@ rd_activity_weights <- paste(
   "vector of weights for the four types of contacts. If `NULL`, no weighting is done."
 )
 
+
+## Templates for DiseasyPopulation
+rd_regional_stratification <- function(type = "param") {
+  checkmate::assert_choice(type, c("param", "field"))
+  paste(
+    "(`character()`)\\cr",
+    "The level of spatial stratification of the population.",
+    switch(type == "field", "Read only.")
+  )
+}
+
+
+
 ## Templates for DiseasyRegions
 rd_regions <- function(type = "param") {
   checkmate::assert_choice(type, c("param", "field", "generators"))
@@ -277,6 +290,11 @@ rd_diseasy_module <- paste(
   "If an instance of the module is provided instead, a copy of this instance is added to the `DiseasyModel`",
   "instance. This copy is a \"clone\" of the instance at the time it is added and any subsequent changes to the",
   "instance will not reflect in the copy that is added to `DiseasyModel`."
+)
+
+rd_module <- paste(
+  "(`R6::R6Class instance`)\\cr",
+  "This instance is cloned to the field with the same name as the class of the module"
 )
 
 ## Templates for DiseasyModelOde
