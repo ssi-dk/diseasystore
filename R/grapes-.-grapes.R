@@ -15,24 +15,48 @@
 #'  try(t %.% c) # Gives error since "c" does not exist in "t"
 #' @export
 `%.%` <- function(env, field) {
-  env_name <- as.character(match.call())[2]
-  field <- as.character(match.call())[3]
-  field_name <- stringr::str_extract(field, r"{^[a-zA-Z0-9\._]+}")
-  field_call <- stringr::str_remove(field, paste0("^", field_name))
 
-  # Check for existence
-  if (!(field_name %in% names(env))) {
-    stop(field_name, " not found in ", env_name, call. = FALSE)
+  field_expr <- substitute(field)
+
+  # Fast path for simple field names
+  if (is.symbol(field_expr)) {
+    field_name <- as.character(field_expr)
+  } else {
+    # Slow path for more complex expressions
+    env_name <- as.character(match.call())[2]
+    field <- as.character(match.call())[3]
+    field_name <- stringr::str_extract(field, r"{^[a-zA-Z0-9\._]+}")
+    field_call <- stringr::str_remove(field, paste0("^", field_name))
   }
 
-  # Retrieve the object
+  # Check for existence
+  exists <- if (is.environment(env)) {
+    base::exists(field_name, envir = env, inherits = FALSE)
+  } else {
+    field_name %in% names(env)
+  }
+
+  if (!exists) {
+    stop(
+      field_name, " not found in ", deparse1(substitute(env)),
+      call. = FALSE
+    )
+  }
+
+  # Retrieve the object directly for simple field names
+  if (is.symbol(field_expr)) {
+    return(env[[field_name]])
+  }
+
+  # Parse object for complex expressions
   obj <- purrr::pluck(env, field_name)
 
-  # Evoke the operation on the object
   if (field_call == "") {
     return(obj)
   } else {
-    return(eval(parse(text = paste0(env_name, "$", field)), envir = rlang::caller_env()))
+    return(eval(
+      parse(text = paste0(env_name, "$", field)),
+      envir = rlang::caller_env()
+    ))
   }
-
 }
