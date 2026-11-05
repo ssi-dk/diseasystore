@@ -2,6 +2,8 @@
 
 ## Minor Improvements and Fixes
 
+* Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
+
 * Check for internet when connecting to online sources (#243).
 
 
@@ -15,6 +17,10 @@
 ## Minor Improvements and Fixes
 
 * Compatibility with `duckdb v1.5.0` (#235).
+
+## Documentation
+
+* Restrictions on automatic data-coupling is now better described (#227)
 
 
 # diseasystore 0.3.2

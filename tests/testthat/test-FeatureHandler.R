@@ -7,21 +7,21 @@ test_that("FeatureHandler initializes with correctly formed arguments", {
   checkmate::expect_class(fh, "FeatureHandler")
   checkmate::assert_function(fh$compute,  args = "...")
   checkmate::assert_function(fh$get,      args = c("target_table", "slice_ts", "target_conn"))
-  checkmate::assert_function(fh$key_join, args = "...")
+  checkmate::assert_function(fh$key_join, args = "...", null.ok = TRUE)
   rm(fh)
 
   # 2) Correctly formed compute function
   fh <- expect_no_error(FeatureHandler$new(compute = \(start_date, end_date, slice_ts, source_conn, ...) 1))
   checkmate::assert_function(fh$compute,  args = c("start_date", "end_date", "slice_ts", "source_conn", "..."))
   checkmate::assert_function(fh$get,      args = c("target_table", "slice_ts", "target_conn"))
-  checkmate::assert_function(fh$key_join, args = "...")
+  checkmate::assert_function(fh$key_join, args = "...", null.ok = TRUE)
   rm(fh)
 
   # 3) Correctly formed get function
   fh <- expect_no_error(FeatureHandler$new(get = \(target_table, slice_ts, target_conn) 1))
   checkmate::assert_function(fh$compute,  args = "...")
   checkmate::assert_function(fh$get,      args = c("target_table", "slice_ts", "target_conn"))
-  checkmate::assert_function(fh$key_join, args = "...")
+  checkmate::assert_function(fh$key_join, args = "...", null.ok = TRUE)
   rm(fh)
 
   # 4) Correctly formed key_join function

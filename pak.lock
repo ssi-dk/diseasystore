@@ -2,7 +2,7 @@
   "packages": [
     {
       "package": "arrow",
-      "version": "25.0.1",
+      "version": "26.0.0",
       "_row": "arrow"
     },
     {
@@ -252,7 +252,7 @@
     },
     {
       "package": "gargle",
-      "version": "1.6.1",
+      "version": "1.7.0",
       "_row": "gargle"
     },
     {
@@ -402,7 +402,7 @@
     },
     {
       "package": "languageserver",
-      "version": "0.3.20",
+      "version": "0.3.21",
       "_row": "languageserver"
     },
     {
@@ -472,7 +472,7 @@
     },
     {
       "package": "openssl",
-      "version": "2.4.2",
+      "version": "2.5.0",
       "_row": "openssl"
     },
     {
@@ -487,7 +487,7 @@
     },
     {
       "package": "parallelly",
-      "version": "1.48.0",
+      "version": "1.50.0",
       "_row": "parallelly"
     },
     {
@@ -622,7 +622,7 @@
     },
     {
       "package": "readxl",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "_row": "readxl"
     },
     {
@@ -717,7 +717,7 @@
     },
     {
       "package": "selectr",
-      "version": "0.6-0",
+      "version": "0.8-0",
       "_row": "selectr"
     },
     {

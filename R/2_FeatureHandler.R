@@ -96,9 +96,9 @@ FeatureHandler <- R6::R6Class(                                                  
       }
 
       if (is.null(key_join)) {
-        args  <- append(args, c("key_join" = \(...) stop("key_join not configured!", call. = FALSE)))
+        args  <- append(args, c("key_join" = NULL))
       } else {
-        checkmate::assert_function(key_join, args = c(".data", "feature"))
+        checkmate::assert_function(key_join, args = c(".data", "feature"), null.ok = TRUE)
       }
 
       # Set the functions of the FeatureHandler
