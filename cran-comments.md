@@ -1,9 +1,3 @@
-## Message for CRAN team
-
-Dear team
-
-This release fixes the issues on the "donttest" CRAN workflow as required.
-
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
