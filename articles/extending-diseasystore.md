@@ -1,0 +1,366 @@
+# Extending diseasystore
+
+This vignette gives you the knowledge you need to create your own
+`diseasystore`.
+
+Once you have familiarised yourself with the concepts, you can consult
+the
+[`vignette("extending-diseasystore-example")`](https://ssi-dk.github.io/diseasystore/articles/extending-diseasystore-example.md),
+where we go through how a individual-level `diseasystore` can be
+implemented.
+
+## The diseasy data model
+
+To begin, we go through the data model used within the `diseasystores`.
+It is this data model that enables the automatic coupling of features
+and powers the package.
+
+### A bitemporal data model
+
+The data created by `diseasystores` are so-called “bitemporal” data.
+This means we have two temporal dimensions. One representing the
+validity of the record, and one representing the availability of the
+record.
+
+#### `valid_from` and `valid_until`
+
+The validity dimension indicates when a given data point is “valid”,
+e.g. a hospitalisation is valid between admission and discharge date.
+This temporal dimension should be familiar to you is simply “regular”
+time.
+
+We encode the validity information into the columns `valid_from` and
+`valid_until` such that a record is valid for any time `t` which
+satisfies `valid_from <= t < valid_until`. For many features, the
+validity is a single day (such as a test result) and the `valid_until`
+column will be the day after `valid_from`.
+
+By convention, we place these column as the last columns of the
+table[^1].
+
+#### `from_ts` and `until_ts`
+
+`diseasystore` uses [SCDB](https://github.com/ssi-dk/SCDB) in the
+background to store the computed features.
+[SCDB](https://github.com/ssi-dk/SCDB) implements the second temporal
+dimension which indicates when a record was present in the data. This
+information is encoded in the columns `from_ts` and `until_ts`.
+Normally, you don’t see these columns when working with `diseasystore`
+since they are masked by [SCDB](https://github.com/ssi-dk/SCDB).
+However, if you inspect the tables created in the database by
+diseasystore, you will find they are present. For our purposes, it is
+sufficient to know that these column gives a time-versioned data base
+where we can extract previous versions through the `slice_ts` argument.
+By supplying any time `τ` as `slice_ts`, we get the data as they were
+available on that date. This allows us to build continuous integration
+of our features while preserving previously computed features.
+
+### Automatic data-coupling
+
+A primary feature of `diseasystore` is its ability to automatically
+couple and aggregate features. This coupling requires common “key\_\*”
+columns between the features. Any feature in a `diseasystore` therefore
+must have at least one “key\_\*” column. By convention, we place these
+column as the first columns of the table.
+
+Some features will not be meaningfully aggregated automatically e.g. the
+incidence of a disease must use information about the population size to
+aggregate meaningfully.
+
+In practice, any observable that can meaningfully use the
+[`?aggregators`](https://ssi-dk.github.io/diseasystore/reference/aggregators.md)
+to summarise the data can automatically be coupled.
+
+### Features
+
+Finally, we come to the main data of the `diseasystore`, namely the
+features. First, a reminder that “feature” here comes from machine
+learning and is any individual piece of information.
+
+We subdivide features into two categories: “observables” and
+“stratifications”. On most levels, these are indistinguishable, but
+their purposes differ and hence we need to handle them individually.
+
+To see the available features of a `diseasystore`, you can use the
+`?DiseasystoreBase$available_features()` method.
+
+#### Observables
+
+In `diseasystore` any feature whose name starts with “n\_” is treated as
+“observables” (by default). For specific `diseasystores`, the naming
+convention may differ. From a modelling perspective, these observables
+are typically the metrics you want to model or take as inputs to inform
+your model.
+
+To see the available observables in a `diseasystore`, you can use the
+`?DiseasystoreBase$available_observables()` method.
+
+#### Stratifications
+
+Conversely, any other feature is a “stratification” feature. These
+features are the variables used to subdivide your analysis to match the
+structure of your model (hence why they are called stratification
+features).
+
+A prominent example for most disease models would be a stratification
+feature like “age_group”, since most diseases show a strong dependency
+on the age of the affected individuals.
+
+To see the available observables in a `diseasystore`, you can use the
+`?DiseasystoreBase$available_stratifications()` method.
+
+#### Naming convention
+
+While there is no formal requirement for the naming of the observables
+or stratifications, it is considered best practice to use the same names
+as other `diseasystores` for features where possible[^2]. This
+simplifies the process of adapting analyses and disease models to new
+`diseasystores`.
+
+## Creating FeatureHandlers
+
+To facilitate the automatic coupling and aggregation of features, we use
+the
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+class. Each feature[^3] in the `diseasystore` has an associated
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+which implements the computation, retrieval and aggregation of the
+feature.
+
+### Computing features
+
+The
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+defines a `?FeatureHandler$compute()` function which must be on the
+form:
+
+    compute = function(start_date, end_date, slice_ts, source_conn, ...)
+
+The arguments `start_date` and `end_date` indicates the period for which
+features should be computed. The `diseasystores` are [dynamically
+expanded](https://ssi-dk.github.io/diseasystore/articles/diseasystore.html#dynamically-expanded),
+so feature computation is often restricted to limited time intervals as
+indicated by `start_date` and `end_date`.
+
+As mentioned [above](#from_ts-and-until_ts) `slice_ts` specifies what
+date the should be computed for. E.g. if `slice_ts` is the current date,
+the current features should be computed. Conversely, if `slice_ts` is
+some past date, features corresponding to this date should be computed.
+
+Lastly, the source_conn is a flexible argument passed to the
+FeatureHandler indicating where the source data needed to compute the
+features is stored (e.g. a database connection or directory).
+
+Note that multiple features can be computed by a single
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md).
+For example, you may decide that it is more convenient for compute
+multiple different features simultaneously (e.g. a hospitalisation and
+the classification of said hospitalisation or a test and the associated
+test result).
+
+When `?FeatureHandler$compute()` is called by the `diseasystore`, it
+also passes a reference to itself as `ds` via the `...` argument. This
+means that if the implementation of `?FeatureHandler$compute()` needs
+access to other features to compute the given feature, the compute
+function can pick up the `ds` reference adding it to the function
+signature:
+
+    compute = function(start_date, end_date, slice_ts, source_conn, ds, ...)
+
+And then use
+`ds$get_feature(<feature>, start_date = start_date, end_date = end_date, slice_ts = slice_ts)`
+to retrieve the necessary features for the computation.
+
+### Retrieving features
+
+The
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+defines a `?FeatureHandler$get()` function which must be in the form:
+
+    get = function(target_table, slice_ts, target_conn)
+
+Typically, you do not need to specify this function since the default (a
+variant of
+[`SCDB::get_table()`](https://ssi-dk.github.io/SCDB/reference/get_table.html))
+always works.
+
+However, in the case that you do need to specify it, the `target_table`
+argument will be a [`DBI::Id`](https://dbi.r-dbi.org/reference/Id.html)
+specifying the location of the data base table where the features are
+stored. `target_conn` is connection to the database. And as above,
+`slice_ts` is the time-keeping variable.
+
+### Aggregators
+
+The
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+defines a `key_join` function which must be on the form:
+
+    key_join = function(.data, feature)
+
+In most cases, you should be able to use the bundled `key_join_*`
+functions (see
+[`?aggregators`](https://ssi-dk.github.io/diseasystore/reference/aggregators.md)
+for a full list).
+
+In the event, that you need to create your own aggregator the arguments
+are as follows:
+
+- `.data` is a grouped `data.frame` whose groups are those specified by
+  the `stratification` argument (see [Automatic
+  aggregation](https://ssi-dk.github.io/diseasystore/articles/diseasystore.html#automatic-aggregation)).
+
+- `feature` is the name of the feature(s) to aggregate.
+
+Your aggregator should return a
+[`dplyr::summarise()`](https://dplyr.tidyverse.org/reference/summarise.html)
+call that operates on all columns specified in the `feature` argument
+and should return the result in a column named “value”.
+
+### Putting it all together
+
+By now, you should know the basics of creating your own
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)s.
+
+For a detailed walkthrough on creating a `diseasystore`, see the
+[`vignette("extending-diseasystore-example")`](https://ssi-dk.github.io/diseasystore/articles/extending-diseasystore-example.md).
+
+To see some other
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)s
+in action, you can consult a few of those bundled with the
+`diseasystore` package.
+
+For example:
+
+- [DiseasystoreGoogleCovid19:
+  index](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L161)
+
+- [DiseasystoreGoogleCovid19: min
+  temperature](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L253)
+
+## Creating a `diseasystore`
+
+With the knowledge of how to build custom `?FeatureHandlers`, we turn
+our attention to the remaining parts of the `diseasystore`’s anatomy.
+
+The `diseasystores` are [R6 classes](https://r6.r-lib.org/index.html)
+which is a implementation of object-oriented (OO) programming. To those
+unfamiliar with OO programming, the `diseasystores` are single “objects”
+with a number of “public” and “private” functions and variables. The
+public functions and variables are visible to the user of the
+`diseasystore` with the private functions and variables are visible only
+to us (the developers).
+
+When extending `diseasystore`, we are only writing private functions and
+variables. The public functions and variables are handled elsewhere[^4].
+
+### ds_map
+
+The `ds_map` field of the `diseasystore` tells the `diseasystore` which
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+is responsible for each feature, thus allowing the `diseasystore` to
+retrieve the features specified in the `observable` and `stratification`
+arguments of calls to `?DiseasystoreBase$get_feature()`.
+
+In other words, it maps the names of features to their corresponding
+`?FeatureHandlers`.
+
+As we saw above, a
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+may compute more than a single feature. Each feature should be mapped to
+the
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+here or else the `diseasystore` will not be able to automatically
+interact with it.
+
+By convention, the name of the
+[`?FeatureHandler`](https://ssi-dk.github.io/diseasystore/reference/FeatureHandler.md)
+should be snake_case and contain a `diseasystore` specific prefix
+(e.g. for
+[`?DiseasystoreGoogleCovid19`](https://ssi-dk.github.io/diseasystore/reference/DiseasystoreGoogleCovid19.md),
+all `?FeatureHandlers` are named “google_covid_19\_”).
+
+These names are used as the table names when storing the features in the
+database, and the prefix helps structure the database accordingly.
+
+This latter part becomes important when [clean
+up](https://ssi-dk.github.io/diseasystore/articles/diseasystore.html#dropping-computed-features)
+for the data base needs to be performed.
+
+By default, any feature whose name starts with “n\_” is treated as an
+observable feature. To override this behaviour, you can specify the
+regex pattern `$observables_regex` to match the names of the observable
+features in your case.
+
+### Key join filter
+
+The `diseasystore` are made to be as flexible as possible which means
+that it can incorporate both individual level data and semi-aggregated
+data. For semi-aggregated data, it is often the case that the data
+includes aggregations at different levels, nested within the data.
+
+For example, the Google COVID-19 data repository contains information on
+both country-level and region-level in the same data files. When the
+user of
+[`?DiseasystoreGoogleCovid19`](https://ssi-dk.github.io/diseasystore/reference/DiseasystoreGoogleCovid19.md)
+asks to get a feature stratified by, for example, “country_id”, we need
+to filter out the data aggregated at the region level.
+
+This is the purpose of `?DiseastoreBase$key_join_filter()`. It takes as
+input the requested stratifications and filters the data accordingly
+after the features have been joined inside the `diseasystore`.
+
+For an example, you can consult [DiseasystoreGoogleCovid19:
+key_join_filter](https://github.com/ssi-dk/diseasystore/blob/ceedbe1/R/DiseasystoreGoogleCovid19.R#L75)
+
+### Testing your `diseasystore`
+
+The `diseasystore` package includes the function
+[`test_diseasystore()`](https://ssi-dk.github.io/diseasystore/reference/test_diseasystore.md)
+to test the `diseasystores`. You can see how to call the testing suite
+in action with
+[`?DiseasystoreGoogleCovid19`](https://ssi-dk.github.io/diseasystore/reference/DiseasystoreGoogleCovid19.md)
+as an example
+[here](https://github.com/ssi-dk/diseasystore/blob/main/tests/testthat/test-DiseasystoreGoogleCovid19.R).
+
+### Exposing the period of data availability
+
+To allow the `diseasystores` to be used programmatically, we expose the
+period of data availability for each `diseasystore`. These are defined
+in the `$.min_start_date` and `$.max_end_date` private fields of the
+`diseasystore`.
+
+### Limiting support for some database backends
+
+In some cases, the `diseasystores` may not be compatible with all
+database backends. For example, the bundled `DiseasystoreSimulist` (see
+[`vignette("extending-diseasystore-example")`](https://ssi-dk.github.io/diseasystore/articles/extending-diseasystore-example.md))
+is not compatible with SQLite due to lack of date support.
+
+In this case, we add a check to the `initialize` method of the
+`diseasystore` to ensure that the database backend is compatible with
+the `diseasystore`.
+
+      initialize = function(...) {
+        super$initialize(...)
+
+        # We do not support SQLite for this diseasystore since it has poor support
+        # for date operations
+        checkmate::assert_disjunct(class(self$target_conn), "SQLiteConnection")
+
+        ...
+      }
+
+[^1]: The [SCDB](https://github.com/ssi-dk/SCDB) package places
+    `checksum`, `from_ts`, and `until_ts` as the last columns. But
+    `valid_from` and `valid_until` should be the last columns in the
+    output passed to `SCDB`.
+
+[^2]: In practice, this means that the names of features should be in
+    `snake_case`.
+
+[^3]: Or “coupled” set of features as we will soon see.
+
+[^4]: By the
+    [`?DiseasystoreBase`](https://ssi-dk.github.io/diseasystore/reference/DiseasystoreBase.md)
+    class.

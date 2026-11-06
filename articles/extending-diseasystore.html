@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Extending diseasystore">
 </head>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Extending diseasystore</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.3.2/vignettes/extending-diseasystore.Rmd" class="external-link"><code>vignettes/extending-diseasystore.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.0/vignettes/extending-diseasystore.Rmd" class="external-link"><code>vignettes/extending-diseasystore.Rmd</code></a></small>
       <div class="d-none name"><code>extending-diseasystore.Rmd</code></div>
     </div>
 
@@ -148,6 +148,12 @@ common “key_*” columns between the features. Any feature in a
 <code>diseasystore</code> therefore must have at least one “key_*”
 column. By convention, we place these column as the first columns of the
 table.</p>
+<p>Some features will not be meaningfully aggregated automatically
+e.g. the incidence of a disease must use information about the
+population size to aggregate meaningfully.</p>
+<p>In practice, any observable that can meaningfully use the
+<code><a href="../reference/aggregators.html">?aggregators</a></code> to summarise the data can automatically be
+coupled.</p>
 </div>
 <div class="section level3">
 <h3 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
@@ -279,7 +285,7 @@ aggregate.</p></li>
 </ul>
 <p>Your aggregator should return a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">dplyr::summarise()</a></code> call
 that operates on all columns specified in the <code>feature</code>
-argument.</p>
+argument and should return the result in a column named “value”.</p>
 </div>
 <div class="section level3">
 <h3 id="putting-it-all-together">Putting it all together<a class="anchor" aria-label="anchor" href="#putting-it-all-together"></a>
@@ -417,7 +423,7 @@ compatible with the <code>diseasystore</code>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
