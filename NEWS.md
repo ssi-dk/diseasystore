@@ -4,6 +4,8 @@
 
 * Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
 
+* `%.%` made faster (#251).
+
 * Check for internet when connecting to online sources (#243).
 
 
