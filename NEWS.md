@@ -1,5 +1,8 @@
 # diseasystore (development version)
 
+* Removed `NAs` introduced in `DiseasytoreBase$key_join_features()` (#257).
+
+
 # diseasystore 0.4.0
 
 ## Minor Improvements and Fixes
