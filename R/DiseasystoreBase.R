@@ -501,10 +501,11 @@ DiseasystoreBase <- R6::R6Class(                                                
       data <- t_add |>
         dplyr::right_join(all_combinations, by = c("date", stratification_names), na_matches = "na") |>
         dplyr::left_join(t_remove,  by = c("date", stratification_names), na_matches = "na") |>
-        tidyr::replace_na(list("value_add" = 0, "n_remove" = 0)) |>
         dplyr::group_by(dplyr::across(tidyselect::all_of(stratification_names))) |>
         dbplyr::window_order(date) |>
-        dplyr::mutate(!!observable := cumsum(.data$value_add) - cumsum(.data$value_remove)) |>
+        dplyr::mutate(
+          !!observable := cumsum(dplyr::coalesce(.data$value_add, 0)) - cumsum(dplyr::coalesce(.data$value_remove, 0))
+        ) |>
         dplyr::ungroup() |>
         dplyr::select("date", all_of(stratification_names), !!observable) |>
         dplyr::collect()
