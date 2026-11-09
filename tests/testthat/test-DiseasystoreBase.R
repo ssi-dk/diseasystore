@@ -400,7 +400,7 @@ test_that("$key_join_features works with non-computing stratifications", {
 
   # Check that we can join the features even if stratification does not compute on features
   expect_no_error(
-    res <- ds$key_join_features(
+    res <- ds$key_join_features(                                                                                        # nolint: implicit_assignment_linter
       observable = "n_cyl",
       stratification = rlang::quos(vs = "test"),
       start_date = Sys.Date() - lubridate::days(2 * nrow(mtcars) - 1),
