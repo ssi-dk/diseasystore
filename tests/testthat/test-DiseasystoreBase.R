@@ -400,13 +400,15 @@ test_that("$key_join_features works with non-computing stratifications", {
 
   # Check that we can join the features even if stratification does not compute on features
   expect_no_error(
-    ds$key_join_features(
+    res <- ds$key_join_features(
       observable = "n_cyl",
       stratification = rlang::quos(vs = "test"),
       start_date = Sys.Date() - lubridate::days(2 * nrow(mtcars) - 1),
       end_date = Sys.Date()
     )
   )
+
+  checkmate::expect_numeric(dplyr::pull(res, "n_cyl"), any.missing = FALSE)
 
   DBI::dbDisconnect(conn)
 })
