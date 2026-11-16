@@ -1,13 +1,13 @@
 # diseasystore (development version)
 
-* Removed `NAs` introduced in `DiseasytoreBase$key_join_features()` (#257).
+* Removed `NAs` introduced in `?DiseasytoreBase$key_join_features()` (#257).
 
 
 # diseasystore 0.4.0
 
 ## Minor Improvements and Fixes
 
-* Observables are now listed in `DiseasystoreEcdcRespiratoryViruses` (#227).
+* Observables are now listed in `?DiseasystoreEcdcRespiratoryViruses` (#227).
 
 * `%.%` made faster (#251).
 
@@ -18,7 +18,7 @@
 
 ## New Features
 
-* Private method `DiseasystoreBase$determine_missing_ranges()` made public (#224).
+* Private method `?DiseasystoreBase$determine_missing_ranges()` made public (#224).
   Previously called `$determine_new_ranges()`.
 
 ## Minor Improvements and Fixes
@@ -43,7 +43,7 @@
 
 ## Breaking change
 
-* `DiseasystoreBase$key_join_features()` no longer accept character stratifications -- must use `rlang::quos()` (#203).
+* `?DiseasystoreBase$key_join_features()` no longer accept character stratifications -- must use `rlang::quos()` (#203).
 
 ## Minor Improvements and Fixes
 
@@ -52,7 +52,7 @@
 * Improved clean up of temporary tables (#207).
   Tables created internally in `diseasystore` are now labelled and removed when no longer needed.
 
-* In `DiseasystoreBase$key_join_features()`, stratifications no longer need to do computation on other features (#203).
+* In `?DiseasystoreBase$key_join_features()`, stratifications no longer need to do computation on other features (#203).
 
 
 # diseasystore 0.3.0
