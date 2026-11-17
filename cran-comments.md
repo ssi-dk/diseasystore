@@ -1,3 +1,6 @@
+This release fixes an uncaught bug in v0.4
+Tests have been added to prevent this issue in then future
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
