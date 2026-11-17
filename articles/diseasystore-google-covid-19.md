@@ -69,7 +69,7 @@ initialize the `diseasystore` that uses the Google COVID-19 data.
 
 ds <- DiseasystoreGoogleCovid19$new()
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/Rtmp2hpORy/duckdb
+#> ℹ /tmp/RtmpIgZYbZ/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.

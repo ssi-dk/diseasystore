@@ -58,7 +58,7 @@ ds <- DiseasystoreGoogleCovid19$new(
   end_date = as.Date("2020-03-15")
 )
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/RtmpilIXZR/duckdb
+#> ℹ /tmp/RtmpAEm74w/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.
