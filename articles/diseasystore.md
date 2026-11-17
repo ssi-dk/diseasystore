@@ -58,7 +58,7 @@ ds <- DiseasystoreGoogleCovid19$new(
   end_date = as.Date("2020-03-15")
 )
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/RtmpaJlFSI/duckdb
+#> ℹ /tmp/RtmpilIXZR/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.
@@ -201,7 +201,7 @@ ds$key_join_features(observable = "n_hospital",
 #> # A tibble: 15 × 2
 #>   date       n_hospital
 #>   <date>          <dbl>
-#> 1 2020-03-01         NA
+#> 1 2020-03-01          3
 #> 2 2020-03-02          6
 #> 3 2020-03-03          5
 #> 4 2020-03-04         12
@@ -224,7 +224,7 @@ ds$key_join_features(observable = "n_hospital",
 #> # A tibble: 15 × 3
 #>   date       country_id n_hospital
 #>   <date>     <chr>           <dbl>
-#> 1 2020-03-01 AR                 NA
+#> 1 2020-03-01 AR                  3
 #> 2 2020-03-02 AR                  6
 #> 3 2020-03-03 AR                  5
 #> 4 2020-03-04 AR                 12
@@ -243,7 +243,7 @@ ds$key_join_features(observable = "n_hospital",
 #> # A tibble: 30 × 4
 #>   date       country_id old   n_hospital
 #>   <date>     <chr>      <lgl>      <dbl>
-#> 1 2020-03-01 AR         FALSE         NA
+#> 1 2020-03-01 AR         FALSE         27
 #> 2 2020-03-02 AR         FALSE         54
 #> 3 2020-03-03 AR         FALSE         45
 #> 4 2020-03-04 AR         FALSE        108

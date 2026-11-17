@@ -88,9 +88,10 @@ The results of the benchmark are shown graphically below (mean and
 standard deviation), where measure the performance of `diseasystore`.
 
 ![The results for the benchmarks of the CRAN versions are as follows:
-The get_feature() benchmark takes 2 seconds to run on the PostgreSQL,
-SQLite backends. The get_feature() benchmark takes 3 seconds to run on
-the DuckDB backends. The key_join_features() benchmark takes 1 seconds
-to run on the DuckDB backends. The key_join_features() benchmark takes 2
-seconds to run on the PostgreSQL, SQLite
+The get_feature() benchmark takes 2 seconds to run on the SQLite
+backends. The get_feature() benchmark takes 3 seconds to run on the
+PostgreSQL backends. The get_feature() benchmark takes 4 seconds to run
+on the DuckDB backends. The key_join_features() benchmark takes 1
+seconds to run on the DuckDB backends. The key_join_features() benchmark
+takes 2 seconds to run on the PostgreSQL, SQLite
 backends.](benchmarks_files/figure-html/unnamed-chunk-4-1.png)

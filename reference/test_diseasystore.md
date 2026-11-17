@@ -85,7 +85,7 @@ test_diseasystore(
     skip_backends = "SQLiteConnection"
   )
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/Rtmpywkfif/duckdb
+#> ℹ /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.
@@ -99,7 +99,7 @@ test_diseasystore(
 #> ── Skip: DiseasystoreSimulist can initialise with default source_conn ──────────
 #> Reason: "SQLiteConnection" %in% skip_backends is TRUE
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.
@@ -109,7 +109,7 @@ test_diseasystore(
 #> ── Skip: Skipped test connection are also disallowed in DiseasystoreSimulist constructor  ──
 #> Reason: empty test
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.
@@ -118,7 +118,7 @@ test_diseasystore(
 #> i See ?duckdb_storage for details and alternatives.
 #> Test passed with 2 successes 😀.
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.
@@ -130,7 +130,7 @@ test_diseasystore(
 #>  "duckdb_connection#ANY" would also be valid
 #> Test passed with 45 successes 🥳.
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.
@@ -139,7 +139,7 @@ test_diseasystore(
 #> i See ?duckdb_storage for details and alternatives.
 #> Test passed with 15 successes 🎊.
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/Rtmpywkfif/duckdb
+#> ℹ /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.
@@ -147,7 +147,7 @@ test_diseasystore(
 #> ℹ Run duckdb(shared_home = FALSE) to accept the temporary directory (and silence this message).
 #> ℹ See ?duckdb_storage for details and alternatives.
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.
@@ -156,7 +156,7 @@ test_diseasystore(
 #> i See ?duckdb_storage for details and alternatives.
 #> Test passed with 24 successes 🎊.
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.
@@ -165,7 +165,7 @@ test_diseasystore(
 #> i See ?duckdb_storage for details and alternatives.
 #> Test passed with 5 successes 🥇.
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> i /tmp/Rtmpywkfif/duckdb
+#> i /tmp/RtmphDZyKp/duckdb
 #> This is removed when the R session ends.
 #> * Extensions are re-downloaded each session.
 #> * Secrets are lost.

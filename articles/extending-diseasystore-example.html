@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Extending diseasystore - simulist example</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.0/vignettes/extending-diseasystore-example.Rmd" class="external-link"><code>vignettes/extending-diseasystore-example.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.1/vignettes/extending-diseasystore-example.Rmd" class="external-link"><code>vignettes/extending-diseasystore-example.Rmd</code></a></small>
       <div class="d-none name"><code>extending-diseasystore-example.Rmd</code></div>
     </div>
 
@@ -22787,7 +22787,7 @@ new instance of the <code>diseasystore</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds</span> <span class="op">&lt;-</span> <span class="fu">diseasystore</span><span class="fu">::</span><span class="va"><a href="../reference/DiseasystoreSimulist.html">DiseasystoreSimulist</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmpjjlLvx/duckdb</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/Rtmpy0M8y3/duckdb</span></span>
 <span><span class="co">#&gt; This is removed when the R session ends.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>
@@ -22867,7 +22867,7 @@ translatable by <a href="https://dbplyr.tidyverse.org/" class="external-link">db
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 152 × 2</span></span></span>
 <span><span class="co">#&gt;   date       n_positive</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01         <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01          1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02          0</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03          1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04          0</span></span>
@@ -22875,9 +22875,7 @@ translatable by <a href="https://dbplyr.tidyverse.org/" class="external-link">db
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 147 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data1</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">n_positive</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="extending-diseasystore-example_files/figure-html/no_stratifications_plot-1.png" class="r-plt" alt="The number of positive tests over time in the example data." width="700"></p>
 </div>
 <div class="section level4">
@@ -22904,18 +22902,16 @@ translatable by <a href="https://dbplyr.tidyverse.org/" class="external-link">db
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 912 × 4</span></span></span>
 <span><span class="co">#&gt;   date       age_group sex    n_positive</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01 15-29     Female         <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02 15-29     Female         <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03 15-29     Female         <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04 15-29     Female         <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-12-05 15-29     Female         <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01 15-29     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02 15-29     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03 15-29     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04 15-29     Female          0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-12-05 15-29     Female          0</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 907 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data2</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">n_positive</span>, color <span class="op">=</span> <span class="va">age_group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">sex</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 154 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">sex</span><span class="op">)</span></span></code></pre></div>
 <p><img src="extending-diseasystore-example_files/figure-html/stratifications_positive_sex_age_plot-1.png" class="r-plt" alt="The number of positive tests over time per age group and sex in the example data." width="700"></p>
 </div>
 <div class="section level4">
@@ -22942,17 +22938,15 @@ translatable by <a href="https://dbplyr.tidyverse.org/" class="external-link">db
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 760 × 3</span></span></span>
 <span><span class="co">#&gt;   date       generation n_admission</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01 Boomer              <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02 Boomer              <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03 Boomer              <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04 Boomer              <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-12-05 Boomer              <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2019-12-01 Boomer               0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2019-12-02 Boomer               0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2019-12-03 Boomer               0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2019-12-04 Boomer               0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2019-12-05 Boomer               1</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 755 more rows</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data3</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">n_admission</span>, color <span class="op">=</span> <span class="va">generation</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 136 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_line()`).</span></span></code></pre></div>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="extending-diseasystore-example_files/figure-html/stratifications_admission_generation_plot-1.png" class="r-plt" alt="The number of positive tests over time per age group in the example data." width="700"></p>
 </div>
 </div>

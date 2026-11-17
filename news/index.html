@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,14 +41,18 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.1/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.1" id="diseasystore-041">diseasystore 0.4.1<a class="anchor" aria-label="anchor" href="#diseasystore-041"></a></h2><p class="text-muted">CRAN release: 2026-11-16</p>
+<ul><li>Removed <code>NAs</code> introduced in <code><a href=".{2}/reference/DiseasytoreBase.html#method-DiseasytoreBase-key_join_features">$key_join_features()</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/257" class="external-link">#257</a>).</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="diseasystore-040">diseasystore 0.4.0<a class="anchor" aria-label="anchor" href="#diseasystore-040"></a></h2><p class="text-muted">CRAN release: 2026-11-06</p>
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-0-4-0">Minor Improvements and Fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-4-0"></a></h3>
-<ul><li><p>Observables are now listed in <code>DiseasystoreEcdcRespiratoryViruses</code> (<a href="https://github.com/ssi-dk/diseasystore/issues/227" class="external-link">#227</a>).</p></li>
+<ul><li><p>Observables are now listed in <code><a href="../reference/DiseasystoreEcdcRespiratoryViruses.html">?DiseasystoreEcdcRespiratoryViruses</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/227" class="external-link">#227</a>).</p></li>
 <li><p><code>%.%</code> made faster (<a href="https://github.com/ssi-dk/diseasystore/issues/251" class="external-link">#251</a>).</p></li>
 <li><p>Check for internet when connecting to online sources (<a href="https://github.com/ssi-dk/diseasystore/issues/243" class="external-link">#243</a>).</p></li>
 </ul></div>
@@ -57,7 +61,7 @@
 <h2 class="pkg-version" data-toc-text="0.3.3" id="diseasystore-033">diseasystore 0.3.3<a class="anchor" aria-label="anchor" href="#diseasystore-033"></a></h2><p class="text-muted">CRAN release: 2026-03-20</p>
 <div class="section level3">
 <h3 id="new-features-0-3-3">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-3-3"></a></h3>
-<ul><li>Private method <code>DiseasystoreBase$determine_missing_ranges()</code> made public (<a href="https://github.com/ssi-dk/diseasystore/issues/224" class="external-link">#224</a>). Previously called <code>$determine_new_ranges()</code>.</li>
+<ul><li>Private method <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-determine_missing_ranges">$determine_missing_ranges()</a></code> made public (<a href="https://github.com/ssi-dk/diseasystore/issues/224" class="external-link">#224</a>). Previously called <code>$determine_new_ranges()</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-0-3-3">Minor Improvements and Fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-3-3"></a></h3>
@@ -81,13 +85,13 @@
 <div class="section level3">
 <h3 id="breaking-change-0-3-1">Breaking change<a class="anchor" aria-label="anchor" href="#breaking-change-0-3-1"></a></h3>
 <ul><li>
-<code>DiseasystoreBase$key_join_features()</code> no longer accept character stratifications – must use <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">rlang::quos()</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/203" class="external-link">#203</a>).</li>
+<code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code> no longer accept character stratifications – must use <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">rlang::quos()</a></code> (<a href="https://github.com/ssi-dk/diseasystore/issues/203" class="external-link">#203</a>).</li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-fixes-0-3-1">Minor Improvements and Fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-fixes-0-3-1"></a></h3>
 <ul><li><p>The <code>$observable_regex</code> field is added, which shows the regex that demarcates observables from stratifications (<a href="https://github.com/ssi-dk/diseasystore/issues/204" class="external-link">#204</a>).</p></li>
 <li><p>Improved clean up of temporary tables (<a href="https://github.com/ssi-dk/diseasystore/issues/207" class="external-link">#207</a>). Tables created internally in <code>diseasystore</code> are now labelled and removed when no longer needed.</p></li>
-<li><p>In <code>DiseasystoreBase$key_join_features()</code>, stratifications no longer need to do computation on other features (<a href="https://github.com/ssi-dk/diseasystore/issues/203" class="external-link">#203</a>).</p></li>
+<li><p>In <code><a href=".{2}/reference/DiseasystoreBase.html#method-DiseasystoreBase-key_join_features">$key_join_features()</a></code>, stratifications no longer need to do computation on other features (<a href="https://github.com/ssi-dk/diseasystore/issues/203" class="external-link">#203</a>).</p></li>
 </ul></div>
 </div>
     <div class="section level2">

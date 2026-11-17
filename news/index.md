@@ -1,12 +1,20 @@
 # Changelog
 
+## diseasystore 0.4.1
+
+CRAN release: 2026-11-16
+
+- Removed `NAs` introduced in `?DiseasytoreBase$key_join_features()`
+  ([\#257](https://github.com/ssi-dk/diseasystore/issues/257)).
+
 ## diseasystore 0.4.0
 
 CRAN release: 2026-11-06
 
 ### Minor Improvements and Fixes
 
-- Observables are now listed in `DiseasystoreEcdcRespiratoryViruses`
+- Observables are now listed in
+  [`?DiseasystoreEcdcRespiratoryViruses`](https://ssi-dk.github.io/diseasystore/reference/DiseasystoreEcdcRespiratoryViruses.md)
   ([\#227](https://github.com/ssi-dk/diseasystore/issues/227)).
 
 - `%.%` made faster
@@ -21,7 +29,7 @@ CRAN release: 2026-03-20
 
 ### New Features
 
-- Private method `DiseasystoreBase$determine_missing_ranges()` made
+- Private method `?DiseasystoreBase$determine_missing_ranges()` made
   public ([\#224](https://github.com/ssi-dk/diseasystore/issues/224)).
   Previously called `$determine_new_ranges()`.
 
@@ -54,7 +62,7 @@ CRAN release: 2025-02-28
 
 ### Breaking change
 
-- `DiseasystoreBase$key_join_features()` no longer accept character
+- `?DiseasystoreBase$key_join_features()` no longer accept character
   stratifications – must use
   [`rlang::quos()`](https://rlang.r-lib.org/reference/defusing-advanced.html)
   ([\#203](https://github.com/ssi-dk/diseasystore/issues/203)).
@@ -70,7 +78,7 @@ CRAN release: 2025-02-28
   created internally in `diseasystore` are now labelled and removed when
   no longer needed.
 
-- In `DiseasystoreBase$key_join_features()`, stratifications no longer
+- In `?DiseasystoreBase$key_join_features()`, stratifications no longer
   need to do computation on other features
   ([\#203](https://github.com/ssi-dk/diseasystore/issues/203)).
 

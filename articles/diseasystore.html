@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">diseasystore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>diseasystore: quick start guide</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.0/vignettes/diseasystore.Rmd" class="external-link"><code>vignettes/diseasystore.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ssi-dk/diseasystore/blob/v0.4.1/vignettes/diseasystore.Rmd" class="external-link"><code>vignettes/diseasystore.Rmd</code></a></small>
       <div class="d-none name"><code>diseasystore.Rmd</code></div>
     </div>
 
@@ -124,7 +124,7 @@ can use any data base back end supported by <a href="https://github.com/ssi-dk/S
 <span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-03-15"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; duckdb keeps downloaded extensions and secrets in a temporary directory:</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmpaJlFSI/duckdb</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> /tmp/RtmpilIXZR/duckdb</span></span>
 <span><span class="co">#&gt; This is removed when the R session ends.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Extensions are re-downloaded each session.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Secrets are lost.</span></span>
@@ -243,7 +243,7 @@ considered “stratifications” you can use the included methods:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 15 × 2</span></span></span>
 <span><span class="co">#&gt;   date       n_hospital</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01         <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01          3</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02          6</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03          5</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-04         12</span></span>
@@ -262,7 +262,7 @@ a list of <code>quosures</code> (see
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 15 × 3</span></span></span>
 <span><span class="co">#&gt;   date       country_id n_hospital</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR                 <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR                  3</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02 AR                  6</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03 AR                  5</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-04 AR                 12</span></span>
@@ -277,7 +277,7 @@ supply any valid R expression:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 4</span></span></span>
 <span><span class="co">#&gt;   date       country_id old   n_hospital</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR         FALSE         <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2020-03-01 AR         FALSE         27</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2020-03-02 AR         FALSE         54</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2020-03-03 AR         FALSE         45</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2020-03-04 AR         FALSE        108</span></span>

@@ -25,16 +25,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ssi-dk/diseasystore/blob/v0.4.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ssi-dk/diseasystore/blob/v0.4.1/DESCRIPTION)
 
 Randløv R (2026). *diseasystore: Feature Stores for the 'diseasy'
-Framework*. R package version 0.4.0,
+Framework*. R package version 0.4.1,
 <https://github.com/ssi-dk/diseasystore>.
 
     @Manual{,
       title = {diseasystore: Feature Stores for the 'diseasy' Framework},
       author = {Rasmus Skytte Randløv},
       year = {2026},
-      note = {R package version 0.4.0},
+      note = {R package version 0.4.1},
       url = {https://github.com/ssi-dk/diseasystore},
     }

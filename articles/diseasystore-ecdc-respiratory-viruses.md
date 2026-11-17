@@ -63,7 +63,7 @@ Weekly data.
 
 ds <- DiseasystoreEcdcRespiratoryViruses$new()
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/RtmpnY5LEI/duckdb
+#> ℹ /tmp/Rtmpc2Vwtp/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.

@@ -22729,7 +22729,7 @@ of the `diseasystore`.
 
 ds <- diseasystore::DiseasystoreSimulist$new()
 #> duckdb keeps downloaded extensions and secrets in a temporary directory:
-#> ℹ /tmp/RtmpjjlLvx/duckdb
+#> ℹ /tmp/Rtmpy0M8y3/duckdb
 #> This is removed when the R session ends.
 #> • Extensions are re-downloaded each session.
 #> • Secrets are lost.
@@ -22822,7 +22822,7 @@ print(data1)
 #> # A tibble: 152 × 2
 #>   date       n_positive
 #>   <date>          <dbl>
-#> 1 2019-12-01         NA
+#> 1 2019-12-01          1
 #> 2 2019-12-02          0
 #> 3 2019-12-03          1
 #> 4 2019-12-04          0
@@ -22834,8 +22834,6 @@ print(data1)
 
 ggplot2::ggplot(data1, ggplot2::aes(x = date, y = n_positive)) +
   ggplot2::geom_line()
-#> Warning: Removed 1 row containing missing values or values outside the scale range
-#> (`geom_line()`).
 ```
 
 ![The number of positive tests over time in the example
@@ -22865,11 +22863,11 @@ print(data2)
 #> # A tibble: 912 × 4
 #>   date       age_group sex    n_positive
 #>   <date>     <chr>     <chr>       <dbl>
-#> 1 2019-12-01 15-29     Female         NA
-#> 2 2019-12-02 15-29     Female         NA
-#> 3 2019-12-03 15-29     Female         NA
-#> 4 2019-12-04 15-29     Female         NA
-#> 5 2019-12-05 15-29     Female         NA
+#> 1 2019-12-01 15-29     Female          0
+#> 2 2019-12-02 15-29     Female          0
+#> 3 2019-12-03 15-29     Female          0
+#> 4 2019-12-04 15-29     Female          0
+#> 5 2019-12-05 15-29     Female          0
 #> # ℹ 907 more rows
 ```
 
@@ -22878,8 +22876,6 @@ print(data2)
 ggplot2::ggplot(data2, ggplot2::aes(x = date, y = n_positive, color = age_group)) +
   ggplot2::geom_line() +
   ggplot2::facet_wrap(~ sex)
-#> Warning: Removed 154 rows containing missing values or values outside the scale range
-#> (`geom_line()`).
 ```
 
 ![The number of positive tests over time per age group and sex in the
@@ -22910,11 +22906,11 @@ print(data3)
 #> # A tibble: 760 × 3
 #>   date       generation n_admission
 #>   <date>     <chr>            <dbl>
-#> 1 2019-12-01 Boomer              NA
-#> 2 2019-12-02 Boomer              NA
-#> 3 2019-12-03 Boomer              NA
-#> 4 2019-12-04 Boomer              NA
-#> 5 2019-12-05 Boomer              NA
+#> 1 2019-12-01 Boomer               0
+#> 2 2019-12-02 Boomer               0
+#> 3 2019-12-03 Boomer               0
+#> 4 2019-12-04 Boomer               0
+#> 5 2019-12-05 Boomer               1
 #> # ℹ 755 more rows
 ```
 
@@ -22922,8 +22918,6 @@ print(data3)
 
 ggplot2::ggplot(data3, ggplot2::aes(x = date, y = n_admission, color = generation)) +
   ggplot2::geom_line()
-#> Warning: Removed 136 rows containing missing values or values outside the scale range
-#> (`geom_line()`).
 ```
 
 ![The number of positive tests over time per age group in the example
